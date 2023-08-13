@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="AwbStateSelector.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="3.1787256"
+     inkscape:cx="612.35233"
+     inkscape:cy="413.05862"
+     inkscape:window-width="3840"
+     inkscape:window-height="2066"
+     inkscape:window-x="-11"
+     inkscape:window-y="3229"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer7"
+     width="105mm">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1818" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Background"
+     style="display:inline">
+    <rect
+       style="opacity:0.6;vector-effect:non-scaling-stroke;fill:#81b4fe;stroke:#81fffe;stroke-width:0.00210013;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;-inkscape-stroke:hairline;paint-order:fill markers stroke"
+       id="rect954"
+       width="105"
+       height="90"
+       x="-193.63542"
+       y="60.812504"
+       transform="scale(-1,1)" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.5833px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;fill:#000000;stroke:#000000;stroke-width:0.264583"
+       x="108.47916"
+       y="87.3125"
+       id="text30287"><tspan
+         sodipodi:role="line"
+         id="tspan30285"
+         style="fill:#000000;stroke:#000000;stroke-width:0.264583"
+         x="108.47916"
+         y="87.3125">action</tspan></text>
+  </g>
+  <g
+     inkscape:label="Circles"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <circle
+       style="opacity:1;fill:#ffffff;stroke:#ecf6ff;stroke-width:20;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       id="path1154"
+       cx="140.96187"
+       cy="105.96971"
+       r="44.04417" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Cutout"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <rect
+       style="opacity:0.6;fill:none;stroke:#7a797b;stroke-width:0.1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect850"
+       width="25"
+       height="60"
+       x="-153.45833"
+       y="90.8125"
+       transform="scale(-1,1)"
+       rx="15" />
+    <ellipse
+       style="opacity:0.6;fill:none;stroke:#7a797b;stroke-width:0.1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       id="path1624"
+       cx="140.9351"
+       cy="105.81096"
+       rx="1.7142857"
+       ry="1.7142856" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer6"
+     inkscape:label="Linien"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <path
+       style="display:inline;fill:#5599ff;stroke:#2a7fff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 118.53333,144.78643 163.5125,66.880243 v 0"
+       id="path5025" />
+    <path
+       style="display:inline;fill:#5599ff;stroke:#2a7fff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 117.73958,65.881243 44.97915,77.906187 v 0"
+       id="path5025-2" />
+    <path
+       style="display:inline;fill:#5599ff;stroke:#2a7fff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 185.20833,105.83333 -89.958311,-2e-5 v 0"
+       id="path5025-2-7" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer7"
+     inkscape:label="Text">
+    <text
+       xml:space="preserve"
+       style="font-size:7.9375px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="141.57619"
+       y="70.552017"
+       id="text15365"><tspan
+         sodipodi:role="line"
+         style="font-size:7.9375px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="141.57619"
+         y="70.552017"
+         id="tspan15367">idle</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:7.9375px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="141.57619"
+         y="80.473892"
+         id="tspan15371">🐌</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.9375px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="110.26186"
+       y="89.140129"
+       id="text15365-3"><tspan
+         sodipodi:role="line"
+         style="font-size:7.9375px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="110.26186"
+         y="89.140129"
+         id="tspan15367-3">action</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:7.9375px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="110.26186"
+         y="99.062004"
+         id="tspan15371-8">🛸</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.9375px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="111.08205"
+       y="120.69885"
+       id="text15365-4"><tspan
+         sodipodi:role="line"
+         style="font-size:7.9375px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="111.08205"
+         y="120.69885"
+         id="tspan15371-5">sleep</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:7.9375px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="111.08205"
+         y="130.62073"
+         id="tspan22385">😴</tspan></text>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+# Remove the true-line below if you want to inherit .editorconfig settings from higher directories
+root = true
+
+#### Core EditorConfig Options ####
+
+# Indentation and spacing
+indent_size = 4
+indent_style = space
+tab_width = 4
+
+# New line preferences
+end_of_line = crlf
+insert_final_newline = false
+
+# C# files
+[*.cs]
+
+file_header_template =Animatronic WorkBench\r\nhttps://github.com/Springwald/AnimatronicWorkBench-AWB\r\n\r\n(C) 2023 Daniel Springwald  - 44789 Bochum, Germany\r\nhttps://daniel.springwald.de - daniel@springwald.de\r\nAll rights reserved   -  Licensed under MIT License
+

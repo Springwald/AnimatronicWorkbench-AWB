@@ -1,0 +1,27 @@
+﻿<Window x:Class="AwbStudio.ProjectManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AwbStudio"
+        mc:Ignorable="d"
+        Title="Animatronic Workbench projects" Height="450" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Window.Icon>
+        <DrawingImage />
+    </Window.Icon>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="0" Click="ButtonCreateNew_Click"/>
+        <Button x:Name="ButtonOpenExisting" Content="Open existing project"  Grid.Row="1" Click="ButtonOpenExisting_Click"/>
+        <Label Content="Latest projects:" Grid.Row="2"></Label>
+        <ListBox x:Name="ListLatestProjects" Grid.Row="3" SelectionChanged="ListLatestProjects_SelectionChanged" SelectionMode="Single">
+        </ListBox>
+    </Grid>
+</Window>
+
+    

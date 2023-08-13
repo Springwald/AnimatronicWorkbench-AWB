@@ -1,0 +1,342 @@
+{
+  "TimelineStateId": 3,
+  "ServoPoints": [
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Eyes",
+      "ValuePercent": 0,
+      "ServoId": "Eyes"
+    },
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmR",
+      "ValuePercent": 88.9763779527559,
+      "ServoId": "ArmR"
+    },
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmL",
+      "ValuePercent": 0,
+      "ServoId": "ArmL"
+    },
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "BodyTL",
+      "ValuePercent": 75.59055118110236,
+      "ServoId": "BodyTL"
+    },
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "HeadRot",
+      "ValuePercent": 49.60629921259843,
+      "ServoId": "HeadRot"
+    },
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck1",
+      "ValuePercent": 51.96850393700787,
+      "ServoId": "Neck1"
+    },
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck2",
+      "ValuePercent": 49.60629921259843,
+      "ServoId": "Neck2"
+    },
+    {
+      "TimeMs": 1000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmR",
+      "ValuePercent": 87.4015748031496,
+      "ServoId": "ArmR"
+    },
+    {
+      "TimeMs": 2000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck1",
+      "ValuePercent": 87.4015748031496,
+      "ServoId": "Neck1"
+    },
+    {
+      "TimeMs": 2000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "HeadRot",
+      "ValuePercent": 66.14173228346458,
+      "ServoId": "HeadRot"
+    },
+    {
+      "TimeMs": 2000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck2",
+      "ValuePercent": 14.960629921259844,
+      "ServoId": "Neck2"
+    },
+    {
+      "TimeMs": 2000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Eyes",
+      "ValuePercent": 0,
+      "ServoId": "Eyes"
+    },
+    {
+      "TimeMs": 2000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmL",
+      "ValuePercent": 0.7874015748031495,
+      "ServoId": "ArmL"
+    },
+    {
+      "TimeMs": 2000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmR",
+      "ValuePercent": 38.582677165354326,
+      "ServoId": "ArmR"
+    },
+    {
+      "TimeMs": 2250,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Eyes",
+      "ValuePercent": 100,
+      "ServoId": "Eyes"
+    },
+    {
+      "TimeMs": 2500,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Eyes",
+      "ValuePercent": 0,
+      "ServoId": "Eyes"
+    },
+    {
+      "TimeMs": 3000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "BodyTL",
+      "ValuePercent": 83.46456692913385,
+      "ServoId": "BodyTL"
+    },
+    {
+      "TimeMs": 3000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmL",
+      "ValuePercent": 0.7874015748031495,
+      "ServoId": "ArmL"
+    },
+    {
+      "TimeMs": 3000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmR",
+      "ValuePercent": 38.582677165354326,
+      "ServoId": "ArmR"
+    },
+    {
+      "TimeMs": 3000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "HeadRot",
+      "ValuePercent": 66.14173228346458,
+      "ServoId": "HeadRot"
+    },
+    {
+      "TimeMs": 4000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmL",
+      "ValuePercent": 60.629921259842526,
+      "ServoId": "ArmL"
+    },
+    {
+      "TimeMs": 4000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "BodyTL",
+      "ValuePercent": 83.46456692913385,
+      "ServoId": "BodyTL"
+    },
+    {
+      "TimeMs": 4000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmR",
+      "ValuePercent": 87.4015748031496,
+      "ServoId": "ArmR"
+    },
+    {
+      "TimeMs": 4000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "HeadRot",
+      "ValuePercent": 22.04724409448819,
+      "ServoId": "HeadRot"
+    },
+    {
+      "TimeMs": 4000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck1",
+      "ValuePercent": 99.21259842519686,
+      "ServoId": "Neck1"
+    },
+    {
+      "TimeMs": 4000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck2",
+      "ValuePercent": 11.811023622047244,
+      "ServoId": "Neck2"
+    },
+    {
+      "TimeMs": 4250,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Eyes",
+      "ValuePercent": 0,
+      "ServoId": "Eyes"
+    },
+    {
+      "TimeMs": 4500,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Eyes",
+      "ValuePercent": 91.33858267716536,
+      "ServoId": "Eyes"
+    },
+    {
+      "TimeMs": 4750,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Eyes",
+      "ValuePercent": 0,
+      "ServoId": "Eyes"
+    },
+    {
+      "TimeMs": 5000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "HeadRot",
+      "ValuePercent": 22.018779342723004,
+      "ServoId": "HeadRot"
+    },
+    {
+      "TimeMs": 5000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck1",
+      "ValuePercent": 99.14285714285714,
+      "ServoId": "Neck1"
+    },
+    {
+      "TimeMs": 5000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck2",
+      "ValuePercent": 11.764705882352942,
+      "ServoId": "Neck2"
+    },
+    {
+      "TimeMs": 5000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmR",
+      "ValuePercent": 87.36842105263158,
+      "ServoId": "ArmR"
+    },
+    {
+      "TimeMs": 5000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmL",
+      "ValuePercent": 60.588235294117645,
+      "ServoId": "ArmL"
+    },
+    {
+      "TimeMs": 5000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "BodyTL",
+      "ValuePercent": 60.629921259842526,
+      "ServoId": "BodyTL"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "HeadRot",
+      "ValuePercent": 49.60629921259843,
+      "ServoId": "HeadRot"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck1",
+      "ValuePercent": 49.60629921259843,
+      "ServoId": "Neck1"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck2",
+      "ValuePercent": 62.99212598425197,
+      "ServoId": "Neck2"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Eyes",
+      "ValuePercent": 0,
+      "ServoId": "Eyes"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "BodyTL",
+      "ValuePercent": 60.629921259842526,
+      "ServoId": "BodyTL"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmR",
+      "ValuePercent": 88.9763779527559,
+      "ServoId": "ArmR"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "ArmL",
+      "ValuePercent": 0.7874015748031495,
+      "ServoId": "ArmL"
+    }
+  ],
+  "SoundPoints": []
+}

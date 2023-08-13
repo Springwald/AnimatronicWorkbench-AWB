@@ -1,0 +1,96 @@
+{
+  "Info": "Animatronic Workbench Project | https://daniel.springwald.de/post/AnimatronicWorkbench",
+  "Title": "Grogu",
+  "ProjectFolder": "E:\\Animatronic-Workbench\\projectData\\Grogu",
+  "AdafruitPwmServos": null,
+  "StsServos": [
+    {
+      "Id": "Eyes",
+      "ClientId": 2,
+      "Channel": 10,
+      "Name": "Eyes close",
+      "MinValue": 1790,
+      "MaxValue": 2100,
+      "DefaultValue": 1790,
+	  "Accelleration": 100,
+	  "Speed": 1500
+    },
+    {
+      "Id": "HeadRot",
+      "ClientId": 2,
+      "Channel": 11,
+      "Name": "Head rotate",
+      "MinValue": 870,
+      "MaxValue": 3000,
+      "DefaultValue": 1859
+    },
+    {
+      "Id": "Neck1",
+      "ClientId": 2,
+      "Channel": 12,
+      "Name": "Neck 1",
+      "MinValue": 1200,
+      "MaxValue": 2600,
+      "DefaultValue": 2125
+    },
+    {
+      "Id": "Neck2",
+      "ClientId": 2,
+      "Channel": 15,
+      "Name": "Neck 2",
+      "MinValue": 1500,
+      "MaxValue": 3200,
+      "DefaultValue": 1852
+    },
+    {
+      "Id": "ArmR",
+      "ClientId": 2,
+      "Channel": 13,
+      "Name": "Arm right",
+      "MinValue": 1000,
+      "MaxValue": 2570,
+      "DefaultValue": 2570
+    },
+    {
+      "Id": "ArmL",
+      "ClientId": 2,
+      "Channel": 14,
+      "Name": "Arm left",
+      "MinValue": 1427,
+      "MaxValue": 2900,
+      "DefaultValue": 1427
+    },
+    {
+      "Id": "BodyTL",
+      "ClientId": 2,
+      "Channel": 16,
+      "Name": "Body tilt",
+      "MinValue": 1300,
+      "MaxValue": 3200,
+      "DefaultValue": 2706
+    }
+  ],
+  "TimelinesStates": [
+	{
+      "Id": 1,
+      "Name": "Sleep"
+    },
+    {
+      "Id": 2,
+      "Name": "Action"
+    },
+    {
+      "Id": 3,
+      "Name": "Idle"
+    },
+    {
+      "Id": 4,
+      "Name": "Force"
+    },
+	{
+      "Id": 5,
+      "Name": "Joint demo"
+    }
+  ],
+  "AutoPlayEsp32ExportFolder": "e:\\Animatronic-Workbench\\AnimatronicWorkBench-AWB\\src\\clients\\awb_esp32_client\\src\\AutoPlay"
+}
