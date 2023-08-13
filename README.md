@@ -1,4 +1,4 @@
-<img src="Images/AWB-Logo.png" style="width:100% margin: 5px;"/>
+<img src="images/AWB-Logo.png" style="width:100% margin: 5px;"/>
 
 # AnimatronicWorkBench-AWB
 
