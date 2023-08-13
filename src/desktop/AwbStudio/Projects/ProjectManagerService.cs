@@ -6,7 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Configs;
-using AwbStudio.Configs;
+using AwbStudio.StudioSettings;
 using System.IO;
 using System.Text.Json;
 

@@ -1,4 +1,4 @@
-﻿// AnimatronicWorkBench core routines
+﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
 // (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
@@ -7,7 +7,6 @@
 
 using Awb.Core.InputControllers.Midi;
 using Awb.Core.Services;
-using System;
 
 namespace Awb.Core.InputControllers.XTouchMini
 {
@@ -28,7 +27,7 @@ namespace Awb.Core.InputControllers.XTouchMini
         {
             var args = new XTouchMiniEventArgs(e.InputId, e.Value);
 
-            
+
 
             // cache values to prevent sending the same value twice later
             switch (args.InputType)
@@ -47,7 +46,7 @@ namespace Awb.Core.InputControllers.XTouchMini
                     break;
                 case XTouchMiniEventArgs.InputTypes.MainFader:
                     break;
-                default: throw new ArgumentOutOfRangeException(nameof(args.InputType)+":"+ args.InputType);
+                default: throw new ArgumentOutOfRangeException(nameof(args.InputType) + ":" + args.InputType);
             }
 
             ActionReceived?.Invoke(this, args);
@@ -75,7 +74,7 @@ namespace Awb.Core.InputControllers.XTouchMini
             if (topLine == false) button += 8;
             if (_buttonLedStates[button - 1] == ledState) return true;
             _buttonLedStates[button - 1] = ledState;
-            return _midiPort?.SendMidiMessage(0x90, (byte)(button-1), (byte)ledState) == true;
+            return _midiPort?.SendMidiMessage(0x90, (byte)(button - 1), (byte)ledState) == true;
         }
 
         ///// <summary>

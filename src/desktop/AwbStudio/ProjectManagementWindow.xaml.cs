@@ -6,8 +6,8 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Configs;
-using AwbStudio.Configs;
 using AwbStudio.Projects;
+using AwbStudio.StudioSettings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -116,7 +116,8 @@ namespace AwbStudio
                         {
                             // ok, project created and opened
                             ShowProjectEditor();
-                        }else
+                        }
+                        else
                         {
                             foreach (var error in errorMessages)
                                 MessageBox.Show(error, "Error opening project");

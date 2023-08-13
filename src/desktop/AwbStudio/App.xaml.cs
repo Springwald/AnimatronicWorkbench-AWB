@@ -5,11 +5,9 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Services;
-using AwbStudio.Configs;
 using AwbStudio.DependencyInjection;
-using AwbStudio.FileManagement;
 using AwbStudio.Projects;
+using AwbStudio.StudioSettings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Windows;

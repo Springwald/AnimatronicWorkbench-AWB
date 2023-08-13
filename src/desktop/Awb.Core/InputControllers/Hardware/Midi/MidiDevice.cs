@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-
 // Based on code from Project MIDI keyboard
 // https://github.com/millennIumAMbiguity/MIDI-Keyboard
 // (C) millennIumAMbiguity - Licensed under MIT 

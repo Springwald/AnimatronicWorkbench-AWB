@@ -10,7 +10,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows.Shapes;
 
-namespace AwbStudio.Configs
+namespace AwbStudio.StudioSettings
 {
     public interface IAwbStudioSettingsService
     {

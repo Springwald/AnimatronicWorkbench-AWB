@@ -1,4 +1,4 @@
-﻿// AnimatronicWorkBench core routines
+﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
 // (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
@@ -7,7 +7,6 @@
 
 using Awb.Core.DataPackets;
 using Awb.Core.Services;
-using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -35,7 +34,7 @@ namespace Awb.Core.Player
 
             foreach (var packet in dataPackets)
             {
-                
+
                 if (packet.IsEmpty) continue;
 
                 var clientID = packet.ClientId;
@@ -56,8 +55,8 @@ namespace Awb.Core.Player
                 var result = await client.Send(payload);
                 if (result.Ok)
                 {
-                   // await _logger.Log($"Sent to client Id '{clientID}'. ({result.DebugInfos})");
-                   // await _logger.Log(string.Join(", ", dataPackets.Select(p => string.Join("|", p.Content.StsServos?.Servos?.Select(s => s.Name + ":" + s.TargetValue)))));
+                    // await _logger.Log($"Sent to client Id '{clientID}'. ({result.DebugInfos})");
+                    // await _logger.Log(string.Join(", ", dataPackets.Select(p => string.Join("|", p.Content.StsServos?.Servos?.Select(s => s.Name + ":" + s.TargetValue)))));
                     dataPacketFactory.SetDataPacketDone(_actuatorsService.Servos, packet);
                 }
                 else
@@ -65,10 +64,10 @@ namespace Awb.Core.Player
                     await _logger.LogError($"Error sending data to client Id '{clientID}': {result.ErrorMessage}");
                     success = false;
                 }
-               
+
             }
 
-          
+
 
             return success;
         }

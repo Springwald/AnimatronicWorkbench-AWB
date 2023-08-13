@@ -9,7 +9,7 @@ namespace AwbStudio.TimelineControls
 {
     public class TimelineNameChosenEventArgs
     {
-        public string FileName { get;  }
+        public string FileName { get; }
 
         public TimelineNameChosenEventArgs(string filename)
         {

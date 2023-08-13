@@ -1,4 +1,4 @@
-﻿// AnimatronicWorkBench core routines
+﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
 // (C) 2023 Daniel Springwald  - 44789 Bochum, Germany

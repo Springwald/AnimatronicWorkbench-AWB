@@ -7,7 +7,7 @@
 
 using System.Linq;
 
-namespace AwbStudio.Configs
+namespace AwbStudio.StudioSettings
 {
     public class AwbStudioSettings
     {

@@ -1,4 +1,4 @@
-﻿// AnimatronicWorkBench core routines
+﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
 // (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
@@ -8,7 +8,6 @@
 using Awb.Core.Clients;
 using Awb.Core.Configs;
 using Awb.Core.Services;
-using System.Threading.Channels;
 
 namespace Awb.Core.Actuators
 {

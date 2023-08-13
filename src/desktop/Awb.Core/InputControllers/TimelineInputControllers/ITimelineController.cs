@@ -17,7 +17,6 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             Playing
         }
 
-
         event EventHandler<TimelineControllerEventArgs> OnTimelineEvent;
 
         Task SetPlayState(PlayStates playStates);

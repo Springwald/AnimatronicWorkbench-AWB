@@ -75,7 +75,8 @@ namespace AwbStudio.TimelineControls
                 case TimelinePlayer.PlayStates.Nothing:
                     break;
                 case TimelinePlayer.PlayStates.Playing:
-                    if (e.PositionMs < this._timelineViewPos.ScrollOffsetMs) {
+                    if (e.PositionMs < this._timelineViewPos.ScrollOffsetMs)
+                    {
                         this._timelineViewPos.ScrollOffsetMs = e.PositionMs;
                         scrollingChanged = true;
                     }

@@ -9,10 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Resources\Icons\**" />
-    <EmbeddedResource Remove="Resources\Icons\**" />
-    <None Remove="Resources\Icons\**" />
-    <Page Remove="Resources\Icons\**" />
+    <Compile Remove="CommonCode\**" />
+    <Compile Remove="Resources\**" />
+    <EmbeddedResource Remove="CommonCode\**" />
+    <EmbeddedResource Remove="Resources\**" />
+    <None Remove="CommonCode\**" />
+    <None Remove="Resources\**" />
+    <Page Remove="CommonCode\**" />
+    <Page Remove="Resources\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,11 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Awb.Core\Awb.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="CommonCode\" />
-    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>

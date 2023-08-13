@@ -7,7 +7,6 @@
 
 using AwbStudio.FileManagement;
 using System;
-using System.Reflection.Metadata.Ecma335;
 using System.Windows.Controls;
 
 namespace AwbStudio.TimelineControls
@@ -50,7 +49,7 @@ namespace AwbStudio.TimelineControls
                     var timelineMetaData = _filenameManager.GetTimelineMetaData(timelineFilename);
                     if (timelineMetaData == null) continue;
                     var button = new Button { Content = $"[{timelineMetaData.StateName}] {timelineMetaData.Title}", Tag = timelineFilename };
-                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this,new TimelineNameChosenEventArgs(timelineFilename)); };
+                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs(timelineFilename)); };
                     this.PanelNames.Children.Add(button);
                 }
             }

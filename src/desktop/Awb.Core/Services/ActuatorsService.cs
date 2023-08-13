@@ -1,4 +1,4 @@
-﻿// AnimatronicWorkBench core routines
+﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
 // (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
@@ -10,7 +10,7 @@ using Awb.Core.Configs;
 
 namespace Awb.Core.Services
 {
-    public interface IActuatorsService 
+    public interface IActuatorsService
     {
         IServo[] Servos { get; }
 

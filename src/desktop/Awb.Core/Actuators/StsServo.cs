@@ -1,4 +1,4 @@
-﻿// AnimatronicWorkBench core routines
+﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
 // (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
@@ -50,7 +50,7 @@ namespace Awb.Core.Actuators
             MinValue = config.MinValue;
             MaxValue = config.MaxValue;
             DefaultValue = defaultValue;
-            TargetValue =  defaultValue;
+            TargetValue = defaultValue;
             IsDirty = true;
         }
 
@@ -62,7 +62,7 @@ namespace Awb.Core.Actuators
 
         public void Dispose()
         {
-            TurnOff ();
+            TurnOff();
         }
     }
 }
