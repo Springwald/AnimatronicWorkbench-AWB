@@ -19,9 +19,6 @@ private:
     int _gpioRxd;
     int _gpioTxd;
 
-    /// scan for Ids and store in "ids" - the last element is -1
-    void scanIds();
-
 public:
     std::vector<u8> *servoIds;
 
@@ -35,6 +32,9 @@ public:
     int readTemperature(int id);
     int readLoad(int id);
     bool servoAvailable(int id);
+
+    /// scan for Ids and store in "ids"
+    void scanIds();
 };
 
 #endif

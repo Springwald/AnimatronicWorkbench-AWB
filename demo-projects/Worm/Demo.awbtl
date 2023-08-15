@@ -1,0 +1,214 @@
+{
+  "TimelineStateId": 4,
+  "ServoPoints": [
+    {
+      "TimeMs": 1000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 3",
+      "ValuePercent": 48.818897637795274,
+      "ServoId": "Servo 3"
+    },
+    {
+      "TimeMs": 1000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 4",
+      "ValuePercent": 37.00787401574803,
+      "ServoId": "Servo 4"
+    },
+    {
+      "TimeMs": 2000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 4",
+      "ValuePercent": 62.99212598425197,
+      "ServoId": "Servo 4"
+    },
+    {
+      "TimeMs": 3000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 4",
+      "ValuePercent": 44.881889763779526,
+      "ServoId": "Servo 4"
+    },
+    {
+      "TimeMs": 4000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 3",
+      "ValuePercent": 31.496062992125985,
+      "ServoId": "Servo 3"
+    },
+    {
+      "TimeMs": 5000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 3",
+      "ValuePercent": 58.26771653543307,
+      "ServoId": "Servo 3"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 1",
+      "ValuePercent": 19.68503937007874,
+      "ServoId": "Servo 1"
+    },
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 1",
+      "ValuePercent": 49.5,
+      "ServoId": "Servo 1"
+    },
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 2",
+      "ValuePercent": 50,
+      "ServoId": "Servo 2"
+    },
+    {
+      "TimeMs": 6000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 2",
+      "ValuePercent": 6.299212598425196,
+      "ServoId": "Servo 2"
+    },
+    {
+      "TimeMs": 7000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 2",
+      "ValuePercent": 6.299212598425196,
+      "ServoId": "Servo 2"
+    },
+    {
+      "TimeMs": 7000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 1",
+      "ValuePercent": 40.15748031496063,
+      "ServoId": "Servo 1"
+    },
+    {
+      "TimeMs": 8000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 1",
+      "ValuePercent": 22.04724409448819,
+      "ServoId": "Servo 1"
+    },
+    {
+      "TimeMs": 8000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 2",
+      "ValuePercent": 16.535433070866144,
+      "ServoId": "Servo 2"
+    },
+    {
+      "TimeMs": 9000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 1",
+      "ValuePercent": 59.055118110236215,
+      "ServoId": "Servo 1"
+    },
+    {
+      "TimeMs": 9000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 2",
+      "ValuePercent": 0,
+      "ServoId": "Servo 2"
+    },
+    {
+      "TimeMs": 10000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 3",
+      "ValuePercent": 45.66929133858268,
+      "ServoId": "Servo 3"
+    },
+    {
+      "TimeMs": 10000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 2",
+      "ValuePercent": 15.748031496062993,
+      "ServoId": "Servo 2"
+    },
+    {
+      "TimeMs": 10000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 1",
+      "ValuePercent": 24.409448818897637,
+      "ServoId": "Servo 1"
+    },
+    {
+      "TimeMs": 11000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 3",
+      "ValuePercent": 49.60629921259843,
+      "ServoId": "Servo 3"
+    },
+    {
+      "TimeMs": 11000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 2",
+      "ValuePercent": 0,
+      "ServoId": "Servo 2"
+    },
+    {
+      "TimeMs": 11000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 1",
+      "ValuePercent": 44.881889763779526,
+      "ServoId": "Servo 1"
+    },
+    {
+      "TimeMs": 13000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 4",
+      "ValuePercent": 41.732283464566926,
+      "ServoId": "Servo 4"
+    },
+    {
+      "TimeMs": 13000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 3",
+      "ValuePercent": 55.118110236220474,
+      "ServoId": "Servo 3"
+    },
+    {
+      "TimeMs": 13000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 2",
+      "ValuePercent": 22.83464566929134,
+      "ServoId": "Servo 2"
+    },
+    {
+      "TimeMs": 13000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Servo 1",
+      "ValuePercent": 25.984251968503933,
+      "ServoId": "Servo 1"
+    }
+  ],
+  "SoundPoints": []
+}

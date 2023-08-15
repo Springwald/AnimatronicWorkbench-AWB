@@ -13,10 +13,6 @@ void AutoPlayer::setup()
     _lastPacketReceivedMillis = -1;
     _actualTimelineIndex = -1;
     _playPosInActualTimeline = 0;
-    if (_stateSelectorStsServoChannel != -1)
-    {
-        _stateSelectorAvailable = true; //_stSerialServoManager->servoAvailable(_stateSelectorStsServoChannel);
-    }
 }
 
 bool AutoPlayer::isPlaying()
@@ -133,33 +129,31 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 
         if (_stSerialServoManager->servoAvailable(servoChannel))
         {
-            if (true)
+            if (servoSpeed == -1 && servoAccelleration == -1)
             {
-                if (servoSpeed == -1 && servoAccelleration == -1)
-                {
-                    // no speed and no accelleration defined
-                    _stSerialServoManager->writePosition(servoChannel, targetValue);
-                }
-                else if (servoSpeed == -1 && servoAccelleration != -1)
-                {
-                    // no speed defined, but accelleration
-                    _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, STS_SERVO_SPEED, servoAccelleration);
-                }
-                else if (servoSpeed != -1 && servoAccelleration == -1)
-                {
-                    // speed defined, but no accelleration
-                    _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, STS_SERVO_ACC);
-                }
-                else
-                {
-                    // speed and accelleration defined
-                    _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
-                }
+                // no speed and no accelleration defined
+                _stSerialServoManager->writePosition(servoChannel, targetValue);
+            }
+            else if (servoSpeed == -1 && servoAccelleration != -1)
+            {
+                // no speed defined, but accelleration
+                _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, STS_SERVO_SPEED, servoAccelleration);
+            }
+            else if (servoSpeed != -1 && servoAccelleration == -1)
+            {
+                // speed defined, but no accelleration
+                _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, STS_SERVO_ACC);
+            }
+            else
+            {
+                // speed and accelleration defined
+                _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
             }
         }
         else
         {
             _errorOccured("Servo channel " + String(servoChannel) + " not attached!");
+            _stSerialServoManager->scanIds();
         }
     }
 }
@@ -169,13 +163,17 @@ int AutoPlayer::selectedStateId()
     if (_stateSelectorStsServoChannel == -1)
         return -1;
 
-    if (_stateSelectorAvailable == false)
-        return -1;
-
     if (millis() < _lastStateCheckMillis + 500) // update interval
         return _currentStateId;
 
     _lastStateCheckMillis = millis();
+
+    if (_stateSelectorAvailable == false)
+    {
+        _stateSelectorAvailable = _stSerialServoManager->servoAvailable(_stateSelectorStsServoChannel);
+        if (_stateSelectorAvailable == false)
+            return -1;
+    }
 
     int pos = _stSerialServoManager->readPosition(_stateSelectorStsServoChannel);
 

@@ -1,0 +1,67 @@
+{
+  "Info": "Animatronic Workbench Project | https://daniel.springwald.de/post/AnimatronicWorkbench",
+  "Title": "Worm",
+  "ProjectFolder": "E:\\Animatronic-Workbench\\projectData\\Worm",
+  "AdafruitPwmServos": null,
+  "StsServos": [
+    {
+      "Id": "Servo 1",
+      "ClientId": 2,
+      "Channel": 1,
+      "Name": "Mouth upper",
+      "MinValue": 1700,
+      "MaxValue": 2300,
+      "DefaultValue": null
+    },
+    {
+      "Id": "Servo 2",
+      "ClientId": 2,
+      "Channel": 2,
+      "Name": "Mouth lower",
+      "MinValue": 1200,
+      "MaxValue": 1800,
+      "DefaultValue": null
+    },
+    {
+      "Id": "Servo 3",
+      "ClientId": 2,
+      "Channel": 3,
+      "Name": "tilt left right",
+      "MinValue": 1500,
+      "MaxValue": 2500,
+      "DefaultValue": null
+    },
+    {
+      "Id": "Servo 4",
+      "ClientId": 2,
+      "Channel": 4,
+      "Name": "rot left right",
+      "MinValue": 1000,
+      "MaxValue": 3000,
+      "DefaultValue": null
+    }
+  ],
+  "TimelinesStates": [
+   {
+      "Id": 1,
+      "Name": "Sleep"
+    },
+    {
+      "Id": 2,
+      "Name": "Action"
+    },
+    {
+      "Id": 3,
+      "Name": "Idle"
+    },
+    {
+      "Id": 4,
+      "Name": "Talk"
+    },
+	{
+      "Id": 5,
+      "Name": "Joint demo"
+    }
+  ],
+  "AutoPlayEsp32ExportFolder": "e:\\Animatronic-Workbench\\AnimatronicWorkBench-AWB\\src\\clients\\awb_esp32_client\\src\\AutoPlay"
+}
