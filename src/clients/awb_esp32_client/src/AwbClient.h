@@ -11,10 +11,10 @@
 #include "ActuatorValue.h"
 #include "NeoPixel/NeoPixelStatusControl.h"
 #include "AutoPlay/AutoPlayer.h"
+#include "WlanConnector.h"
+#include "Hardware.h"
 
 using byte = unsigned char;
-
-#define maxActuatorValues 32
 
 class AwbClient
 {
@@ -33,9 +33,10 @@ protected:
     AutoPlayer *_autoPlayer;
     int _lastAutoPlaySelectedStateId = -1;
     String _lastAutoPlayTimelineName = "";
+    WlanConnector *_wlanConnector;
 
-    ActuatorValue _stsServoValues[maxActuatorValues];
-    ActuatorValue _pwmServoValues[maxActuatorValues];
+    ActuatorValue _stsServoValues[MAX_ACTUATOR_VALUES];
+    ActuatorValue _pwmServoValues[MAX_ACTUATOR_VALUES];
 
     void processPacket(String payload);
     void updateActuators();
@@ -49,7 +50,7 @@ public:
     AwbClient(const unsigned int clientId)
     {
         _clientId = clientId;
-        }
+    }
 
     ~AwbClient()
     {

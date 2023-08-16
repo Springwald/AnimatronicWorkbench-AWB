@@ -3,6 +3,7 @@
 #include "Packet.h"
 #include "PacketSenderReceiver.h"
 #include <ArduinoJson.h>
+#include "WlanConnector.h"
 #include "AwbClient.h"
 
 bool demoMode = false;
@@ -77,6 +78,11 @@ void AwbClient::setup()
 
     _display.resetDebugInfos();
     _display.draw_message("Welcome to the ESP32 Client for Animatronic WorkBench.", 2000, MSG_TYPE_INFO);
+
+    const TCallBackErrorOccured wlanErrorOccured = [this](String message)
+    { showError(message); };
+
+    _wlanConnector = new WlanConnector(&_stsServoValues, &_pwmServoValues, wlanErrorOccured);
 }
 
 void AwbClient::showError(String message)
@@ -229,7 +235,7 @@ void AwbClient::processPacket(String payload)
             String name = channels[i]["Name"];
 
             bool done = false;
-            for (int f = 0; f < maxActuatorValues; f++)
+            for (int f = 0; f < MAX_ACTUATOR_VALUES; f++)
             {
                 if (_stsServoValues[f].id == id)
                 {
@@ -259,7 +265,7 @@ void AwbClient::updateActuators()
     if (_servoCriticalTemp || _servoCriticalLoad)
         return;
 
-    for (int i = 0; i < maxActuatorValues; i++)
+    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // Sts serial bus servos
         if (_stsServoValues[i].name.length() > 0)
@@ -293,7 +299,7 @@ void AwbClient::readActuatorsStatuses()
     bool criticalTemp = false;
     bool criticalLoad = false;
 
-    for (int i = 0; i < maxActuatorValues; i++)
+    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // Sts serial bus servos
         if (_stsServoValues[i].name.length() > 0)
@@ -327,10 +333,10 @@ void AwbClient::readActuatorsStatuses()
 
 void AwbClient::showValues()
 {
-    int maxValues = maxActuatorValues * 2;
+    int maxValues = MAX_ACTUATOR_VALUES * 2;
     String values[maxValues];
     int used = 0;
-    for (int i = 0; i < maxActuatorValues; i++)
+    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // sts serial bus servos
         if (_stsServoValues[i].name.length() > 0 && used < maxValues)
@@ -352,10 +358,10 @@ void AwbClient::showValues()
 
 void AwbClient::showTemperaturStatuses()
 {
-    int maxValues = maxActuatorValues * 2;
+    int maxValues = MAX_ACTUATOR_VALUES * 2;
     String statuses[maxValues];
     int used = 0;
-    for (int i = 0; i < maxActuatorValues; i++)
+    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // sts serial bus servos
         if (_stsServoValues[i].name.length() > 0 && used < maxValues)
@@ -376,10 +382,10 @@ void AwbClient::showTemperaturStatuses()
 
 void AwbClient::showLoadStatuses()
 {
-    int maxValues = maxActuatorValues * 2;
+    int maxValues = MAX_ACTUATOR_VALUES * 2;
     String statuses[maxValues];
     int used = 0;
-    for (int i = 0; i < maxActuatorValues; i++)
+    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // sts serial bus servos
         if (_stsServoValues[i].name.length() > 0 && used < maxValues)
