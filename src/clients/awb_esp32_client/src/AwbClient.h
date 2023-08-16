@@ -45,11 +45,14 @@ protected:
     void showTemperaturStatuses();
     void showLoadStatuses();
     void showError(String message);
+    void showMsg(String message);
 
 public:
     AwbClient(const unsigned int clientId)
     {
         _clientId = clientId;
+        _stsServoValues = new std::vector<ActuatorValue>();
+        _pwmServoValues = new std::vector<ActuatorValue>();
     }
 
     ~AwbClient()

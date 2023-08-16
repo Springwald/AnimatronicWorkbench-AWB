@@ -28,6 +28,4 @@
 /* DAC speaker */
 // #define USE_DAC_SPEAKER
 
-#define MAX_ACTUATOR_VALUES 32 // max number of actuator values calculated and visualized
-
 #endif

@@ -17,7 +17,6 @@ StaticJsonDocument<1024 * 32> jsondoc;
 
 void AwbClient::setup()
 {
-
     _display.setup(_clientId);
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
@@ -61,11 +60,19 @@ void AwbClient::setup()
     {
         // get the first id of stSerialServoManager servoIds
         int id = this->_stSerialServoManager->servoIds->at(i);
-        _stsServoValues->at(i).id = id;
-        _stsServoValues->at(i).targetValue = -1;
-        _stsServoValues->at(i).name = "no set yet.";
+        auto actuatorValue = ActuatorValue();
+        actuatorValue.id = id;
+        actuatorValue.targetValue = -1;
+        actuatorValue.name = "no set yet.";
+        this->_stsServoValues->push_back(actuatorValue);
     }
-    showValues();
+
+    const TCallBackErrorOccured wlanErrorOccured = [this](String message)
+    { showError(message); };
+    _wlanConnector = new WlanConnector(_clientId, _stsServoValues, _pwmServoValues, wlanErrorOccured);
+    _wlanConnector->setup();
+
+    showMsg("Found " + String(this->_stSerialServoManager->servoIds->size()) + " servos");
 
     char *packetHeader = (char *)"AWB";
     this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, packetErrorOccured);
@@ -77,24 +84,27 @@ void AwbClient::setup()
 #endif
 
     _display.resetDebugInfos();
-    _display.draw_message("Welcome to the ESP32 Client for Animatronic WorkBench.", 2000, MSG_TYPE_INFO);
-
-    const TCallBackErrorOccured wlanErrorOccured = [this](String message)
-    { showError(message); };
-
-    _wlanConnector = new WlanConnector(_stsServoValues, _pwmServoValues, wlanErrorOccured);
+    showMsg("Welcome to the ESP32 Client for Animatronic WorkBench.");
 }
 
 void AwbClient::showError(String message)
 {
     int durationMs = 2000;
     _display.draw_message(message, durationMs, MSG_TYPE_ERROR);
+    _wlanConnector->logError(message);
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
 #endif
 #ifdef USE_DAC_SPEAKER
     _dacSpeaker.beep();
 #endif
+}
+
+void AwbClient::showMsg(String message)
+{
+    int durationMs = 1000;
+    _display.draw_message(message, durationMs, MSG_TYPE_INFO);
+    _wlanConnector->logInfo(message);
 }
 
 void AwbClient::loop()
@@ -179,6 +189,8 @@ void AwbClient::loop()
     // update display
     if (!packetReceived)
         _display.loop();
+
+    _wlanConnector->update();
 }
 
 void AwbClient::processPacket(String payload)
@@ -207,9 +219,7 @@ void AwbClient::processPacket(String payload)
         else
         {
             int duration = jsondoc["DispMsg"]["Ms"];
-            if (duration == 0)
-                duration = 1000; // default duration
-            _display.draw_message(message, duration, MSG_TYPE_INFO);
+            showMsg(message);
         }
     }
 
@@ -235,7 +245,7 @@ void AwbClient::processPacket(String payload)
             String name = channels[i]["Name"];
 
             bool done = false;
-            for (int f = 0; f < MAX_ACTUATOR_VALUES; f++)
+            for (int f = 0; f < _stsServoValues->size(); f++)
             {
                 if (_stsServoValues->at(f).id == id)
                 {
@@ -265,7 +275,7 @@ void AwbClient::updateActuators()
     if (_servoCriticalTemp || _servoCriticalLoad)
         return;
 
-    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
+    for (int i = 0; i < _stsServoValues->size(); i++)
     {
         // Sts serial bus servos
         if (_stsServoValues->at(i).name.length() > 0)
@@ -285,6 +295,10 @@ void AwbClient::updateActuators()
                 }
             }
         }
+    }
+
+    for (int i = 0; i < _pwmServoValues->size(); i++)
+    {
 
         // Adafruit PWM driver
         if (_pwmServoValues->at(i).name.length() > 0)
@@ -319,6 +333,9 @@ void AwbClient::readActuatorsStatuses()
                 showError("Servo " + String(_stsServoValues->at(i).id) + " critical load! " + String(_stsServoValues->at(i).load));
             }
         }
+    }
+    for (int i = 0; i < _pwmServoValues->size(); i++)
+    {
 
         // Adafruit PWM servo driver
         if (_pwmServoValues->at(i).name.length() > 0)
@@ -333,21 +350,23 @@ void AwbClient::readActuatorsStatuses()
 
 void AwbClient::showValues()
 {
-    int maxValues = MAX_ACTUATOR_VALUES * 2;
-    String values[maxValues];
+    String values[100]; //_stsServoValues->size()];
     int used = 0;
-    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
+    for (int i = 0; i < _stsServoValues->size(); i++)
     {
+
         // sts serial bus servos
-        if (_stsServoValues->at(i).name.length() > 0 && used < maxValues)
+        if (_stsServoValues->at(i).name.length() > 0)
         {
             // values[used] = _stsServoValues[i].name + ":" + _stsServoValues[i].targetValue; // use names
             values[used] = String(_stsServoValues->at(i).id) + ":" + _stsServoValues->at(i).targetValue; // use ids only (needs less space)
             used++;
         }
-
+    }
+    for (int i = 0; i < _pwmServoValues->size(); i++)
+    {
         // Adafruit PWM servo driver
-        if (_pwmServoValues->at(i).name.length() > 0 && used < maxValues)
+        if (_pwmServoValues->at(i).name.length() > 0)
         {
             values[used] = "P" + _pwmServoValues->at(i).name + ":" + _pwmServoValues->at(i).targetValue;
             used++;
@@ -358,10 +377,10 @@ void AwbClient::showValues()
 
 void AwbClient::showTemperaturStatuses()
 {
-    int maxValues = MAX_ACTUATOR_VALUES * 2;
+    int maxValues = _stsServoValues->size() + _pwmServoValues->size();
     String statuses[maxValues];
     int used = 0;
-    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
+    for (int i = 0; i < _stsServoValues->size(); i++)
     {
         // sts serial bus servos
         if (_stsServoValues->at(i).name.length() > 0 && used < maxValues)
@@ -369,6 +388,9 @@ void AwbClient::showTemperaturStatuses()
             statuses[used] = String(_stsServoValues->at(i).id) + ":" + _stsServoValues->at(i).temperature + "C";
             used++;
         }
+    }
+    for (int i = 0; i < _pwmServoValues->size(); i++)
+    {
         // Adafruit PWM servo driver
         if (_pwmServoValues->at(i).name.length() > 0 && used < maxValues)
         {
@@ -382,10 +404,10 @@ void AwbClient::showTemperaturStatuses()
 
 void AwbClient::showLoadStatuses()
 {
-    int maxValues = MAX_ACTUATOR_VALUES * 2;
+    int maxValues = _stsServoValues->size() + _pwmServoValues->size();
     String statuses[maxValues];
     int used = 0;
-    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
+    for (int i = 0; i < maxValues; i++)
     {
         // sts serial bus servos
         if (_stsServoValues->at(i).name.length() > 0 && used < maxValues)

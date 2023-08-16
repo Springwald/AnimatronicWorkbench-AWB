@@ -69,7 +69,7 @@ bool StSerialServoManager::servoAvailable(int id)
 void StSerialServoManager::scanIds()
 {
     servoIds = new std::vector<u8>();
-    for (int i = 1; i < maxStsServoId; i++)
+    for (int i = 1; i < MAX_STS_SERVO_ID_SCAN_RANGE; i++)
     {
         int id = _serialServo.Ping(i);
         if (id != -1)

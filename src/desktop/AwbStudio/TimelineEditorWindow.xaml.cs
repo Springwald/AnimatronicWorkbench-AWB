@@ -488,6 +488,7 @@ namespace AwbStudio
 
             var data = new Esp32ClientExportData()
             {
+                ProjectName = _project.Title,
                 TimelineStates = _project.TimelinesStates,
                 StsServoConfigs = _project.StsServos,
                 TimelineData = timelines.ToArray()

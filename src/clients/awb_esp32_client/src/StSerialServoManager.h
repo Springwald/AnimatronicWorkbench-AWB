@@ -8,7 +8,7 @@
 class StSerialServoManager
 {
 
-#define maxStsServoId 20
+#define MAX_STS_SERVO_ID_SCAN_RANGE 20
 
     using TCallBackErrorOccured = std::function<void(String)>;
 
@@ -18,6 +18,8 @@ private:
     int _acc;
     int _gpioRxd;
     int _gpioTxd;
+    void scanIds(); /// scan for Ids and store in "servoIds"
+    
 
 public:
     std::vector<u8> *servoIds;
@@ -32,9 +34,6 @@ public:
     int readTemperature(int id);
     int readLoad(int id);
     bool servoAvailable(int id);
-
-    /// scan for Ids and store in "ids"
-    void scanIds();
 };
 
 #endif

@@ -153,7 +153,6 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
         else
         {
             _errorOccured("Servo channel " + String(servoChannel) + " not attached!");
-            _stSerialServoManager->scanIds();
         }
     }
 }

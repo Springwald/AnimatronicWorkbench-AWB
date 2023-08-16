@@ -38,11 +38,11 @@ namespace Awb.Core.LoadNSave.Export
 
             protected:
             public:
-                std::vector<Timeline> *timelines;
             """;
 
         const string _head2 = """
-           
+                std::vector<Timeline> *timelines;
+
                 AutoPlayData()
                 {
                     timelines = new std::vector<Timeline>();
@@ -69,14 +69,21 @@ namespace Awb.Core.LoadNSave.Export
             result.AppendLine($"// Created on {DateTime.Now.ToString()}");
             result.AppendLine(_head1);
 
+
+            result.AppendLine($"\tconst char *ProjectName = \"{exportData.ProjectName}\";   // Project Name");
+            result.AppendLine($"\tconst char *WlanSSID = \"AWB-{exportData.ProjectName}\";  // WLAN SSID Name");
+            result.AppendLine($"\tconst char *WlanPassword = \"awb12345\"; // WLAN Password");
+
             var stsServos = exportData.StsServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.StsServoConfig>();
             var stsServoChannels = stsServos.Select(s => s.Channel).ToArray() ;
             var stsServoAccelerations = stsServos.Select(s => s.Accelleration  ?? -1).ToArray();
             var stsServoSpeeds = stsServos.Select(s => s.Speed ?? -1).ToArray();
+            var stsServoNames = stsServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
             result.AppendLine($"\tint stsServoCount = {stsServos.Length};");
             result.AppendLine($"\tint stsServoChannels[{stsServos.Length}] = {{{string.Join(", ", stsServoChannels.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint stsServoAccelleration[{stsServos.Length}] = {{{string.Join(", ", stsServoAccelerations.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint stsServoSpeed[{stsServos.Length}] = {{{string.Join(", ", stsServoSpeeds.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tString stsServoName[{stsServos.Length}] = {{{string.Join(", ", stsServoNames.Select(s => $"\"{s}\""))}}};");
 
             var stateIds = exportData.TimelineStates?.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
             result.AppendLine($"\tint timelineStateIds[{exportData.TimelineStates?.Length ?? 0}] = {{{string.Join(", ", stateIds)}}};");
