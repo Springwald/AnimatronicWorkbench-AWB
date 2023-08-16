@@ -61,9 +61,9 @@ void AwbClient::setup()
     {
         // get the first id of stSerialServoManager servoIds
         int id = this->_stSerialServoManager->servoIds->at(i);
-        _stsServoValues[i].id = id;
-        _stsServoValues[i].targetValue = -1;
-        _stsServoValues[i].name = "no set yet.";
+        _stsServoValues->at(i).id = id;
+        _stsServoValues->at(i).targetValue = -1;
+        _stsServoValues->at(i).name = "no set yet.";
     }
     showValues();
 
@@ -82,7 +82,7 @@ void AwbClient::setup()
     const TCallBackErrorOccured wlanErrorOccured = [this](String message)
     { showError(message); };
 
-    _wlanConnector = new WlanConnector(&_stsServoValues, &_pwmServoValues, wlanErrorOccured);
+    _wlanConnector = new WlanConnector(_stsServoValues, _pwmServoValues, wlanErrorOccured);
 }
 
 void AwbClient::showError(String message)
@@ -220,7 +220,7 @@ void AwbClient::processPacket(String payload)
         {
             int channel = channels[i]["Ch"];
             int value = channels[i]["Val"];
-            _pwmServoValues[channel].targetValue = value;
+            _pwmServoValues->at(channel).targetValue = value;
         }
     }
 
@@ -237,12 +237,12 @@ void AwbClient::processPacket(String payload)
             bool done = false;
             for (int f = 0; f < MAX_ACTUATOR_VALUES; f++)
             {
-                if (_stsServoValues[f].id == id)
+                if (_stsServoValues->at(f).id == id)
                 {
                     // set servo target value
-                    _stsServoValues[f].id = id;
-                    _stsServoValues[f].targetValue = value;
-                    _stsServoValues[f].name = name;
+                    _stsServoValues->at(f).id = id;
+                    _stsServoValues->at(f).targetValue = value;
+                    _stsServoValues->at(f).name = name;
                     done = true;
                     break;
                 }
@@ -268,26 +268,26 @@ void AwbClient::updateActuators()
     for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // Sts serial bus servos
-        if (_stsServoValues[i].name.length() > 0)
+        if (_stsServoValues->at(i).name.length() > 0)
         {
-            if (_stsServoValues[i].targetValue == -1)
+            if (_stsServoValues->at(i).targetValue == -1)
             {
                 // turn servo off
-                _stSerialServoManager->setTorque(_stsServoValues[i].id, false);
+                _stSerialServoManager->setTorque(_stsServoValues->at(i).id, false);
             }
             else
             {
                 // set new target value if changed
-                if (_stsServoValues[i].currentValue != _stsServoValues[i].targetValue)
+                if (_stsServoValues->at(i).currentValue != _stsServoValues->at(i).targetValue)
                 {
-                    _stSerialServoManager->writePosition(_stsServoValues[i].id, _stsServoValues[i].targetValue);
-                    _stsServoValues[i].currentValue = _stsServoValues[i].targetValue;
+                    _stSerialServoManager->writePosition(_stsServoValues->at(i).id, _stsServoValues->at(i).targetValue);
+                    _stsServoValues->at(i).currentValue = _stsServoValues->at(i).targetValue;
                 }
             }
         }
 
         // Adafruit PWM driver
-        if (_pwmServoValues[i].name.length() > 0)
+        if (_pwmServoValues->at(i).name.length() > 0)
         {
             // not implemented yet
         }
@@ -299,29 +299,29 @@ void AwbClient::readActuatorsStatuses()
     bool criticalTemp = false;
     bool criticalLoad = false;
 
-    for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
+    for (int i = 0; i < _stsServoValues->size(); i++)
     {
         // Sts serial bus servos
-        if (_stsServoValues[i].name.length() > 0)
+        if (_stsServoValues->at(i).name.length() > 0)
         {
-            _stsServoValues[i].temperature = _stSerialServoManager->readTemperature(_stsServoValues[i].id);
-            if (_stsServoValues[i].temperature > STS_SERVO_MAX_TEMPERATURE)
+            _stsServoValues->at(i).temperature = _stSerialServoManager->readTemperature(_stsServoValues->at(i).id);
+            if (_stsServoValues->at(i).temperature > STS_SERVO_MAX_TEMPERATURE)
             {
                 criticalTemp = true;
-                _stSerialServoManager->setTorque(_stsServoValues[i].id, false);
-                showError("Servo " + String(_stsServoValues[i].id) + " critical temperature! " + String(_stsServoValues[i].temperature) + "C");
+                _stSerialServoManager->setTorque(_stsServoValues->at(i).id, false);
+                showError("Servo " + String(_stsServoValues->at(i).id) + " critical temperature! " + String(_stsServoValues->at(i).temperature) + "C");
             }
-            _stsServoValues[i].load = _stSerialServoManager->readLoad(_stsServoValues[i].id);
-            if (abs(_stsServoValues[i].load) > STS_SERVO_MAX_LOAD)
+            _stsServoValues->at(i).load = _stSerialServoManager->readLoad(_stsServoValues->at(i).id);
+            if (abs(_stsServoValues->at(i).load) > STS_SERVO_MAX_LOAD)
             {
                 criticalLoad = true;
-                _stSerialServoManager->setTorque(_stsServoValues[i].id, false);
-                showError("Servo " + String(_stsServoValues[i].id) + " critical load! " + String(_stsServoValues[i].load));
+                _stSerialServoManager->setTorque(_stsServoValues->at(i).id, false);
+                showError("Servo " + String(_stsServoValues->at(i).id) + " critical load! " + String(_stsServoValues->at(i).load));
             }
         }
 
         // Adafruit PWM servo driver
-        if (_pwmServoValues[i].name.length() > 0)
+        if (_pwmServoValues->at(i).name.length() > 0)
         {
             // PWM Servo support no status information reading
         }
@@ -339,17 +339,17 @@ void AwbClient::showValues()
     for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // sts serial bus servos
-        if (_stsServoValues[i].name.length() > 0 && used < maxValues)
+        if (_stsServoValues->at(i).name.length() > 0 && used < maxValues)
         {
             // values[used] = _stsServoValues[i].name + ":" + _stsServoValues[i].targetValue; // use names
-            values[used] = String(_stsServoValues[i].id) + ":" + _stsServoValues[i].targetValue; // use ids only (needs less space)
+            values[used] = String(_stsServoValues->at(i).id) + ":" + _stsServoValues->at(i).targetValue; // use ids only (needs less space)
             used++;
         }
 
         // Adafruit PWM servo driver
-        if (_pwmServoValues[i].name.length() > 0 && used < maxValues)
+        if (_pwmServoValues->at(i).name.length() > 0 && used < maxValues)
         {
-            values[used] = "P" + _pwmServoValues[i].name + ":" + _pwmServoValues[i].targetValue;
+            values[used] = "P" + _pwmServoValues->at(i).name + ":" + _pwmServoValues->at(i).targetValue;
             used++;
         }
     }
@@ -364,16 +364,16 @@ void AwbClient::showTemperaturStatuses()
     for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // sts serial bus servos
-        if (_stsServoValues[i].name.length() > 0 && used < maxValues)
+        if (_stsServoValues->at(i).name.length() > 0 && used < maxValues)
         {
-            statuses[used] = String(_stsServoValues[i].id) + ":" + _stsServoValues[i].temperature + "C";
+            statuses[used] = String(_stsServoValues->at(i).id) + ":" + _stsServoValues->at(i).temperature + "C";
             used++;
         }
         // Adafruit PWM servo driver
-        if (_pwmServoValues[i].name.length() > 0 && used < maxValues)
+        if (_pwmServoValues->at(i).name.length() > 0 && used < maxValues)
         {
             // pwm servos have no status information
-            statuses[used] = _pwmServoValues[i].name + ": PWM?";
+            statuses[used] = _pwmServoValues->at(i).name + ": PWM?";
             used++;
         }
     }
@@ -388,16 +388,16 @@ void AwbClient::showLoadStatuses()
     for (int i = 0; i < MAX_ACTUATOR_VALUES; i++)
     {
         // sts serial bus servos
-        if (_stsServoValues[i].name.length() > 0 && used < maxValues)
+        if (_stsServoValues->at(i).name.length() > 0 && used < maxValues)
         {
-            statuses[used] = String(_stsServoValues[i].id) + ":" + _stsServoValues[i].load;
+            statuses[used] = String(_stsServoValues->at(i).id) + ":" + _stsServoValues->at(i).load;
             used++;
         }
         // Adafruit PWM servo driver
-        if (_pwmServoValues[i].name.length() > 0 && used < maxValues)
+        if (_pwmServoValues->at(i).name.length() > 0 && used < maxValues)
         {
             // pwm servos have no status information
-            statuses[used] = _pwmServoValues[i].name + ": PWM?";
+            statuses[used] = _pwmServoValues->at(i).name + ": PWM?";
             used++;
         }
     }

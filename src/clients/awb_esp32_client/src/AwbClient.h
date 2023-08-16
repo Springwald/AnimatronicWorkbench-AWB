@@ -35,8 +35,8 @@ protected:
     String _lastAutoPlayTimelineName = "";
     WlanConnector *_wlanConnector;
 
-    ActuatorValue _stsServoValues[MAX_ACTUATOR_VALUES];
-    ActuatorValue _pwmServoValues[MAX_ACTUATOR_VALUES];
+    std::vector<ActuatorValue> *_stsServoValues;
+    std::vector<ActuatorValue> *_pwmServoValues;
 
     void processPacket(String payload);
     void updateActuators();

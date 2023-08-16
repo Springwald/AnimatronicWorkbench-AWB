@@ -18,8 +18,9 @@ protected:
     TCallBackErrorOccured _errorOccured;
     AutoPlayData *_data;
     WebServer *_server;
-    ActuatorValue *_stsServoValues[MAX_ACTUATOR_VALUES];
-    ActuatorValue *_pwmServoValues[MAX_ACTUATOR_VALUES];
+    
+    std::vector<ActuatorValue> *_stsServoValues;
+    std::vector<ActuatorValue> *_pwmServoValues;
 
     String GetHtml();
     void handle_Default();
@@ -27,7 +28,7 @@ protected:
 
 public:
     // the constructor which takes the stsServoValues and matches them to the variable
-    WlanConnector(ActuatorValue *stsServoValues[MAX_ACTUATOR_VALUES], ActuatorValue *pwmServoValues[MAX_ACTUATOR_VALUES], TCallBackErrorOccured errorOccured)
+    WlanConnector(std::vector<ActuatorValue> *stsServoValues, std::vector<ActuatorValue> *pwmServoValues, TCallBackErrorOccured errorOccured)
         : _errorOccured(errorOccured), _stsServoValues(stsServoValues), _pwmServoValues(pwmServoValues)
     {
         _data = new AutoPlayData();
