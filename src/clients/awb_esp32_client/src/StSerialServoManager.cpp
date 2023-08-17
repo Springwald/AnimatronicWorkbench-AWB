@@ -12,7 +12,7 @@ void StSerialServoManager::setup()
 {
     Serial1.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
     _serialServo.pSerial = &Serial1;
-    delay(1000);
+    delay(100);
     scanIds();
 }
 
@@ -72,13 +72,13 @@ void StSerialServoManager::scanIds()
     servoIds = new std::vector<u8>();
     for (int i = 1; i < MAX_STS_SERVO_ID_SCAN_RANGE; i++)
     {
-        int retries = 3;
+        int retries = 5;
         while (retries-- > 0)
         {
             int id = _serialServo.Ping(i);
             if (_serialServo.Error != 0)
             {
-                delay(500);
+                delay(100);
             }
             else
             {

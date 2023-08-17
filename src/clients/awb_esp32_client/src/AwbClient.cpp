@@ -22,7 +22,7 @@ void AwbClient::setup()
     const TCallBackErrorOccured wlanErrorOccured = [this](String message)
     { showError(message); };
    _wlanConnector = new WlanConnector(_clientId, _actualStatusInformation, wlanErrorOccured);
-   //_wlanConnector->setup();
+   _wlanConnector->setup();
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     this->_neoPixelStatus = new NeoPixelStatusControl();
