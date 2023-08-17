@@ -18,11 +18,25 @@ void StSerialServoManager::setup()
 
 void StSerialServoManager::writePositionDetailed(u8 id, s16 position, u16 speed, u8 acc)
 {
+    for (int i = 0; i < stsServoValues->size(); i++)
+    {
+        if (stsServoValues->at(i).id == id)
+        {
+            stsServoValues->at(i).currentValue = position;
+        }
+    }
     _serialServo.WritePosEx(id, position, speed, acc);
 }
 
 void StSerialServoManager::writePosition(u8 id, s16 position)
 {
+    for (int i = 0; i < stsServoValues->size(); i++)
+    {
+        if (stsServoValues->at(i).id == id)
+        {
+            stsServoValues->at(i).currentValue = position;
+        }
+    }
     _serialServo.WritePosEx(id, position, STS_SERVO_SPEED, STS_SERVO_ACC);
 }
 

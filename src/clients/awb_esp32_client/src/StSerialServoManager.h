@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <vector>
 #include <SCServo.h>
+#include "ActuatorValue.h"
 
 class StSerialServoManager
 {
@@ -13,18 +14,18 @@ class StSerialServoManager
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:
+    std::vector<ActuatorValue> *stsServoValues;
     TCallBackErrorOccured _errorOccured;
     int _speed;
     int _acc;
     int _gpioRxd;
     int _gpioTxd;
     void scanIds(); /// scan for Ids and store in "servoIds"
-    
 
 public:
     std::vector<u8> *servoIds;
 
-    StSerialServoManager(TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd, int speed, int acc) : _errorOccured(errorOccured), _speed(speed), _acc(acc), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd){};
+    StSerialServoManager(std::vector<ActuatorValue> *stsServoValues, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd, int speed, int acc) : _errorOccured(errorOccured), _speed(speed), _acc(acc), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), stsServoValues(stsServoValues){};
 
     void setup();
     void writePositionDetailed(u8 id, s16 position, u16 speed, u8 acc);

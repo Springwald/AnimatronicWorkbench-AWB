@@ -56,7 +56,7 @@ void AwbClient::setup()
     { showError(message); };
 
     this->_adafruitpwmManager = new AdafruitPwmManager(adafruitPwmErrorOccured);
-    this->_stSerialServoManager = new StSerialServoManager(stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
+    this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
 
     // iterate through all stsServoIds
