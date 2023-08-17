@@ -25,12 +25,9 @@ namespace AwbStudio.TimelineControls
         private TimelineData? _timelineData;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private int _playPosMs = 0;
-
-        private readonly TimelineViewPos _timelineViewPos = new TimelineViewPos();
+        public TimelineViewPos ViewPos  { get; } = new TimelineViewPos();
 
         private TimelineCaptions? _timelineCaptions;
-
-        public TimelineViewPos ViewPos => _timelineViewPos;
 
         public TimelineData? TimelineData
         {
@@ -75,16 +72,9 @@ namespace AwbStudio.TimelineControls
                 case TimelinePlayer.PlayStates.Nothing:
                     break;
                 case TimelinePlayer.PlayStates.Playing:
-                    if (e.PositionMs < this._timelineViewPos.ScrollOffsetMs)
-                    {
-                        this._timelineViewPos.ScrollOffsetMs = e.PositionMs;
-                        scrollingChanged = true;
-                    }
-                    if (e.PositionMs > this._timelineViewPos.ScrollOffsetMs + this._timelineViewPos.DisplayMs)
-                    {
-                        this._timelineViewPos.ScrollOffsetMs = e.PositionMs - this._timelineViewPos.DisplayMs;
-                        scrollingChanged = true;
-                    }
+                    
+                    var actualPlayPosMs = e.PositionMs;
+                    scrollingChanged = SyncScrollOffsetToNewPlayPos(actualPlayPosMs);
                     break;
 
                 default: throw new ArgumentOutOfRangeException($"{nameof(e.PlayState)}:{e.PlayState.ToString()}");
@@ -98,6 +88,24 @@ namespace AwbStudio.TimelineControls
             {
                 MyInvoker.Invoke(new Action(() => this.PaintPlayPos(_timelineData)));
             }
+        }
+
+
+        /// <summary>
+        /// set the scroll offset in a way, that the manual playPos is always at the position chosen in the hardware controller 
+        /// </summary>
+        /// <returns>true, when changed</returns>
+        private bool SyncScrollOffsetToNewPlayPos(int newPlayPosMs)
+        {
+            if (this._timelinePlayer != null)
+            {
+                if (this._timelinePlayer.PlayState == TimelinePlayer.PlayStates.Playing)
+                {
+                    this.ViewPos.ScrollOffsetMs = newPlayPosMs - this.ViewPos.PosSelectorManualMs;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public TimelineViewer()
@@ -133,7 +141,7 @@ namespace AwbStudio.TimelineControls
                 const int dotWidth = dotRadius * 2;
                 foreach (var point in pointsForThisServo)
                 {
-                    if (point.TimeMs >= _timelineViewPos.ScrollOffsetMs && point.TimeMs <= _timelineViewPos.DisplayMs + _timelineViewPos.ScrollOffsetMs) // is inside view
+                    if (point.TimeMs >= ViewPos.ScrollOffsetMs && point.TimeMs <= ViewPos.DisplayMs + ViewPos.ScrollOffsetMs) // is inside view
                     {
                         this.GridDots.Children.Add(new Ellipse
                         {
@@ -148,14 +156,6 @@ namespace AwbStudio.TimelineControls
                     }
                 }
 
-                //var firstPoint = pointsForThisServo.FirstOrDefault();
-                //if (firstPoint != null && firstPoint.TimeMs > 0)
-                //    pointsForThisServo.Insert(0, new ServoPoint(firstPoint.ServoId, firstPoint.ValuePercent, timeMs: 0));
-
-                //var lastPoint = pointsForThisServo.LastOrDefault();
-                //if (lastPoint != null && lastPoint.TimeMs <  _timelineViewPos.DisplayMs + _timelineViewPos.ScrollOffsetMs)
-                //    pointsForThisServo.Add(new ServoPoint(lastPoint.ServoId, lastPoint.ValuePercent, timeMs: (int)RenderDurationMs));
-
                 var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = GetXPos((int)(p.TimeMs), _timelineData), Y = this.ActualHeight - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
                 var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.Color, StrokeThickness = 1, Points = points };
                 this.PanelLines.Children.Add(line);
@@ -164,11 +164,15 @@ namespace AwbStudio.TimelineControls
             // update the data optical grid lines
             OpticalGrid.Children.Clear();
             var duration = ViewPos.DisplayMs;
-            for (int ms = 0; ms < duration; ms += 1000)
+            const int STEP = 1000;
+            for (int ms = 0; ms < duration + STEP; ms += STEP)
             {
-                var x = ms * this.ActualWidth / duration;
-                OpticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = this.ActualHeight - _paintMarginTopBottom, Stroke = _gridLineBrush });
-                OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / 1000).ToString(), BorderThickness = new Thickness(left: x, top: this.ActualHeight - 30, right: 0, bottom: 0) });
+                var x = (ms - ViewPos.ScrollOffsetMs % STEP ) * this.ActualWidth / duration;
+                if (x > 0)
+                {
+                    OpticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = this.ActualHeight - _paintMarginTopBottom, Stroke = _gridLineBrush });
+                    OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: this.ActualHeight - 30, right: 0, bottom: 0) });
+                }
             }
             foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
             {
@@ -227,11 +231,11 @@ namespace AwbStudio.TimelineControls
         private void PaintPlayPos(TimelineData? timeline)
         {
             // draw the manual midi controller play position as triangle at the bottom
-            var x =  ((double)(_timelineViewPos.PosSelectorManualMs) / ViewPos.DisplayMs) * this.ActualWidth;
+            var x =  ((double)(ViewPos.PosSelectorManualMs) / ViewPos.DisplayMs) * this.ActualWidth;
            ManualPlayPosAbsolute.Margin = new Thickness(x - ManualPlayPosAbsolute.ActualWidth/2 , 0,0,0);
 
             // draw the play position as a vertical line
-            if (timeline == null || _playPosMs < 0 || _playPosMs > _timelineViewPos.ScrollOffsetMs + _timelineViewPos.DisplayMs)
+            if (timeline == null || _playPosMs < 0 || _playPosMs > ViewPos.ScrollOffsetMs + ViewPos.DisplayMs)
             {
                 PlayPosLine.Visibility = Visibility.Hidden;
             }
@@ -251,7 +255,7 @@ namespace AwbStudio.TimelineControls
         private double GetXPos(int ms, TimelineData? timeline) =>
             (timeline == null)
             ? 0
-            : ((double)(ms - _timelineViewPos.ScrollOffsetMs) / ViewPos.DisplayMs) * this.ActualWidth;
+            : ((double)(ms - ViewPos.ScrollOffsetMs) / ViewPos.DisplayMs) * this.ActualWidth;
     }
 
 }
