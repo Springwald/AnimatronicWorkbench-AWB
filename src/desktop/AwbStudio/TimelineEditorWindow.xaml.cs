@@ -146,9 +146,9 @@ namespace AwbStudio
             {
                 case TimelineControllerEventArgs.EventTypes.PlayPosAbsoluteChanged:
                     var viewPos = TimelineViewerControl.ViewPos;
-                    var playPosAbsoluteMs = ((int)((viewPos.DisplayMs / 100.0 * e.ValueInPercent) / _timelinePlayer.PlayPosSnapMs) * _timelinePlayer.PlayPosSnapMs);
+                    viewPos.PosSelectorManualMs = ((int)((viewPos.DisplayMs / 100.0 * e.ValueInPercent) / _timelinePlayer.PlayPosSnapMs) * _timelinePlayer.PlayPosSnapMs);
                     int newPos = _timelinePlayer.PositionMs;
-                    newPos = viewPos.ScrollOffsetMs + playPosAbsoluteMs;
+                    newPos = viewPos.ScrollOffsetMs + viewPos.PosSelectorManualMs;
                     _manualUpdatingPlayPos = true;
                     await _timelinePlayer.Update(newPositionMs: newPos);
                     _manualUpdatingPlayPos = false;

@@ -25,5 +25,6 @@
             <Ellipse HorizontalAlignment="Left" Height="10" Width="10"  Margin="289,291,0,0" Fill="red" Stroke="Black" VerticalAlignment="Top" />
         </Grid>
         <StackPanel/>
+        <Label x:Name="ManualPlayPosAbsolute" Content="🔺" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Foreground="#FF8DA2FA"/>
     </Grid>
 </UserControl>

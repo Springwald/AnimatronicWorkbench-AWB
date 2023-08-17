@@ -18,5 +18,10 @@ namespace AwbStudio.TimelineControls
         /// The left offset of the timeline in seconds
         /// </summary>
         public int ScrollOffsetMs { get; set; } = 0;
+
+        /// <summary>
+        /// The position of the midi-input controller fader in milli seconds
+        /// </summary>
+        public int PosSelectorManualMs { get; set; } = 0;
     }
 }

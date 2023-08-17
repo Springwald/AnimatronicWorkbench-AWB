@@ -16,7 +16,7 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// What is the duration of the timeline filled with points?
         /// </summary>
-        public int DurationMs => AllPoints?.Max(p => p.TimeMs) ?? 0;
+        public int DurationMs => AllPoints?.Any() == true ? AllPoints.Max(p => p.TimeMs) : 0;
 
         public IEnumerable<TimelinePoint> AllPoints
         {
