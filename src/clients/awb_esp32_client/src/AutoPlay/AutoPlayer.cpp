@@ -46,6 +46,7 @@ bool AutoPlayer::getStateSelectorAvailable()
 
 void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 {
+    return;
     if (servoHaveErrorsLikeTooHot)
     {
         _actualTimelineIndex = -1;

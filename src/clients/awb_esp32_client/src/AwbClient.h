@@ -24,6 +24,7 @@ protected:
     DacSpeaker _dacSpeaker;
     int _displayStateCounter = 0;
     long _lastStatusMillis = 0;
+    long _startMillis = millis();
     PacketSenderReceiver *_packetSenderReceiver;
     AdafruitPwmManager *_adafruitpwmManager;
     StSerialServoManager *_stSerialServoManager;

@@ -441,7 +441,8 @@ bool AwbDisplay::draw_debugInfos()
     statusFooterSprite.fillScreen(0x000000);
 
     y++;
-    memoryInfo = "free:" + String(freeMemory / 1024) + "k lost:" + String(_freeMemoryOnStart - freeMemory);
+    int lostMemory = _freeMemoryOnStart - freeMemory;
+    memoryInfo = "free:" + String(freeMemory / 1024) + "k lost:" + String(lostMemory / 1024) + "." + String((lostMemory % 1024) / 100) + "k";
     statusFooterSprite.drawString(memoryInfo, statusFooterSprite.width() / 2, y);
 
     y += _textSizeLineHeight;

@@ -84,7 +84,6 @@ void AwbClient::setup()
 #endif
 
     showMsg("Welcome to the ESP32 Client for Animatronic WorkBench.");
-    _display.resetDebugInfos();
 }
 
 void AwbClient::showError(String message)
@@ -190,8 +189,13 @@ void AwbClient::loop()
     if (!packetReceived)
         _display.loop();
 
-    _wlanConnector->memoryInfo = _display.memoryInfo;
+    _wlanConnector->memoryInfo = &_display.memoryInfo;
     _wlanConnector->update();
+
+    if (millis() - _startMillis < 5000)
+    {
+        _display.resetDebugInfos(); // only check memory usage after 5 seconds to avoid false alarms when starting up
+    }
 }
 
 void AwbClient::processPacket(String payload)

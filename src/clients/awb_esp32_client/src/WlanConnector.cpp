@@ -61,6 +61,8 @@ void WlanConnector::handle_NotFound()
 String WlanConnector::GetHtml()
 {
     auto ageSeconds = (millis() - _startTime) / 1000;
+    auto ageMinutes = ageSeconds / 60;
+    auto ageHours = ageMinutes / 60;
 
     String ptr = "<!DOCTYPE html> <html>\n";
     ptr += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
@@ -73,82 +75,85 @@ String WlanConnector::GetHtml()
     ptr += "</style>\n";
     ptr += "</head>\n";
     ptr += "<body>\n";
-    ptr += "<p>Animatronic Workbench - Client ID " + String(_clientId) + "</p>\n";
-    ptr += "<h1>'" + String(_data->ProjectName) + "' figure</h1>\n";
-    ptr += "<p> " + String(ageSeconds / 60) + " minutes, " + String(ageSeconds % 60) + " seconds uptime<br/>" + memoryInfo + "</p>\n";
-
-    // STS Servo status
-    ptr += "<div class=\"region\">\n";
-    ptr += "<span>" + String(_stsServoValues->size()) + " STS-Servos</span>\n";
-    ptr += "<table>\n";
-    ptr += "<tr><th>Id</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th></tr>\n";
-    for (int i = 0; i < _stsServoValues->size(); i++)
+    if (true)
     {
-        auto servo = _stsServoValues->at(i);
-        auto name = servo.name;
-        for (int a = 0; a < _data->stsServoCount; a++)
+        ptr += "<p>Animatronic Workbench - Client ID " + String(_clientId) + "</p>\n";
+        ptr += "<h1>'" + String(_data->ProjectName) + "' figure</h1>\n";
+
+        ptr += "<p> " + String(ageHours) + " hours, " + String(ageMinutes % 60) + " minutes, " + String(ageSeconds % 60) + " seconds uptime<br/>" + *memoryInfo + "</p>\n";
+
+        // STS Servo status
+        ptr += "<div class=\"region\">\n";
+        ptr += "<span>" + String(_stsServoValues->size()) + " STS-Servos</span>\n";
+        ptr += "<table>\n";
+        ptr += "<tr><th>Id</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th></tr>\n";
+        for (int i = 0; i < _stsServoValues->size(); i++)
         {
-            if (_data->stsServoChannels[a] == servo.id)
+            auto servo = _stsServoValues->at(i);
+            auto name = servo.name;
+            for (int a = 0; a < _data->stsServoCount; a++)
             {
-                name = _data->stsServoName[a];
-                break;
+                if (_data->stsServoChannels[a] == servo.id)
+                {
+                    name = _data->stsServoName[a];
+                    break;
+                }
             }
+            ptr += "<tr><td>" + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
         }
-        ptr += "<tr><td>" + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
-    }
-    ptr += "</table>\n";
-    ptr += "</div>\n";
+        ptr += "</table>\n";
+        ptr += "</div>\n";
 
-    //  AutoPlayer status
-    ptr += "<div class=\"region\">\n";
-    ptr += "<span>Autoplayer</span>\n";
-    ptr += "<table>\n";
-    ptr += "<tr><th>Info</th><th>ValueName</th></tr>\n";
-    ptr += "<tr><td>current state</td><td> " + String(_autoPlayer->getCurrentState()->name) + "</td></tr>\n";
-    ptr += "<tr><td>current timeline</td><td> " + String(_autoPlayer->getCurrentTimelineName()) + "</td></tr>\n";
-    ptr += "<tr><td>is playing</td><td> " + String(_autoPlayer->isPlaying() == true ? "yes" : "no") + "</td></tr>\n";
-    ptr += "<tr><td>selected state id</td><td> " + String(_autoPlayer->selectedStateId()) + "</td></tr>\n";
-    ptr += "<tr><td>state selector available</td><td> " + String(_autoPlayer->getStateSelectorAvailable() == true ? "yes" : "no") + "</td></tr>\n";
-    ptr += "<tr><td>state selector STS servo channel</td><td> " + String(_autoPlayer->getStateSelectorStsServoChannel()) + "</td></tr>\n";
+        //  AutoPlayer status
+        ptr += "<div class=\"region\">\n";
+        ptr += "<span>Autoplayer</span>\n";
+        ptr += "<table>\n";
+        ptr += "<tr><th>Info</th><th>ValueName</th></tr>\n";
+        ptr += "<tr><td>current state</td><td> " + String(_autoPlayer->getCurrentState()->name) + "</td></tr>\n";
+        ptr += "<tr><td>current timeline</td><td> " + String(_autoPlayer->getCurrentTimelineName()) + "</td></tr>\n";
+        ptr += "<tr><td>is playing</td><td> " + String(_autoPlayer->isPlaying() == true ? "yes" : "no") + "</td></tr>\n";
+        ptr += "<tr><td>selected state id</td><td> " + String(_autoPlayer->selectedStateId()) + "</td></tr>\n";
+        ptr += "<tr><td>state selector available</td><td> " + String(_autoPlayer->getStateSelectorAvailable() == true ? "yes" : "no") + "</td></tr>\n";
+        ptr += "<tr><td>state selector STS servo channel</td><td> " + String(_autoPlayer->getStateSelectorStsServoChannel()) + "</td></tr>\n";
 
-    ptr += "</table>\n";
-    ptr += "</div>\n";
+        ptr += "</table>\n";
+        ptr += "</div>\n";
 
-    //  System messages
-    ptr += "<div class=\"region\">\n";
-    ptr += "<table>\n";
-    ptr += "<tr><th>Message</th></th></tr>\n";
-    auto msgPos = _messagesCount - 1;
-    for (int i = 0; i < MAX_LOG_MESSAGES; i++)
-    {
-        if (msgPos >= MAX_LOG_MESSAGES)
+        //  System messages
+        ptr += "<div class=\"region\">\n";
+        ptr += "<table>\n";
+        ptr += "<tr><th>Message</th></th></tr>\n";
+        auto msgPos = _messagesCount - 1;
+        for (int i = 0; i < MAX_LOG_MESSAGES; i++)
         {
-            msgPos = 0;
+            if (msgPos >= MAX_LOG_MESSAGES)
+            {
+                msgPos = 0;
+            }
+            ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
+            msgPos++;
         }
-        ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
-        msgPos++;
+        ptr += "</table>\n";
+        ptr += "</div>\n";
+
+        /*   if (led1stat)
+           {
+               ptr += "<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n";
+           }
+           else
+           {
+               ptr += "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/led1on\">ON</a>\n";
+           }
+
+           if (led2stat)
+           {
+               ptr += "<p>LED2 Status: ON</p><a class=\"button button-off\" href=\"/led2off\">OFF</a>\n";
+           }
+           else
+           {
+               ptr += "<p>LED2 Status: OFF</p><a class=\"button button-on\" href=\"/led2on\">ON</a>\n";
+           }*/
     }
-    ptr += "</table>\n";
-    ptr += "</div>\n";
-
-    /*   if (led1stat)
-       {
-           ptr += "<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n";
-       }
-       else
-       {
-           ptr += "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/led1on\">ON</a>\n";
-       }
-
-       if (led2stat)
-       {
-           ptr += "<p>LED2 Status: ON</p><a class=\"button button-off\" href=\"/led2off\">OFF</a>\n";
-       }
-       else
-       {
-           ptr += "<p>LED2 Status: OFF</p><a class=\"button button-on\" href=\"/led2on\">ON</a>\n";
-       }*/
-
     ptr += "<script type=\"text/javascript\">";
     ptr += " function Redirect() { window.location=\"http://192.168.1.1\";  }";
     ptr += " setTimeout('Redirect()', 2000); ";
