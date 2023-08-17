@@ -56,12 +56,12 @@ bool StSerialServoManager::servoAvailable(int id)
     }
 
     // not already found with scanIds(). Try to ping it directly.
-    int scanId = _serialServo.Ping(id);
-    if (scanId != -1)
-    {
-        servoIds->push_back(scanId);
-        return true;
-    }
+    // int scanId = _serialServo.Ping(id);
+    // if (scanId != -1)
+    // {
+    //     servoIds->push_back(scanId);
+    //     return true;
+    // }
 
     return false;
 }

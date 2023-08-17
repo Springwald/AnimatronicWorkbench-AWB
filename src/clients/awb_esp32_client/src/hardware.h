@@ -23,7 +23,7 @@
 #define STS_SERVO_RXD 18             // GPIO 18
 #define STS_SERVO_TXD 19             // GPIO 19
 #define STS_SERVO_MAX_TEMPERATURE 45 // max temperature (celsius) before servo is disabled
-#define STS_SERVO_MAX_LOAD 250       // max load before servo is disabled
+#define STS_SERVO_MAX_LOAD 150       // max load before servo is disabled
 
 /* DAC speaker */
 // #define USE_DAC_SPEAKER

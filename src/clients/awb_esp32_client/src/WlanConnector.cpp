@@ -75,7 +75,7 @@ String WlanConnector::GetHtml()
     ptr += "<body>\n";
     ptr += "<p>Animatronic Workbench - Client ID " + String(_clientId) + "</p>\n";
     ptr += "<h1>'" + String(_data->ProjectName) + "' figure</h1>\n";
-    ptr += "<p> " + String(ageSeconds) + " seconds uptime</p>\n";
+    ptr += "<p> " + String(ageSeconds / 60) + " minutes, " + String(ageSeconds % 60) + " seconds uptime</p>\n";
 
     // STS Servo status
     ptr += "<div class=\"region\">\n";
@@ -109,21 +109,24 @@ String WlanConnector::GetHtml()
     ptr += "<tr><td>is playing</td><td> " + String(_autoPlayer->isPlaying() == true ? "yes" : "no") + "</td></tr>\n";
     ptr += "<tr><td>selected state id</td><td> " + String(_autoPlayer->selectedStateId()) + "</td></tr>\n";
     ptr += "<tr><td>state selector available</td><td> " + String(_autoPlayer->getStateSelectorAvailable() == true ? "yes" : "no") + "</td></tr>\n";
+    ptr += "<tr><td>state selector STS servo channel</td><td> " + String(_autoPlayer->getStateSelectorStsServoChannel()) + "</td></tr>\n";
+
+    ptr += "</table>\n";
     ptr += "</div>\n";
 
     //  System messages
     ptr += "<div class=\"region\">\n";
     ptr += "<table>\n";
     ptr += "<tr><th>Message</th></th></tr>\n";
-    auto msgPos = _messagesCount;
+    auto msgPos = _messagesCount - 1;
     for (int i = 0; i < MAX_LOG_MESSAGES; i++)
     {
-        ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
-        msgPos++;
         if (msgPos >= MAX_LOG_MESSAGES)
         {
             msgPos = 0;
         }
+        ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
+        msgPos++;
     }
     ptr += "</table>\n";
     ptr += "</div>\n";

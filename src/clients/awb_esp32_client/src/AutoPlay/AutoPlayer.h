@@ -28,7 +28,7 @@ protected:
 
     int _currentStateId = -1;
     int _stateSelectorStsServoChannel;
-    bool _stateSelectorAvailable;
+    bool _stateSelectorAvailable = false;
     long _lastStateCheckMillis = -1;
 
 public:
@@ -46,6 +46,7 @@ public:
     TimelineState *getCurrentState();
     String getCurrentTimelineName();
     bool getStateSelectorAvailable();
+    int getStateSelectorStsServoChannel();
     int selectedStateId();
     void startNewTimeline(int timelineIndex);
     void startNewTimelineForSelectedState();

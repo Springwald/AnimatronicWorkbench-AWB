@@ -25,6 +25,11 @@ TimelineState *AutoPlayer::getCurrentState()
     return new TimelineState(1, String("Idle"));
 }
 
+int AutoPlayer::getStateSelectorStsServoChannel()
+{
+    return _stateSelectorStsServoChannel;
+}
+
 String AutoPlayer::getCurrentTimelineName()
 {
     if (_actualTimelineIndex == -1)
@@ -34,7 +39,8 @@ String AutoPlayer::getCurrentTimelineName()
     return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
 }
 
-bool AutoPlayer::getStateSelectorAvailable() {
+bool AutoPlayer::getStateSelectorAvailable()
+{
     return _stateSelectorAvailable;
 }
 
