@@ -103,7 +103,7 @@ namespace AwbStudio.TimelineControls
         /// set the scroll offset in a way, that the manual playPos is always at the position chosen in the hardware controller 
         /// </summary>
         /// <returns>true, when changed</returns>
-        private bool SyncScrollOffsetToNewPlayPos(int newPlayPosMs, bool snapToGrid)
+        public bool SyncScrollOffsetToNewPlayPos(int newPlayPosMs, bool snapToGrid)
         {
             if (this._timelinePlayer != null)
             {

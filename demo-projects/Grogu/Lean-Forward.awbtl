@@ -290,6 +290,14 @@
       "ServoId": "BodyTL"
     },
     {
+      "TimeMs": 12750,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck1",
+      "ValuePercent": 34.645669291338585,
+      "ServoId": "Neck1"
+    },
+    {
       "TimeMs": 13000,
       "Title": null,
       "Description": null,
@@ -482,6 +490,22 @@
       "ServoId": "Eyes"
     },
     {
+      "TimeMs": 24500,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck1",
+      "ValuePercent": 11.811023622047244,
+      "ServoId": "Neck1"
+    },
+    {
+      "TimeMs": 24500,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck2",
+      "ValuePercent": 90.5511811023622,
+      "ServoId": "Neck2"
+    },
+    {
       "TimeMs": 25750,
       "Title": null,
       "Description": null,
@@ -598,7 +622,7 @@
       "Title": null,
       "Description": null,
       "TargetObjectId": "Neck1",
-      "ValuePercent": 11.811023622047244,
+      "ValuePercent": 0,
       "ServoId": "Neck1"
     },
     {
@@ -606,7 +630,7 @@
       "Title": null,
       "Description": null,
       "TargetObjectId": "Neck2",
-      "ValuePercent": 87.4015748031496,
+      "ValuePercent": 100,
       "ServoId": "Neck2"
     },
     {
@@ -688,6 +712,14 @@
       "TargetObjectId": "HeadRot",
       "ValuePercent": 37.00787401574803,
       "ServoId": "HeadRot"
+    },
+    {
+      "TimeMs": 37500,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "Neck2",
+      "ValuePercent": 95.2755905511811,
+      "ServoId": "Neck2"
     },
     {
       "TimeMs": 39000,
