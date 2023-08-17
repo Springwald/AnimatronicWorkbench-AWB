@@ -34,6 +34,10 @@ String AutoPlayer::getCurrentTimelineName()
     return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
 }
 
+bool AutoPlayer::getStateSelectorAvailable() {
+    return _stateSelectorAvailable;
+}
+
 void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 {
     if (servoHaveErrorsLikeTooHot)

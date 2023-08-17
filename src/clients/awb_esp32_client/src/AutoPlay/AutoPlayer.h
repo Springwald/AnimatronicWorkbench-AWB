@@ -45,6 +45,7 @@ public:
     bool isPlaying();
     TimelineState *getCurrentState();
     String getCurrentTimelineName();
+    bool getStateSelectorAvailable();
     int selectedStateId();
     void startNewTimeline(int timelineIndex);
     void startNewTimelineForSelectedState();

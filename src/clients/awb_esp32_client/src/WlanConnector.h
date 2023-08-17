@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "AutoPlay/AutoPlayData.h"
+#include "AutoPlay/AutoPlayer.h"
 #include "hardware.h"
 #include <WiFi.h>
 #include <WebServer.h>
@@ -17,7 +18,7 @@ class WlanConnector
 {
     using TCallBackErrorOccured = std::function<void(String)>;
 
-protected:
+private:
     int _clientId;
     TCallBackErrorOccured _errorOccured;
     AutoPlayData *_data;
@@ -26,6 +27,7 @@ protected:
 
     std::vector<ActuatorValue> *_stsServoValues;
     std::vector<ActuatorValue> *_pwmServoValues;
+
     String _messages[MAX_LOG_MESSAGES];
     int _messagesCount;
 
@@ -34,10 +36,10 @@ protected:
     void handle_NotFound();
 
 public:
-    // std::vector<String> *messages;
+    AutoPlayer *_autoPlayer;
 
-    WlanConnector(int clientId, std::vector<ActuatorValue> *stsServoValues, std::vector<ActuatorValue> *pwmServoValues, TCallBackErrorOccured errorOccured)
-        : _errorOccured(errorOccured), _stsServoValues(stsServoValues), _pwmServoValues(pwmServoValues), _clientId(clientId)
+    WlanConnector(int clientId, std::vector<ActuatorValue> *stsServoValues, std::vector<ActuatorValue> *pwmServoValues, AutoPlayer *autoPlayer, TCallBackErrorOccured errorOccured)
+        : _errorOccured(errorOccured), _stsServoValues(stsServoValues), _pwmServoValues(pwmServoValues), _clientId(clientId), _autoPlayer(autoPlayer)
     {
         _data = new AutoPlayData();
     }

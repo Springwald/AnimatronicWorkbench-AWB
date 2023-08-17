@@ -69,7 +69,7 @@ void AwbClient::setup()
 
     const TCallBackErrorOccured wlanErrorOccured = [this](String message)
     { showError(message); };
-    _wlanConnector = new WlanConnector(_clientId, _stsServoValues, _pwmServoValues, wlanErrorOccured);
+    _wlanConnector = new WlanConnector(_clientId, _stsServoValues, _pwmServoValues, _autoPlayer, wlanErrorOccured);
     _wlanConnector->setup();
 
     showMsg("Found " + String(this->_stSerialServoManager->servoIds->size()) + " servos");
@@ -83,8 +83,8 @@ void AwbClient::setup()
     this->_dacSpeaker.setVolume(DEFAULT_VOLUME);
 #endif
 
-    _display.resetDebugInfos();
     showMsg("Welcome to the ESP32 Client for Animatronic WorkBench.");
+    _display.resetDebugInfos();
 }
 
 void AwbClient::showError(String message)

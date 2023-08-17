@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "AutoPlay/AutoPlayData.h"
+#include "AutoPlay/AutoPlayer.h"
 #include "WlanConnector.h"
 #include <vector>
 #include <WiFi.h>
@@ -68,13 +69,15 @@ String WlanConnector::GetHtml()
     ptr += "body{ margin-top: 0px; width: 100%;}\n";
     ptr += ".region { display: table; margin: 0.5em auto; border: 1px solid black; padding: 0.2em 1em 0.2em 1em;}\n";
     ptr += "tr:nth-child(even) {background-color: #eeeeee;}\n";
-    ptr += "table td { margin: 0; border: none; padding: 0 1em 0 1em;}\n";
+    ptr += "table td { margin: 0; border: none; padding: 0 1em 0 1em; }\n";
     ptr += "</style>\n";
     ptr += "</head>\n";
     ptr += "<body>\n";
     ptr += "<p>Animatronic Workbench - Client ID " + String(_clientId) + "</p>\n";
     ptr += "<h1>'" + String(_data->ProjectName) + "' figure</h1>\n";
     ptr += "<p> " + String(ageSeconds) + " seconds uptime</p>\n";
+
+    // STS Servo status
     ptr += "<div class=\"region\">\n";
     ptr += "<span>" + String(_stsServoValues->size()) + " STS-Servos</span>\n";
     ptr += "<table>\n";
@@ -82,11 +85,33 @@ String WlanConnector::GetHtml()
     for (int i = 0; i < _stsServoValues->size(); i++)
     {
         auto servo = _stsServoValues->at(i);
-        ptr += "<tr><td>" + String(servo.id) + "</td><td>" + servo.name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
+        auto name = servo.name;
+        for (int a = 0; a < _data->stsServoCount; a++)
+        {
+            if (_data->stsServoChannels[a] == servo.id)
+            {
+                name = _data->stsServoName[a];
+                break;
+            }
+        }
+        ptr += "<tr><td>" + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
     }
     ptr += "</table>\n";
     ptr += "</div>\n";
 
+    //  AutoPlayer status
+    ptr += "<div class=\"region\">\n";
+    ptr += "<span>Autoplayer</span>\n";
+    ptr += "<table>\n";
+    ptr += "<tr><th>Info</th><th>ValueName</th></tr>\n";
+    ptr += "<tr><td>current state</td><td> " + String(_autoPlayer->getCurrentState()->name) + "</td></tr>\n";
+    ptr += "<tr><td>current timeline</td><td> " + String(_autoPlayer->getCurrentTimelineName()) + "</td></tr>\n";
+    ptr += "<tr><td>is playing</td><td> " + String(_autoPlayer->isPlaying() == true ? "yes" : "no") + "</td></tr>\n";
+    ptr += "<tr><td>selected state id</td><td> " + String(_autoPlayer->selectedStateId()) + "</td></tr>\n";
+    ptr += "<tr><td>state selector available</td><td> " + String(_autoPlayer->getStateSelectorAvailable() == true ? "yes" : "no") + "</td></tr>\n";
+    ptr += "</div>\n";
+
+    //  System messages
     ptr += "<div class=\"region\">\n";
     ptr += "<table>\n";
     ptr += "<tr><th>Message</th></th></tr>\n";
