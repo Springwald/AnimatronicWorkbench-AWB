@@ -190,6 +190,7 @@ void AwbClient::loop()
     if (!packetReceived)
         _display.loop();
 
+    _wlanConnector->memoryInfo = _display.memoryInfo;
     _wlanConnector->update();
 }
 

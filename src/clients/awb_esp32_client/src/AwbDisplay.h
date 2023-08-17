@@ -36,6 +36,8 @@ private:
   bool draw_debugInfos();
 
 public:
+  String memoryInfo;
+
   void setup(int clientId);
   void loop();
 

@@ -441,7 +441,8 @@ bool AwbDisplay::draw_debugInfos()
     statusFooterSprite.fillScreen(0x000000);
 
     y++;
-    statusFooterSprite.drawString("free:" + String(freeMemory / 1024) + "k lost:" + String(_freeMemoryOnStart - freeMemory), statusFooterSprite.width() / 2, y);
+    memoryInfo = "free:" + String(freeMemory / 1024) + "k lost:" + String(_freeMemoryOnStart - freeMemory);
+    statusFooterSprite.drawString(memoryInfo, statusFooterSprite.width() / 2, y);
 
     y += _textSizeLineHeight;
     statusFooterSprite.setTextColor(0xAAAAFFU, 0);

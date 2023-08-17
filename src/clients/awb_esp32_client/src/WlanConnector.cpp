@@ -75,7 +75,7 @@ String WlanConnector::GetHtml()
     ptr += "<body>\n";
     ptr += "<p>Animatronic Workbench - Client ID " + String(_clientId) + "</p>\n";
     ptr += "<h1>'" + String(_data->ProjectName) + "' figure</h1>\n";
-    ptr += "<p> " + String(ageSeconds / 60) + " minutes, " + String(ageSeconds % 60) + " seconds uptime</p>\n";
+    ptr += "<p> " + String(ageSeconds / 60) + " minutes, " + String(ageSeconds % 60) + " seconds uptime<br/>" + memoryInfo + "</p>\n";
 
     // STS Servo status
     ptr += "<div class=\"region\">\n";

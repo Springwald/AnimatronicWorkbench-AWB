@@ -37,6 +37,7 @@ private:
 
 public:
     AutoPlayer *_autoPlayer;
+    String memoryInfo;
 
     WlanConnector(int clientId, std::vector<ActuatorValue> *stsServoValues, std::vector<ActuatorValue> *pwmServoValues, AutoPlayer *autoPlayer, TCallBackErrorOccured errorOccured)
         : _errorOccured(errorOccured), _stsServoValues(stsServoValues), _pwmServoValues(pwmServoValues), _clientId(clientId), _autoPlayer(autoPlayer)
