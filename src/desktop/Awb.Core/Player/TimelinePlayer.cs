@@ -25,7 +25,7 @@ namespace Awb.Core.Player
             Playing
         }
 
-        private PlayStates _playState;
+        public  PlayStates PlayState { get; private set; } = PlayStates.Nothing;
 
         private volatile bool _timerFiring;
         private volatile bool _updating;
@@ -77,14 +77,14 @@ namespace Awb.Core.Player
                 _playTimer = new Timer(PlayTimerCallback);
                 _playTimer.Change(dueTime: _updatePlayPeriodMs, period: _updatePlayPeriodMs);
             }
-            _playState = PlayStates.Playing;
+            PlayState = PlayStates.Playing;
             await Task.CompletedTask;
         }
 
 
         public async void Stop()
         {
-            _playState = PlayStates.Nothing;
+            PlayState = PlayStates.Nothing;
             await Task.CompletedTask;
         }
 
@@ -159,7 +159,7 @@ namespace Awb.Core.Player
 
             if (OnPlayStateChanged != null) OnPlayStateChanged.Invoke(this, new PlayStateEventArgs
             {
-                PlayState = _playState,
+                PlayState = PlayState,
                 PlaybackSpeed = PlaybackSpeed,
                 PositionMs = newPositionMs,
             });
@@ -184,7 +184,7 @@ namespace Awb.Core.Player
             TimeSpan diff = (DateTime.UtcNow - _lastPlayUpdate.Value);
             _lastPlayUpdate = DateTime.UtcNow;
 
-            if (_playState == PlayStates.Playing)
+            if (PlayState == PlayStates.Playing)
             {
                 if (PositionMs >= TimelineData.DurationMs)
                 {
