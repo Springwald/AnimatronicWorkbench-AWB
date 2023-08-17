@@ -13,6 +13,7 @@
 #include "AutoPlay/AutoPlayer.h"
 #include "WlanConnector.h"
 #include "Hardware.h"
+#include "ActualStatusInformation.h"
 
 using byte = unsigned char;
 
@@ -36,8 +37,7 @@ protected:
     String _lastAutoPlayTimelineName = "";
     WlanConnector *_wlanConnector;
 
-    std::vector<ActuatorValue> *_stsServoValues;
-    std::vector<ActuatorValue> *_pwmServoValues;
+    ActualStatusInformation *_actualStatusInformation;
 
     void processPacket(String payload);
     void updateActuators();
@@ -52,8 +52,7 @@ public:
     AwbClient(const unsigned int clientId)
     {
         _clientId = clientId;
-        _stsServoValues = new std::vector<ActuatorValue>();
-        _pwmServoValues = new std::vector<ActuatorValue>();
+        _actualStatusInformation = new ActualStatusInformation();
     }
 
     ~AwbClient()

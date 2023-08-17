@@ -17,7 +17,7 @@ namespace Awb.Core.Player
     //todo: no concept for ramping behaviour yet: Value changes are submittet to the actuatator imidiatelly
     public class TimelinePlayer : IDisposable
     {
-        public int PlayPosSnapMs = 250;
+        public const int PlayPosSnapMs = 250;
 
         public enum PlayStates
         {

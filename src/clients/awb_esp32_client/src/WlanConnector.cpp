@@ -9,8 +9,7 @@
 
 void WlanConnector::setup()
 {
-    logInfo(String("Starting up..."));
-
+    return;
     IPAddress local_ip(192, 168, 1, 1);
     IPAddress gateway(192, 168, 1, 1);
     IPAddress subnet(255, 255, 255, 0);
@@ -30,6 +29,7 @@ void WlanConnector::setup()
 
 void WlanConnector::update()
 {
+    return;
     _server->handleClient();
 }
 
@@ -75,67 +75,68 @@ String WlanConnector::GetHtml()
     ptr += "</style>\n";
     ptr += "</head>\n";
     ptr += "<body>\n";
-    if (true)
+    if (false)
     {
         ptr += "<p>Animatronic Workbench - Client ID " + String(_clientId) + "</p>\n";
         ptr += "<h1>'" + String(_data->ProjectName) + "' figure</h1>\n";
 
         ptr += "<p> " + String(ageHours) + " hours, " + String(ageMinutes % 60) + " minutes, " + String(ageSeconds % 60) + " seconds uptime<br/>" + *memoryInfo + "</p>\n";
 
-        // STS Servo status
-        ptr += "<div class=\"region\">\n";
-        ptr += "<span>" + String(_stsServoValues->size()) + " STS-Servos</span>\n";
-        ptr += "<table>\n";
-        ptr += "<tr><th>Id</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th></tr>\n";
-        for (int i = 0; i < _stsServoValues->size(); i++)
-        {
-            auto servo = _stsServoValues->at(i);
-            auto name = servo.name;
-            for (int a = 0; a < _data->stsServoCount; a++)
-            {
-                if (_data->stsServoChannels[a] == servo.id)
+        /*
+                // STS Servo status
+                ptr += "<div class=\"region\">\n";
+                ptr += "<span>" + String( this->_actualStatusInformation->stsServoValues->size()) + " STS-Servos</span>\n";
+                ptr += "<table>\n";
+                ptr += "<tr><th>Id</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th></tr>\n";
+                for (int i = 0; i <  this->_actualStatusInformation->stsServoValues->size(); i++)
                 {
-                    name = _data->stsServoName[a];
-                    break;
+                    auto servo =  this->_actualStatusInformation->stsServoValues->at(i);
+                    auto name = servo.name;
+                    for (int a = 0; a < _data->stsServoCount; a++)
+                    {
+                        if (_data->stsServoChannels[a] == servo.id)
+                        {
+                            name = _data->stsServoName[a];
+                            break;
+                        }
+                    }
+                    ptr += "<tr><td>" + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
                 }
-            }
-            ptr += "<tr><td>" + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
-        }
-        ptr += "</table>\n";
-        ptr += "</div>\n";
+                ptr += "</table>\n";
+                ptr += "</div>\n";
 
-        //  AutoPlayer status
-        ptr += "<div class=\"region\">\n";
-        ptr += "<span>Autoplayer</span>\n";
-        ptr += "<table>\n";
-        ptr += "<tr><th>Info</th><th>ValueName</th></tr>\n";
-        ptr += "<tr><td>current state</td><td> " + String(_autoPlayer->getCurrentState()->name) + "</td></tr>\n";
-        ptr += "<tr><td>current timeline</td><td> " + String(_autoPlayer->getCurrentTimelineName()) + "</td></tr>\n";
-        ptr += "<tr><td>is playing</td><td> " + String(_autoPlayer->isPlaying() == true ? "yes" : "no") + "</td></tr>\n";
-        ptr += "<tr><td>selected state id</td><td> " + String(_autoPlayer->selectedStateId()) + "</td></tr>\n";
-        ptr += "<tr><td>state selector available</td><td> " + String(_autoPlayer->getStateSelectorAvailable() == true ? "yes" : "no") + "</td></tr>\n";
-        ptr += "<tr><td>state selector STS servo channel</td><td> " + String(_autoPlayer->getStateSelectorStsServoChannel()) + "</td></tr>\n";
+                //  AutoPlayer status
+                ptr += "<div class=\"region\">\n";
+                ptr += "<span>Autoplayer</span>\n";
+                ptr += "<table>\n";
+                ptr += "<tr><th>Info</th><th>ValueName</th></tr>\n";
+                ptr += "<tr><td>current state</td><td> " + String(this->_actualStatusInformation->autoPlayerCurrentStateName) + "</td></tr>\n";
+                ptr += "<tr><td>current timeline</td><td> " + String(_actualStatusInformation->autoPlayerCurrentTimelineName) + "</td></tr>\n";
+                ptr += "<tr><td>is playing</td><td> " + String(_actualStatusInformation->autoPlayerIsPlaying == true ? "yes" : "no") + "</td></tr>\n";
+                ptr += "<tr><td>selected state id</td><td> " + String(_actualStatusInformation->autoPlayerSelectedStateId) + "</td></tr>\n";
+                ptr += "<tr><td>state selector available</td><td> " + String( _actualStatusInformation->autoPlayerStateSelectorAvailable == true ? "yes" : "no") + "</td></tr>\n";
+                ptr += "<tr><td>state selector STS servo channel</td><td> " + String(_actualStatusInformation->autoPlayerStateSelectorStsServoChannel) + "</td></tr>\n";
 
-        ptr += "</table>\n";
-        ptr += "</div>\n";
+                ptr += "</table>\n";
+                ptr += "</div>\n";
 
-        //  System messages
-        ptr += "<div class=\"region\">\n";
-        ptr += "<table>\n";
-        ptr += "<tr><th>Message</th></th></tr>\n";
-        auto msgPos = _messagesCount - 1;
-        for (int i = 0; i < MAX_LOG_MESSAGES; i++)
-        {
-            if (msgPos >= MAX_LOG_MESSAGES)
-            {
-                msgPos = 0;
-            }
-            ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
-            msgPos++;
-        }
-        ptr += "</table>\n";
-        ptr += "</div>\n";
-
+                //  System messages
+                ptr += "<div class=\"region\">\n";
+                ptr += "<table>\n";
+                ptr += "<tr><th>Message</th></th></tr>\n";
+                auto msgPos = _messagesCount - 1;
+                for (int i = 0; i < MAX_LOG_MESSAGES; i++)
+                {
+                    if (msgPos >= MAX_LOG_MESSAGES)
+                    {
+                        msgPos = 0;
+                    }
+                    ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
+                    msgPos++;
+                }
+                ptr += "</table>\n";
+                ptr += "</div>\n";
+        */
         /*   if (led1stat)
            {
                ptr += "<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n";

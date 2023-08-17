@@ -9,6 +9,7 @@
 #include <WebServer.h>
 #include "ActuatorValue.h"
 #include <String.h>
+#include "ActualStatusInformation.h"
 
 using byte = unsigned char;
 
@@ -24,9 +25,7 @@ private:
     AutoPlayData *_data;
     WebServer *_server;
     long _startTime = millis();
-
-    std::vector<ActuatorValue> *_stsServoValues;
-    std::vector<ActuatorValue> *_pwmServoValues;
+    ActualStatusInformation *_actualStatusInformation;
 
     String _messages[MAX_LOG_MESSAGES];
     int _messagesCount;
@@ -36,11 +35,10 @@ private:
     void handle_NotFound();
 
 public:
-    AutoPlayer *_autoPlayer;
     String *memoryInfo;
 
-    WlanConnector(int clientId, std::vector<ActuatorValue> *stsServoValues, std::vector<ActuatorValue> *pwmServoValues, AutoPlayer *autoPlayer, TCallBackErrorOccured errorOccured)
-        : _errorOccured(errorOccured), _stsServoValues(stsServoValues), _pwmServoValues(pwmServoValues), _clientId(clientId), _autoPlayer(autoPlayer)
+    WlanConnector(int clientId, ActualStatusInformation *actualStatusInformation, TCallBackErrorOccured errorOccured)
+        : _errorOccured(errorOccured), _clientId(clientId), _actualStatusInformation(actualStatusInformation)
     {
         _data = new AutoPlayData();
     }

@@ -11,6 +11,7 @@ using Awb.Core.Timelines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -25,7 +26,8 @@ namespace AwbStudio.TimelineControls
         private TimelineData? _timelineData;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private int _playPosMs = 0;
-        public TimelineViewPos ViewPos  { get; } = new TimelineViewPos();
+        private bool _wasPlaying = false;
+        public TimelineViewPos ViewPos { get; } = new TimelineViewPos();
 
         private TimelineCaptions? _timelineCaptions;
 
@@ -35,6 +37,7 @@ namespace AwbStudio.TimelineControls
             set
             {
                 _timelineData = value;
+                SyncScrollOffsetToNewPlayPos(0, snapToGrid: true);
                 PaintTimeLine();
                 PaintPlayPos(_timelineData);
             }
@@ -52,7 +55,7 @@ namespace AwbStudio.TimelineControls
 
         public TimelinePlayer? _timelinePlayer;
 
-        public TimelinePlayer? TimelinePlayer
+        public TimelinePlayer? Timelineplayer
         {
             get => _timelinePlayer;
             set
@@ -70,11 +73,16 @@ namespace AwbStudio.TimelineControls
             switch (e.PlayState)
             {
                 case TimelinePlayer.PlayStates.Nothing:
+                    if (_wasPlaying)
+                    {
+                        scrollingChanged = SyncScrollOffsetToNewPlayPos(e.PositionMs, snapToGrid: true);
+                        _wasPlaying = false;
+                    }
                     break;
+
                 case TimelinePlayer.PlayStates.Playing:
-                    
-                    var actualPlayPosMs = e.PositionMs;
-                    scrollingChanged = SyncScrollOffsetToNewPlayPos(actualPlayPosMs);
+                    scrollingChanged = SyncScrollOffsetToNewPlayPos(e.PositionMs, snapToGrid: false);
+                    _wasPlaying = true;
                     break;
 
                 default: throw new ArgumentOutOfRangeException($"{nameof(e.PlayState)}:{e.PlayState.ToString()}");
@@ -95,15 +103,19 @@ namespace AwbStudio.TimelineControls
         /// set the scroll offset in a way, that the manual playPos is always at the position chosen in the hardware controller 
         /// </summary>
         /// <returns>true, when changed</returns>
-        private bool SyncScrollOffsetToNewPlayPos(int newPlayPosMs)
+        private bool SyncScrollOffsetToNewPlayPos(int newPlayPosMs, bool snapToGrid)
         {
             if (this._timelinePlayer != null)
             {
-                if (this._timelinePlayer.PlayState == TimelinePlayer.PlayStates.Playing)
+                if (snapToGrid)
                 {
-                    this.ViewPos.ScrollOffsetMs = newPlayPosMs - this.ViewPos.PosSelectorManualMs;
-                    return true;
+                    this.ViewPos.ScrollOffsetMs = ((newPlayPosMs - this.ViewPos.PosSelectorManualMs) / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
                 }
+                else
+                {
+                    this.ViewPos.ScrollOffsetMs = newPlayPosMs - this.ViewPos.PosSelectorManualMs ;
+                }
+                return true;
             }
             return false;
         }
@@ -165,10 +177,11 @@ namespace AwbStudio.TimelineControls
             OpticalGrid.Children.Clear();
             var duration = ViewPos.DisplayMs;
             const int STEP = 1000;
-            for (int ms = 0; ms < duration + STEP; ms += STEP)
+            for (int msRaw = 0; msRaw < duration + ViewPos.DisplayMs; msRaw += STEP)
             {
-                var x = (ms - ViewPos.ScrollOffsetMs % STEP ) * this.ActualWidth / duration;
-                if (x > 0)
+                int ms = msRaw - ViewPos.ScrollOffsetMs;
+                var x = ms * this.ActualWidth / duration;
+                if (x > 0 && x < this.ActualWidth)
                 {
                     OpticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = this.ActualHeight - _paintMarginTopBottom, Stroke = _gridLineBrush });
                     OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: this.ActualHeight - 30, right: 0, bottom: 0) });
@@ -231,8 +244,8 @@ namespace AwbStudio.TimelineControls
         private void PaintPlayPos(TimelineData? timeline)
         {
             // draw the manual midi controller play position as triangle at the bottom
-            var x =  ((double)(ViewPos.PosSelectorManualMs) / ViewPos.DisplayMs) * this.ActualWidth;
-           ManualPlayPosAbsolute.Margin = new Thickness(x - ManualPlayPosAbsolute.ActualWidth/2 , 0,0,0);
+            var x = ((double)(ViewPos.PosSelectorManualMs) / ViewPos.DisplayMs) * this.ActualWidth;
+            ManualPlayPosAbsolute.Margin = new Thickness(x - ManualPlayPosAbsolute.ActualWidth / 2, 0, 0, 0);
 
             // draw the play position as a vertical line
             if (timeline == null || _playPosMs < 0 || _playPosMs > ViewPos.ScrollOffsetMs + ViewPos.DisplayMs)
@@ -248,7 +261,6 @@ namespace AwbStudio.TimelineControls
                 PlayPosLine.Y2 = this.ActualHeight;
                 PlayPosLine.Visibility = Visibility.Visible;
             }
-
         }
 
 

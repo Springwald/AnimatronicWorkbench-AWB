@@ -43,6 +43,7 @@ namespace AwbStudio
         private volatile bool _manualUpdatingPlayPos;
         private volatile bool _manualUpdatingValues;
         private bool _switchingPages;
+        private int _lastActuatorChanged= 1; // prevent double actuator change events to the midi controller
 
         protected TimelineData TimelineData { get; set; }
 
@@ -88,7 +89,7 @@ namespace AwbStudio
             _timelinePlayer.OnPlayStateChanged += OnPlayStateChanged;
 
             TimelineViewerControl.TimelineData = TimelineData;
-            TimelineViewerControl.TimelinePlayer = _timelinePlayer;
+            TimelineViewerControl.Timelineplayer = _timelinePlayer;
             TimelineViewerControl.ActuatorsService = _actuatorsService;
 
             TimelineChooser.OnTimelineChosen += TimelineChosenToLoad;
@@ -146,7 +147,7 @@ namespace AwbStudio
             {
                 case TimelineControllerEventArgs.EventTypes.PlayPosAbsoluteChanged:
                     var viewPos = TimelineViewerControl.ViewPos;
-                    viewPos.PosSelectorManualMs = ((int)((viewPos.DisplayMs / 100.0 * e.ValueInPercent) / _timelinePlayer.PlayPosSnapMs) * _timelinePlayer.PlayPosSnapMs);
+                    viewPos.PosSelectorManualMs = ((int)((viewPos.DisplayMs / 100.0 * e.ValueInPercent) / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs);
 
                     switch (_timelinePlayer.PlayState)
                     {
@@ -165,7 +166,7 @@ namespace AwbStudio
                         default:
                             throw new ArgumentOutOfRangeException($"{nameof(_timelinePlayer.PlayState)}:{_timelinePlayer.PlayState.ToString()}");
                     }
-
+                    _lastActuatorChanged = -1;
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.Play:
@@ -205,10 +206,17 @@ namespace AwbStudio
                     if (_manualUpdatingValues) await _timelinePlayer.Update();
                     _manualUpdatingValues = false;
                     MyInvoker.Invoke(new Action(() => { TimelineViewerControl.PaintTimeLine(); }));
+                    if (_lastActuatorChanged != e.ActuatorIndex)
+                    {
+                        ShowValuesOnTimelineInputController(_timelinePlayer.PositionMs);
+                        _lastActuatorChanged = e.ActuatorIndex;
+                    }
+                    
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.ActuatorTogglePoint:
                     _unsavedChanges = true;
+                    _lastActuatorChanged = -1;
                     servos = _actuatorsService?.Servos;
                     if (servos == null) return;
                     if (e.ActuatorIndex >= servos.Length) return;
@@ -232,15 +240,17 @@ namespace AwbStudio
 
                 case TimelineControllerEventArgs.EventTypes.NextPage:
                     await ScrollPaging(pageSizeMs);
+                    _lastActuatorChanged = -1;
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.PreviousPage:
                     await ScrollPaging(-pageSizeMs);
+                    _lastActuatorChanged = -1;
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.Save:
-
                     this.SaveTimelineData();
+                    _lastActuatorChanged = -1;
                     break;
 
                 default:
@@ -251,7 +261,7 @@ namespace AwbStudio
         private async Task ScrollPaging(int howManyMs)
         {
             if (TimelineViewerControl == null) return;
-            if (TimelineViewerControl.TimelinePlayer == null) return;
+            if (TimelineViewerControl.Timelineplayer == null) return;
             if (_switchingPages) return;
             int fps = 20;
             int speed = 4; // speed (x seconds per second)
@@ -261,7 +271,7 @@ namespace AwbStudio
             {
                 var newOffset = TimelineViewerControl.ViewPos.ScrollOffsetMs + scrollSpeedMs;
                 TimelineViewerControl.ViewPos.ScrollOffsetMs = Math.Max(0, newOffset);
-                await TimelineViewerControl.TimelinePlayer.Update(TimelineViewerControl.TimelinePlayer.PositionMs + scrollSpeedMs);
+                await TimelineViewerControl.Timelineplayer.Update(TimelineViewerControl.Timelineplayer.PositionMs + scrollSpeedMs);
                 MyInvoker.Invoke(new Action(() => TimelineViewerControl.PaintTimeLine()));
                 await Task.Delay(1000 / fps);
             }
@@ -338,7 +348,6 @@ namespace AwbStudio
             }
             ComboTimelineStates.SelectedIndex = _project.TimelinesStates?.TakeWhile(t => t.Id != data.TimelineStateId).Count() ?? 0;
 
-
             if (_timelinePlayer != null)
             {
                 await _timelinePlayer.Update(0);
@@ -405,13 +414,13 @@ namespace AwbStudio
         private async void Stop()
         {
             // snap scrollpos to snap positions 
-            TimelineViewerControl.ViewPos.ScrollOffsetMs = (TimelineViewerControl.ViewPos.ScrollOffsetMs / _timelinePlayer.PlayPosSnapMs) * _timelinePlayer.PlayPosSnapMs;
+            TimelineViewerControl.ViewPos.ScrollOffsetMs = (TimelineViewerControl.ViewPos.ScrollOffsetMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
             if (_timelinePlayer != null)
             {
                 _timelinePlayer.Stop();
 
                 // snap playpos to snap positions 
-                await _timelinePlayer.Update((_timelinePlayer.PositionMs / _timelinePlayer.PlayPosSnapMs) * _timelinePlayer.PlayPosSnapMs);
+                await _timelinePlayer.Update((_timelinePlayer.PositionMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs);
             }
             _timelineController?.SetPlayState(ITimelineController.PlayStates.Editor);
             MyInvoker.Invoke(new Action(() => TimelineViewerControl.PaintTimeLine()));
