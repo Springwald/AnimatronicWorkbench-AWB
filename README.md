@@ -4,6 +4,9 @@
 
 An desktop editor and thin clients to choreograph animatronic movements
 
+See project website at
+https://daniel.springwald.de/post/2023/AnimatronicWorkbench-EN
+
 ## Setup
 
 Check the hardware.h file for the correct setting:
