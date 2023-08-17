@@ -91,7 +91,7 @@ void AwbClient::showError(String message)
 {
     int durationMs = 2000;
     _display.draw_message(message, durationMs, MSG_TYPE_ERROR);
-    // _wlanConnector->logError(message);
+    _wlanConnector->logError(message);
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
 #endif

@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include "StSerialServoManager.h"
 #include "hardware.h"
+#include "ActualStatusInformation.h"
+#include "ActuatorValue.h"
 
 // It's pretty messy and also a bit unclean that the library creates a global object.
 // But it is the only way I found to use the library.
@@ -23,22 +25,23 @@ void StSerialServoManager::updateActuators()
 
     for (int i = 0; i < this->stsServoValues->size(); i++)
     {
-        auto servo = this->stsServoValues->at(i);
-        if (servo.targetValue == -1)
+        // get a pointer to the current servo
+        ActuatorValue *servo = &this->stsServoValues->at(i);
+        if (servo->targetValue == -1)
         {
             // turn servo off
-            setTorque(servo.id, false);
+            setTorque(servo->id, false);
         }
         else
         {
             // set new target value if changed
-            if (servo.currentValue != servo.targetValue)
+            if (servo->currentValue != servo->targetValue)
             {
-                int speed = servo.speed;
-                int acc = servo.acc;
+                int speed = servo->speed;
+                int acc = servo->acc;
                 if (speed == -1 && acc == -1)
                 {
-                    _serialServo.WritePosEx(servo.id, servo.targetValue, STS_SERVO_SPEED, STS_SERVO_ACC);
+                    _serialServo.WritePosEx(servo->id, servo->targetValue, STS_SERVO_SPEED, STS_SERVO_ACC);
                 }
                 else
                 {
@@ -46,9 +49,9 @@ void StSerialServoManager::updateActuators()
                         speed = STS_SERVO_SPEED;
                     if (acc == -1)
                         acc = STS_SERVO_ACC;
-                    _serialServo.WritePosEx(servo.id, servo.targetValue, speed, acc);
+                    _serialServo.WritePosEx(servo->id, servo->targetValue, speed, acc);
                 }
-                servo.currentValue = servo.targetValue;
+                servo->currentValue = servo->targetValue;
             }
         }
     }
@@ -65,9 +68,6 @@ void StSerialServoManager::writePositionDetailed(int id, int position, int speed
             stsServoValues->at(i).acc = acc;
         }
     }
-    //_serialServo.WritePosEx(id, position, 500, 200);
-    // updateActuators();
-    // updateActuators();
 }
 
 void StSerialServoManager::writePosition(int id, int position)
@@ -79,8 +79,6 @@ void StSerialServoManager::writePosition(int id, int position)
             stsServoValues->at(i).targetValue = position;
         }
     }
-    // serialServo.WritePosEx(id, position, 500, 20);
-    // updateActuators();
 }
 
 int StSerialServoManager::readPosition(u8 id)

@@ -22,7 +22,7 @@ protected:
     StSerialServoManager *_stSerialServoManager;
     AutoPlayData *_data;
     long _lastMsUpdate;
-    long _lastPacketReceivedMillis;
+    long _lastPacketReceivedMillis = -1;
     int _actualTimelineIndex = -1;
     int _playPosInActualTimeline = 0;
 
