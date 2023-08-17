@@ -30,8 +30,7 @@ protected:
     AdafruitPwmManager *_adafruitpwmManager;
     StSerialServoManager *_stSerialServoManager;
     NeoPixelStatusControl *_neoPixelStatus;
-    bool _servoCriticalTemp = false;
-    bool _servoCriticalLoad = false;
+
     AutoPlayer *_autoPlayer;
     int _lastAutoPlaySelectedStateId = -1;
     String _lastAutoPlayTimelineName = "";

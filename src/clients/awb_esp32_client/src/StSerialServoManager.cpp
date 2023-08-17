@@ -16,6 +16,34 @@ void StSerialServoManager::setup()
     scanIds();
 }
 
+void StSerialServoManager::updateActuators()
+{
+    if (servoCriticalTemp || servoCriticalLoad)
+        return;
+
+    for (int i = 0; i < this->stsServoValues->size(); i++)
+    {
+        // Sts serial bus servos
+        if (this->stsServoValues->at(i).name.length() > 0)
+        {
+            if (this->stsServoValues->at(i).targetValue == -1)
+            {
+                // turn servo off
+                setTorque(this->stsServoValues->at(i).id, false);
+            }
+            else
+            {
+                // set new target value if changed
+                if (this->stsServoValues->at(i).currentValue != this->stsServoValues->at(i).targetValue)
+                {
+                    writePosition(this->stsServoValues->at(i).id, this->stsServoValues->at(i).targetValue);
+                    this->stsServoValues->at(i).currentValue = this->stsServoValues->at(i).targetValue;
+                }
+            }
+        }
+    }
+}
+
 void StSerialServoManager::writePositionDetailed(u8 id, s16 position, u16 speed, u8 acc)
 {
     for (int i = 0; i < stsServoValues->size(); i++)

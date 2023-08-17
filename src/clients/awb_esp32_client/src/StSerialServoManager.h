@@ -20,14 +20,19 @@ private:
     int _acc;
     int _gpioRxd;
     int _gpioTxd;
+
     void scanIds(); /// scan for Ids and store in "servoIds"
 
 public:
+    bool servoCriticalTemp = false;
+    bool servoCriticalLoad = false;
     std::vector<u8> *servoIds;
 
     StSerialServoManager(std::vector<ActuatorValue> *stsServoValues, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd, int speed, int acc) : _errorOccured(errorOccured), _speed(speed), _acc(acc), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), stsServoValues(stsServoValues){};
 
     void setup();
+    void updateActuators();
+
     void writePositionDetailed(u8 id, s16 position, u16 speed, u8 acc);
     void writePosition(u8 id, s16 position);
     int readPosition(u8 id);

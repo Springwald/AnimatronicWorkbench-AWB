@@ -112,7 +112,7 @@ void AwbClient::loop()
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
-    _autoPlayer->update(_servoCriticalTemp);
+    _autoPlayer->update(this->_stSerialServoManager->servoCriticalTemp);
 
     if (_autoPlayer->selectedStateId() != _lastAutoPlaySelectedStateId)
     {
@@ -138,7 +138,7 @@ void AwbClient::loop()
 
     if (!packetReceived && millis() > _lastStatusMillis + 100)
     {
-        if (_servoCriticalTemp || _servoCriticalLoad)
+        if (this->_stSerialServoManager->servoCriticalTemp == true || this->_stSerialServoManager->servoCriticalLoad == true)
         {
             readActuatorsStatuses();
             showTemperaturStatuses();
@@ -275,50 +275,12 @@ void AwbClient::processPacket(String payload)
         }
     }
 
-    updateActuators();
+    _stSerialServoManager->updateActuators();
     _autoPlayer->stopBecauseOfIncommingPackage();
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->showActivity();
 #endif
-}
-
-void AwbClient::updateActuators()
-{
-    if (_servoCriticalTemp || _servoCriticalLoad)
-        return;
-
-    for (int i = 0; i < this->_actualStatusInformation->stsServoValues->size(); i++)
-    {
-        // Sts serial bus servos
-        if (this->_actualStatusInformation->stsServoValues->at(i).name.length() > 0)
-        {
-            if (this->_actualStatusInformation->stsServoValues->at(i).targetValue == -1)
-            {
-                // turn servo off
-                _stSerialServoManager->setTorque(this->_actualStatusInformation->stsServoValues->at(i).id, false);
-            }
-            else
-            {
-                // set new target value if changed
-                if (this->_actualStatusInformation->stsServoValues->at(i).currentValue != this->_actualStatusInformation->stsServoValues->at(i).targetValue)
-                {
-                    _stSerialServoManager->writePosition(this->_actualStatusInformation->stsServoValues->at(i).id, this->_actualStatusInformation->stsServoValues->at(i).targetValue);
-                    this->_actualStatusInformation->stsServoValues->at(i).currentValue = this->_actualStatusInformation->stsServoValues->at(i).targetValue;
-                }
-            }
-        }
-    }
-
-    for (int i = 0; i < this->_actualStatusInformation->pwmServoValues->size(); i++)
-    {
-
-        // Adafruit PWM driver
-        if (this->_actualStatusInformation->pwmServoValues->at(i).name.length() > 0)
-        {
-            // not implemented yet
-        }
-    }
 }
 
 void AwbClient::readActuatorsStatuses()
@@ -357,8 +319,8 @@ void AwbClient::readActuatorsStatuses()
         }
     }
 
-    _servoCriticalTemp = criticalTemp;
-    _servoCriticalLoad = criticalLoad;
+    this->_stSerialServoManager->servoCriticalTemp = criticalTemp;
+    this->_stSerialServoManager->servoCriticalLoad = criticalLoad;
 }
 
 void AwbClient::showValues()
