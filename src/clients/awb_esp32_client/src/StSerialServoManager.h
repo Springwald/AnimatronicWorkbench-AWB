@@ -33,8 +33,8 @@ public:
     void setup();
     void updateActuators();
 
-    void writePositionDetailed(u8 id, s16 position, u16 speed, u8 acc);
-    void writePosition(u8 id, s16 position);
+    void writePositionDetailed(int id, int position, int speed, int acc);
+    void writePosition(int id, int position);
     int readPosition(u8 id);
     void setTorque(u8 id, bool on);
     int readTemperature(int id);

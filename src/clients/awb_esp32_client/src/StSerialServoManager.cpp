@@ -18,54 +18,69 @@ void StSerialServoManager::setup()
 
 void StSerialServoManager::updateActuators()
 {
-    if (servoCriticalTemp || servoCriticalLoad)
+    if (servoCriticalTemp == true || servoCriticalLoad == true)
         return;
 
     for (int i = 0; i < this->stsServoValues->size(); i++)
     {
-        // Sts serial bus servos
-        if (this->stsServoValues->at(i).name.length() > 0)
+        auto servo = this->stsServoValues->at(i);
+        if (servo.targetValue == -1)
         {
-            if (this->stsServoValues->at(i).targetValue == -1)
+            // turn servo off
+            setTorque(servo.id, false);
+        }
+        else
+        {
+            // set new target value if changed
+            if (servo.currentValue != servo.targetValue)
             {
-                // turn servo off
-                setTorque(this->stsServoValues->at(i).id, false);
-            }
-            else
-            {
-                // set new target value if changed
-                if (this->stsServoValues->at(i).currentValue != this->stsServoValues->at(i).targetValue)
+                int speed = servo.speed;
+                int acc = servo.acc;
+                if (speed == -1 && acc == -1)
                 {
-                    writePosition(this->stsServoValues->at(i).id, this->stsServoValues->at(i).targetValue);
-                    this->stsServoValues->at(i).currentValue = this->stsServoValues->at(i).targetValue;
+                    _serialServo.WritePosEx(servo.id, servo.targetValue, STS_SERVO_SPEED, STS_SERVO_ACC);
                 }
+                else
+                {
+                    if (speed == -1)
+                        speed = STS_SERVO_SPEED;
+                    if (acc == -1)
+                        acc = STS_SERVO_ACC;
+                    _serialServo.WritePosEx(servo.id, servo.targetValue, speed, acc);
+                }
+                servo.currentValue = servo.targetValue;
             }
         }
     }
 }
 
-void StSerialServoManager::writePositionDetailed(u8 id, s16 position, u16 speed, u8 acc)
+void StSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
 {
     for (int i = 0; i < stsServoValues->size(); i++)
     {
         if (stsServoValues->at(i).id == id)
         {
-            stsServoValues->at(i).currentValue = position;
+            stsServoValues->at(i).targetValue = position;
+            stsServoValues->at(i).speed = speed;
+            stsServoValues->at(i).acc = acc;
         }
     }
-    _serialServo.WritePosEx(id, position, speed, acc);
+    //_serialServo.WritePosEx(id, position, 500, 200);
+    // updateActuators();
+    // updateActuators();
 }
 
-void StSerialServoManager::writePosition(u8 id, s16 position)
+void StSerialServoManager::writePosition(int id, int position)
 {
     for (int i = 0; i < stsServoValues->size(); i++)
     {
         if (stsServoValues->at(i).id == id)
         {
-            stsServoValues->at(i).currentValue = position;
+            stsServoValues->at(i).targetValue = position;
         }
     }
-    _serialServo.WritePosEx(id, position, STS_SERVO_SPEED, STS_SERVO_ACC);
+    // serialServo.WritePosEx(id, position, 500, 20);
+    // updateActuators();
 }
 
 int StSerialServoManager::readPosition(u8 id)

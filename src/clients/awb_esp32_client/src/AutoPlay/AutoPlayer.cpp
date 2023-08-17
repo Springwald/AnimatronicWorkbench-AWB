@@ -139,32 +139,14 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 
         if (_stSerialServoManager->servoAvailable(servoChannel))
         {
-            if (servoSpeed == -1 && servoAccelleration == -1)
-            {
-                // no speed and no accelleration defined
-                _stSerialServoManager->writePosition(servoChannel, targetValue);
-            }
-            else if (servoSpeed == -1 && servoAccelleration != -1)
-            {
-                // no speed defined, but accelleration
-                _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, STS_SERVO_SPEED, servoAccelleration);
-            }
-            else if (servoSpeed != -1 && servoAccelleration == -1)
-            {
-                // speed defined, but no accelleration
-                _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, STS_SERVO_ACC);
-            }
-            else
-            {
-                // speed and accelleration defined
-                _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
-            }
+            _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
         else
         {
             _errorOccured("Servo channel " + String(servoChannel) + " not attached!");
         }
     }
+    _stSerialServoManager->updateActuators();
 }
 
 int AutoPlayer::selectedStateId()

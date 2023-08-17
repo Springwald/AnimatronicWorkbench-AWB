@@ -14,6 +14,8 @@ public:
     int id;
     int targetValue;
     int currentValue;
+    int speed = -1;
+    int acc = -1;
 
     int temperature;
     int load;
