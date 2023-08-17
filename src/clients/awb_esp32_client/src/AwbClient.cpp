@@ -21,8 +21,8 @@ void AwbClient::setup()
 
     const TCallBackErrorOccured wlanErrorOccured = [this](String message)
     { showError(message); };
-   _wlanConnector = new WlanConnector(_clientId, _actualStatusInformation, wlanErrorOccured);
-   _wlanConnector->setup();
+    _wlanConnector = new WlanConnector(_clientId, _actualStatusInformation, wlanErrorOccured);
+    _wlanConnector->setup();
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     this->_neoPixelStatus = new NeoPixelStatusControl();
@@ -58,7 +58,6 @@ void AwbClient::setup()
     this->_adafruitpwmManager = new AdafruitPwmManager(adafruitPwmErrorOccured);
     this->_stSerialServoManager = new StSerialServoManager(stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
-    _autoPlayer = new AutoPlayer(_stSerialServoManager, AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL, autoPlayerErrorOccured);
 
     // iterate through all stsServoIds
     for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
@@ -72,6 +71,9 @@ void AwbClient::setup()
         this->_actualStatusInformation->stsServoValues->push_back(actuatorValue);
     }
     showMsg("Found " + String(this->_stSerialServoManager->servoIds->size()) + " servos");
+    delay(1000);
+
+    _autoPlayer = new AutoPlayer(_stSerialServoManager, AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL, autoPlayerErrorOccured);
 
     char *packetHeader = (char *)"AWB";
     this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, packetErrorOccured);
@@ -89,7 +91,7 @@ void AwbClient::showError(String message)
 {
     int durationMs = 2000;
     _display.draw_message(message, durationMs, MSG_TYPE_ERROR);
-   // _wlanConnector->logError(message);
+    // _wlanConnector->logError(message);
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
 #endif
@@ -102,7 +104,7 @@ void AwbClient::showMsg(String message)
 {
     int durationMs = 1000;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
-   // _wlanConnector->logInfo(message);
+    _wlanConnector->logInfo(message);
 }
 
 void AwbClient::loop()
@@ -189,6 +191,13 @@ void AwbClient::loop()
         _display.loop();
 
     _wlanConnector->memoryInfo = &_display.memoryInfo;
+    _actualStatusInformation->autoPlayerCurrentStateName = _autoPlayer->getCurrentTimelineName();
+    _actualStatusInformation->autoPlayerSelectedStateId = _autoPlayer->selectedStateId();
+    _actualStatusInformation->autoPlayerIsPlaying = _autoPlayer->isPlaying();
+    _actualStatusInformation->autoPlayerSelectedStateId = _autoPlayer->selectedStateId();
+    _actualStatusInformation->autoPlayerStateSelectorAvailable = _autoPlayer->getStateSelectorAvailable();
+    _actualStatusInformation->autoPlayerCurrentTimelineName = _autoPlayer->getCurrentTimelineName();
+    _actualStatusInformation->autoPlayerStateSelectorStsServoChannel = _autoPlayer->getStateSelectorStsServoChannel();
     _wlanConnector->update();
 
     if (millis() - _startMillis < 5000)

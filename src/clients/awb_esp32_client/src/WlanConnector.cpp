@@ -24,6 +24,12 @@ void WlanConnector::setup()
     _server->onNotFound([this]()
                         { this->handle_NotFound(); });
     _server->begin();
+
+    // fill messages with empty strings
+    for (int i = 0; i < MAX_LOG_MESSAGES; i++)
+    {
+        _messages[i] = String("");
+    }
 }
 
 void WlanConnector::update()
@@ -118,21 +124,21 @@ String WlanConnector::GetHtml()
         ptr += "</div>\n";
 
         //  System messages
-    /*    ptr += "<div class=\"region\">\n";
+        ptr += "<div class=\"region\">\n";
         ptr += "<table>\n";
-        ptr += "<tr><th>Message</th></th></tr>\n";
-        auto msgPos = _messagesCount - 1;
+        ptr += "<tr><th>Message</th></tr>\n";
+        int msgPos = _messagesCount;
         for (int i = 0; i < MAX_LOG_MESSAGES; i++)
         {
-            if (msgPos >= MAX_LOG_MESSAGES)
+            // if (msgPos >= MAX_LOG_MESSAGES)
             {
-                msgPos = 0;
+                msgPos = i;
             }
             ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
             msgPos++;
         }
         ptr += "</table>\n";
-        ptr += "</div>\n";*/
+        ptr += "</div>\n";
         /*   if (led1stat)
            {
                ptr += "<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n";

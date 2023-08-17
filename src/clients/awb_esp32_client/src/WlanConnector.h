@@ -28,7 +28,7 @@ private:
     ActualStatusInformation *_actualStatusInformation;
 
     String _messages[MAX_LOG_MESSAGES];
-    int _messagesCount;
+    int _messagesCount = 0;
 
     String GetHtml();
     void handle_Default();
