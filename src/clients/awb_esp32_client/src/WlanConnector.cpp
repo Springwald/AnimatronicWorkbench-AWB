@@ -156,7 +156,7 @@ String WlanConnector::GetHtml()
     }
     ptr += "<script type=\"text/javascript\">";
     ptr += " function Redirect() { window.location=\"http://192.168.1.1\";  }";
-    ptr += " setTimeout('Redirect()', 2000); ";
+    ptr += " setTimeout('Redirect()', 5000); ";
     ptr += "</script>";
 
     ptr += "</body>\n";
