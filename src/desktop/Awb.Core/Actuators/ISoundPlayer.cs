@@ -7,6 +7,9 @@
 
 namespace Awb.Core.Actuators
 {
+    /// <summary>
+    /// A sound player to let the animatronic figure speak or play sounds
+    /// </summary>
     public interface ISoundPlayer : IActuator
     {
         //PlaySound(string soundId);

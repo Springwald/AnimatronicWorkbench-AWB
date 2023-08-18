@@ -10,17 +10,54 @@ using Awb.Core.Services;
 
 namespace Awb.Core.Actuators
 {
+    /// <summary>
+    /// A STS serial servo motor e.g. from the manufacturer "Wavewshare" or "Feebtech" 
+    /// </summary>
     public class StsServo : IServo
     {
+        /// <summary>
+        /// The requested target value of this servo
+        /// </summary>
         private int _targetValue;
 
+        /// <summary>
+        /// The unique id of this servo
+        /// </summary>
         public string Id { get; }
+
+        /// <summary>
+        /// The unique id of the client this servo is connected to
+        /// </summary>
         public uint ClientId { get; }
+
+        /// <summary>
+        /// The optional visible name of the servo
+        /// </summary>
         public string? Name { get; }
+
+        /// <summary>
+        /// The channel of the servo, mostly starting with 1 instead of 0
+        /// </summary>
         public uint Channel { get; }
+
+        /// <summary>
+        /// The maximum value this servo should handle in the constructred animatronic figure
+        /// </summary>
         public int MinValue { get; }
+
+        /// <summary>
+        /// The maximum value this servo should handle in the constructred animatronic figure
+        /// </summary>
         public int MaxValue { get; }
+
+        /// <summary>
+        /// The "normal" startup value of this servo
+        /// </summary>
         public int DefaultValue { get; }
+
+        /// <summary>
+        /// The requested target value of this servo
+        /// </summary>
         public int TargetValue
         {
             get => _targetValue;
@@ -34,7 +71,9 @@ namespace Awb.Core.Actuators
             }
         }
 
-
+        /// <summary>
+        /// Indicates if the servo has changed since the last call>
+        /// </summary>
         public bool IsDirty { get; set; }
 
         public string Label => $"[C{ClientId}-STS{Channel}] {Name ?? string.Empty}";
