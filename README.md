@@ -11,7 +11,7 @@ This is quite tedious, often looks choppy as a result and has to be recompiled a
 For this reason, I have developed the software "Animatronic Workbench" (AWB).
 
 This allows you to create the movements of animatronic figures on the screen without any programming knowledge. 
-The first practical use of the software was with my [animatronic Grogu](https://daniel.springwald.de/post/Animatronic-Grogu-).
+The first practical use of the software was with my [animatronic Grogu](https://daniel.springwald.de/post/Animatronic-Grogu-EN).
 
 For more details on the project and the usage see the project website:
 
