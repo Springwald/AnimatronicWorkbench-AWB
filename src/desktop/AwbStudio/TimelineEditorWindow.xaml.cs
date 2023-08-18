@@ -266,15 +266,19 @@ namespace AwbStudio
             int fps = 20;
             int speed = 4; // speed (x seconds per second)
             _switchingPages = true;
+            int newPosMs = 0;
             int scrollSpeedMs = (howManyMs > 0 ? 1 : -1) * (1000 / fps) * speed;
             for (int i = 0; i < howManyMs / scrollSpeedMs; i++)
             {
                 var newOffset = TimelineViewerControl.ViewPos.ScrollOffsetMs + scrollSpeedMs;
                 TimelineViewerControl.ViewPos.ScrollOffsetMs = Math.Max(0, newOffset);
-                await TimelineViewerControl.Timelineplayer.Update(TimelineViewerControl.Timelineplayer.PositionMs + scrollSpeedMs);
+                newPosMs = TimelineViewerControl.Timelineplayer.PositionMs + scrollSpeedMs;
+                await TimelineViewerControl.Timelineplayer.Update(newPosMs);
                 MyInvoker.Invoke(new Action(() => TimelineViewerControl.PaintTimeLine()));
                 await Task.Delay(1000 / fps);
             }
+            await TimelineViewerControl.Timelineplayer.Update((newPosMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs);
+            TimelineViewerControl.SyncScrollOffsetToNewPlayPos(newPosMs, snapToGrid: true);
             _switchingPages = false;
         }
 

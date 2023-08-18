@@ -62,14 +62,16 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     if (_data == nullptr)
         return;
 
+    bool packedReceivedLately = _lastPacketReceivedMillis != -1 && millis() < _lastPacketReceivedMillis + 60 * 1000; //  got a awb studio packet or last packet is newer than given seconds * 1000ms
+    if (packedReceivedLately == true)
+    {
+        // no data received, so we stop the auto mode
+        _actualTimelineIndex = -1;
+        return;
+    }
+
     if (!isPlaying())
     {
-        if (_lastPacketReceivedMillis == -1 || millis() > _lastPacketReceivedMillis + 20000) // never got a awb studio packet or last packet is older than 20 seconds
-        {
-            // no data received, so we stop the auto mode
-            _actualTimelineIndex = -1;
-            return;
-        }
         // start automode
         startNewTimelineForSelectedState();
         return;
