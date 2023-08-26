@@ -17,6 +17,10 @@ For more details on the project and the usage see the project website:
 
 https://daniel.springwald.de/post/AnimatronicWorkbench-EN
 
+## Setup / Installation
+
+The installation and setup of Animatronic Workbench Studio is [described here](https://daniel.springwald.de/post/AnimatronicWorkbench-Setup-EN).
+
 ## Third party material
 
 This project also contains modules from other authors - in unchanged or revised form.
