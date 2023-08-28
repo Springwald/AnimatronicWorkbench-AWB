@@ -63,6 +63,9 @@ static LGFX_Sprite statusFooterSprite(&lcd);
 
 static const lgfx::IFont *font = nullptr;
 
+/**
+ * Setup the display
+ */
 void AwbDisplay::setup(int clientId)
 {
     resetDebugInfos();

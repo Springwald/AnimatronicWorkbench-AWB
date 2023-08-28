@@ -14,23 +14,44 @@ class StSerialServoManager
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:
-    std::vector<ActuatorValue> *stsServoValues;
-    TCallBackErrorOccured _errorOccured;
-    int _speed;
-    int _acc;
-    int _gpioRxd;
-    int _gpioTxd;
+    std::vector<ActuatorValue> *stsServoValues; /// The sts servo values
+    TCallBackErrorOccured _errorOccured;        /// callback functio to call if an error occured
+    int _speed;                                 /// the speed to use for the sts servos
+    int _acc;                                   /// the acceleration to use for the sts servos
+    int _gpioRxd;                               /// the gpio pin for the rxd communication to the sts servos
+    int _gpioTxd;                               /// the gpio pin for the txd communication to the sts servos
 
-    void scanIds(); /// scan for Ids and store in "servoIds"
+    /**
+     * Scan for Ids and store in "servoIds"
+     */
+    void scanIds();
 
 public:
+    /**
+     * has any servo a critical temperature?
+     */
     bool servoCriticalTemp = false;
+
+    /**
+     * has any servo a critical load?
+     */
     bool servoCriticalLoad = false;
+
+    /**
+     * the ids of the servos (1-253)
+     */
     std::vector<u8> *servoIds;
 
     StSerialServoManager(std::vector<ActuatorValue> *stsServoValues, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd, int speed, int acc) : _errorOccured(errorOccured), _speed(speed), _acc(acc), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), stsServoValues(stsServoValues){};
 
+    /**
+     * Set up the sts servos
+     */
     void setup();
+
+    /**
+     * update the sts servos
+     */
     void updateActuators();
 
     void writePositionDetailed(int id, int position, int speed, int acc);

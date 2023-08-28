@@ -15,10 +15,14 @@ StaticJsonDocument<1024 * 32> jsondoc;
 
 #define DEFAULT_VOLUME 5
 
+/**
+ * initialize the AWB client
+ */
 void AwbClient::setup()
 {
-    _display.setup(_clientId);
+    _display.setup(_clientId); // set up the display
 
+    // set up the wlan connector
     const TCallBackErrorOccured wlanErrorOccured = [this](String message)
     { showError(message); };
     _wlanConnector = new WlanConnector(_clientId, _actualStatusInformation, wlanErrorOccured);
@@ -34,27 +38,17 @@ void AwbClient::setup()
     this->_dacSpeaker.begin();
 #endif
 
-    const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload)
-    {
-        // process the packet
-        if (clientId == this->_clientId)
-        {
-            this->processPacket(payload);
-        }
-    };
-
+    // set up error callbacks for the different components
     const TCallBackErrorOccured packetErrorOccured = [this](String message)
     { showError(message); };
-
     const TCallBackErrorOccured adafruitPwmErrorOccured = [this](String message)
     { showError(message); };
-
     const TCallBackErrorOccured stsServoErrorOccured = [this](String message)
     { showError(message); };
-
     const TCallBackErrorOccured autoPlayerErrorOccured = [this](String message)
     { showError(message); };
 
+    // set up the actuators
     this->_adafruitpwmManager = new AdafruitPwmManager(adafruitPwmErrorOccured);
     this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
@@ -62,7 +56,7 @@ void AwbClient::setup()
     // iterate through all stsServoIds
     for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
     {
-        // get the first id of stSerialServoManager servoIds
+        // get the id of stSerialServoManager servoIds
         int id = this->_stSerialServoManager->servoIds->at(i);
         auto actuatorValue = ActuatorValue();
         actuatorValue.id = id;
@@ -75,6 +69,15 @@ void AwbClient::setup()
 
     _autoPlayer = new AutoPlayer(_stSerialServoManager, AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL, autoPlayerErrorOccured);
 
+    // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
+    const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload)
+    {
+        // process the packet
+        if (clientId == this->_clientId)
+        {
+            this->processPacket(payload);
+        }
+    };
     char *packetHeader = (char *)"AWB";
     this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, packetErrorOccured);
 
@@ -84,9 +87,12 @@ void AwbClient::setup()
     this->_dacSpeaker.setVolume(DEFAULT_VOLUME);
 #endif
 
-    showMsg("Welcome to the ESP32 Client for Animatronic WorkBench.");
+    showMsg("Welcome! Animatronic WorkBench ESP32 Client");
 }
 
+/**
+ * show an error message on the display, neopixels and/or speaker
+ */
 void AwbClient::showError(String message)
 {
     int durationMs = 2000;
@@ -100,6 +106,9 @@ void AwbClient::showError(String message)
 #endif
 }
 
+/**
+ * show an info message on the display (no error)
+ */
 void AwbClient::showMsg(String message)
 {
     int durationMs = 1000;
@@ -107,23 +116,29 @@ void AwbClient::showMsg(String message)
     _wlanConnector->logInfo(message);
 }
 
+/**
+ * the main loop of the AWB client
+ */
 void AwbClient::loop()
 {
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
+    // update autoplay timelines and actuators
     _autoPlayer->update(this->_stSerialServoManager->servoCriticalTemp);
-
     if (_autoPlayer->selectedStateId() != _lastAutoPlaySelectedStateId)
     {
+        // an other timeline filter state was selected
         _lastAutoPlaySelectedStateId = _autoPlayer->selectedStateId();
         _display.set_debugStatus("StateId:" + String(_lastAutoPlaySelectedStateId));
     }
     if (!_autoPlayer->getCurrentTimelineName().equals(_lastAutoPlayTimelineName))
     {
+        // an other timeline was started
         _lastAutoPlayTimelineName = _autoPlayer->getCurrentTimelineName();
         if (!_autoPlayer->isPlaying())
         {
+            // no timeline is playing, so turn off torque for all sts servos
             for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
             {
                 // turn off torque for all sts servos
@@ -136,20 +151,23 @@ void AwbClient::loop()
 
     bool onlyLoadCheck = false;
 
-    if (!packetReceived && millis() > _lastStatusMillis + 100)
+    if (!packetReceived && millis() > _lastStatusMillis + 100) // update status every 100ms
     {
         if (this->_stSerialServoManager->servoCriticalTemp == true || this->_stSerialServoManager->servoCriticalLoad == true)
         {
+            // critical temperature or load detected, so only check and show load status
             readActuatorsStatuses();
             showTemperaturStatuses();
         }
         else
         {
+            // no critical temperature or load detected
             _lastStatusMillis = millis();
             _displayStateCounter++;
 
             if (onlyLoadCheck)
             {
+                // only check and show load status
                 readActuatorsStatuses();
                 showLoadStatuses();
             }
@@ -190,6 +208,7 @@ void AwbClient::loop()
     if (!packetReceived)
         _display.loop();
 
+    // collect all status information for lcd display and WLAN status display
     _wlanConnector->memoryInfo = &_display.memoryInfo;
     _actualStatusInformation->autoPlayerCurrentStateName = _autoPlayer->getCurrentTimelineName();
     _actualStatusInformation->autoPlayerSelectedStateId = _autoPlayer->selectedStateId();
@@ -206,6 +225,9 @@ void AwbClient::loop()
     }
 }
 
+/**
+ * process a received packet from the Animatronic Workbench Studio
+ */
 void AwbClient::processPacket(String payload)
 {
     if (demoMode == true)
@@ -217,11 +239,12 @@ void AwbClient::processPacket(String payload)
     DeserializationError error = deserializeJson(jsondoc, payload);
     if (error)
     {
+        // packet content is not valid json
         showError("json:" + String(error.c_str()));
         return;
     }
 
-    if (jsondoc.containsKey("DispMsg")) // DisplayMessage
+    if (jsondoc.containsKey("DispMsg")) // packat contains a display message
     {
         const char *message = jsondoc["DispMsg"]["Msg"];
         if (message == NULL)
@@ -236,7 +259,7 @@ void AwbClient::processPacket(String payload)
         }
     }
 
-    if (jsondoc.containsKey("AdfPwm")) // Adafruit PWM driver
+    if (jsondoc.containsKey("AdfPwm")) // packet contains adafruit PWM driver data
     {
         JsonArray channels = jsondoc["AdfPwm"]["Ch"];
         for (size_t i = 0; i < channels.size(); i++)
@@ -247,7 +270,7 @@ void AwbClient::processPacket(String payload)
         }
     }
 
-    if (jsondoc.containsKey("STS")) // STS bus Servos
+    if (jsondoc.containsKey("STS")) // package contains STS bus servo data
     {
         JsonArray channels = jsondoc["STS"]["Servos"];
         int stsCount = 0;
@@ -283,6 +306,9 @@ void AwbClient::processPacket(String payload)
 #endif
 }
 
+/**
+ * read the status information from the actuators
+ */
 void AwbClient::readActuatorsStatuses()
 {
     bool criticalTemp = false;
@@ -323,17 +349,18 @@ void AwbClient::readActuatorsStatuses()
     this->_stSerialServoManager->servoCriticalLoad = criticalLoad;
 }
 
+/**
+ * show the target values of the actuators on the display
+ */
 void AwbClient::showValues()
 {
     String values[100]; //_stsServoValues->size()];
     int used = 0;
     for (int i = 0; i < this->_actualStatusInformation->stsServoValues->size(); i++)
     {
-
         // sts serial bus servos
         if (this->_actualStatusInformation->stsServoValues->at(i).name.length() > 0)
         {
-            // values[used] = _stsServoValues[i].name + ":" + _stsServoValues[i].targetValue; // use names
             values[used] = String(this->_actualStatusInformation->stsServoValues->at(i).id) + ":" + this->_actualStatusInformation->stsServoValues->at(i).targetValue; // use ids only (needs less space)
             used++;
         }
@@ -350,6 +377,9 @@ void AwbClient::showValues()
     _display.set_values(values, used);
 }
 
+/**
+ * show the temperature values of the actuators on the display
+ */
 void AwbClient::showTemperaturStatuses()
 {
     int maxValues = this->_actualStatusInformation->stsServoValues->size() + this->_actualStatusInformation->pwmServoValues->size();
@@ -377,6 +407,9 @@ void AwbClient::showTemperaturStatuses()
     _display.set_values(statuses, used);
 }
 
+/**
+ * show the load (torque) status of the actuators on the display
+ */
 void AwbClient::showLoadStatuses()
 {
     int maxValues = this->_actualStatusInformation->stsServoValues->size() + this->_actualStatusInformation->pwmServoValues->size();
