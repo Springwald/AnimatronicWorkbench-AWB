@@ -15,10 +15,10 @@ class Timeline
 
 protected:
 public:
-    String name;
-    TimelineState *state;
-    std::vector<StsServoPoint> *stsServoPoints;
-    int durationMs;
+    String name;                                /// the name of the timeline
+    TimelineState *state;                       /// the state of the timeline
+    std::vector<StsServoPoint> *stsServoPoints; /// the sts servo points of the timeline
+    int durationMs;                             /// the duration of the timeline in milliseconds
 
 public:
     Timeline(TimelineState *state, String name, std::vector<StsServoPoint> *p_stsPoints) : stsServoPoints(p_stsPoints), name(name), state(state)

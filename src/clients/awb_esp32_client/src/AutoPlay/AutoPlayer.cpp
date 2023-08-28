@@ -7,6 +7,9 @@
 #include "hardware.h"
 #include <vector>
 
+/**
+ * Initializes a new instance of the <see cref="AutoPlayer"/> class.
+ */
 void AutoPlayer::setup()
 {
     _lastMsUpdate = millis();
@@ -15,21 +18,33 @@ void AutoPlayer::setup()
     _playPosInActualTimeline = 0;
 }
 
+/**
+ * Is actually playing a timeline?
+ */
 bool AutoPlayer::isPlaying()
 {
     return _actualTimelineIndex != -1;
 }
 
-TimelineState *AutoPlayer::getCurrentState()
+/**
+ * Is a hardware state selector available?
+ */
+bool AutoPlayer::getStateSelectorAvailable()
 {
-    return new TimelineState(1, String("Idle"));
+    return _stateSelectorAvailable;
 }
 
+/**
+ * If a sts servo is used to select the state, this is the channel
+ */
 int AutoPlayer::getStateSelectorStsServoChannel()
 {
     return _stateSelectorStsServoChannel;
 }
 
+/**
+ * If a timeline is playing, this is the name of the timeline
+ */
 String AutoPlayer::getCurrentTimelineName()
 {
     if (_actualTimelineIndex == -1)
@@ -39,11 +54,9 @@ String AutoPlayer::getCurrentTimelineName()
     return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
 }
 
-bool AutoPlayer::getStateSelectorAvailable()
-{
-    return _stateSelectorAvailable;
-}
-
+/**
+ * Updates the autoplayer and plays the timelines
+ */
 void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 {
     if (servoHaveErrorsLikeTooHot)
@@ -53,7 +66,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     }
 
     int diff = millis() - _lastMsUpdate;
-    if (diff < 50)
+    if (diff < 50) // update interval in milliseconds
         return;
 
     _lastMsUpdate = millis();
@@ -151,6 +164,9 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     _stSerialServoManager->updateActuators();
 }
 
+/**
+ * If a state selector is used, this is the selected state id
+*/
 int AutoPlayer::selectedStateId()
 {
     if (_stateSelectorStsServoChannel == -1)
@@ -184,12 +200,18 @@ int AutoPlayer::selectedStateId()
     return _currentStateId;
 }
 
+/**
+ * Starts the auto player with the given timeline
+*/
 void AutoPlayer::startNewTimeline(int timelineIndex)
 {
     _actualTimelineIndex = timelineIndex;
     _playPosInActualTimeline = 0;
 }
 
+/**
+ * Starts a new timeline for the selected state
+*/
 void AutoPlayer::startNewTimelineForSelectedState()
 {
     auto stateId = selectedStateId();
@@ -225,6 +247,9 @@ void AutoPlayer::startNewTimelineForSelectedState()
     _actualTimelineIndex = -1;
 }
 
+/**
+ * Stops the auto player because of incomming data package of Animatronic Workbench Studio
+*/
 void AutoPlayer::stopBecauseOfIncommingPackage()
 {
     _actualTimelineIndex = -1;
