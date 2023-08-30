@@ -10,27 +10,53 @@
 
 using byte = unsigned char;
 
+/**
+ * sends and receives packets over the serial port
+ */
 class PacketSenderReceiver
 {
     using TCallBackPacketReceived = std::function<void(unsigned int, String)>;
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:
-    unsigned int _clientId;
+    unsigned int _clientId; /// the id of the client
 
-    char *_packetHeader;
-    String _packetHeaderString;
+    char *_packetHeader;        /// the packet header to identify the software sending the packet
+    String _packetHeaderString; /// the packet header to identify the software sending the packet
 
-    TCallBackPacketReceived _packetReceived;
-    TCallBackErrorOccured _errorOccured;
-    unsigned long _next_alife_packet_to_send;
-    String _receiveBuffer;
+    TCallBackPacketReceived _packetReceived;  /// callback function to call if a packet was received
+    TCallBackErrorOccured _errorOccured;      /// callback function to call if an error occured
+    unsigned long _next_alife_packet_to_send; /// the time when the next alife packet should be sent
+    String _receiveBuffer;                    /// the buffer to store the received data
 
+    /**
+     * process a received data packet
+     */
     void processDataPacket(String packetContent);
+
+    /**
+     * send a packet to the serial port
+     */
     void sendPacketHeader();
+
+    /**
+     * send the packet start bytes to the serial port
+     */
     void sendPacketStart(byte packetType);
+
+    /**
+     * send the packet end bytes to the serial port
+     */
     void sendPacketEnd();
+
+    /**
+     * send a packet to the serial port to inform the other side that the last packet was received
+     */
     void sendResponsePacket(unsigned int packetId, bool ok, String message);
+
+    /**
+     * notity an error
+     */
     void errorReceiving(String message);
 
 public:
@@ -51,6 +77,10 @@ public:
 
         _packetHeaderString = String(_packetHeader).substring(0, 9);
     }
+
+    /**
+     * the packet sender / Receiver loop
+     */
     bool loop();
 };
 

@@ -10,6 +10,9 @@
 // Otherwise it seems to crash in various places - I guess because of memory problems.
 SMS_STS _serialServo;
 
+/**
+ * Set up the sts servos
+ */
 void StSerialServoManager::setup()
 {
     Serial1.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
@@ -18,6 +21,9 @@ void StSerialServoManager::setup()
     scanIds();
 }
 
+/**
+ * update the sts servos
+ */
 void StSerialServoManager::updateActuators()
 {
     if (servoCriticalTemp == true || servoCriticalLoad == true)
@@ -41,6 +47,7 @@ void StSerialServoManager::updateActuators()
                 int acc = servo->acc;
                 if (speed == -1 && acc == -1)
                 {
+                    // use default values for speed and acc
                     _serialServo.WritePosEx(servo->id, servo->targetValue, STS_SERVO_SPEED, STS_SERVO_ACC);
                 }
                 else
@@ -57,6 +64,9 @@ void StSerialServoManager::updateActuators()
     }
 }
 
+/**
+ * write the position to the servo, including speed and acceleration
+ */
 void StSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
 {
     for (int i = 0; i < stsServoValues->size(); i++)
@@ -70,6 +80,9 @@ void StSerialServoManager::writePositionDetailed(int id, int position, int speed
     }
 }
 
+/**
+ * write the position to the servo, using the default speed and acceleration
+ */
 void StSerialServoManager::writePosition(int id, int position)
 {
     for (int i = 0; i < stsServoValues->size(); i++)
@@ -81,26 +94,41 @@ void StSerialServoManager::writePosition(int id, int position)
     }
 }
 
+/**
+ * read the actual position from the servo
+ */
 int StSerialServoManager::readPosition(u8 id)
 {
     return _serialServo.ReadPos(id);
 }
 
+/**
+ * set the maximum torque of the servo. Set 0 to turn the servo off
+ */
 void StSerialServoManager::setTorque(u8 id, bool on)
 {
     _serialServo.EnableTorque(id, on ? 1 : 0);
 }
 
+/**
+ * read the actual load of the servo
+ */
 int StSerialServoManager::readLoad(int id)
 {
     return _serialServo.ReadLoad(id);
 }
 
+/**
+ * read the temperature of the servo in degree celsius
+ */
 int StSerialServoManager::readTemperature(int id)
 {
     return _serialServo.ReadTemper(id);
 }
 
+/**
+ * is the servo available?
+ */
 bool StSerialServoManager::servoAvailable(int id)
 {
     for (int i = 0; i < servoIds->size(); i++)
@@ -122,6 +150,10 @@ bool StSerialServoManager::servoAvailable(int id)
     return false;
 }
 
+/**
+ * scan for all available servo ids.
+ * Only inside the given range to prevent long delays.
+ */
 void StSerialServoManager::scanIds()
 {
     servoIds = new std::vector<u8>();

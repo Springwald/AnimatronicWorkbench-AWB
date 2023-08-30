@@ -54,12 +54,39 @@ public:
      */
     void updateActuators();
 
+    /**
+     * write the position to the servo, including speed and acceleration
+     */
     void writePositionDetailed(int id, int position, int speed, int acc);
+
+    /**
+     * write the position to the servo, using the default speed and acceleration
+     */
     void writePosition(int id, int position);
+
+    /**
+     * read the actual position from the servo
+     */
     int readPosition(u8 id);
+
+    /**
+     * set the maximum torque of the servo. Set 0 to turn the servo off
+     */
     void setTorque(u8 id, bool on);
+
+    /**
+     * read the temperature of the servo in degree celsius
+     */
     int readTemperature(int id);
+
+    /**
+     * read the actual load of the servo
+     */
     int readLoad(int id);
+
+    /**
+     * is the servo available?
+     */
     bool servoAvailable(int id);
 };
 

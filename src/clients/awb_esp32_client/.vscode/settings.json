@@ -55,5 +55,13 @@
         "thread": "cpp",
         "cinttypes": "cpp"
     },
-    "cmake.sourceDirectory": "E:/Animatronic-Workbench/AnimatronicWorkBench-AWB/src/clients/awb_esp32_client/.pio/libdeps/m5stack-core-esp32/LovyanGFX/examples_for_PC/CMake_SDL"
+    "cmake.sourceDirectory": "E:/Animatronic-Workbench/AnimatronicWorkBench-AWB/src/clients/awb_esp32_client/.pio/libdeps/m5stack-core-esp32/LovyanGFX/examples_for_PC/CMake_SDL",
+    "spellright.language": [
+        "de"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext"
+    ]
 }

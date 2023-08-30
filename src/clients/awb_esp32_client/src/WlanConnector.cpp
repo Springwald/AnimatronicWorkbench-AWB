@@ -7,20 +7,23 @@
 #include <WebServer.h>
 #include <String.h>
 
+/**
+ * set up the webserver
+ */
 void WlanConnector::setup()
 {
+    // open a wifi access point
     IPAddress local_ip(192, 168, 1, 1);
     IPAddress gateway(192, 168, 1, 1);
     IPAddress subnet(255, 255, 255, 0);
-
     WiFi.softAP(_data->WlanSSID, _data->WlanPassword);
     WiFi.softAPConfig(local_ip, gateway, subnet);
 
+    // set up the webserver and define the url handlers
     _server = new WebServer(80);
-
     _server->on("/", [this]()
                 { this->handle_Default(); });
-    //_server.on("/led1on", handle_led1on);
+    //_server.on("/state/1", handle_state);
     _server->onNotFound([this]()
                         { this->handle_NotFound(); });
     _server->begin();
@@ -32,16 +35,25 @@ void WlanConnector::setup()
     }
 }
 
+/**
+ * update loof of the webserver
+ */
 void WlanConnector::update()
 {
     _server->handleClient();
 }
 
+/**
+ * log an error message
+ */
 void WlanConnector::logError(String msg)
 {
     logInfo(String("Error! ") + msg);
 }
 
+/**
+ * log an info message
+ */
 void WlanConnector::logInfo(String msg)
 {
     _messagesCount++;
@@ -52,16 +64,25 @@ void WlanConnector::logInfo(String msg)
     _messages[_messagesCount] = msg;
 }
 
+/**
+ * handle the root http request
+ */
 void WlanConnector::handle_Default()
 {
     _server->send(200, "text/html", GetHtml());
 }
 
+/**
+ * handle a not found http request
+ */
 void WlanConnector::handle_NotFound()
 {
     _server->send(404, "text/plain", "Not found");
 }
 
+/**
+ * get the html page for the webserver default site
+ */
 String WlanConnector::GetHtml()
 {
     auto ageSeconds = (millis() - _startTime) / 1000;
@@ -139,23 +160,6 @@ String WlanConnector::GetHtml()
         }
         ptr += "</table>\n";
         ptr += "</div>\n";
-        /*   if (led1stat)
-           {
-               ptr += "<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n";
-           }
-           else
-           {
-               ptr += "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/led1on\">ON</a>\n";
-           }
-
-           if (led2stat)
-           {
-               ptr += "<p>LED2 Status: ON</p><a class=\"button button-off\" href=\"/led2off\">OFF</a>\n";
-           }
-           else
-           {
-               ptr += "<p>LED2 Status: OFF</p><a class=\"button button-on\" href=\"/led2on\">ON</a>\n";
-           }*/
     }
     ptr += "<script type=\"text/javascript\">";
     ptr += " function Redirect() { window.location=\"http://192.168.1.1\";  }";
