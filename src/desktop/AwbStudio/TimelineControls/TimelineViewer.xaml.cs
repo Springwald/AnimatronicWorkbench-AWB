@@ -11,7 +11,6 @@ using Awb.Core.Timelines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -21,49 +20,15 @@ namespace AwbStudio.TimelineControls
 {
     public partial class TimelineViewer : UserControl
     {
-        const double _paintMarginTopBottom = 30;
+        
 
         private TimelineData? _timelineData;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private int _playPosMs = 0;
         private bool _wasPlaying = false;
-        public TimelineViewPos ViewPos { get; } = new TimelineViewPos();
-
         private TimelineCaptions? _timelineCaptions;
-
-        public TimelineData? TimelineData
-        {
-            get { return _timelineData; }
-            set
-            {
-                _timelineData = value;
-                SyncScrollOffsetToNewPlayPos(0, snapToGrid: true);
-                PaintTimeLine();
-                PaintPlayPos(_timelineData);
-            }
-        }
-
         private IActuatorsService? _actuatorsService;
-        public IActuatorsService? ActuatorsService
-        {
-            get => _actuatorsService; set
-            {
-                _actuatorsService = value;
-                CalculateCaptions();
-            }
-        }
-
-        public TimelinePlayer? _timelinePlayer;
-
-        public TimelinePlayer? Timelineplayer
-        {
-            get => _timelinePlayer;
-            set
-            {
-                _timelinePlayer = value;
-                if (_timelinePlayer != null) _timelinePlayer.OnPlayStateChanged += this.PlayerStateChanged;
-            }
-        }
+        private TimelinePlayer? _timelinePlayer;
 
         private void PlayerStateChanged(object? sender, PlayStateEventArgs e)
         {
@@ -98,7 +63,52 @@ namespace AwbStudio.TimelineControls
             }
         }
 
+        /// <summary>
+        /// The actual view and scroll position of the timeline
+        /// </summary>
+        public TimelineViewPos ViewPos { get; } = new TimelineViewPos();
 
+        /// <summary>
+        /// The timeline data to be displayed
+        /// </summary>
+        public TimelineData? TimelineData
+        {
+            get { return _timelineData; }
+            set
+            {
+                _timelineData = value;
+                SyncScrollOffsetToNewPlayPos(0, snapToGrid: true);
+                PaintTimeLine();
+                PaintPlayPos(_timelineData);
+            }
+        }
+        
+        /// <summary>
+        /// The service to get the actuators
+        /// </summary>
+        public IActuatorsService? ActuatorsService
+        {
+            get => _actuatorsService; set
+            {
+                _actuatorsService = value;
+                CalculateCaptions();
+            }
+        }
+
+        /// <summary>
+        /// The timeline player to control the timeline playback
+        /// </summary>
+        public TimelinePlayer? Timelineplayer
+        {
+            get => _timelinePlayer;
+            set
+            {
+                _timelinePlayer = value;
+                if (_timelinePlayer != null) _timelinePlayer.OnPlayStateChanged += this.PlayerStateChanged;
+            }
+        }
+
+        
         /// <summary>
         /// set the scroll offset in a way, that the manual playPos is always at the position chosen in the hardware controller 
         /// </summary>
@@ -113,7 +123,7 @@ namespace AwbStudio.TimelineControls
                 }
                 else
                 {
-                    this.ViewPos.ScrollOffsetMs = newPlayPosMs - this.ViewPos.PosSelectorManualMs ;
+                    this.ViewPos.ScrollOffsetMs = newPlayPosMs - this.ViewPos.PosSelectorManualMs;
                 }
                 return true;
             }
@@ -131,11 +141,16 @@ namespace AwbStudio.TimelineControls
 
         public void PaintTimeLine()
         {
-            if (this.ActualHeight < 100 || this.ActualWidth < 100) return;
+            const double _paintMarginTopBottom = 30;
+
+            double height = GridTimeline.ActualHeight;
+            double width = GridTimeline.ActualWidth;
+
+            if (height < 100 || width < 100) return;
 
             var servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Distinct().ToArray() ?? Array.Empty<string>();
 
-            double diagramHeight = this.ActualHeight - _paintMarginTopBottom * 2;
+            double diagramHeight = height - _paintMarginTopBottom * 2;
 
             // Update the content points and lines
             // ToDo: cache and only update on changes; or: use model binding and auto update
@@ -163,12 +178,12 @@ namespace AwbStudio.TimelineControls
                             Stroke = caption.Color,
                             Height = dotWidth,
                             Width = dotWidth,
-                            Margin = new Thickness { Left = GetXPos((int)point.TimeMs, _timelineData) - dotRadius, Top = this.ActualHeight - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }
+                            Margin = new Thickness { Left = GetXPos((int)point.TimeMs, _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }
                         });
                     }
                 }
 
-                var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = GetXPos((int)(p.TimeMs), _timelineData), Y = this.ActualHeight - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
+                var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = GetXPos((int)(p.TimeMs), _timelineData), Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
                 var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.Color, StrokeThickness = 1, Points = points };
                 this.PanelLines.Children.Add(line);
             }
@@ -180,17 +195,17 @@ namespace AwbStudio.TimelineControls
             for (int msRaw = 0; msRaw < duration + ViewPos.DisplayMs; msRaw += STEP)
             {
                 int ms = msRaw - ViewPos.ScrollOffsetMs;
-                var x = ms * this.ActualWidth / duration;
-                if (x > 0 && x < this.ActualWidth)
+                var x = ms * width / duration;
+                if (x > 0 && x < width)
                 {
-                    OpticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = this.ActualHeight - _paintMarginTopBottom, Stroke = _gridLineBrush });
-                    OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: this.ActualHeight - 30, right: 0, bottom: 0) });
+                    OpticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = height - _paintMarginTopBottom, Stroke = _gridLineBrush });
+                    OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: height - 30, right: 0, bottom: 0) });
                 }
             }
             foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
             {
-                var y = this.ActualHeight - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
-                OpticalGrid.Children.Add(new Line { X1 = 0, X2 = this.ActualWidth, Y1 = y, Y2 = y, Stroke = _gridLineBrush });
+                var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
+                OpticalGrid.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = _gridLineBrush });
             }
 
             // update the play position
