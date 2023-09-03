@@ -20,15 +20,14 @@ namespace AwbStudio.TimelineControls
 {
     public partial class TimelineViewer : UserControl
     {
-        
-
-        private TimelineData? _timelineData;
-        private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private int _playPosMs = 0;
         private bool _wasPlaying = false;
-        private TimelineCaptions? _timelineCaptions;
+        private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
+        private TimelineData? _timelineData;
+       
         private IActuatorsService? _actuatorsService;
         private TimelinePlayer? _timelinePlayer;
+        private TimelineViewPos _viewPos;
 
         private void PlayerStateChanged(object? sender, PlayStateEventArgs e)
         {
@@ -66,8 +65,22 @@ namespace AwbStudio.TimelineControls
         /// <summary>
         /// The actual view and scroll position of the timeline
         /// </summary>
-        public TimelineViewPos ViewPos { get; } = new TimelineViewPos();
+        public TimelineViewPos ViewPos
+        {
+            set
+            {
+                if (value != null)
+                {
+                    if (_viewPos != null) throw new Exception("ViewPos.Changed is already set");
+                    _viewPos = value;
+                    _viewPos.Changed += this.OnViewPosChanged;
+                    this.OnViewPosChanged(this, EventArgs.Empty);
+                }
+            }
+            get => _viewPos;
+        }
 
+   
         /// <summary>
         /// The timeline data to be displayed
         /// </summary>
@@ -82,7 +95,7 @@ namespace AwbStudio.TimelineControls
                 PaintPlayPos(_timelineData);
             }
         }
-        
+
         /// <summary>
         /// The service to get the actuators
         /// </summary>
@@ -108,7 +121,7 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        
+
         /// <summary>
         /// set the scroll offset in a way, that the manual playPos is always at the position chosen in the hardware controller 
         /// </summary>
@@ -212,6 +225,18 @@ namespace AwbStudio.TimelineControls
             PaintPlayPos(_timelineData);
         }
 
+        private void OnViewPosChanged(object? sender, EventArgs e)
+        {
+            if (_timelineData == null) return;
+            
+            // update the scrollbar
+            TimelineScrollbar.Maximum = _timelineData.DurationMs - ViewPos.DisplayMs;
+            TimelineScrollbar.Value = ViewPos.ScrollOffsetMs;
+
+            // update the timeline
+            PaintTimeLine();
+        }
+
         private void TimelineViewer_Loaded(object sender, RoutedEventArgs e)
         {
             Loaded -= TimelineViewer_Loaded;
@@ -232,27 +257,9 @@ namespace AwbStudio.TimelineControls
             PaintPlayPos(_timelineData);
         }
 
-        private static string ServoTag(string servoId) => $"Servo {servoId}";
+        
 
-        private void CalculateCaptions()
-        {
-            if (ActuatorsService == null) throw new ArgumentNullException(nameof(ActuatorsService));
 
-            _timelineCaptions = new TimelineCaptions();
-
-            // Add servos
-            int no = 1;
-            foreach (var servo in ActuatorsService.Servos)
-            {
-                _timelineCaptions.AddServo(servo.Id, $"({no++}) {servo.Label}");
-            }
-
-            LineNames.Children.Clear();
-            foreach (var caption in _timelineCaptions.Captions)
-            {
-                LineNames.Children.Add(new Label { Content = caption.Label, Foreground = caption.Color });
-            }
-        }
 
 
 
@@ -279,10 +286,7 @@ namespace AwbStudio.TimelineControls
         }
 
 
-        private double GetXPos(int ms, TimelineData? timeline) =>
-            (timeline == null)
-            ? 0
-            : ((double)(ms - ViewPos.ScrollOffsetMs) / ViewPos.DisplayMs) * this.ActualWidth;
+   
     }
 
 }
