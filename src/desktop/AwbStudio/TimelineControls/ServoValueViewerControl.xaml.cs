@@ -114,12 +114,12 @@ namespace AwbStudio.TimelineControls
                             Stroke = caption.Color,
                             Height = dotWidth,
                             Width = dotWidth,
-                            Margin = new Thickness { Left = _viewPos.GetXPos((int)point.TimeMs, _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }
-                        });
+                            Margin = new Thickness { Left = _viewPos.GetXPos(ms: (int)point.TimeMs, controlWidth: width, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }
+                        }) ;
                     }
                 }
 
-                var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = _viewPos.GetXPos((int)(p.TimeMs), _timelineData), Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
+                var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = _viewPos.GetXPos((int)(p.TimeMs), controlWidth: width, timelineData: _timelineData), Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
                 var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.Color, StrokeThickness = 1, Points = points };
                 this.PanelLines.Children.Add(line);
             }
@@ -149,13 +149,13 @@ namespace AwbStudio.TimelineControls
 
         private void CalculateCaptions()
         {
-            if (ActuatorsService == null) throw new ArgumentNullException(nameof(ActuatorsService));
+            if (_actuatorsService == null) throw new ArgumentNullException(nameof(ActuatorsService));
 
             _timelineCaptions = new TimelineCaptions();
 
             // Add servos
             int no = 1;
-            foreach (var servo in ActuatorsService.Servos)
+            foreach (var servo in _actuatorsService.Servos)
             {
                 _timelineCaptions.AddServo(servo.Id, $"({no++}) {servo.Label}");
             }

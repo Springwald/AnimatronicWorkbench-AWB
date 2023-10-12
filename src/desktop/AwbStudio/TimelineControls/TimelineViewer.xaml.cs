@@ -9,7 +9,6 @@ using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,7 +23,7 @@ namespace AwbStudio.TimelineControls
         private bool _wasPlaying = false;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
-       
+
         private IActuatorsService? _actuatorsService;
         private TimelinePlayer? _timelinePlayer;
         private TimelineViewPos _viewPos;
@@ -80,7 +79,7 @@ namespace AwbStudio.TimelineControls
             get => _viewPos;
         }
 
-   
+
         /// <summary>
         /// The timeline data to be displayed
         /// </summary>
@@ -104,7 +103,6 @@ namespace AwbStudio.TimelineControls
             get => _actuatorsService; set
             {
                 _actuatorsService = value;
-                CalculateCaptions();
             }
         }
 
@@ -165,42 +163,6 @@ namespace AwbStudio.TimelineControls
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 
-            // Update the content points and lines
-            // ToDo: cache and only update on changes; or: use model binding and auto update
-            PanelLines.Children.Clear();
-            GridDots.Children.Clear();
-            foreach (var servoId in servoIds)
-            {
-                var caption = _timelineCaptions?.GetServoCaption(servoId) ?? new TimelineCaption { Color = new SolidColorBrush(Colors.White) };
-
-                // Add polylines with points
-                var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == servoId).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
-
-                // add dots
-                const int dotRadius = 3;
-                const int dotWidth = dotRadius * 2;
-                foreach (var point in pointsForThisServo)
-                {
-                    if (point.TimeMs >= ViewPos.ScrollOffsetMs && point.TimeMs <= ViewPos.DisplayMs + ViewPos.ScrollOffsetMs) // is inside view
-                    {
-                        this.GridDots.Children.Add(new Ellipse
-                        {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Fill = caption.Color,
-                            Stroke = caption.Color,
-                            Height = dotWidth,
-                            Width = dotWidth,
-                            Margin = new Thickness { Left = GetXPos((int)point.TimeMs, _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }
-                        });
-                    }
-                }
-
-                var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = GetXPos((int)(p.TimeMs), _timelineData), Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
-                var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.Color, StrokeThickness = 1, Points = points };
-                this.PanelLines.Children.Add(line);
-            }
-
             // update the data optical grid lines
             OpticalGrid.Children.Clear();
             var duration = ViewPos.DisplayMs;
@@ -228,7 +190,7 @@ namespace AwbStudio.TimelineControls
         private void OnViewPosChanged(object? sender, EventArgs e)
         {
             if (_timelineData == null) return;
-            
+
             // update the scrollbar
             TimelineScrollbar.Maximum = _timelineData.DurationMs - ViewPos.DisplayMs;
             TimelineScrollbar.Value = ViewPos.ScrollOffsetMs;
@@ -257,11 +219,6 @@ namespace AwbStudio.TimelineControls
             PaintPlayPos(_timelineData);
         }
 
-        
-
-
-
-
 
         private void PaintPlayPos(TimelineData? timeline)
         {
@@ -276,7 +233,7 @@ namespace AwbStudio.TimelineControls
             }
             else
             {
-                x = GetXPos(_playPosMs, timeline);
+                x = this.ViewPos.GetXPos(ms: _playPosMs, controlWidth: this.ActualWidth);
                 PlayPosLine.X1 = x;
                 PlayPosLine.X2 = x;
                 PlayPosLine.Y1 = 0;
@@ -284,9 +241,6 @@ namespace AwbStudio.TimelineControls
                 PlayPosLine.Visibility = Visibility.Visible;
             }
         }
-
-
-   
     }
 
 }
