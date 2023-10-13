@@ -59,6 +59,8 @@ namespace AwbStudio
 
             _timelineController = inputControllerService.TimelineController;
 
+            TimelineViewerControl.ViewPos = new TimelineViewPos();
+
             Loaded += TimelineEditorWindow_Loaded;
         }
 
@@ -91,6 +93,8 @@ namespace AwbStudio
             TimelineViewerControl.TimelineData = TimelineData;
             TimelineViewerControl.Timelineplayer = _timelinePlayer;
             TimelineViewerControl.ActuatorsService = _actuatorsService;
+
+          
 
             TimelineChooser.OnTimelineChosen += TimelineChosenToLoad;
 
