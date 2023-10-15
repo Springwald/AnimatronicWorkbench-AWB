@@ -30,23 +30,6 @@ namespace AwbStudio.TimelineControls
         private TimelineViewPos? _viewPos;
         private IActuatorsService? _actuatorsService;
 
-        public ServoValueViewerControl()
-        {
-            InitializeComponent();
-            Loaded += ServoValueViewerControl_Loaded;
-        }
-
-        private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            DrawOpticalGrid();
-            SizeChanged += ServoValueViewerControl_SizeChanged;
-        }
-
-        private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            DrawOpticalGrid();
-        }
-
         /// <summary>
         /// The timeline data to be displayed
         /// </summary>
@@ -90,6 +73,23 @@ namespace AwbStudio.TimelineControls
             get => _viewPos;
         }
 
+        public ServoValueViewerControl()
+        {
+            InitializeComponent();
+            Loaded += ServoValueViewerControl_Loaded;
+        }
+
+        private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            DrawOpticalGrid();
+            SizeChanged += ServoValueViewerControl_SizeChanged;
+        }
+
+        private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            DrawOpticalGrid();
+        }
+
         private void OnViewPosChanged(object? sender, EventArgs e)
         {
             MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
@@ -97,8 +97,6 @@ namespace AwbStudio.TimelineControls
 
         private void PaintServoValues()
         {
-
-
             PanelLines.Children.Clear();
             GridDots.Children.Clear();
 
@@ -156,9 +154,11 @@ namespace AwbStudio.TimelineControls
 
             double height = this.ActualHeight;
             double width = this.ActualWidth;
-            double diagramHeight = height - _paintMarginTopBottom * 2;
 
             if (height < 100 || width < 100) return;
+
+            double diagramHeight = height - _paintMarginTopBottom * 2;
+
             foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
             {
                 var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
