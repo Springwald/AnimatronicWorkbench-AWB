@@ -23,6 +23,7 @@ namespace AwbStudio.TimelineControls
     public partial class ServoValueViewerControl : UserControl
     {
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
+        private const double _paintMarginTopBottom = 30;
 
         private TimelineCaptions? _timelineCaptions;
         private TimelineData? _timelineData;
@@ -32,16 +33,18 @@ namespace AwbStudio.TimelineControls
         public ServoValueViewerControl()
         {
             InitializeComponent();
-            Loaded += ServoValueViewerControl_Loaded    ;
+            Loaded += ServoValueViewerControl_Loaded;
         }
 
         private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
+            DrawOpticalGrid();
+            SizeChanged += ServoValueViewerControl_SizeChanged;
         }
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.InvalidateVisual();
+            DrawOpticalGrid();
         }
 
         /// <summary>
@@ -94,11 +97,10 @@ namespace AwbStudio.TimelineControls
 
         private void PaintServoValues()
         {
-            const double _paintMarginTopBottom = 30;
+
 
             PanelLines.Children.Clear();
             GridDots.Children.Clear();
-            OpticalGrid.Children.Clear();
 
             if (_viewPos == null) return;
             if (_timelineData == null) return;
@@ -146,8 +148,17 @@ namespace AwbStudio.TimelineControls
                 var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.Color, StrokeThickness = 1, Points = points };
                 this.PanelLines.Children.Add(line);
             }
+        }
 
+        private void DrawOpticalGrid()
+        {
+            OpticalGrid.Children.Clear();
 
+            double height = this.ActualHeight;
+            double width = this.ActualWidth;
+            double diagramHeight = height - _paintMarginTopBottom * 2;
+
+            if (height < 100 || width < 100) return;
             foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
             {
                 var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
