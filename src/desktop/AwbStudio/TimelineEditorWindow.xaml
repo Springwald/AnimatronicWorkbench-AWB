@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
 
         <TimelineControls:TimelineViewer x:Name="TimelineViewerControl" Grid.Column="0" Grid.Row="0"/>
-
+        
         <Grid Grid.Column="0" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"></ColumnDefinition>

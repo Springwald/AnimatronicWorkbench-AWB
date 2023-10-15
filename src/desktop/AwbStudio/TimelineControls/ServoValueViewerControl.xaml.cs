@@ -67,7 +67,7 @@ namespace AwbStudio.TimelineControls
 
         private void OnViewPosChanged(object? sender, EventArgs e)
         {
-            PaintServoValues();
+            MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
         }
 
         private void PaintServoValues()
@@ -124,20 +124,7 @@ namespace AwbStudio.TimelineControls
                 this.PanelLines.Children.Add(line);
             }
 
-            // update the data optical grid lines
-            OpticalGrid.Children.Clear();
-            var duration = ViewPos.DisplayMs;
-            const int STEP = 1000;
-            for (int msRaw = 0; msRaw < duration + ViewPos.DisplayMs; msRaw += STEP)
-            {
-                int ms = msRaw - ViewPos.ScrollOffsetMs;
-                var x = ms * width / duration;
-                if (x > 0 && x < width)
-                {
-                    OpticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = height - _paintMarginTopBottom, Stroke = _gridLineBrush });
-                    OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: height - 30, right: 0, bottom: 0) });
-                }
-            }
+    
             foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
             {
                 var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;

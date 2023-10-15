@@ -73,6 +73,7 @@ namespace AwbStudio.TimelineControls
                     if (_viewPos != null) throw new Exception("ViewPos.Changed is already set");
                     _viewPos = value;
                     _viewPos.Changed += this.OnViewPosChanged;
+                    ServoValueViewer.ViewPos = value;
                     this.OnViewPosChanged(this, EventArgs.Empty);
                 }
             }
@@ -89,6 +90,7 @@ namespace AwbStudio.TimelineControls
             set
             {
                 _timelineData = value;
+                ServoValueViewer.TimelineData = value;
                 SyncScrollOffsetToNewPlayPos(0, snapToGrid: true);
                 PaintTimeLine();
                 PaintPlayPos(_timelineData);
@@ -177,11 +179,7 @@ namespace AwbStudio.TimelineControls
                     OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: height - 30, right: 0, bottom: 0) });
                 }
             }
-            foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
-            {
-                var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
-                OpticalGrid.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = _gridLineBrush });
-            }
+           
 
             // update the play position
             PaintPlayPos(_timelineData);
@@ -192,11 +190,16 @@ namespace AwbStudio.TimelineControls
             if (_timelineData == null) return;
 
             // update the scrollbar
-            TimelineScrollbar.Maximum = _timelineData.DurationMs - ViewPos.DisplayMs;
-            TimelineScrollbar.Value = ViewPos.ScrollOffsetMs;
+            MyInvoker.Invoke(() =>
+            {
+                // wait for the UI to be updated (otherwise the scrollbar is not updated
+                TimelineScrollbar.Maximum = _timelineData.DurationMs - ViewPos.DisplayMs;
+                TimelineScrollbar.Value = ViewPos.ScrollOffsetMs;
+                // update the timeline
+                PaintTimeLine();
+            }); 
 
-            // update the timeline
-            PaintTimeLine();
+          ;
         }
 
         private void TimelineViewer_Loaded(object sender, RoutedEventArgs e)

@@ -18,6 +18,7 @@
                 <Line x:Name="PlayPosLine" Stroke="DarkOrange" StrokeThickness="1" X1="10" X2="50" Y1="10" Y2="200" ></Line>
             </Grid>
             <Label x:Name="ManualPlayPosAbsolute" Content="🔺" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Foreground="#FF8DA2FA"/>
+            <local:ServoValueViewerControl x:Name="ServoValueViewer"/>
         </Grid>
         <ScrollBar Grid.Row="1" x:Name="TimelineScrollbar" Height="20" Orientation="Horizontal" />
     </Grid>
