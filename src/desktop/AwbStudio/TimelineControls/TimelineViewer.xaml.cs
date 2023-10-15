@@ -105,6 +105,7 @@ namespace AwbStudio.TimelineControls
             get => _actuatorsService; set
             {
                 _actuatorsService = value;
+                ServoValueViewer.ActuatorsService = value;
             }
         }
 

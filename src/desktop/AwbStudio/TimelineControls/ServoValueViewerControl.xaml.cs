@@ -32,6 +32,16 @@ namespace AwbStudio.TimelineControls
         public ServoValueViewerControl()
         {
             InitializeComponent();
+            Loaded += ServoValueViewerControl_Loaded    ;
+        }
+
+        private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.InvalidateVisual();
         }
 
         /// <summary>
@@ -44,6 +54,18 @@ namespace AwbStudio.TimelineControls
             {
                 _timelineData = value;
                 PaintServoValues();
+            }
+        }
+
+        /// <summary>
+        /// The service to get the actuators
+        /// </summary>
+        public IActuatorsService? ActuatorsService
+        {
+            get => _actuatorsService; set
+            {
+                _actuatorsService = value;
+                CalculateCaptions();
             }
         }
 
@@ -76,10 +98,11 @@ namespace AwbStudio.TimelineControls
 
             PanelLines.Children.Clear();
             GridDots.Children.Clear();
+            OpticalGrid.Children.Clear();
 
             if (_viewPos == null) return;
             if (_timelineData == null) return;
-            
+
             double height = this.ActualHeight;
             double width = this.ActualWidth;
 
@@ -91,7 +114,7 @@ namespace AwbStudio.TimelineControls
 
             // Update the content points and lines
             // ToDo: cache and only update on changes; or: use model binding and auto update
-            
+
             foreach (var servoId in servoIds)
             {
                 var caption = _timelineCaptions?.GetServoCaption(servoId) ?? new TimelineCaption { Color = new SolidColorBrush(Colors.White) };
@@ -115,7 +138,7 @@ namespace AwbStudio.TimelineControls
                             Height = dotWidth,
                             Width = dotWidth,
                             Margin = new Thickness { Left = _viewPos.GetXPos(ms: (int)point.TimeMs, controlWidth: width, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }
-                        }) ;
+                        });
                     }
                 }
 
@@ -124,7 +147,7 @@ namespace AwbStudio.TimelineControls
                 this.PanelLines.Children.Add(line);
             }
 
-    
+
             foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
             {
                 var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
