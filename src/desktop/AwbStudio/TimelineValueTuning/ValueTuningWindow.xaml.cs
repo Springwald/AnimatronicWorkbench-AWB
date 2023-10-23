@@ -24,9 +24,9 @@ namespace AwbStudio
     /// <summary>
     /// Interaction logic for ValueTuningControl.xaml
     /// </summary>
-    public partial class ValueTuningControl : Window
+    public partial class ValueTuningWindow : Window
     {
-        public ValueTuningControl()
+        public ValueTuningWindow()
         {
             InitializeComponent();
         }

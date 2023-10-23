@@ -1,0 +1,31 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AwbStudio"
+        xmlns:ValueTuning="clr-namespace:AwbStudio.ValueTuning" x:Class="AwbStudio.ValueTuningWindow"
+        mc:Ignorable="d"
+        Title="ValueTuningWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <ValueTuning:SingleValueControl Grid.Column="0" />
+        <ValueTuning:SingleValueControl Grid.Column="1" />
+        <ValueTuning:SingleValueControl Grid.Column="2" />
+        <ValueTuning:SingleValueControl Grid.Column="3" />
+        <ValueTuning:SingleValueControl Grid.Column="4" />
+        <ValueTuning:SingleValueControl Grid.Column="5" />
+        <ValueTuning:SingleValueControl Grid.Column="6" />
+        <ValueTuning:SingleValueControl Grid.Column="7" />
+
+    </Grid>
+</Window>
