@@ -13,7 +13,7 @@
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <Label Content="Ch 1"  Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <Slider Orientation="Vertical" Grid.Row="1"  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" >
+        <Slider Orientation="Vertical" Grid.Row="1"  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Maximum="100" >
             <Slider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform ScaleX="-1"/>
