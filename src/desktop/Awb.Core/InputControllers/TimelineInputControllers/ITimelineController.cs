@@ -11,6 +11,8 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
 {
     public interface ITimelineController : IDisposable
     {
+        string?[] ActualActuatorNames { set; }
+
         public enum PlayStates
         {
             Editor,

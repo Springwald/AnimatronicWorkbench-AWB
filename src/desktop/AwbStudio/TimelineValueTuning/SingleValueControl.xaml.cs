@@ -6,19 +6,8 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using System.Reflection.Metadata.Ecma335;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AwbStudio.ValueTuning
 {
@@ -27,9 +16,44 @@ namespace AwbStudio.ValueTuning
     /// </summary>
     public partial class SingleValueControl : UserControl
     {
+        private bool _isSetting = false;
+
         public SingleValueControl()
         {
             InitializeComponent();
+            SliderValue.ValueChanged += SliderValue_ValueChanged;
         }
+
+        private void SliderValue_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_isSetting) return;
+            Value = e.NewValue;
+            ValueChanged?.Invoke(this, e.NewValue);
+        }
+
+        public double Value
+        {
+            get => SliderValue.Value;
+            set
+            {
+                if (SliderValue.Value != value)
+                {
+                    _isSetting = true;
+                    LabelValue.Content = $"{value:0.0}";
+                    SliderValue.Value = value;
+                    _isSetting = false;
+                }
+            }
+        }
+
+        public string ActuatorName
+        {
+            set
+            {
+                LabelName.Content = value;
+            }
+        }
+
+        public EventHandler<double> ValueChanged;
     }
 }

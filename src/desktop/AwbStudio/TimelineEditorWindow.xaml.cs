@@ -33,17 +33,20 @@ namespace AwbStudio
         private readonly IAwbLogger _logger;
         private readonly AwbProject _project;
         private readonly FileManager _fileManager;
-        private readonly ITimelineController? _timelineController;
+        private readonly ITimelineController[] _timelineControllers;
 
         private TimelinePlayer _timelinePlayer;
         private IActuatorsService _actuatorsService;
         private IAwbClientsService _clientService;
 
         private bool _unsavedChanges;
+
+        public ValueTuningWindow ValueTuningWin { get; private set; }
+
         private volatile bool _manualUpdatingPlayPos;
         private volatile bool _manualUpdatingValues;
         private bool _switchingPages;
-        private int _lastActuatorChanged= 1; // prevent double actuator change events to the midi controller
+        private int _lastActuatorChanged = 1; // prevent double actuator change events to the midi controller
 
         protected TimelineData TimelineData { get; set; }
 
@@ -56,8 +59,7 @@ namespace AwbStudio
 
             _project = _projectManagerService.ActualProject;
             _fileManager = new FileManager(_project);
-
-            _timelineController = inputControllerService.TimelineController;
+            _timelineControllers = inputControllerService.TimelineControllers;
 
             var viewPos = new TimelineViewPos();
             TimelineViewerControl.ViewPos = viewPos;
@@ -97,9 +99,11 @@ namespace AwbStudio
 
             TimelineChooser.OnTimelineChosen += TimelineChosenToLoad;
 
-
-            if (_timelineController != null)
-                _timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
+            foreach (var timelineController in _timelineControllers)
+            {
+                timelineController.ActualActuatorNames = _actuatorsService.Servos.Select(s => s.Name).ToArray();
+                timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
+            }
 
             Closing += TimelineEditorWindow_Closing;
 
@@ -107,6 +111,8 @@ namespace AwbStudio
             this.Topmost = false;
             this.IsEnabled = true;
             _unsavedChanges = false;
+
+   
 
             await _timelinePlayer.Update();
         }
@@ -136,10 +142,10 @@ namespace AwbStudio
             }
             Closing -= TimelineEditorWindow_Closing;
 
-            if (_timelineController != null)
+            foreach (var timelineController in _timelineControllers)
             {
-                _timelineController.SetPlayState(ITimelineController.PlayStates.Editor);
-                _timelineController.OnTimelineEvent -= TimelineController_OnTimelineEvent;
+                timelineController.SetPlayState(ITimelineController.PlayStates.Editor);
+                timelineController.OnTimelineEvent -= TimelineController_OnTimelineEvent;
             }
 
             _timelinePlayer.OnPlayStateChanged -= OnPlayStateChanged;
@@ -159,7 +165,7 @@ namespace AwbStudio
                             break;
 
                         case TimelinePlayer.PlayStates.Nothing:
-                           
+
                             int newPos = _timelinePlayer.PositionMs;
                             newPos = viewPos.ScrollOffsetMs + viewPos.PosSelectorManualMs;
                             _manualUpdatingPlayPos = true;
@@ -215,7 +221,7 @@ namespace AwbStudio
                         ShowValuesOnTimelineInputController(_timelinePlayer.PositionMs);
                         _lastActuatorChanged = e.ActuatorIndex;
                     }
-                    
+
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.ActuatorTogglePoint:
@@ -296,15 +302,18 @@ namespace AwbStudio
 
         private void ShowValuesOnTimelineInputController(int playPosMs)
         {
-            if (_timelineController == null) return;
+            if (_timelineControllers == null) return;
 
             var servos = _actuatorsService?.Servos;
             if (servos == null) return;
             for (int i = 0; i < servos.Length; i++)
             {
                 var servo = servos[i];
-                _timelineController.SetActuatorValue(index: i, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * (servo.TargetValue - servo.MinValue * 1.0) / (1.0 * servo.MaxValue - servo.MinValue))));
-                _timelineController.ShowPointButtonState(index: i, pointExists: TimelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
+                foreach (var timelineController in _timelineControllers)
+                {
+                    timelineController.SetActuatorValue(index: i, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * (servo.TargetValue - servo.MinValue * 1.0) / (1.0 * servo.MaxValue - servo.MinValue))));
+                    timelineController.ShowPointButtonState(index: i, pointExists: TimelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
+                }
             }
         }
 
@@ -416,7 +425,8 @@ namespace AwbStudio
         private void Play()
         {
             _timelinePlayer?.Play();
-            _timelineController?.SetPlayState(ITimelineController.PlayStates.Playing);
+            foreach(var timelineController in _timelineControllers)
+                timelineController?.SetPlayState(ITimelineController.PlayStates.Playing);
         }
 
         private async void Stop()
@@ -430,7 +440,8 @@ namespace AwbStudio
                 // snap playpos to snap positions 
                 await _timelinePlayer.Update((_timelinePlayer.PositionMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs);
             }
-            _timelineController?.SetPlayState(ITimelineController.PlayStates.Editor);
+            foreach (var timelineController in _timelineControllers)
+                timelineController.SetPlayState(ITimelineController.PlayStates.Editor);
             MyInvoker.Invoke(new Action(() => TimelineViewerControl.PaintTimeLine()));
         }
 

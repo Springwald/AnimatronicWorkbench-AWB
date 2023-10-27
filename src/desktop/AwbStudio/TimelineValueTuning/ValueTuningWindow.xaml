@@ -7,6 +7,9 @@
         xmlns:ValueTuning="clr-namespace:AwbStudio.ValueTuning" x:Class="AwbStudio.ValueTuningWindow"
         mc:Ignorable="d"
         Title="ValueTuningWindow" Height="450" Width="800">
+    <Window.Icon>
+        <DrawingImage />
+    </Window.Icon>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -18,14 +21,14 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <ValueTuning:SingleValueControl Grid.Column="0" />
-        <ValueTuning:SingleValueControl Grid.Column="1" />
-        <ValueTuning:SingleValueControl Grid.Column="2" />
-        <ValueTuning:SingleValueControl Grid.Column="3" />
-        <ValueTuning:SingleValueControl Grid.Column="4" />
-        <ValueTuning:SingleValueControl Grid.Column="5" />
-        <ValueTuning:SingleValueControl Grid.Column="6" />
-        <ValueTuning:SingleValueControl Grid.Column="7" />
+        <ValueTuning:SingleValueControl Grid.Column="0" x:Name="ValueControl1" />
+        <ValueTuning:SingleValueControl Grid.Column="1" x:Name="ValueControl2"/>
+        <ValueTuning:SingleValueControl Grid.Column="2" x:Name="ValueControl3"/>
+        <ValueTuning:SingleValueControl Grid.Column="3" x:Name="ValueControl4"/>
+        <ValueTuning:SingleValueControl Grid.Column="4" x:Name="ValueControl5"/>
+        <ValueTuning:SingleValueControl Grid.Column="5" x:Name="ValueControl6"/>
+        <ValueTuning:SingleValueControl Grid.Column="6" x:Name="ValueControl7"/>
+        <ValueTuning:SingleValueControl Grid.Column="7" x:Name="ValueControl8"/>
 
     </Grid>
 </Window>

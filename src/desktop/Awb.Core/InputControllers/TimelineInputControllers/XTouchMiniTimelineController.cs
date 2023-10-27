@@ -14,6 +14,8 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
         private readonly XTouchMiniController _xTouchMiniController;
         private ITimelineController.PlayStates _playState = ITimelineController.PlayStates.Editor;
 
+        public string?[] ActualActuatorNames { set{ } }
+
         public XTouchMiniTimelineController(XTouchMiniController xTouchMiniController)
         {
             _xTouchMiniController = xTouchMiniController;

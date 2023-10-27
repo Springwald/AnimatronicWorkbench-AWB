@@ -14,6 +14,7 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
         private ITimelineController.PlayStates _playState = ITimelineController.PlayStates.Editor;
         private readonly Bcf2000Controller _bcf2000Controller;
 
+        public string?[] ActualActuatorNames { set { } }
         public Bcf2000TimelineController(Bcf2000Controller bcf2000Controller)
         {
             _bcf2000Controller = bcf2000Controller;
