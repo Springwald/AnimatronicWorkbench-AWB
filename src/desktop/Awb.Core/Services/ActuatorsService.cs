@@ -26,9 +26,9 @@ namespace Awb.Core.Services
         {
             var servos = new List<IServo>();
 
-            if (config.AdafruitPwmServos != null)
+            if (config.Pca9685PwmServos != null)
             {
-                foreach (var adafruitPwmServoConfig in config.AdafruitPwmServos)
+                foreach (var adafruitPwmServoConfig in config.Pca9685PwmServos)
                 {
 
                 }

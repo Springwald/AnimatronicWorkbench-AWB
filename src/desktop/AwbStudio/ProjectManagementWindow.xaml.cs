@@ -101,13 +101,27 @@ namespace AwbStudio
                              new StsServoConfig("StsServo1", clientId: 1, channel: 1)
                              {
                                  Name ="Demo serial Servo 1",
-                                 Accelleration = 20,
+                                 Acceleration = 20,
                                  DefaultValue = 2000,
                                  MaxValue = 4095,
                                  MinValue = 0,
                                  Speed = 1000,
                              },
-                         }
+                         },
+                        Pca9685PwmServos = new Pca9685PwmServoConfig[]
+                        {
+                            new Pca9685PwmServoConfig()
+                            {
+                                Id = "PwmServo1",
+                                Name = "Demo PWM Servo 1",
+                                ClientId = 1,
+                                I2cAdress = 0x40,
+                                Channel = 1,
+                                DefaultValue = 2000,
+                                MaxValue = 4095,
+                                MinValue = 0,
+                            },
+                        }
                     };
 
                     if (_projectManagerService.SaveProject(project, projectFolder: dialog.SelectedPath))

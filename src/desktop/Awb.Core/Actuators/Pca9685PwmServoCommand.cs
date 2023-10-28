@@ -7,7 +7,7 @@
 
 namespace Awb.Core.Actuators
 {
-    public class AdafruitPwmServoCommand
+    public class Pca9685PwmServoCommand
     {
         public int Channel { get; set; }
         public int I2cAdress { get; set; }

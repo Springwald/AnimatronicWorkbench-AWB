@@ -76,7 +76,7 @@ namespace Awb.Core.LoadNSave.Export
 
             var stsServos = exportData.StsServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.StsServoConfig>();
             var stsServoChannels = stsServos.Select(s => s.Channel).ToArray() ;
-            var stsServoAccelerations = stsServos.Select(s => s.Accelleration  ?? -1).ToArray();
+            var stsServoAccelerations = stsServos.Select(s => s.Acceleration  ?? -1).ToArray();
             var stsServoSpeeds = stsServos.Select(s => s.Speed ?? -1).ToArray();
             var stsServoNames = stsServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
             result.AppendLine($"\tint stsServoCount = {stsServos.Length};");

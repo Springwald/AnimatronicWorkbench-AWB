@@ -1,0 +1,43 @@
+{
+  "Info": "The TestFace for animatronic Grogu 2.0",
+  "Title": "Grogu 2.0 TestFace",
+  "ProjectFolder": "E:\\Animatronic-Workbench\\AnimatronicWorkbench-AWB\\demo-projects\\Grogu-2.0-TestFace",
+  "Pca9685PwmServos": [
+    {
+      "Id": "PwmServo1",
+      "ClientId": 1,
+      "I2cAdress": 64,
+      "Channel": 1,
+      "Name": "Demo PWM Servo 1",
+      "MinValue": 0,
+      "MaxValue": 4095,
+      "DefaultValue": 2000,
+      "Acceleration": null,
+      "Speed": null
+    }
+  ],
+  "StsServos": [],
+  "TimelinesStates": [
+    {
+      "Id": 1,
+      "Name": "sleep"
+    },
+    {
+      "Id": 2,
+      "Name": "action"
+    },
+    {
+      "Id": 3,
+      "Name": "idle"
+    },
+    {
+      "Id": 4,
+      "Name": "talk"
+    },
+    {
+      "Id": 5,
+      "Name": "joint demo"
+    }
+  ],
+  "AutoPlayEsp32ExportFolder": null
+}

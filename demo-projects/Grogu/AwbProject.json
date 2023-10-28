@@ -12,7 +12,7 @@
       "MinValue": 1790,
       "MaxValue": 2100,
       "DefaultValue": 1790,
-	  "Accelleration": 100,
+	  "Acceleration": 100,
 	  "Speed": 1500
     },
     {
