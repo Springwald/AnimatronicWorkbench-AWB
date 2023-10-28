@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Clients;
 using Awb.Core.Configs;
 using Awb.Core.Services;
 
@@ -13,7 +12,6 @@ namespace Awb.Core.Actuators
 {
     public class Pca9685PwmServo : IServo
     {
-        private readonly Esp32ComPortClient? _espClient;
         public string Id { get; }
         public uint ClientId { get; }
         public string? Name { get; }
@@ -27,7 +25,7 @@ namespace Awb.Core.Actuators
 
         public string Label => $"[C{ClientId}-PWM{Channel}] {Name ?? string.Empty}";
 
-        public Pca9685PwmServo(Pca9685PwmServoConfig config, IAwbClientsService clients)
+        public Pca9685PwmServo(Pca9685PwmServoConfig config)
         {
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
 
@@ -42,7 +40,6 @@ namespace Awb.Core.Actuators
 
             Channel = config.Channel;
             I2cAdress = config.I2cAdress;
-            _espClient = clients.GetClient(config.ClientId) ?? throw new KeyNotFoundException($"EspClientId '{config.ClientId}' not found!");
         }
 
         public bool TurnOff()

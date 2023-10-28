@@ -78,7 +78,7 @@ namespace Awb.Core.Actuators
 
         public string Label => $"[C{ClientId}-STS{Channel}] {Name ?? string.Empty}";
 
-        public StsServo(StsServoConfig config, IAwbClientsService clients)
+        public StsServo(StsServoConfig config)
         {
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
 

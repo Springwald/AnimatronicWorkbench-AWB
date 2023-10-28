@@ -1,5 +1,30 @@
 {
   "TimelineStateId": 3,
-  "ServoPoints": [],
+  "ServoPoints": [
+    {
+      "TimeMs": 0,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "PwmServo1",
+      "ValuePercent": 49.60629921259843,
+      "ServoId": "PwmServo1"
+    },
+    {
+      "TimeMs": 2000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "PwmServo1",
+      "ValuePercent": 100,
+      "ServoId": "PwmServo1"
+    },
+    {
+      "TimeMs": 4000,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "PwmServo1",
+      "ValuePercent": 49.60629921259843,
+      "ServoId": "PwmServo1"
+    }
+  ],
   "SoundPoints": []
 }
