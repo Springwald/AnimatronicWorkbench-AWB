@@ -14,7 +14,7 @@ https://daniel.springwald.de
 #include "AwbClient.h"
 
 // If you use more than one AWB-client, you have to enter different IDs per client here
-#define CLIENT_ID 2
+#define CLIENT_ID 1
 
 AwbClient awbClient = AwbClient(CLIENT_ID);
 

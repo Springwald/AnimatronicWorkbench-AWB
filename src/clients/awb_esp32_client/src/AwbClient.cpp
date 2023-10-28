@@ -41,7 +41,7 @@ void AwbClient::setup()
     // set up error callbacks for the different components
     const TCallBackErrorOccured packetErrorOccured = [this](String message)
     { showError(message); };
-    const TCallBackErrorOccured adafruitPwmErrorOccured = [this](String message)
+    const TCallBackErrorOccured pca9685PwmErrorOccured = [this](String message)
     { showError(message); };
     const TCallBackErrorOccured stsServoErrorOccured = [this](String message)
     { showError(message); };
@@ -49,7 +49,7 @@ void AwbClient::setup()
     { showError(message); };
 
     // set up the actuators
-    this->_adafruitpwmManager = new AdafruitPwmManager(adafruitPwmErrorOccured);
+    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
     this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
 
@@ -259,9 +259,9 @@ void AwbClient::processPacket(String payload)
         }
     }
 
-    if (jsondoc.containsKey("AdfPwm")) // packet contains adafruit PWM driver data
+    if (jsondoc.containsKey("Pca9685Pwm")) // packet contains adafruit PWM driver data
     {
-        JsonArray channels = jsondoc["AdfPwm"]["Ch"];
+        JsonArray channels = jsondoc["Pca9685Pwm"]["Ch"];
         for (size_t i = 0; i < channels.size(); i++)
         {
             int channel = channels[i]["Ch"];
@@ -298,6 +298,7 @@ void AwbClient::processPacket(String payload)
         }
     }
 
+    _pca9685pwmManager->updateActuators();
     _stSerialServoManager->updateActuators();
     _autoPlayer->stopBecauseOfIncommingPackage();
 

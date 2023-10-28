@@ -16,7 +16,7 @@ namespace Awb.Core.Actuators
         public uint ClientId { get; }
         public string? Name { get; }
         public uint Channel { get; }
-        public int I2cAdress { get; }
+        public uint I2cAdress { get; }
         public int MinValue { get; }
         public int MaxValue { get; }
         public int DefaultValue { get; }

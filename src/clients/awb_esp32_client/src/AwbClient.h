@@ -6,7 +6,7 @@
 #include "Adafruit_PWMServoDriver.h"
 #include "StSerialServoManager.h"
 #include "DacSpeaker.h"
-#include "AdafruitPwmManager.h"
+#include "Pca9685PwmManager.h"
 #include "PacketSenderReceiver.h"
 #include "ActuatorValue.h"
 #include "NeoPixel/NeoPixelStatusControl.h"
@@ -27,7 +27,7 @@ protected:
     long _lastStatusMillis = 0;                  /// The last time the status was udated
     long _startMillis = millis();                /// The start millis
     PacketSenderReceiver *_packetSenderReceiver; /// The packet sender receiver to communicate with the Animatronic Workbench Studio
-    AdafruitPwmManager *_adafruitpwmManager;     /// The pwm manager to control the adafruit pwm board
+    Pca9685PwmManager *_pca9685pwmManager;       /// The pwm manager to control the Pca9685 pwm board
     StSerialServoManager *_stSerialServoManager; /// The serial servo manager to control the sts serial servos
     NeoPixelStatusControl *_neoPixelStatus;      /// The neopixel status control
 
@@ -88,7 +88,7 @@ public:
     ~AwbClient()
     {
         delete _packetSenderReceiver;
-        delete _adafruitpwmManager;
+        delete _pca9685pwmManager;
         delete _stSerialServoManager;
         delete _neoPixelStatus;
         delete _autoPlayer;

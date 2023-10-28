@@ -5,17 +5,13 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.Text.Json.Serialization;
+
 namespace Awb.Core.DataPackets
 {
-    public class AdafruitPwm
+    public class Pca9685PwmServosPacketData
     {
-        public int I2c { get; set; }
-
-        public AdafruitPwmChannel[]? Channels { get; set; }
-
-        public AdafruitPwm(int i2cAddress)
-        {
-            I2c = i2cAddress;
-        }
+        [JsonPropertyName("Servos")]
+        public Pca9685PwmServoPacketData[]? Servos { get; set; }
     }
 }

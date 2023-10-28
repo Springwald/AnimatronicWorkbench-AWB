@@ -2,8 +2,8 @@
 #define hardware_h
 
 /* Display settings */
-// #define DISPLAY_M5STACK  // if you use a M5Stack, uncomment this line
-#define DISPLAY_SSD1306 // e.g. for Waveshare Servo Driver with ESP32
+#define DISPLAY_M5STACK // if you use a M5Stack, uncomment this line
+// #define DISPLAY_SSD1306 // e.g. for Waveshare Servo Driver with ESP32
 
 /* Neopixel status LEDs */
 #define USE_NEOPIXEL_STATUS_CONTROL
@@ -24,6 +24,11 @@
 #define STS_SERVO_TXD 19             // GPIO 19
 #define STS_SERVO_MAX_TEMPERATURE 45 // max temperature (celsius) before servo is disabled
 #define STS_SERVO_MAX_LOAD 250       // max load before servo is disabled
+
+/* PCA9685 PWM servo settings */
+#define PCA9685_I2C_ADDRESS 0x40
+#define PCA9685_SPEED 1500
+#define PCA9685_ACC 10
 
 /* DAC speaker */
 // #define USE_DAC_SPEAKER

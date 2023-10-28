@@ -11,7 +11,7 @@ namespace Awb.Core.Configs
     {
         public string Id { get; set; }
         public uint ClientId { get; set; }
-        public int I2cAdress { get; set; }
+        public uint I2cAdress { get; set; }
         public uint Channel { get; set; }
         public string? Name { get; set; }
         public int MinValue { get; set; }
