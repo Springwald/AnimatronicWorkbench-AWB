@@ -162,7 +162,7 @@ namespace AwbStudio.TimelineControls
 
             if (height < 100 || width < 100) return;
 
-            var servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Distinct().ToArray() ?? Array.Empty<string>();
+            //r servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Distinct().ToArray() ?? Array.Empty<string>();
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 

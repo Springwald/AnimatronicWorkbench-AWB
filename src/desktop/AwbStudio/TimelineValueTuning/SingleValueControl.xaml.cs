@@ -6,7 +6,6 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System;
-using System.Reflection.Metadata.Ecma335;
 using System.Windows.Controls;
 
 namespace AwbStudio.ValueTuning
@@ -26,8 +25,8 @@ namespace AwbStudio.ValueTuning
 
         private void SliderValue_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
+            if (e.NewValue.Equals(e.OldValue)) return;
             if (_isSetting) return;
-            Value = e.NewValue;
             ValueChanged?.Invoke(this, e.NewValue);
         }
 
@@ -36,13 +35,11 @@ namespace AwbStudio.ValueTuning
             get => SliderValue.Value;
             set
             {
-                if (SliderValue.Value != value)
-                {
-                    _isSetting = true;
-                    LabelValue.Content = $"{value:0.0}";
-                    SliderValue.Value = value;
-                    _isSetting = false;
-                }
+                if (value.Equals(Value)) return;
+                _isSetting = true;
+                LabelValue.Content = $"{value:0.0}";
+                SliderValue.Value = value;
+                _isSetting = false;
             }
         }
 
