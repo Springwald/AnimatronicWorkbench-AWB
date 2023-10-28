@@ -180,7 +180,8 @@ namespace AwbStudio.TimelineControls
                     OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: height - 30, right: 0, bottom: 0) });
                 }
             }
-           
+
+            ServoValueViewer.PaintServoValues();
 
             // update the play position
             PaintPlayPos(_timelineData);

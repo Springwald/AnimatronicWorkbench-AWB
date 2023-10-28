@@ -95,7 +95,7 @@ namespace AwbStudio.TimelineControls
             MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
         }
 
-        private void PaintServoValues()
+        public void PaintServoValues()
         {
             PanelLines.Children.Clear();
             GridDots.Children.Clear();
