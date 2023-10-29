@@ -2,7 +2,7 @@
 #define hardware_h
 
 /* Display settings */
-#define DISPLAY_M5STACK // if you use a M5Stack, uncomment this line
+#define DISPLAY_M5STACK // if you use a M5Stack, uncomment this line. Uses GPIO 14+18 for display communication
 // #define DISPLAY_SSD1306 // e.g. for Waveshare Servo Driver with ESP32
 
 /* Neopixel status LEDs */
