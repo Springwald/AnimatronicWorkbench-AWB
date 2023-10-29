@@ -1,29 +1,29 @@
 {
-  "TimelineStateId": 3,
+  "TimelineStateId": 1,
   "ServoPoints": [
     {
       "TimeMs": 0,
       "Title": null,
       "Description": null,
-      "TargetObjectId": "PwmServo1",
-      "ValuePercent": 49.60629921259843,
-      "ServoId": "PwmServo1"
+      "TargetObjectId": "PwmServo0",
+      "ValuePercent": 50.39370078740157,
+      "ServoId": "PwmServo0"
+    },
+    {
+      "TimeMs": 991,
+      "Title": null,
+      "Description": null,
+      "TargetObjectId": "PwmServo0",
+      "ValuePercent": 74.01574803149606,
+      "ServoId": "PwmServo0"
     },
     {
       "TimeMs": 2000,
       "Title": null,
       "Description": null,
-      "TargetObjectId": "PwmServo1",
-      "ValuePercent": 100,
-      "ServoId": "PwmServo1"
-    },
-    {
-      "TimeMs": 4000,
-      "Title": null,
-      "Description": null,
-      "TargetObjectId": "PwmServo1",
+      "TargetObjectId": "PwmServo0",
       "ValuePercent": 49.60629921259843,
-      "ServoId": "PwmServo1"
+      "ServoId": "PwmServo0"
     }
   ],
   "SoundPoints": []

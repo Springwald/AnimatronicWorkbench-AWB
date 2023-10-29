@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "StsServoPoint.h"
+#include "Pca9685PwmServoPoint.h"
 #include "TimelineState.h"
 
 using byte = unsigned char;
@@ -15,21 +16,31 @@ class Timeline
 
 protected:
 public:
-    String name;                                /// the name of the timeline
-    TimelineState *state;                       /// the state of the timeline
-    std::vector<StsServoPoint> *stsServoPoints; /// the sts servo points of the timeline
-    int durationMs;                             /// the duration of the timeline in milliseconds
+    String name;                                         /// the name of the timeline
+    TimelineState *state;                                /// the state of the timeline
+    std::vector<StsServoPoint> *stsServoPoints;          /// the sts servo points of the timeline
+    std::vector<Pca9685PwmServoPoint> *pca9685PwmPoints; /// the Pca9685 Pwm servo points of the timeline
+    int durationMs;                                      /// the duration of the timeline in milliseconds
 
 public:
-    Timeline(TimelineState *state, String name, std::vector<StsServoPoint> *p_stsPoints) : stsServoPoints(p_stsPoints), name(name), state(state)
+    Timeline(TimelineState *state, String name, std::vector<StsServoPoint> *p_stsPoints, std::vector<Pca9685PwmServoPoint> *p_pca9685PwmPoints) : stsServoPoints(p_stsPoints), pca9685PwmPoints(p_pca9685PwmPoints), name(name), state(state)
     {
         durationMs = 0;
-        // calculate duration for sts servo points
+
+        // calculate highest duration for sts servo points
         for (int i = 0; i < stsServoPoints->size(); i++)
         {
             // get the ms value of the point
             if (stsServoPoints->at(i).ms > durationMs)
                 durationMs = stsServoPoints->at(i).ms;
+        }
+
+        // calculate highest duration for Pca9685 Pwm servo points
+        for (int i = 0; i < pca9685PwmPoints->size(); i++)
+        {
+            // get the ms value of the point
+            if (pca9685PwmPoints->at(i).ms > durationMs)
+                durationMs = pca9685PwmPoints->at(i).ms;
         }
 
         // calculate duration for other points

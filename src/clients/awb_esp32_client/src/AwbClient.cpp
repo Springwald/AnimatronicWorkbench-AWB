@@ -10,6 +10,7 @@ bool demoMode = false;
 
 using TCallBackPacketReceived = std::function<void(unsigned int, String)>;
 using TCallBackErrorOccured = std::function<void(String)>;
+using TCallBackMessageToShow = std::function<void(String)>;
 
 StaticJsonDocument<1024 * 32> jsondoc;
 
@@ -43,13 +44,15 @@ void AwbClient::setup()
     { showError(message); };
     const TCallBackErrorOccured pca9685PwmErrorOccured = [this](String message)
     { showError(message); };
+    const TCallBackMessageToShow pca9685PwmMessageToShow = [this](String message)
+    { showError(message); };
     const TCallBackErrorOccured stsServoErrorOccured = [this](String message)
     { showError(message); };
     const TCallBackErrorOccured autoPlayerErrorOccured = [this](String message)
     { showError(message); };
 
     // set up the actuators
-    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
+    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
     this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
 
@@ -121,7 +124,6 @@ void AwbClient::showMsg(String message)
  */
 void AwbClient::loop()
 {
-
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
@@ -268,31 +270,11 @@ void AwbClient::processPacket(String payload)
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
             String name = servos[i]["Name"];
-            int index = -1;
-            for (int f = 0; f < this->_actualStatusInformation->pwmServoValues->size(); f++)
-            {
-                if (this->_actualStatusInformation->pwmServoValues->at(f).id == channel)
-                {
-                    // pwm servo already added
-                    index = f;
-                    break;
-                }
-            }
-            if (index == -1)
-            {
-                // pwm servo not added yet. Insert it now
-                showMsg("added pwm servo id " + String(channel) + " '" + name + "' to list.");
-                ActuatorValue actuatorValue;
-                actuatorValue.id = channel;
-                actuatorValue.name = name;
-                this->_actualStatusInformation->pwmServoValues->push_back(actuatorValue);
-                index = _actualStatusInformation->pwmServoValues->size() - 1;
-            }
-
-            // set servo target value
-            this->_actualStatusInformation->pwmServoValues->at(index).targetValue = value;
+            // store the method showMsg in an anonymous function
+            _pca9685pwmManager->setTargetValue(channel, value, name);
         }
     }
+    _pca9685pwmManager->updateActuators();
 
     if (jsondoc.containsKey("STS")) // package contains STS bus servo data
     {
@@ -321,9 +303,8 @@ void AwbClient::processPacket(String payload)
                 showError("Servo " + String(id) + " not attached!");
         }
     }
-
-    _pca9685pwmManager->updateActuators();
     _stSerialServoManager->updateActuators();
+
     _autoPlayer->stopBecauseOfIncommingPackage();
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL

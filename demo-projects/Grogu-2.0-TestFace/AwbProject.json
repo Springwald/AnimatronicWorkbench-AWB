@@ -9,8 +9,8 @@
       "I2cAdress": 64,
       "Channel": 0,
       "Name": "Demo PWM Servo 0",
-      "MinValue": 0,
-      "MaxValue": 4095,
+      "MinValue": 370,
+      "MaxValue": 2620,
       "DefaultValue": 2000,
       "Acceleration": null,
       "Speed": null

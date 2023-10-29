@@ -11,10 +11,12 @@
 class Pca9685PwmManager
 {
     using TCallBackErrorOccured = std::function<void(String)>;
+    using TCallBackMessageToShow = std::function<void(String)>;
 
 private:
     Adafruit_PWMServoDriver _pwm;
     TCallBackErrorOccured _errorOccured;
+    TCallBackMessageToShow _messageToShow;
 
     std::vector<ActuatorValue> *pwmServoValues; /// The pwm servo values
     int _speed;                                 /// the speed to use for the sts servos
@@ -25,7 +27,7 @@ private:
     void setOscillatorFrequency(uint8_t adr, uint32_t freq);
 
 public:
-    Pca9685PwmManager(std::vector<ActuatorValue> *pwmServoValues, TCallBackErrorOccured errorOccured, uint i2cAdress, int speed, int acc) : _errorOccured(errorOccured), _speed(speed), _acc(acc), _i2cAdress(i2cAdress), pwmServoValues(pwmServoValues)
+    Pca9685PwmManager(std::vector<ActuatorValue> *pwmServoValues, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow, uint i2cAdress, int speed, int acc) : _errorOccured(errorOccured), _messageToShow(messageToShow), _speed(speed), _acc(acc), _i2cAdress(i2cAdress), pwmServoValues(pwmServoValues)
     {
         this->_pwm = Adafruit_PWMServoDriver(); // called this way, it uses the default address 0x40
         this->_pwm.setPWMFreq(SERVO_FREQ);      // Analog servos run at ~50 Hz updates
@@ -65,6 +67,7 @@ public:
         // }
     };
 
+    void setTargetValue(int channel, int value, String name);
     void updateActuators();
 };
 

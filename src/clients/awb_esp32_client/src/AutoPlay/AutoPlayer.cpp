@@ -60,6 +60,7 @@ String AutoPlayer::getCurrentTimelineName()
  */
 void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 {
+
     if (servoHaveErrorsLikeTooHot)
     {
         _actualTimelineIndex = -1;
@@ -101,7 +102,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
         return;
     }
 
-    // Play Servos
+    // Play STS Servos
     for (int servoIndex = 0; servoIndex < _data->stsServoCount; servoIndex++)
     {
         u8 servoChannel = _data->stsServoChannels[servoIndex];
@@ -163,6 +164,61 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
         }
     }
     _stSerialServoManager->updateActuators();
+
+    // Play PWM Servos
+    for (int servoIndex = 0; servoIndex < _data->pca9685PwmServoCount; servoIndex++)
+    {
+        int servoChannel = _data->pca9685PwmServoChannels[servoIndex];
+        int servoSpeed = _data->pca9685PwmServoSpeed[servoIndex];
+        int servoAccelleration = _data->pca9685PwmServoAccelleration[servoIndex];
+
+        Pca9685PwmServoPoint *point1 = nullptr;
+        Pca9685PwmServoPoint *point2 = nullptr;
+
+        for (int iPoint = 0; iPoint < actualTimelineData.pca9685PwmPoints->size(); iPoint++)
+        {
+            Pca9685PwmServoPoint *point = &actualTimelineData.pca9685PwmPoints->at(iPoint);
+            if (point->channel == servoChannel)
+            {
+                if (point->ms <= _playPosInActualTimeline)
+                    point1 = point;
+
+                if (point->ms >= _playPosInActualTimeline)
+                {
+                    point2 = point;
+                    break;
+                }
+            }
+        }
+
+        if (point1 == nullptr && point2 == nullptr)
+            continue; // no points found for this object before or after the actual position
+
+        if (point1 == nullptr)
+        {
+            // no point before the actual position found, so we take the first point after the actual position
+            point1 = point2;
+        }
+        else if (point2 == nullptr)
+        {
+            // no point after the actual position found, so we take the last point before the actual position
+            point2 = point1;
+        }
+
+        int pointDistanceMs = point2->ms - point1->ms;
+        int targetValue = 0;
+        if (pointDistanceMs == 0)
+        {
+            targetValue = point1->value;
+        }
+        else
+        {
+            double posBetweenPoints = (_playPosInActualTimeline - point1->ms * 1.0) / pointDistanceMs;
+            targetValue = point1->value + (point2->value - point1->value) * posBetweenPoints;
+        }
+        _pca9685PwmManager->setTargetValue(servoChannel, targetValue, _data->pca9685PwmServoName[servoIndex]);
+    }
+    _pca9685PwmManager->updateActuators();
 }
 
 /**

@@ -9,7 +9,8 @@
 #include "Pca9685PwmServoPoint.h"
 #include "TimelineState.h"
 #include "AutoPlayData.h"
-#include "../StSerialServoManager.h"
+#include "../Actuators/StSerialServoManager.h"
+#include "../Actuators/Pca9685PwmManager.h"
 
 using byte = unsigned char;
 
@@ -21,6 +22,7 @@ protected:
     TCallBackErrorOccured _errorOccured; // the error occured callback
 
     StSerialServoManager *_stSerialServoManager; // the STS serial servo manager
+    Pca9685PwmManager *_pca9685PwmManager;       // the PCA9685 PWM manager
 
     AutoPlayData *_data; // the data exported by Animatronic Workbench Studio
 
