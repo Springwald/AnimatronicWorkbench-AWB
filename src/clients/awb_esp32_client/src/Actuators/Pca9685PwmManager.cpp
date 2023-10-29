@@ -32,8 +32,6 @@ void Pca9685PwmManager::setOscillatorFrequency(uint8_t adr, uint32_t freq)
 
 void Pca9685PwmManager::setTargetValue(int channel, int value, String name)
 {
-    
-
     int index = -1;
     for (int f = 0; f < this->pwmServoValues->size(); f++)
     {
@@ -44,6 +42,7 @@ void Pca9685PwmManager::setTargetValue(int channel, int value, String name)
             break;
         }
     }
+
     if (index == -1)
     {
         // pwm servo not added yet. Insert it now

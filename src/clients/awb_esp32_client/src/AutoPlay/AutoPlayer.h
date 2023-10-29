@@ -37,7 +37,7 @@ protected:
     long _lastStateCheckMillis = -1;      // millis() of last state check
 
 public:
-    AutoPlayer(StSerialServoManager *stSerialServoManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
+    AutoPlayer(StSerialServoManager *stSerialServoManager, Pca9685PwmManager *pca9685PwmManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
     {
         _lastMsUpdate = millis();
         _data = new AutoPlayData();

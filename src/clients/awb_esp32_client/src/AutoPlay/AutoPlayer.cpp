@@ -68,7 +68,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     }
 
     int diff = millis() - _lastMsUpdate;
-    if (diff < 50) // update interval in milliseconds
+    if (diff < 25) // update interval in milliseconds
         return;
 
     _lastMsUpdate = millis();
@@ -171,6 +171,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
         int servoChannel = _data->pca9685PwmServoChannels[servoIndex];
         int servoSpeed = _data->pca9685PwmServoSpeed[servoIndex];
         int servoAccelleration = _data->pca9685PwmServoAccelleration[servoIndex];
+        auto servoName = _data->pca9685PwmServoName[servoIndex];
 
         Pca9685PwmServoPoint *point1 = nullptr;
         Pca9685PwmServoPoint *point2 = nullptr;
@@ -216,7 +217,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
             double posBetweenPoints = (_playPosInActualTimeline - point1->ms * 1.0) / pointDistanceMs;
             targetValue = point1->value + (point2->value - point1->value) * posBetweenPoints;
         }
-        _pca9685PwmManager->setTargetValue(servoChannel, targetValue, _data->pca9685PwmServoName[servoIndex]);
+        _pca9685PwmManager->setTargetValue(servoChannel, targetValue, servoName);
     }
     _pca9685PwmManager->updateActuators();
 }

@@ -45,7 +45,7 @@ void AwbClient::setup()
     const TCallBackErrorOccured pca9685PwmErrorOccured = [this](String message)
     { showError(message); };
     const TCallBackMessageToShow pca9685PwmMessageToShow = [this](String message)
-    { showError(message); };
+    { showMsg(message); };
     const TCallBackErrorOccured stsServoErrorOccured = [this](String message)
     { showError(message); };
     const TCallBackErrorOccured autoPlayerErrorOccured = [this](String message)
@@ -70,7 +70,7 @@ void AwbClient::setup()
     showMsg("Found " + String(this->_stSerialServoManager->servoIds->size()) + " servos");
     delay(1000);
 
-    _autoPlayer = new AutoPlayer(_stSerialServoManager, AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL, autoPlayerErrorOccured);
+    _autoPlayer = new AutoPlayer(_stSerialServoManager, _pca9685pwmManager, AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL, autoPlayerErrorOccured);
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload)
