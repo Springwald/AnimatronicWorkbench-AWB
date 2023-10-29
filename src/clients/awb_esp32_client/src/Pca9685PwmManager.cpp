@@ -34,35 +34,34 @@ void Pca9685PwmManager::updateActuators()
 {
     for (int i = 0; i < this->pwmServoValues->size(); i++)
     {
-        /* // get a pointer to the current servo
-         ActuatorValue *servo = &this->pwmServoValues->at(i);
-         if (servo->targetValue == -1)
-         {
-             // turn servo off
-             setTorque(servo->id, false);
-         }
-         else
-         {
-             // set new target value if changed
-             if (servo->currentValue != servo->targetValue)
-             {
-                 int speed = servo->speed;
-                 int acc = servo->acc;
-                 if (speed == -1 && acc == -1)
-                 {
-                     // use default values for speed and acc
-                     _serialServo.WritePosEx(servo->id, servo->targetValue, STS_SERVO_SPEED, STS_SERVO_ACC);
-                 }
-                 else
-                 {
-                     if (speed == -1)
-                         speed = STS_SERVO_SPEED;
-                     if (acc == -1)
-                         acc = STS_SERVO_ACC;
-                     _serialServo.WritePosEx(servo->id, servo->targetValue, speed, acc);
-                 }
-                 servo->currentValue = servo->targetValue;
-             }
-         }*/
+        // get a pointer to the current servo
+        ActuatorValue *servo = &this->pwmServoValues->at(i);
+        if (servo->targetValue == -1)
+        {
+            // turn servo off
+            // todo: implement
+        }
+        else
+        {
+            // set new target value if changed
+            if (servo->currentValue != servo->targetValue)
+            {
+                int speed = servo->speed;
+                int acc = servo->acc;
+
+                if (speed == -1 && acc == -1)
+                {
+                    // use default values for speed and acc
+                }
+                else
+                {
+                }
+
+                uint8_t servoNo = servo->id;
+                uint16_t microseconds = servo->targetValue;
+                _pwm.writeMicroseconds(servoNo, microseconds);
+                servo->currentValue = servo->targetValue;
+            }
+        }
     }
 }

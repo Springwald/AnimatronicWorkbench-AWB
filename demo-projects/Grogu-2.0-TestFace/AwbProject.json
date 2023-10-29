@@ -4,11 +4,11 @@
   "ProjectFolder": "E:\\Animatronic-Workbench\\AnimatronicWorkbench-AWB\\demo-projects\\Grogu-2.0-TestFace",
   "Pca9685PwmServos": [
     {
-      "Id": "PwmServo1",
+      "Id": "PwmServo0",
       "ClientId": 2,
       "I2cAdress": 64,
-      "Channel": 1,
-      "Name": "Demo PWM Servo 1",
+      "Channel": 0,
+      "Name": "Demo PWM Servo 0",
       "MinValue": 0,
       "MaxValue": 4095,
       "DefaultValue": 2000,
