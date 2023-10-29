@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "StsServoPoint.h"
+#include "Pca9685PwmServoPoint.h"
 #include "TimelineState.h"
 #include "AutoPlayData.h"
 #include "../StSerialServoManager.h"

@@ -4,6 +4,7 @@
 #include "Timeline.h"
 #include "TimelineState.h"
 #include "StsServoPoint.h"
+#include "Pca9685PwmServoPoint.h"
 #include "hardware.h"
 #include <vector>
 
@@ -166,7 +167,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 
 /**
  * If a state selector is used, this is the selected state id
-*/
+ */
 int AutoPlayer::selectedStateId()
 {
     if (_stateSelectorStsServoChannel == -1)
@@ -202,7 +203,7 @@ int AutoPlayer::selectedStateId()
 
 /**
  * Starts the auto player with the given timeline
-*/
+ */
 void AutoPlayer::startNewTimeline(int timelineIndex)
 {
     _actualTimelineIndex = timelineIndex;
@@ -211,7 +212,7 @@ void AutoPlayer::startNewTimeline(int timelineIndex)
 
 /**
  * Starts a new timeline for the selected state
-*/
+ */
 void AutoPlayer::startNewTimelineForSelectedState()
 {
     auto stateId = selectedStateId();
@@ -249,7 +250,7 @@ void AutoPlayer::startNewTimelineForSelectedState()
 
 /**
  * Stops the auto player because of incomming data package of Animatronic Workbench Studio
-*/
+ */
 void AutoPlayer::stopBecauseOfIncommingPackage()
 {
     _actualTimelineIndex = -1;

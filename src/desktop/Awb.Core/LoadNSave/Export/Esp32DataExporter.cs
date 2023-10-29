@@ -20,6 +20,7 @@ namespace Awb.Core.LoadNSave.Export
             #include "Timeline.h"
             #include "TimelineState.h"
             #include "StsServoPoint.h"
+            #include "Pca9685PwmServoPoint.h"
             
             /// <summary>
             /// This is a prototype for the AutoPlayData class.
@@ -74,6 +75,7 @@ namespace Awb.Core.LoadNSave.Export
             result.AppendLine($"\tconst char *WlanSSID = \"AWB-{exportData.ProjectName}\";  // WLAN SSID Name");
             result.AppendLine($"\tconst char *WlanPassword = \"awb12345\"; // WLAN Password");
 
+            // export the sts servo informations
             var stsServos = exportData.StsServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.StsServoConfig>();
             var stsServoChannels = stsServos.Select(s => s.Channel).ToArray() ;
             var stsServoAccelerations = stsServos.Select(s => s.Acceleration  ?? -1).ToArray();
@@ -84,6 +86,8 @@ namespace Awb.Core.LoadNSave.Export
             result.AppendLine($"\tint stsServoAccelleration[{stsServos.Length}] = {{{string.Join(", ", stsServoAccelerations.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint stsServoSpeed[{stsServos.Length}] = {{{string.Join(", ", stsServoSpeeds.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tString stsServoName[{stsServos.Length}] = {{{string.Join(", ", stsServoNames.Select(s => $"\"{s}\""))}}};");
+
+            // export the pca9685 pwm servo informations
 
             var stateIds = exportData.TimelineStates?.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
             result.AppendLine($"\tint timelineStateIds[{exportData.TimelineStates?.Length ?? 0}] = {{{string.Join(", ", stateIds)}}};");
@@ -106,6 +110,7 @@ namespace Awb.Core.LoadNSave.Export
                 }
 
                 result.AppendLine($"\t\tauto *stsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
+                result.AppendLine($"\t\tauto *pca9685PwmServoPoints{timelineNo} = new std::vector<Pca9685PwmServoPoint>();");
 
                 // Export Servo-Points
                 foreach (var servoPoint in timeline.ServoPoints.OrderBy(p => p.TimeMs))
@@ -119,8 +124,16 @@ namespace Awb.Core.LoadNSave.Export
                         continue;
                     }
 
-                    // find other servos
-                    // todo eg. PWM Servos
+                    // find pwm servo
+                    var pwmServo = exportData.Pca9685PwmServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
+                    if (pwmServo != null)
+                    {
+                        var value = (int)(pwmServo.MinValue + servoPoint.ValuePercent * (pwmServo.MaxValue - pwmServo.MinValue) / 100.0);
+                        result.AppendLine($"\t\tpca9685PwmServoPoints{timelineNo}->push_back(Pca9685PwmServoPoint({pwmServo.I2cAdress},{pwmServo.Channel},{servoPoint.TimeMs},{value}));");
+                        continue;
+                    }
+
+                    // todo: find other servos
 
                     // servo id not sound
                     return new Esp32ExportResult

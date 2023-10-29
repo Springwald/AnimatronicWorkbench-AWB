@@ -121,6 +121,7 @@ void AwbClient::showMsg(String message)
  */
 void AwbClient::loop()
 {
+
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
@@ -259,26 +260,49 @@ void AwbClient::processPacket(String payload)
         }
     }
 
-    if (jsondoc.containsKey("Pca9685Pwm")) // packet contains adafruit PWM driver data
+    if (jsondoc.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
     {
-        JsonArray channels = jsondoc["Pca9685Pwm"]["Ch"];
-        for (size_t i = 0; i < channels.size(); i++)
+        JsonArray servos = jsondoc["Pca9685Pwm"]["Servos"];
+        for (size_t i = 0; i < servos.size(); i++)
         {
-            int channel = channels[i]["Ch"];
-            int value = channels[i]["Val"];
-            this->_actualStatusInformation->pwmServoValues->at(channel).targetValue = value;
+            int channel = servos[i]["Ch"];
+            int value = servos[i]["TVal"];
+            String name = servos[i]["Name"];
+            int index = -1;
+            for (int f = 0; f < this->_actualStatusInformation->pwmServoValues->size(); f++)
+            {
+                if (this->_actualStatusInformation->pwmServoValues->at(f).id == channel)
+                {
+                    // pwm servo already added
+                    index = f;
+                    break;
+                }
+            }
+            if (index == -1)
+            {
+                // pwm servo not added yet. Insert it now
+                showMsg("added pwm servo id " + String(channel) + " '" + name + "' to list.");
+                ActuatorValue actuatorValue;
+                actuatorValue.id = channel;
+                actuatorValue.name = name;
+                this->_actualStatusInformation->pwmServoValues->push_back(actuatorValue);
+                index = _actualStatusInformation->pwmServoValues->size() - 1;
+            }
+
+            // set servo target value
+            this->_actualStatusInformation->pwmServoValues->at(index).targetValue = value;
         }
     }
 
     if (jsondoc.containsKey("STS")) // package contains STS bus servo data
     {
-        JsonArray channels = jsondoc["STS"]["Servos"];
+        JsonArray servos = jsondoc["STS"]["Servos"];
         int stsCount = 0;
-        for (size_t i = 0; i < channels.size(); i++)
+        for (size_t i = 0; i < servos.size(); i++)
         {
-            int id = channels[i]["Ch"];
-            int value = channels[i]["TVal"];
-            String name = channels[i]["Name"];
+            int id = servos[i]["Ch"];
+            int value = servos[i]["TVal"];
+            String name = servos[i]["Name"];
 
             bool done = false;
             for (int f = 0; f < this->_actualStatusInformation->stsServoValues->size(); f++)

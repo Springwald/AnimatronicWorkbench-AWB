@@ -23,8 +23,8 @@ namespace AwbStudio
             InitializeComponent();
             TextBoxDebugOutput.Text = "";
             ShowInTaskbar = true;
-            WindowState =  WindowState.Minimized;
-            //WindowState = Debugger.IsAttached ? WindowState.Normal :  WindowState.Minimized;
+            //WindowState =  WindowState.Minimized;
+            WindowState = Debugger.IsAttached ? WindowState.Normal :  WindowState.Minimized;
         }
     }
 }

@@ -533,6 +533,7 @@ namespace AwbStudio
                 ProjectName = _project.Title,
                 TimelineStates = _project.TimelinesStates,
                 StsServoConfigs = _project.StsServos,
+                Pca9685PwmServoConfigs = _project.Pca9685PwmServos,
                 TimelineData = timelines.ToArray()
             };
             var exporter = new Esp32DataExporter();
