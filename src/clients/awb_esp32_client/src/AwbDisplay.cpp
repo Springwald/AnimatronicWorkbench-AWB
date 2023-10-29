@@ -70,7 +70,7 @@ void AwbDisplay::setup(int clientId)
 {
     resetDebugInfos();
     lcd.init();
-    _isSmallScreen = lcd.height() <= 64 || lcd.width() <= 1290;
+    _isSmallScreen = lcd.height() <= 64 || lcd.width() <= 290;
 
     const lgfx::IFont *font = nullptr;
 

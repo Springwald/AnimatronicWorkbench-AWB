@@ -52,9 +52,9 @@ void AwbClient::setup()
     { showError(message); };
 
     // set up the actuators
-    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
     this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
+    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
 
     // iterate through all stsServoIds
     for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
@@ -70,7 +70,13 @@ void AwbClient::setup()
     showMsg("Found " + String(this->_stSerialServoManager->servoIds->size()) + " servos");
     delay(1000);
 
-    _autoPlayer = new AutoPlayer(_stSerialServoManager, _pca9685pwmManager, AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL, autoPlayerErrorOccured);
+#ifdef AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL
+    auto autoPlayerStateSelectorStsServoChannel = AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL;
+#else
+    auto autoPlayerStateSelectorStsServoChannel = -1;
+#endif
+
+    _autoPlayer = new AutoPlayer(_stSerialServoManager, _pca9685pwmManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload)
@@ -320,9 +326,10 @@ void AwbClient::readActuatorsStatuses()
     bool criticalTemp = false;
     bool criticalLoad = false;
 
+    // check Sts serial bus servos
     for (int i = 0; i < this->_actualStatusInformation->stsServoValues->size(); i++)
     {
-        // Sts serial bus servos
+
         if (this->_actualStatusInformation->stsServoValues->at(i).name.length() > 0)
         {
             this->_actualStatusInformation->stsServoValues->at(i).temperature = _stSerialServoManager->readTemperature(this->_actualStatusInformation->stsServoValues->at(i).id);
@@ -341,18 +348,18 @@ void AwbClient::readActuatorsStatuses()
             }
         }
     }
+    this->_stSerialServoManager->servoCriticalTemp = criticalTemp;
+    this->_stSerialServoManager->servoCriticalLoad = criticalLoad;
+
+    // check PWM servos
     for (int i = 0; i < this->_actualStatusInformation->pwmServoValues->size(); i++)
     {
-
-        // Adafruit PWM servo driver
+        // PWM servo driver
         if (this->_actualStatusInformation->pwmServoValues->at(i).name.length() > 0)
         {
             // PWM Servo support no status information reading
         }
     }
-
-    this->_stSerialServoManager->servoCriticalTemp = criticalTemp;
-    this->_stSerialServoManager->servoCriticalLoad = criticalLoad;
 }
 
 /**
