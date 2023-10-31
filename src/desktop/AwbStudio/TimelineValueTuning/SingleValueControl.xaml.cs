@@ -15,7 +15,7 @@ namespace AwbStudio.ValueTuning
     /// </summary>
     public partial class SingleValueControl : UserControl
     {
-        private bool _isSetting = false;
+        private volatile bool _isSetting = false;
 
         public SingleValueControl()
         {

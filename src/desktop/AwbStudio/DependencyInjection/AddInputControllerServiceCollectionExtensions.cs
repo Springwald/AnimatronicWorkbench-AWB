@@ -25,7 +25,9 @@ namespace AwbStudio.DependencyInjection
 
                 return new InputControllerService(
                     logger: logger, 
-                    additionalTimelineControllers: new ITimelineController[] { valueTuningWindow });
+                    additionalTimelineControllers: new ITimelineController[] { 
+                        valueTuningWindow 
+                    });
             });
         }
 
