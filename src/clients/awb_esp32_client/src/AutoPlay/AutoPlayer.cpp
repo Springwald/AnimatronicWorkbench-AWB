@@ -68,7 +68,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     }
 
     int diff = millis() - _lastMsUpdate;
-    if (diff < 25) // update interval in milliseconds
+    if (diff < 5) // update interval in milliseconds
         return;
 
     _lastMsUpdate = millis();

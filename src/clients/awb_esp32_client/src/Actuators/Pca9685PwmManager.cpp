@@ -54,8 +54,8 @@ void Pca9685PwmManager::setTargetValue(int channel, int value, String name)
         index = this->pwmServoValues->size() - 1;
     }
 
-    // set servo target value
-    this->pwmServoValues->at(index).targetValue = value;
+    this->pwmServoValues->at(index).name = name;         // update the servo name
+    this->pwmServoValues->at(index).targetValue = value; // set servo target value
 }
 
 void Pca9685PwmManager::updateActuators()

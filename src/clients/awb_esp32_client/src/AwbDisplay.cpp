@@ -244,7 +244,7 @@ void AwbDisplay::draw_values()
         return;
 
     _valuesDirty = false;
-    int columns = 3;
+    int columns = primarySprite.width() / 200;
 
     if (_isSmallScreen)
     {
