@@ -18,7 +18,6 @@ namespace AwbStudio.TimelineControls
 {
     public partial class TimelineViewer : UserControl
     {
-        private int _playPosMs = 0;
         private bool _wasPlaying = false;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
@@ -29,7 +28,7 @@ namespace AwbStudio.TimelineControls
 
         private void PlayerStateChanged(object? sender, PlayStateEventArgs e)
         {
-            this._playPosMs = e.PositionMs;
+            ViewPos.PosSelectorManualMs = e.PositionMs - ViewPos.ScrollOffsetMs;
             var scrollingChanged = false;
 
             switch (e.PlayState)
@@ -79,7 +78,6 @@ namespace AwbStudio.TimelineControls
             get => _viewPos;
         }
 
-
         /// <summary>
         /// The timeline data to be displayed
         /// </summary>
@@ -120,7 +118,6 @@ namespace AwbStudio.TimelineControls
                 if (_timelinePlayer != null) _timelinePlayer.OnPlayStateChanged += this.PlayerStateChanged;
             }
         }
-
 
         /// <summary>
         /// set the scroll offset in a way, that the manual playPos is always at the position chosen in the hardware controller 
@@ -226,13 +223,14 @@ namespace AwbStudio.TimelineControls
             ManualPlayPosAbsolute.Margin = new Thickness(x - ManualPlayPosAbsolute.ActualWidth / 2, 0, 0, 0);
 
             // draw the play position as a vertical line
-            if (timeline == null || _playPosMs < 0 || _playPosMs > ViewPos.ScrollOffsetMs + ViewPos.DisplayMs)
+            var playPosMs = ViewPos.PosSelectorManualMs + ViewPos.ScrollOffsetMs;
+            if (timeline == null || playPosMs < 0 || playPosMs > ViewPos.ScrollOffsetMs + ViewPos.DisplayMs)
             {
                 PlayPosLine.Visibility = Visibility.Hidden;
             }
             else
             {
-                x = this.ViewPos.GetXPos(ms: _playPosMs, controlWidth: this.ActualWidth);
+                x = this.ViewPos.GetXPos(ms: playPosMs, controlWidth: this.ActualWidth);
                 PlayPosLine.X1 = x;
                 PlayPosLine.X2 = x;
                 PlayPosLine.Y1 = 0;
@@ -243,6 +241,8 @@ namespace AwbStudio.TimelineControls
 
         private void TimelineScrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (_timelinePlayer?.PlayState == TimelinePlayer.PlayStates.Playing) return;
+
             if (ViewPos.SetPosSelectorManualMsByPercent(e.NewValue))
             {
                 MyInvoker.Invoke(() =>
