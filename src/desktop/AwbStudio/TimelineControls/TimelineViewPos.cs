@@ -5,9 +5,9 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Player;
 using Awb.Core.Timelines;
 using System;
-using System.Windows.Controls;
 
 namespace AwbStudio.TimelineControls
 {
@@ -25,17 +25,56 @@ namespace AwbStudio.TimelineControls
         /// <summary>
         /// How many seconds are displayed in the timeline
         /// </summary>
-        public int DisplayMs { get => _displayMs; set { _displayMs = value; Changed?.Invoke(this, EventArgs.Empty); } }
+        public int DisplayMs
+        {
+            get => _displayMs;
+            set
+            {
+                if (_displayMs == value) return;
+                _displayMs = value;
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
 
         /// <summary>
         /// The left offset of the timeline in seconds
         /// </summary>
-        public int ScrollOffsetMs { get => _scrollOffsetMs; set { _scrollOffsetMs = value; Changed?.Invoke(this, EventArgs.Empty); } }
+        public int ScrollOffsetMs
+        {
+            get => _scrollOffsetMs;
+            set
+            {
+                if (_scrollOffsetMs == value) return;
+                _scrollOffsetMs = value;
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
 
         /// <summary>
         /// The position of the midi-input controller fader in milli seconds
         /// </summary>
-        public int PosSelectorManualMs { get => _posSelectorManualMs; set { _posSelectorManualMs = value; Changed?.Invoke(this, EventArgs.Empty); } }
+        public int PosSelectorManualMs
+        {
+            get => _posSelectorManualMs;
+            set
+            {
+                if (_posSelectorManualMs == value) return;
+                _posSelectorManualMs = value;
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        /// <returns>true:value has changed; false:no change in the value</returns>
+        public bool SetPosSelectorManualMsByPercent(double percent)
+        {
+            var newMs = ((int)((this.DisplayMs / 100.0 * percent) / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs);
+            if (newMs == this.PosSelectorManualMs) return false;
+            this.PosSelectorManualMs = ((int)((this.DisplayMs / 100.0 * percent) / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs);
+            return true;
+        }
+
+        public double GetPosSelectorPercent()
+            => this.PosSelectorManualMs * 100.0 / this.DisplayMs;
 
         /// <summary>
         /// The x paint position on the screen
@@ -45,7 +84,7 @@ namespace AwbStudio.TimelineControls
         /// <param name="timelineData">the data of the actual timeline</param>
         /// <returns></returns>
         public double GetXPos(int ms, double controlWidth, TimelineData timelineData) =>
-            timelineData == null ? 0 :  
+            timelineData == null ? 0 :
             ((double)(ms - ScrollOffsetMs) / DisplayMs) * controlWidth;
 
         /// <summary>

@@ -23,6 +23,13 @@ namespace AwbStudio.ValueTuning
             SliderValue.ValueChanged += SliderValue_ValueChanged;
         }
 
+        protected override void OnMouseWheel(System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var newValue = Math.Max(Math.Min(SliderValue.Value + e.Delta / 30d, SliderValue.Maximum), SliderValue.Minimum);
+            if (newValue.Equals(SliderValue.Value)) return;
+            SliderValue.Value = newValue;
+        }
+
         private void SliderValue_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             if (e.NewValue.Equals(e.OldValue)) return;

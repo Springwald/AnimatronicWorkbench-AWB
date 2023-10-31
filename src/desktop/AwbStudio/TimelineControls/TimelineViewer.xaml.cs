@@ -9,7 +9,6 @@ using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -155,8 +154,9 @@ namespace AwbStudio.TimelineControls
 
         public void PaintTimeLine()
         {
-            const double _paintMarginTopBottom = 30;
+            if (ViewPos == null) return;
 
+            const double _paintMarginTopBottom = 30;
             double height = GridTimeline.ActualHeight;
             double width = GridTimeline.ActualWidth;
 
@@ -194,14 +194,9 @@ namespace AwbStudio.TimelineControls
             // update the scrollbar
             MyInvoker.Invoke(() =>
             {
-                // wait for the UI to be updated (otherwise the scrollbar is not updated
-                TimelineScrollbar.Maximum = _timelineData.DurationMs - ViewPos.DisplayMs;
-                TimelineScrollbar.Value = ViewPos.ScrollOffsetMs;
-                // update the timeline
-                PaintTimeLine();
-            }); 
-
-          ;
+                TimelineScrollbar.Value = ViewPos.GetPosSelectorPercent();
+                PaintTimeLine();  // update the timeline
+            });
         }
 
         private void TimelineViewer_Loaded(object sender, RoutedEventArgs e)
@@ -224,7 +219,6 @@ namespace AwbStudio.TimelineControls
             PaintPlayPos(_timelineData);
         }
 
-
         private void PaintPlayPos(TimelineData? timeline)
         {
             // draw the manual midi controller play position as triangle at the bottom
@@ -244,6 +238,17 @@ namespace AwbStudio.TimelineControls
                 PlayPosLine.Y1 = 0;
                 PlayPosLine.Y2 = this.ActualHeight;
                 PlayPosLine.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void TimelineScrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (ViewPos.SetPosSelectorManualMsByPercent(e.NewValue))
+            {
+                MyInvoker.Invoke(() =>
+                {
+                    PaintTimeLine(); // update the timeline
+                });
             }
         }
     }
