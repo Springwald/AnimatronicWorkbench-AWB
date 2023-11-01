@@ -191,7 +191,6 @@ namespace AwbStudio.TimelineControls
             // update the scrollbar
             MyInvoker.Invoke(() =>
             {
-                TimelineScrollbar.Value = ViewPos.GetPosSelectorPercent();
                 PaintTimeLine();  // update the timeline
             });
         }
@@ -209,7 +208,6 @@ namespace AwbStudio.TimelineControls
             if (_timelinePlayer != null) _timelinePlayer.OnPlayStateChanged -= this.PlayerStateChanged;
         }
 
-
         private void TimelineViewer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             PaintTimeLine();
@@ -218,6 +216,8 @@ namespace AwbStudio.TimelineControls
 
         private void PaintPlayPos(TimelineData? timeline)
         {
+            if (ViewPos == null) return;
+
             // draw the manual midi controller play position as triangle at the bottom
             var x = ((double)(ViewPos.PosSelectorManualMs) / ViewPos.DisplayMs) * this.ActualWidth;
             ManualPlayPosAbsolute.Margin = new Thickness(x - ManualPlayPosAbsolute.ActualWidth / 2, 0, 0, 0);
@@ -236,19 +236,6 @@ namespace AwbStudio.TimelineControls
                 PlayPosLine.Y1 = 0;
                 PlayPosLine.Y2 = this.ActualHeight;
                 PlayPosLine.Visibility = Visibility.Visible;
-            }
-        }
-
-        private void TimelineScrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (_timelinePlayer?.PlayState == TimelinePlayer.PlayStates.Playing) return;
-
-            if (ViewPos.SetPosSelectorManualMsByPercent(e.NewValue))
-            {
-                MyInvoker.Invoke(() =>
-                {
-                    PaintTimeLine(); // update the timeline
-                });
             }
         }
     }

@@ -11,24 +11,34 @@
         <DrawingImage />
     </Window.Icon>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <ValueTuning:SingleValueControl Grid.Column="0" x:Name="ValueControl1" />
-        <ValueTuning:SingleValueControl Grid.Column="1" x:Name="ValueControl2"/>
-        <ValueTuning:SingleValueControl Grid.Column="2" x:Name="ValueControl3"/>
-        <ValueTuning:SingleValueControl Grid.Column="3" x:Name="ValueControl4"/>
-        <ValueTuning:SingleValueControl Grid.Column="4" x:Name="ValueControl5"/>
-        <ValueTuning:SingleValueControl Grid.Column="5" x:Name="ValueControl6"/>
-        <ValueTuning:SingleValueControl Grid.Column="6" x:Name="ValueControl7"/>
-        <ValueTuning:SingleValueControl Grid.Column="7" x:Name="ValueControl8"/>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ValueTuning:SingleValueControl Grid.Column="0" x:Name="ValueControl1" />
+            <ValueTuning:SingleValueControl Grid.Column="1" x:Name="ValueControl2"/>
+            <ValueTuning:SingleValueControl Grid.Column="2" x:Name="ValueControl3"/>
+            <ValueTuning:SingleValueControl Grid.Column="3" x:Name="ValueControl4"/>
+            <ValueTuning:SingleValueControl Grid.Column="4" x:Name="ValueControl5"/>
+            <ValueTuning:SingleValueControl Grid.Column="5" x:Name="ValueControl6"/>
+            <ValueTuning:SingleValueControl Grid.Column="6" x:Name="ValueControl7"/>
+            <ValueTuning:SingleValueControl Grid.Column="7" x:Name="ValueControl8"/>
+        </Grid>
+        <ScrollBar Grid.Row="1" x:Name="TimelineScrollbar" Orientation="Horizontal" Minimum="0" Maximum="100" Value="0"
+                   Foreground="White"
+                   Background="Black"
+                   ValueChanged="TimelineScrollbar_ValueChanged" />
+        <Rectangle Margin="0,0,0,0" Grid.Row="1" Stroke="DarkGray"  />
     </Grid>
 </Window>

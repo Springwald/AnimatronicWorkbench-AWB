@@ -6,7 +6,6 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.InputControllers.TimelineInputControllers;
-using Awb.Core.Services;
 using AwbStudio.ValueTuning;
 using System;
 using System.Threading.Tasks;
@@ -20,7 +19,6 @@ namespace AwbStudio
     public partial class ValueTuningWindow : Window, ITimelineController
     {
         private readonly SingleValueControl[] _valuesControls;
-        private readonly IActuatorsService _actuatorsService;
 
         public ValueTuningWindow()
         {
@@ -48,7 +46,6 @@ namespace AwbStudio
             }
         }
 
-
         public string?[] ActualActuatorNames
         {
             set
@@ -68,24 +65,32 @@ namespace AwbStudio
         {
         }
 
-        public Task SetActuatorValue(int index, double valueInPercent)
+        public async Task SetActuatorValue(int index, double valueInPercent)
         {
             if (index < 0 || index >= _valuesControls.Length) throw new ArgumentOutOfRangeException($"{nameof(index)}:{index}");
             MyInvoker.Invoke(() =>
             {
                 _valuesControls[index].Value = valueInPercent;
             });
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
-        public Task SetPlayState(ITimelineController.PlayStates playStates)
+        public async Task SetPlayState(ITimelineController.PlayStates playStates)
         {
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         public Task ShowPointButtonState(int index, bool pointExists)
         {
             return Task.CompletedTask;
+        }
+
+        private void TimelineScrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            OnTimelineEvent?.Invoke(this, new TimelineControllerEventArgs(
+                        TimelineControllerEventArgs.EventTypes.PlayPosAbsoluteChanged,
+                        actuatorIndex: -1,
+                        valueInPercent: e.NewValue));
         }
     }
 }
