@@ -6,9 +6,11 @@
 #include <vector>
 #include <string>
 #include "StsServoPoint.h"
+#include "Pca9685PwmServoPoint.h"
 #include "TimelineState.h"
 #include "AutoPlayData.h"
-#include "../StSerialServoManager.h"
+#include "../Actuators/StSerialServoManager.h"
+#include "../Actuators/Pca9685PwmManager.h"
 
 using byte = unsigned char;
 
@@ -20,6 +22,7 @@ protected:
     TCallBackErrorOccured _errorOccured; // the error occured callback
 
     StSerialServoManager *_stSerialServoManager; // the STS serial servo manager
+    Pca9685PwmManager *_pca9685PwmManager;       // the PCA9685 PWM manager
 
     AutoPlayData *_data; // the data exported by Animatronic Workbench Studio
 
@@ -34,7 +37,7 @@ protected:
     long _lastStateCheckMillis = -1;      // millis() of last state check
 
 public:
-    AutoPlayer(StSerialServoManager *stSerialServoManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
+    AutoPlayer(StSerialServoManager *stSerialServoManager, Pca9685PwmManager *pca9685PwmManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
     {
         _lastMsUpdate = millis();
         _data = new AutoPlayData();

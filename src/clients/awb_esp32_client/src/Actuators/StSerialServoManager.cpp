@@ -15,9 +15,11 @@ SMS_STS _serialServo;
  */
 void StSerialServoManager::setup()
 {
+#ifdef USE_STS_SERVO
     Serial1.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
     _serialServo.pSerial = &Serial1;
     delay(100);
+#endif
     scanIds();
 }
 
@@ -26,6 +28,10 @@ void StSerialServoManager::setup()
  */
 void StSerialServoManager::updateActuators()
 {
+#ifndef USE_STS_SERVO
+    return;
+#endif
+
     if (servoCriticalTemp == true || servoCriticalLoad == true)
         return;
 
@@ -69,6 +75,9 @@ void StSerialServoManager::updateActuators()
  */
 void StSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
 {
+#ifndef USE_STS_SERVO
+    return;
+#endif
     for (int i = 0; i < stsServoValues->size(); i++)
     {
         if (stsServoValues->at(i).id == id)
@@ -85,6 +94,9 @@ void StSerialServoManager::writePositionDetailed(int id, int position, int speed
  */
 void StSerialServoManager::writePosition(int id, int position)
 {
+#ifndef USE_STS_SERVO
+    return;
+#endif
     for (int i = 0; i < stsServoValues->size(); i++)
     {
         if (stsServoValues->at(i).id == id)
@@ -99,6 +111,9 @@ void StSerialServoManager::writePosition(int id, int position)
  */
 int StSerialServoManager::readPosition(u8 id)
 {
+#ifndef USE_STS_SERVO
+    return -1;
+#endif
     return _serialServo.ReadPos(id);
 }
 
@@ -107,6 +122,9 @@ int StSerialServoManager::readPosition(u8 id)
  */
 void StSerialServoManager::setTorque(u8 id, bool on)
 {
+#ifndef USE_STS_SERVO
+    return;
+#endif
     _serialServo.EnableTorque(id, on ? 1 : 0);
 }
 
@@ -115,6 +133,9 @@ void StSerialServoManager::setTorque(u8 id, bool on)
  */
 int StSerialServoManager::readLoad(int id)
 {
+#ifndef USE_STS_SERVO
+    return -1;
+#endif
     return _serialServo.ReadLoad(id);
 }
 
@@ -123,6 +144,9 @@ int StSerialServoManager::readLoad(int id)
  */
 int StSerialServoManager::readTemperature(int id)
 {
+#ifndef USE_STS_SERVO
+    return -1;
+#endif
     return _serialServo.ReadTemper(id);
 }
 
@@ -131,6 +155,9 @@ int StSerialServoManager::readTemperature(int id)
  */
 bool StSerialServoManager::servoAvailable(int id)
 {
+#ifndef USE_STS_SERVO
+    return false;
+#endif
     for (int i = 0; i < servoIds->size(); i++)
     {
         if (servoIds->at(i) == id)
@@ -157,6 +184,10 @@ bool StSerialServoManager::servoAvailable(int id)
 void StSerialServoManager::scanIds()
 {
     servoIds = new std::vector<u8>();
+
+#ifndef USE_STS_SERVO
+    return;
+#endif
     for (int i = 1; i < MAX_STS_SERVO_ID_SCAN_RANGE; i++)
     {
         int retries = 5;

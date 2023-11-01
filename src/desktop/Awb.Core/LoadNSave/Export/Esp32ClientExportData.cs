@@ -15,6 +15,7 @@ namespace Awb.Core.LoadNSave.Export
         public TimelineData[]? TimelineData { get; set; }
         public TimelineState[]? TimelineStates { get; set; }
         public StsServoConfig[]? StsServoConfigs { get; set; }
+        public Pca9685PwmServoConfig[]? Pca9685PwmServoConfigs { get; set; }
         public string? ProjectName { get; set; }
     }
 }

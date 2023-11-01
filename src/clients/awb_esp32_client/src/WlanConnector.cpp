@@ -107,9 +107,10 @@ String WlanConnector::GetHtml()
 
         ptr += "<p> " + String(ageHours) + " hours, " + String(ageMinutes % 60) + " minutes, " + String(ageSeconds % 60) + " seconds uptime<br/>" + *memoryInfo + "</p>\n";
 
-        // STS Servo status
+        // Servo status
         ptr += "<div class=\"region\">\n";
-        ptr += "<span>" + String(this->_actualStatusInformation->stsServoValues->size()) + " STS-Servos</span>\n";
+        ptr += "<span>" + String(this->_actualStatusInformation->stsServoValues->size()) + " STS-Servos, ";
+        ptr += String(this->_actualStatusInformation->pwmServoValues->size()) + " PWM-Servos</span>\n";
         ptr += "<table>\n";
         ptr += "<tr><th>Id</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th></tr>\n";
         for (int i = 0; i < this->_actualStatusInformation->stsServoValues->size(); i++)
@@ -124,8 +125,15 @@ String WlanConnector::GetHtml()
                     break;
                 }
             }
-            ptr += "<tr><td>" + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
+            ptr += "<tr><td>STS " + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
         }
+
+        for (int i = 0; i < this->_actualStatusInformation->pwmServoValues->size(); i++)
+        {
+            auto servo = this->_actualStatusInformation->pwmServoValues->at(i);
+            ptr += "<tr><td>PWM " + String(servo.id) + "</td><td>" + servo.name + "</td><td>" + String(servo.currentValue) + "</td><td>-</td><td>-</tr>\n";
+        }
+
         ptr += "</table>\n";
         ptr += "</div>\n";
 

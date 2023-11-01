@@ -15,7 +15,7 @@ namespace Awb.Core.Configs
 
         public string ProjectFolder { get; set; }
 
-        public AdafruitPwmServoConfig[]? AdafruitPwmServos { get; set; }
+        public Pca9685PwmServoConfig[]? Pca9685PwmServos { get; set; }
 
         public StsServoConfig[]? StsServos { get; set; }
 

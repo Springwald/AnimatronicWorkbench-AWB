@@ -145,7 +145,7 @@ void AwbDisplay::setup(int clientId)
     lcd.setColorDepth(colorDepth);
 
     String title = _isSmallScreen ? "AWB" : "AnimatronicWorkBench";
-    showTopBar(title + " - client ID " + (String)clientId + "");
+    showTopBar(title + " - ID " + (String)clientId + "");
 
     if (_isSmallScreen)
     {
@@ -244,11 +244,12 @@ void AwbDisplay::draw_values()
         return;
 
     _valuesDirty = false;
-    int columns = 3;
+    int columns = primarySprite.width() / 200;
 
     if (_isSmallScreen)
     {
         primarySprite.fillSprite(0x000000U);
+        primarySprite.setTextColor(0xFFDDFFU);
     }
     else
     {

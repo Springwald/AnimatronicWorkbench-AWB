@@ -7,6 +7,7 @@
 
 using Awb.Core.Configs;
 using AwbStudio.StudioSettings;
+using System;
 using System.IO;
 using System.Text.Json;
 
@@ -49,7 +50,7 @@ namespace AwbStudio.Projects
                 PropertyNameCaseInsensitive = true,
             };
             project.ProjectFolder = projectFolder;
-            var jsonStr = JsonSerializer.Serialize<AwbProject>(project, options);  
+            var jsonStr = JsonSerializer.Serialize<AwbProject>(project, options);
             File.WriteAllText(ProjectConfigFilename(projectFolder), jsonStr);
             return true;
         }
@@ -69,8 +70,19 @@ namespace AwbStudio.Projects
                 DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never,
                 PropertyNameCaseInsensitive = true,
             };
-            var jsonStr = File.ReadAllText(ProjectConfigFilename(projectFolder));
-            var projectConfig = JsonSerializer.Deserialize<AwbProject>(jsonStr, options);
+
+            AwbProject? projectConfig = null;
+            try
+            {
+                var jsonStr = File.ReadAllText(ProjectConfigFilename(projectFolder));
+                projectConfig = JsonSerializer.Deserialize<AwbProject>(jsonStr, options);
+            }
+            catch (Exception ex)
+            {
+                errorMessages = new string[] { $"Project config file '{ProjectConfigFilename(projectFolder)}' could not be loaded: " + ex.Message };
+                return false;
+            }
+
             if (projectConfig == null)
             {
                 errorMessages = new string[] { $"Project config file '{ProjectConfigFilename(projectFolder)}' could not be loaded: Deserialized == null" };

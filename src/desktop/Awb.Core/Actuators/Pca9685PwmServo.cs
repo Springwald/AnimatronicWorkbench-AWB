@@ -5,22 +5,18 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Clients;
 using Awb.Core.Configs;
 using Awb.Core.Services;
 
 namespace Awb.Core.Actuators
 {
-    public class AdafruitPwmServo : IServo
+    public class Pca9685PwmServo : IServo
     {
-        private readonly Esp32ComPortClient? _espClient;
-        private readonly int _channel;
-        private readonly int _i2cAdress;
-
         public string Id { get; }
         public uint ClientId { get; }
         public string? Name { get; }
         public uint Channel { get; }
+        public uint I2cAdress { get; }
         public int MinValue { get; }
         public int MaxValue { get; }
         public int DefaultValue { get; }
@@ -29,7 +25,7 @@ namespace Awb.Core.Actuators
 
         public string Label => $"[C{ClientId}-PWM{Channel}] {Name ?? string.Empty}";
 
-        public AdafruitPwmServo(AdafruitPwmServoConfig config, IAwbClientsService clients)
+        public Pca9685PwmServo(Pca9685PwmServoConfig config)
         {
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
 
@@ -42,19 +38,19 @@ namespace Awb.Core.Actuators
             TargetValue = defaultValue;
             IsDirty = true;
 
-            _channel = config.Channel;
-            _i2cAdress = config.I2cAdress;
-            _espClient = clients.GetClient(config.ClientId) ?? throw new KeyNotFoundException($"EspClientId '{config.ClientId}' not found!");
+            Channel = config.Channel;
+            I2cAdress = config.I2cAdress;
         }
 
         public bool TurnOff()
         {
-            throw new NotImplementedException();
+            TargetValue = -1;
+            return true;
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            TurnOff();
         }
     }
 }

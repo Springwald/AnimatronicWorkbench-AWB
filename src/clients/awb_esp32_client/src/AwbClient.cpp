@@ -10,6 +10,7 @@ bool demoMode = false;
 
 using TCallBackPacketReceived = std::function<void(unsigned int, String)>;
 using TCallBackErrorOccured = std::function<void(String)>;
+using TCallBackMessageToShow = std::function<void(String)>;
 
 StaticJsonDocument<1024 * 32> jsondoc;
 
@@ -41,17 +42,19 @@ void AwbClient::setup()
     // set up error callbacks for the different components
     const TCallBackErrorOccured packetErrorOccured = [this](String message)
     { showError(message); };
-    const TCallBackErrorOccured adafruitPwmErrorOccured = [this](String message)
+    const TCallBackErrorOccured pca9685PwmErrorOccured = [this](String message)
     { showError(message); };
+    const TCallBackMessageToShow pca9685PwmMessageToShow = [this](String message)
+    { showMsg(message); };
     const TCallBackErrorOccured stsServoErrorOccured = [this](String message)
     { showError(message); };
     const TCallBackErrorOccured autoPlayerErrorOccured = [this](String message)
     { showError(message); };
 
     // set up the actuators
-    this->_adafruitpwmManager = new AdafruitPwmManager(adafruitPwmErrorOccured);
     this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
+    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
 
     // iterate through all stsServoIds
     for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
@@ -67,7 +70,13 @@ void AwbClient::setup()
     showMsg("Found " + String(this->_stSerialServoManager->servoIds->size()) + " servos");
     delay(1000);
 
-    _autoPlayer = new AutoPlayer(_stSerialServoManager, AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL, autoPlayerErrorOccured);
+#ifdef AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL
+    auto autoPlayerStateSelectorStsServoChannel = AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL;
+#else
+    auto autoPlayerStateSelectorStsServoChannel = -1;
+#endif
+
+    _autoPlayer = new AutoPlayer(_stSerialServoManager, _pca9685pwmManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload)
@@ -259,26 +268,29 @@ void AwbClient::processPacket(String payload)
         }
     }
 
-    if (jsondoc.containsKey("AdfPwm")) // packet contains adafruit PWM driver data
+    if (jsondoc.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
     {
-        JsonArray channels = jsondoc["AdfPwm"]["Ch"];
-        for (size_t i = 0; i < channels.size(); i++)
+        JsonArray servos = jsondoc["Pca9685Pwm"]["Servos"];
+        for (size_t i = 0; i < servos.size(); i++)
         {
-            int channel = channels[i]["Ch"];
-            int value = channels[i]["Val"];
-            this->_actualStatusInformation->pwmServoValues->at(channel).targetValue = value;
+            int channel = servos[i]["Ch"];
+            int value = servos[i]["TVal"];
+            String name = servos[i]["Name"];
+            // store the method showMsg in an anonymous function
+            _pca9685pwmManager->setTargetValue(channel, value, name);
         }
     }
+    _pca9685pwmManager->updateActuators();
 
     if (jsondoc.containsKey("STS")) // package contains STS bus servo data
     {
-        JsonArray channels = jsondoc["STS"]["Servos"];
+        JsonArray servos = jsondoc["STS"]["Servos"];
         int stsCount = 0;
-        for (size_t i = 0; i < channels.size(); i++)
+        for (size_t i = 0; i < servos.size(); i++)
         {
-            int id = channels[i]["Ch"];
-            int value = channels[i]["TVal"];
-            String name = channels[i]["Name"];
+            int id = servos[i]["Ch"];
+            int value = servos[i]["TVal"];
+            String name = servos[i]["Name"];
 
             bool done = false;
             for (int f = 0; f < this->_actualStatusInformation->stsServoValues->size(); f++)
@@ -297,8 +309,8 @@ void AwbClient::processPacket(String payload)
                 showError("Servo " + String(id) + " not attached!");
         }
     }
-
     _stSerialServoManager->updateActuators();
+
     _autoPlayer->stopBecauseOfIncommingPackage();
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
@@ -314,9 +326,10 @@ void AwbClient::readActuatorsStatuses()
     bool criticalTemp = false;
     bool criticalLoad = false;
 
+    // check Sts serial bus servos
     for (int i = 0; i < this->_actualStatusInformation->stsServoValues->size(); i++)
     {
-        // Sts serial bus servos
+
         if (this->_actualStatusInformation->stsServoValues->at(i).name.length() > 0)
         {
             this->_actualStatusInformation->stsServoValues->at(i).temperature = _stSerialServoManager->readTemperature(this->_actualStatusInformation->stsServoValues->at(i).id);
@@ -335,18 +348,18 @@ void AwbClient::readActuatorsStatuses()
             }
         }
     }
+    this->_stSerialServoManager->servoCriticalTemp = criticalTemp;
+    this->_stSerialServoManager->servoCriticalLoad = criticalLoad;
+
+    // check PWM servos
     for (int i = 0; i < this->_actualStatusInformation->pwmServoValues->size(); i++)
     {
-
-        // Adafruit PWM servo driver
+        // PWM servo driver
         if (this->_actualStatusInformation->pwmServoValues->at(i).name.length() > 0)
         {
             // PWM Servo support no status information reading
         }
     }
-
-    this->_stSerialServoManager->servoCriticalTemp = criticalTemp;
-    this->_stSerialServoManager->servoCriticalLoad = criticalLoad;
 }
 
 /**

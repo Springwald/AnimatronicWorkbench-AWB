@@ -5,17 +5,12 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-namespace Awb.Core.DataPackets
+namespace Awb.Core.Actuators
 {
-    public class AdafruitPwm
+    public class Pca9685PwmServoCommand
     {
-        public int I2c { get; set; }
-
-        public AdafruitPwmChannel[]? Channels { get; set; }
-
-        public AdafruitPwm(int i2cAddress)
-        {
-            I2c = i2cAddress;
-        }
+        public int Channel { get; set; }
+        public int I2cAdress { get; set; }
+        public int? TargetValue { get; set; }
     }
 }

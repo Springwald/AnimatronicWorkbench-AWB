@@ -9,15 +9,18 @@ using System.Text.Json.Serialization;
 
 namespace Awb.Core.DataPackets
 {
-    public class DataPacketContent
+    public class Pca9685PwmServoPacketData
     {
-        [JsonPropertyName("DispMsg")]
-        public DisplayMessage? DisplayMessage { get; set; }
+        [JsonPropertyName("Ch")]
+        public uint Channel { get; set; }
 
-        [JsonPropertyName("Pca9685Pwm")]
-        public Pca9685PwmServosPacketData? Pca9685PwmServos { get; set; }
+        [JsonPropertyName("I2c")]
+        public uint I2cAddress { get; set; }
 
-        [JsonPropertyName("STS")]
-        public StsServosPacketData? StsServos { get; set; }
+        [JsonPropertyName("TVal")]
+        public int TargetValue { get; set; }
+
+        [JsonPropertyName("Name")]
+        public string? Name { get; set; }
     }
 }

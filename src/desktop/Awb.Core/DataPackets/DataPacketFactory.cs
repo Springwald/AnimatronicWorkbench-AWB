@@ -33,7 +33,7 @@ namespace Awb.Core.DataPackets
                         {
                             DisplayMessage = null,
                             StsServos = stsServos,
-                            PwmServos = pwmServos
+                            Pca9685PwmServos = pwmServos
                         }
                     };
                 }
@@ -42,20 +42,33 @@ namespace Awb.Core.DataPackets
 
         public void SetDataPacketDone(IServo[] servos, ClientDataPacket clientDataPacket)
         {
-            foreach (var servoPacketData in clientDataPacket.Content.StsServos.Servos)
+            if (clientDataPacket.Content.StsServos?.Servos != null)
             {
-                var stsServo = servos.Select(s => s as StsServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId);
+                foreach (var servoPacketData in clientDataPacket.Content.StsServos.Servos)
                 {
-                    if (stsServo != null) stsServo.IsDirty = false;
+                    var stsServo = servos.Select(s => s as StsServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId);
+                    {
+                        if (stsServo != null) stsServo.IsDirty = false;
+                    }
+                }
+            }
+            if (clientDataPacket.Content.Pca9685PwmServos?.Servos != null)
+            {
+                foreach (var servoPacketData in clientDataPacket.Content.Pca9685PwmServos.Servos)
+                {
+                    var pwmServo = servos.Select(s => s as Pca9685PwmServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId && s.I2cAdress == servoPacketData.I2cAddress);
+                    {
+                        if (pwmServo != null) pwmServo.IsDirty = false;
+                    }
                 }
             }
         }
 
-        private StsServosPacketData? GetStsServoChanges(IServo[] allSservos)
+        private StsServosPacketData? GetStsServoChanges(IServo[] allServos)
         {
             var stsServos = new List<StsServoPacketData>();
 
-            foreach (var servo in allSservos)
+            foreach (var servo in allServos)
             {
                 var stsServo = servo as StsServo;
                 if (stsServo != null && stsServo.IsDirty)
@@ -79,8 +92,32 @@ namespace Awb.Core.DataPackets
             return null;
         }
 
-        private AdafruitPwm[]? GetPwmServoChanges(IServo[] allServos)
+        private Pca9685PwmServosPacketData? GetPwmServoChanges(IServo[] allServos)
         {
+            var pwmServos = new List<Pca9685PwmServoPacketData>();
+
+            foreach (var servo in allServos)
+            {
+                var pwmServo = servo as Pca9685PwmServo;
+                if (pwmServo != null && pwmServo.IsDirty)
+                {
+                    pwmServos.Add(new Pca9685PwmServoPacketData
+                    {
+                        I2cAddress = pwmServo.I2cAdress,
+                        Channel = pwmServo.Channel,
+                        TargetValue = servo.TargetValue,
+                        Name = string.IsNullOrWhiteSpace(pwmServo.Name) ? $"STS{pwmServo.Channel}" : pwmServo.Name,
+                    });
+                }
+            }
+
+            if (pwmServos.Count > 0)
+            {
+                return new Pca9685PwmServosPacketData
+                {
+                    Servos = pwmServos.ToArray(),
+                };
+            }
             return null;
         }
 

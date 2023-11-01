@@ -7,7 +7,7 @@
 #include "hardware.h"
 #include <WiFi.h>
 #include <WebServer.h>
-#include "ActuatorValue.h"
+#include "Actuators/ActuatorValue.h"
 #include <String.h>
 #include "ActualStatusInformation.h"
 

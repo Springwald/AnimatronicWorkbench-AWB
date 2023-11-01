@@ -20,6 +20,7 @@ namespace Awb.Core.LoadNSave.Export
             #include "Timeline.h"
             #include "TimelineState.h"
             #include "StsServoPoint.h"
+            #include "Pca9685PwmServoPoint.h"
             
             /// <summary>
             /// This is a prototype for the AutoPlayData class.
@@ -73,10 +74,12 @@ namespace Awb.Core.LoadNSave.Export
             result.AppendLine($"\tconst char *ProjectName = \"{exportData.ProjectName}\";   // Project Name");
             result.AppendLine($"\tconst char *WlanSSID = \"AWB-{exportData.ProjectName}\";  // WLAN SSID Name");
             result.AppendLine($"\tconst char *WlanPassword = \"awb12345\"; // WLAN Password");
+            result.AppendLine();
 
+            // export the sts servo informations
             var stsServos = exportData.StsServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.StsServoConfig>();
             var stsServoChannels = stsServos.Select(s => s.Channel).ToArray() ;
-            var stsServoAccelerations = stsServos.Select(s => s.Accelleration  ?? -1).ToArray();
+            var stsServoAccelerations = stsServos.Select(s => s.Acceleration  ?? -1).ToArray();
             var stsServoSpeeds = stsServos.Select(s => s.Speed ?? -1).ToArray();
             var stsServoNames = stsServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
             result.AppendLine($"\tint stsServoCount = {stsServos.Length};");
@@ -84,7 +87,24 @@ namespace Awb.Core.LoadNSave.Export
             result.AppendLine($"\tint stsServoAccelleration[{stsServos.Length}] = {{{string.Join(", ", stsServoAccelerations.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint stsServoSpeed[{stsServos.Length}] = {{{string.Join(", ", stsServoSpeeds.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tString stsServoName[{stsServos.Length}] = {{{string.Join(", ", stsServoNames.Select(s => $"\"{s}\""))}}};");
+            result.AppendLine();
 
+            // export the pca9685 pwm servo informations
+            var pca9685PwmServos = exportData.Pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.Pca9685PwmServoConfig>();
+            var pca9685PwmServoChannels = pca9685PwmServos.Select(s => s.Channel).ToArray();
+            var pca9685PwmServoI2cAdresses = pca9685PwmServos.Select(s => s.I2cAdress).ToArray();
+            var pca9685PwmServoAccelerations = pca9685PwmServos.Select(s => s.Acceleration ?? -1).ToArray();
+            var pca9685PwmServoSpeeds = pca9685PwmServos.Select(s => s.Speed ?? -1).ToArray();
+            var pca9685PwmServoNames = pca9685PwmServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
+            result.AppendLine($"\tint pca9685PwmServoCount = {pca9685PwmServos.Length};");
+            result.AppendLine($"\tint pca9685PwmServoI2cAdresses[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoI2cAdresses.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint pca9685PwmServoChannels[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoChannels.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint pca9685PwmServoAccelleration[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoAccelerations.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint pca9685PwmServoSpeed[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoSpeeds.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tString pca9685PwmServoName[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoNames.Select(s => $"\"{s}\""))}}};");
+            result.AppendLine();
+
+            // export the states
             var stateIds = exportData.TimelineStates?.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
             result.AppendLine($"\tint timelineStateIds[{exportData.TimelineStates?.Length ?? 0}] = {{{string.Join(", ", stateIds)}}};");
             result.AppendLine($"\tint timelineStateCount = {stateIds.Length};");
@@ -106,6 +126,7 @@ namespace Awb.Core.LoadNSave.Export
                 }
 
                 result.AppendLine($"\t\tauto *stsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
+                result.AppendLine($"\t\tauto *pca9685PwmServoPoints{timelineNo} = new std::vector<Pca9685PwmServoPoint>();");
 
                 // Export Servo-Points
                 foreach (var servoPoint in timeline.ServoPoints.OrderBy(p => p.TimeMs))
@@ -119,8 +140,16 @@ namespace Awb.Core.LoadNSave.Export
                         continue;
                     }
 
-                    // find other servos
-                    // todo eg. PWM Servos
+                    // find pwm servo
+                    var pwmServo = exportData.Pca9685PwmServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
+                    if (pwmServo != null)
+                    {
+                        var value = (int)(pwmServo.MinValue + servoPoint.ValuePercent * (pwmServo.MaxValue - pwmServo.MinValue) / 100.0);
+                        result.AppendLine($"\t\tpca9685PwmServoPoints{timelineNo}->push_back(Pca9685PwmServoPoint({pwmServo.I2cAdress},{pwmServo.Channel},{servoPoint.TimeMs},{value}));");
+                        continue;
+                    }
+
+                    // todo: find other servos
 
                     // servo id not sound
                     return new Esp32ExportResult
@@ -131,7 +160,7 @@ namespace Awb.Core.LoadNSave.Export
                 }
 
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineState({state.Id}, String(\"{state.Name}\"));");
-                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo});");
+                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 
                 result.AppendLine();

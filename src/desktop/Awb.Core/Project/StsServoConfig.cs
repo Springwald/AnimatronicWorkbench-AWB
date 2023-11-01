@@ -17,7 +17,7 @@ namespace Awb.Core.Configs
         public int MinValue { get; set; }
         public int MaxValue { get; set; }
         public int? DefaultValue { get; set; }
-        public int? Accelleration { get; set; }
+        public int? Acceleration { get; set; }
         public int? Speed { get; set; }
 
         public StsServoConfig(string id, uint clientId, uint channel)

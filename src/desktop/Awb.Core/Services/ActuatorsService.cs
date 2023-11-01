@@ -13,7 +13,6 @@ namespace Awb.Core.Services
     public interface IActuatorsService
     {
         IServo[] Servos { get; }
-
     }
 
     public class ActuatorsService : IActuatorsService
@@ -26,11 +25,16 @@ namespace Awb.Core.Services
         {
             var servos = new List<IServo>();
 
-            if (config.AdafruitPwmServos != null)
+            if (config.Pca9685PwmServos != null)
             {
-                foreach (var adafruitPwmServoConfig in config.AdafruitPwmServos)
+                foreach (var pca9685PwmServoConfig in config.Pca9685PwmServos)
                 {
-
+                    if (pca9685PwmServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
+                    var client = awbClientsService.GetClient(pca9685PwmServoConfig.ClientId);
+                    if (client == null)
+                        logger.LogError($"ActuatorsService: Client with Id '{pca9685PwmServoConfig.ClientId}' for Pca9685PwmServo '{pca9685PwmServoConfig.Name}' not found!");
+                    var stsServo = new Pca9685PwmServo(pca9685PwmServoConfig);
+                    servos.Add(stsServo);
                 }
             }
 
@@ -41,10 +45,8 @@ namespace Awb.Core.Services
                     if (stsServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
                     var client = awbClientsService.GetClient(stsServoConfig.ClientId);
                     if (client == null)
-                    {
-                        logger.LogError($"Client with Id '{stsServoConfig.ClientId}' not found!");
-                    }
-                    var stsServo = new StsServo(stsServoConfig, awbClientsService);
+                        logger.LogError($"ActuatorsService: Client with Id '{stsServoConfig.ClientId}' for stsServo '{stsServoConfig.Name}' not found!");
+                    var stsServo = new StsServo(stsServoConfig);
                     servos.Add(stsServo);
                 }
             }

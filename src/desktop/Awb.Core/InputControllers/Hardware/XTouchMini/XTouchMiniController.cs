@@ -27,8 +27,6 @@ namespace Awb.Core.InputControllers.XTouchMini
         {
             var args = new XTouchMiniEventArgs(e.InputId, e.Value);
 
-
-
             // cache values to prevent sending the same value twice later
             switch (args.InputType)
             {
@@ -36,6 +34,7 @@ namespace Awb.Core.InputControllers.XTouchMini
                     break;
                 case XTouchMiniEventArgs.InputTypes.KnobRotation:
                     if (args.InputIndex < 0 || args.InputIndex > 8) return; // Layer B?
+                    if (_valuesKnobRotation[args.InputIndex - 1] == (byte)args.Value) return; // no change
                     _valuesKnobRotation[args.InputIndex - 1] = (byte)args.Value;
                     break;
                 case XTouchMiniEventArgs.InputTypes.KnobPress:

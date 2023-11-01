@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -18,7 +19,15 @@ namespace AwbStudio.DependencyInjection
             services.TryAddSingleton<IInputControllerService>(sp =>
             {
                 var logger = sp.GetRequiredService<IAwbLogger>();
-                return new InputControllerService(logger);
+
+                var valueTuningWindow = new ValueTuningWindow();
+                valueTuningWindow.Show();
+
+                return new InputControllerService(
+                    logger: logger, 
+                    additionalTimelineControllers: new ITimelineController[] { 
+                        valueTuningWindow 
+                    });
             });
         }
 
