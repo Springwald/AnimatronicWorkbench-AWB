@@ -64,7 +64,7 @@ public:
     {
         _next_alife_packet_to_send = millis();
 
-        _packetHeader = new char[9]{
+        _packetHeader = new char[10]{
             (char)PACKET_HEADER_START_BYTE,
             (char)PACKET_HEADER_START_BYTE,
             (char)PACKET_HEADER_START_BYTE,
@@ -73,9 +73,10 @@ public:
             (char)packetHeader[2],
             (char)PACKET_HEADER_END_BYTE,
             (char)PACKET_HEADER_END_BYTE,
-            (char)PACKET_HEADER_END_BYTE};
+            (char)PACKET_HEADER_END_BYTE,
+            0};
 
-        _packetHeaderString = String(_packetHeader).substring(0, 9);
+        _packetHeaderString = String(_packetHeader);
     }
 
     /**
