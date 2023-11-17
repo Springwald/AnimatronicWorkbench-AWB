@@ -16,7 +16,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 01.11.2023 23:52:35
+// Created on 17.11.2023 00:01:04
 
 class AutoPlayData
 {
@@ -38,7 +38,7 @@ public:
 	int pca9685PwmServoChannels[4] = {0, 1, 2, 3};
 	int pca9685PwmServoAccelleration[4] = {-1, -1, -1, -1};
 	int pca9685PwmServoSpeed[4] = {-1, -1, -1, -1};
-	String pca9685PwmServoName[4] = {"Mouth", "Eyes top", "Eyes bot", "Test"};
+	String pca9685PwmServoName[4] = {"Mouth", "Eyes top", "Eyes bot", "Ear right"};
 
 	int timelineStateIds[5] = {1, 2, 3, 4, 5};
 	int timelineStateCount = 5;
@@ -63,6 +63,13 @@ public:
 		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,2,4750,1167));
 		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,2,6000,1167));
 		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,1,6000,1663));
+		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,3,6000,1507));
+		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,3,7000,1230));
+		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,3,8000,1230));
+		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,3,9000,1790));
+		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,3,10000,1790));
+		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,3,11000,1507));
+		pca9685PwmServoPoints1->push_back(Pca9685PwmServoPoint(64,3,12000,1507));
 		auto state1 = new TimelineState(1, String("sleep"));
 		Timeline *timeline1 = new Timeline(state1, String("Test Face"), stsServoPoints1, pca9685PwmServoPoints1);
 		timelines->push_back(*timeline1);
