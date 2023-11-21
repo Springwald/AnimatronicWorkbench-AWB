@@ -2,8 +2,8 @@
 #define hardware_h
 
 /* Display settings */
-#define DISPLAY_M5STACK // if you use a M5Stack, uncomment this line. Uses GPIO 14+18 for display communication
-// #define DISPLAY_SSD1306 // e.g. for Waveshare Servo Driver with ESP32
+// #define DISPLAY_M5STACK // if you use a M5Stack, uncomment this line. Uses GPIO 14+18 for display communication
+#define DISPLAY_SSD1306 // e.g. for Waveshare Servo Driver with ESP32
 
 /* Neopixel status LEDs */
 // #define USE_NEOPIXEL_STATUS_CONTROL
@@ -18,7 +18,7 @@
 #define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457
 
 /* STS serial servo settings */
-// #define USE_STS_SERVO
+#define USE_STS_SERVO
 #define STS_SERVO_SPEED 1500         // speed, default = 1500
 #define STS_SERVO_ACC 10             // acceleration, default = 100
 #define STS_SERVO_RXD 18             // eg. GPIO 18 for wavesahre servo driver
@@ -27,7 +27,7 @@
 #define STS_SERVO_MAX_LOAD 250       // max load before servo is disabled
 
 /* PCA9685 PWM servo settings */
-#define USE_PCA9685_PWM_SERVO
+// #define USE_PCA9685_PWM_SERVO
 #define PCA9685_I2C_ADDRESS 0x40
 #define PCA9685_SPEED 1500
 #define PCA9685_ACC 10

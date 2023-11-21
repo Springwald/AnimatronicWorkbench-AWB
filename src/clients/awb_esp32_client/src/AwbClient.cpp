@@ -130,6 +130,7 @@ void AwbClient::showMsg(String message)
  */
 void AwbClient::loop()
 {
+
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 

@@ -244,7 +244,7 @@ void AwbDisplay::draw_values()
         return;
 
     _valuesDirty = false;
-    int columns = primarySprite.width() / 200;
+    int columns = max(1, primarySprite.width() / 200);
 
     if (_isSmallScreen)
     {
@@ -299,8 +299,6 @@ void AwbDisplay::draw_values()
     primarySprite.pushSprite(0, _primarySpriteTop);
 }
 
-// send alife packet
-
 void AwbDisplay::set_debugStatus(String message)
 {
     _statusDirty = true;
@@ -330,8 +328,6 @@ void AwbDisplay::draw_message(String message, int durationMs, int msgType)
         }
     }
     primarySprite.setTextColor(0xFFFFFFU, backCol);
-
-    // primarySprite.fillScreen(backCol);
     primarySprite.fillScreen(backCol);
     primarySprite.setTextDatum(top_center);
 
