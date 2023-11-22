@@ -27,7 +27,7 @@
 #define STS_SERVO_MAX_LOAD 250       // max load before servo is disabled
 
 /* PCA9685 PWM servo settings */
-// #define USE_PCA9685_PWM_SERVO
+#define USE_PCA9685_PWM_SERVO
 #define PCA9685_I2C_ADDRESS 0x40
 #define PCA9685_SPEED 1500
 #define PCA9685_ACC 10

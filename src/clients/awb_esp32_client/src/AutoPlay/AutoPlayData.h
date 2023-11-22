@@ -16,7 +16,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 20.11.2023 23:41:51
+// Created on 21.11.2023 19:22:26
 
 class AutoPlayData
 {
@@ -49,41 +49,29 @@ public:
         timelines = new std::vector<Timeline>();
 		auto *stsServoPoints1 = new std::vector<StsServoPoint>();
 		auto *pca9685PwmServoPoints1 = new std::vector<Pca9685PwmServoPoint>();
-		stsServoPoints1->push_back(StsServoPoint(6,0,2000));
-		stsServoPoints1->push_back(StsServoPoint(7,0,2050));
-		stsServoPoints1->push_back(StsServoPoint(8,0,2050));
-		stsServoPoints1->push_back(StsServoPoint(6,1000,2087));
-		stsServoPoints1->push_back(StsServoPoint(6,2000,2000));
+		stsServoPoints1->push_back(StsServoPoint(7,0,2531));
+		stsServoPoints1->push_back(StsServoPoint(8,0,2051));
+		stsServoPoints1->push_back(StsServoPoint(6,0,1562));
+		stsServoPoints1->push_back(StsServoPoint(6,1000,692));
+		stsServoPoints1->push_back(StsServoPoint(7,1000,1322));
+		stsServoPoints1->push_back(StsServoPoint(8,1000,1388));
+		stsServoPoints1->push_back(StsServoPoint(6,2000,2740));
+		stsServoPoints1->push_back(StsServoPoint(7,2000,1322));
+		stsServoPoints1->push_back(StsServoPoint(8,2000,2035));
+		stsServoPoints1->push_back(StsServoPoint(6,4000,692));
+		stsServoPoints1->push_back(StsServoPoint(7,4000,3370));
+		stsServoPoints1->push_back(StsServoPoint(8,4000,2035));
+		stsServoPoints1->push_back(StsServoPoint(7,5500,1322));
+		stsServoPoints1->push_back(StsServoPoint(8,5750,2731));
+		stsServoPoints1->push_back(StsServoPoint(7,7000,2595));
+		stsServoPoints1->push_back(StsServoPoint(6,7000,692));
+		stsServoPoints1->push_back(StsServoPoint(8,7000,2034));
+		stsServoPoints1->push_back(StsServoPoint(6,9000,1514));
+		stsServoPoints1->push_back(StsServoPoint(7,9000,2595));
+		stsServoPoints1->push_back(StsServoPoint(8,9000,2034));
 		auto state1 = new TimelineState(1, String("idle"));
 		Timeline *timeline1 = new Timeline(state1, String("Neck Test"), stsServoPoints1, pca9685PwmServoPoints1);
 		timelines->push_back(*timeline1);
-
-		auto *stsServoPoints2 = new std::vector<StsServoPoint>();
-		auto *pca9685PwmServoPoints2 = new std::vector<Pca9685PwmServoPoint>();
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,0,0,1432));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,1,0,1663));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,2,0,1167));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,0,1000,2300));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,0,2000,1438));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,1,4000,1663));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,2,4000,1167));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,1,4250,821));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,2,4250,1716));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,0,4500,1438));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,1,4750,1655));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,2,4750,1167));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,2,6000,1167));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,1,6000,1663));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,3,6000,1507));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,3,7000,1230));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,3,8000,1230));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,3,9000,1790));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,3,10000,1790));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,3,11000,1507));
-		pca9685PwmServoPoints2->push_back(Pca9685PwmServoPoint(64,3,12000,1507));
-		auto state2 = new TimelineState(1, String("idle"));
-		Timeline *timeline2 = new Timeline(state2, String("Test Face"), stsServoPoints2, pca9685PwmServoPoints2);
-		timelines->push_back(*timeline2);
 
     }
 
