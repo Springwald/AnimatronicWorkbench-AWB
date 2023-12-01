@@ -30,20 +30,12 @@ public:
 
             _bus_instance.config(cfg);
             _panel_instance.setBus(&_bus_instance);
-
-            // The SSD1306 may have different connection patterns between the panel and
-            // controller depending on the product, and the 0xDA command adjusts for this.
-            // If it does not display correctly, try the following values of the
-            // setComPins function one at a time:
-            _panel_instance.setComPins(0x02);
-            //  _panel_instance.setComPins(0x12);
-            //  _panel_instance.setComPins(0x22);
-            //  _panel_instance.setComPins(0x32);
+            _panel_instance.setComPins(DISPLAY_SSD1306_COM_PINS);
         }
         {
             auto cfg = _panel_instance.config();
-            cfg.panel_width = 128;
-            cfg.panel_height = 32;
+            cfg.panel_width = DISPLAY_SSD1306_WIDTH;
+            cfg.panel_height = DISPLAY_SSD1306_HEIGHT;
             _panel_instance.config(cfg);
         }
         setPanel(&_panel_instance);

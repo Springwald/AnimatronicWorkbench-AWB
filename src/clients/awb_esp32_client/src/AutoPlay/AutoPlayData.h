@@ -16,7 +16,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 21.11.2023 19:22:26
+// Created on 01.12.2023 00:59:47
 
 class AutoPlayData
 {
@@ -27,11 +27,11 @@ public:
 	const char *WlanSSID = "AWB-Grogu 2.0 TestFace";  // WLAN SSID Name
 	const char *WlanPassword = "awb12345"; // WLAN Password
 
-	int stsServoCount = 3;
-	int stsServoChannels[3] = {6, 7, 8};
-	int stsServoAccelleration[3] = {-1, -1, -1};
-	int stsServoSpeed[3] = {-1, -1, -1};
-	String stsServoName[3] = {"Neck 1", "Neck 2", "Head rotate"};
+	int stsServoCount = 4;
+	int stsServoChannels[4] = {1, 6, 7, 8};
+	int stsServoAccelleration[4] = {-1, -1, -1, -1};
+	int stsServoSpeed[4] = {-1, -1, -1, -1};
+	String stsServoName[4] = {"Right hand", "Neck 1", "Neck 2", "Head rotate"};
 
 	int pca9685PwmServoCount = 4;
 	int pca9685PwmServoI2cAdresses[4] = {64, 64, 64, 64};
