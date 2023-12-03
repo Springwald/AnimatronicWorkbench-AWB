@@ -18,6 +18,8 @@ namespace AwbStudio.TimelineControls
 {
     public partial class TimelineViewer : UserControl
     {
+        private const int ItemsPerBank = 8;
+
         private bool _wasPlaying = false;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
@@ -25,6 +27,7 @@ namespace AwbStudio.TimelineControls
         private IActuatorsService? _actuatorsService;
         private TimelinePlayer? _timelinePlayer;
         private TimelineViewPos _viewPos;
+        private int _actualBankIndex = 0;
 
         private void PlayerStateChanged(object? sender, PlayStateEventArgs e)
         {
@@ -58,6 +61,8 @@ namespace AwbStudio.TimelineControls
                 MyInvoker.Invoke(new Action(() => this.PaintPlayPos(_timelineData)));
             }
         }
+
+      
 
         /// <summary>
         /// The actual view and scroll position of the timeline
@@ -184,9 +189,20 @@ namespace AwbStudio.TimelineControls
             PaintPlayPos(_timelineData);
         }
 
+        private int _lastBankIndex = -1;
+
         private void OnViewPosChanged(object? sender, EventArgs e)
         {
             if (_timelineData == null) return;
+
+            if (_lastBankIndex != ViewPos.BankIndex && _actuatorsService != null)
+            {
+                _lastBankIndex = ViewPos.BankIndex;
+                MyInvoker.Invoke(new Action(() => {
+                    var bankStartItemNo = ViewPos.BankIndex * ViewPos.ItemsPerBank + 1 ; // base 1
+                    labelBankNo.Content = $"Bank {ViewPos.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + ViewPos.ItemsPerBank-1)}]";
+                }));
+            }
 
             // update the scrollbar
             MyInvoker.Invoke(() =>

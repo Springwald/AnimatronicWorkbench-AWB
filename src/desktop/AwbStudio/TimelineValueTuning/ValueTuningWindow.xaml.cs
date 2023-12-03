@@ -8,6 +8,7 @@
 using Awb.Core.InputControllers.TimelineInputControllers;
 using AwbStudio.ValueTuning;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -43,6 +44,18 @@ namespace AwbStudio
                 {
                     OnTimelineEvent?.Invoke(this, new TimelineControllerEventArgs(TimelineControllerEventArgs.EventTypes.ActuatorValueChanged, actuatorIndex: index, valueInPercent: value));
                 };
+            }
+
+            KeyDown += ValueTuningWindow_KeyDown;
+        }
+
+        private void ValueTuningWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+           switch (e.Key)
+            {
+                case System.Windows.Input.Key.Tab:
+                    OnTimelineEvent?.Invoke(this, new TimelineControllerEventArgs(TimelineControllerEventArgs.EventTypes.NextBank, actuatorIndex: 0, valueInPercent: 0));
+                    break;
             }
         }
 

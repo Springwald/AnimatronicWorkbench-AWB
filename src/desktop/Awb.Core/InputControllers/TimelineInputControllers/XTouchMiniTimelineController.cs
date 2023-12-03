@@ -14,7 +14,7 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
         private readonly XTouchMiniController _xTouchMiniController;
         private ITimelineController.PlayStates _playState = ITimelineController.PlayStates.Editor;
 
-        public string?[] ActualActuatorNames { set{ } }
+        public string?[] ActualActuatorNames { set { } }
 
         public XTouchMiniTimelineController(XTouchMiniController xTouchMiniController)
         {
@@ -105,6 +105,19 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
                                 default:
                                     throw new ArgumentOutOfRangeException($"{nameof(_playState)}:{_playState}");
                             }
+                            break;
+
+                        case 2:// bank switch button
+                            if (e.Value == 127)// 127=pressed, 0=released
+                                switch (_playState)
+                                {
+                                    case ITimelineController.PlayStates.Editor:
+                                    case ITimelineController.PlayStates.Playing:
+                                        OnTimelineEvent.Invoke(this, new TimelineControllerEventArgs(TimelineControllerEventArgs.EventTypes.NextBank));
+                                        break;
+                                    default:
+                                        throw new ArgumentOutOfRangeException($"{nameof(_playState)}:{_playState}");
+                                }
                             break;
 
                         case 3: // << button

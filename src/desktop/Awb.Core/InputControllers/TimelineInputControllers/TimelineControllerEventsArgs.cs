@@ -57,6 +57,11 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             PreviousPage,
 
             /// <summary>
+            /// editor mode: switch to the next 8 actuator bank
+            /// </summary>
+            NextBank,
+
+            /// <summary>
             /// editor mode: save the actual timeline
             /// </summary>
             Save

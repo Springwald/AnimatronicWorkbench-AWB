@@ -14,6 +14,7 @@
         <Grid Grid.Row="0" x:Name="GridTimeline">
             <Grid x:Name="OpticalGrid">
             </Grid>
+             <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo" >BANK 1 (1-8)</Label>
             <Grid x:Name="PlayControls">
                 <Line x:Name="PlayPosLine" Stroke="DarkOrange" StrokeThickness="1" X1="10" X2="50" Y1="10" Y2="200" ></Line>
             </Grid>

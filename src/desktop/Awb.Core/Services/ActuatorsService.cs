@@ -13,6 +13,11 @@ namespace Awb.Core.Services
     public interface IActuatorsService
     {
         IServo[] Servos { get; }
+
+        ISoundPlayer SoundPlayer { get; }
+
+         string[] AllIds { get; }
+        IActuator[] AllActuators { get; }
     }
 
     public class ActuatorsService : IActuatorsService
@@ -21,10 +26,15 @@ namespace Awb.Core.Services
 
         public string[] AllIds { get; }
 
+        public IActuator[] AllActuators { get; }
+
+        public ISoundPlayer SoundPlayer { get; }
+
         public ActuatorsService(AwbProject config, IAwbClientsService awbClientsService, IAwbLogger logger)
         {
             var servos = new List<IServo>();
 
+            // add PWM servos
             if (config.Pca9685PwmServos != null)
             {
                 foreach (var pca9685PwmServoConfig in config.Pca9685PwmServos)
@@ -38,6 +48,7 @@ namespace Awb.Core.Services
                 }
             }
 
+            // add STS servos
             if (config.StsServos != null)
             {
                 foreach (var stsServoConfig in config.StsServos)
@@ -51,7 +62,20 @@ namespace Awb.Core.Services
                 }
             }
 
-            AllIds = servos.Select(s => s.Id).ToArray();
+            // add sound player
+            if (config.Mp3PlayerYX5300 != null) 
+            {
+                SoundPlayer = new Mp3PlayerYX5300(config.Mp3PlayerYX5300);
+            }
+
+            
+            var allActuators = new List<IActuator>();
+            allActuators.AddRange(servos);    
+            if (SoundPlayer != null) allActuators.Add(SoundPlayer);
+            AllActuators = allActuators.ToArray();
+
+            // check for duplicate Ids
+            AllIds = allActuators.Select(a => a.Id).ToArray();
             if (AllIds.Length != AllIds.Distinct().Count())
             {
                 foreach (var id in AllIds)

@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Project;
 using Awb.Core.Sounds;
 
 namespace Awb.Core.Configs
@@ -20,6 +21,8 @@ namespace Awb.Core.Configs
         public Pca9685PwmServoConfig[]? Pca9685PwmServos { get; set; }
 
         public StsServoConfig[]? StsServos { get; set; }
+
+        public Mp3PlayerYX5300Config? Mp3PlayerYX5300 { get; set; } 
 
         public TimelineState[]? TimelinesStates { get; set; }
 

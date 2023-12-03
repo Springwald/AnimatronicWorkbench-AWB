@@ -112,8 +112,6 @@ namespace AwbStudio
             this.IsEnabled = true;
             _unsavedChanges = false;
 
-   
-
             await _timelinePlayer.Update();
         }
 
@@ -157,8 +155,8 @@ namespace AwbStudio
             {
                 case TimelineControllerEventArgs.EventTypes.PlayPosAbsoluteChanged:
                     var viewPos = TimelineViewerControl.ViewPos;
-                    viewPos.SetPosSelectorManualMsByPercent(e.ValueInPercent) ;
-                    
+                    viewPos.SetPosSelectorManualMsByPercent(e.ValueInPercent);
+
                     switch (_timelinePlayer.PlayState)
                     {
                         case TimelinePlayer.PlayStates.Playing:
@@ -177,6 +175,10 @@ namespace AwbStudio
                             throw new ArgumentOutOfRangeException($"{nameof(_timelinePlayer.PlayState)}:{_timelinePlayer.PlayState.ToString()}");
                     }
                     _lastActuatorChanged = -1;
+                    break;
+
+                case TimelineControllerEventArgs.EventTypes.NextBank:
+                    SwitchToNextBank();
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.Play:
@@ -227,20 +229,40 @@ namespace AwbStudio
                 case TimelineControllerEventArgs.EventTypes.ActuatorTogglePoint:
                     _unsavedChanges = true;
                     _lastActuatorChanged = -1;
-                    servos = _actuatorsService?.Servos;
-                    if (servos == null) return;
-                    if (e.ActuatorIndex >= servos.Length) return;
-                    servo = servos[e.ActuatorIndex];
-                    point = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
-                    if (point == null)
+                    var actuators = _actuatorsService?.AllActuators;
+                    if (actuators == null) return;
+                    if (e.ActuatorIndex >= actuators.Length) return;
+                    var actuator = actuators[e.ActuatorIndex];
+
+                    servo = actuator as IServo;
+                    if (servo != null)
                     {
-                        targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
-                        point = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
-                        TimelineData?.ServoPoints.Add(point);
+
+                        point = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                        if (point == null)
+                        {
+                            targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
+                            point = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
+                            TimelineData?.ServoPoints.Add(point);
+                        }
+                        else
+                        {
+                            TimelineData?.ServoPoints.Remove(point);
+                        }
                     }
                     else
                     {
-                        TimelineData?.ServoPoints.Remove(point);
+                        var mp3PlayerYX5300 = actuator as Mp3PlayerYX5300;
+                        if (mp3PlayerYX5300 != null)
+                        {
+
+                        }
+                        else
+                        {
+                            throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Name}/{actuator.Label} is an unhandled actutuator type.");
+                        }
+
+
                     }
                     _manualUpdatingValues = true;
                     if (_manualUpdatingValues) await _timelinePlayer.Update();
@@ -266,6 +288,14 @@ namespace AwbStudio
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.EventType)}:{e.EventType.ToString()}");
             }
+        }
+
+        private void SwitchToNextBank()
+        {
+            var newBankIndex = TimelineViewerControl.ViewPos.BankIndex + 1;
+            var maxBankIndex = _actuatorsService.AllIds.Length / TimelineViewerControl.ViewPos.ItemsPerBank;
+            if (newBankIndex > maxBankIndex) newBankIndex = 0;
+            TimelineViewerControl.ViewPos.BankIndex = newBankIndex;
         }
 
         private async Task ScrollPaging(int howManyMs)
@@ -425,7 +455,7 @@ namespace AwbStudio
         private void Play()
         {
             _timelinePlayer?.Play();
-            foreach(var timelineController in _timelineControllers)
+            foreach (var timelineController in _timelineControllers)
                 timelineController?.SetPlayState(ITimelineController.PlayStates.Playing);
         }
 

@@ -18,6 +18,11 @@ namespace AwbStudio.TimelineControls
         private int _posSelectorManualMs = 0;
 
         /// <summary>
+        ///  The index of the active actuator bank
+        /// </summary>
+        private int _bankIndex;
+
+        /// <summary>
         /// Is fired, when the timeline position or view has changed
         /// </summary>
         public EventHandler? Changed;
@@ -32,6 +37,26 @@ namespace AwbStudio.TimelineControls
             {
                 if (_displayMs == value) return;
                 _displayMs = value;
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// How many items are grouped in one actuator bank
+        /// </summary>
+        public int ItemsPerBank { get; } = 8;
+
+
+        /// <summary>
+        ///  The index of the active actuator bank
+        /// </summary>
+        public int BankIndex
+        {
+            get => _bankIndex;
+            set
+            {
+                if (_bankIndex == value) return;
+                _bankIndex = value;
                 Changed?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -73,6 +98,7 @@ namespace AwbStudio.TimelineControls
             return true;
         }
 
+       
         public double GetPosSelectorPercent()
             => this.PosSelectorManualMs * 100.0 / this.DisplayMs;
 

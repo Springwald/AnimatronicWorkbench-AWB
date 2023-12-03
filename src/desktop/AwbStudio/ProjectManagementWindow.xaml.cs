@@ -117,7 +117,8 @@ namespace AwbStudio
                                 MaxValue = 4095,
                                 MinValue = 0,
                             },
-                        }
+                        }, 
+                        Mp3PlayerYX5300 = new Awb.Core.Project.Mp3PlayerYX5300Config(rxPin: 14, txPin: 15, soundPlayerId: "Mp3Player")
                     };
 
                     if (_projectManagerService.SaveProject(project, projectFolder: dialog.SelectedPath))
