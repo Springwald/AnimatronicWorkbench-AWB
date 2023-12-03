@@ -5,11 +5,13 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Sounds;
+
 namespace Awb.Core.Configs
 {
     public class AwbProject
     {
-        public string Info { get; set; } = "Animatronic Workbench Project | https://daniel.springwald.de/post/AnimatronicWorkbench";
+        public string Info { get; set; } = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench";
 
         public string Title { get; set; }
 
@@ -23,15 +25,15 @@ namespace Awb.Core.Configs
 
         public string? AutoPlayEsp32ExportFolder { get; set; }
 
+        public Sound[] Sounds { get; }
+
         public AwbProject(string title, string projectFolder)
         {
             Title = title;
             ProjectFolder = projectFolder;
+            Sounds = new SoundManager(Path.Combine(projectFolder, "audio")).Sounds;
         }
 
-        public static implicit operator string(AwbProject v)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }
