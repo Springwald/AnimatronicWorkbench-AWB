@@ -16,7 +16,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 17.01.2024 16:01:06
+// Created on 17.01.2024 23:52:32
 
 class AutoPlayData
 {
@@ -27,11 +27,11 @@ public:
 	const char *WlanSSID = "AWB-Grogu 2.0 TestFace 2";  // WLAN SSID Name
 	const char *WlanPassword = "awb12345"; // WLAN Password
 
-	int stsServoCount = 0;
-	int stsServoChannels[0] = {};
-	int stsServoAcceleration[0] = {};
-	int stsServoSpeed[0] = {};
-	String stsServoName[0] = {};
+	int stsServoCount = 1;
+	int stsServoChannels[1] = {4};
+	int stsServoAcceleration[1] = {-1};
+	int stsServoSpeed[1] = {-1};
+	String stsServoName[1] = {"right ear"};
 
 	int scsServoCount = 3;
 	int scsServoChannels[3] = {1, 2, 3};
@@ -56,9 +56,13 @@ public:
 		auto *stsServoPoints1 = new std::vector<StsServoPoint>();
 		auto *scsServoPoints1 = new std::vector<StsServoPoint>();
 		auto *pca9685PwmServoPoints1 = new std::vector<Pca9685PwmServoPoint>();
-		scsServoPoints1->push_back(StsServoPoint(1,0,2048));
-		scsServoPoints1->push_back(StsServoPoint(2,0,2048));
-		scsServoPoints1->push_back(StsServoPoint(3,0,2048));
+		scsServoPoints1->push_back(StsServoPoint(1,0,4096));
+		scsServoPoints1->push_back(StsServoPoint(2,0,3080));
+		scsServoPoints1->push_back(StsServoPoint(3,0,2080));
+		scsServoPoints1->push_back(StsServoPoint(1,7000,1));
+		stsServoPoints1->push_back(StsServoPoint(4,7000,2048));
+		scsServoPoints1->push_back(StsServoPoint(2,7000,1500));
+		scsServoPoints1->push_back(StsServoPoint(3,7000,2000));
 		auto state1 = new TimelineState(1, String("idle"));
 		Timeline *timeline1 = new Timeline(state1, String("Eyes Test"), stsServoPoints1, scsServoPoints1, pca9685PwmServoPoints1);
 		timelines->push_back(*timeline1);

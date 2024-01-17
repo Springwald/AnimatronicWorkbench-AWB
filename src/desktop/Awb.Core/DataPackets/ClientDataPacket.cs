@@ -19,6 +19,7 @@ namespace Awb.Core.DataPackets
                 if (Content == null) return true;
                 if (Content.DisplayMessage?.Message != null && !string.IsNullOrWhiteSpace(Content.DisplayMessage.Message)) return false;
                 if (Content.StsServos?.Servos?.Any() == true) return false;
+                if (Content.ScsServos?.Servos?.Any() == true) return false;
                 if (Content.Pca9685PwmServos?.Servos?.Any() == true) return false;
                 return true;
             }

@@ -59,14 +59,15 @@ void AwbClient::setup()
 
     // set up the actuators
 
-#ifdef USE_STS_SERVO &&USE_SCS_SERVO
+#ifdef USE_STS_SERVO
+
+#ifdef USE_SCS_SERVO
     if (STS_SERVO_RXD == SCS_SERVO_RXD || STS_SERVO_RXD == SCS_SERVO_TXD || STS_SERVO_TXD == SCS_SERVO_RXD || STS_SERVO_TXD == SCS_SERVO_TXD)
         showError("STS and SCS use the same RXD/TXD pins!");
     delay(2000);
     throw "STS and SCS use the same RXD/TXD pins!";
 #endif
 
-#ifdef USE_STS_SERVO
     showSetupMsg("setup STS servos");
     this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
@@ -189,7 +190,6 @@ void AwbClient::showSetupMsg(String message)
  */
 void AwbClient::loop()
 {
-
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
@@ -207,6 +207,7 @@ void AwbClient::loop()
         _lastAutoPlaySelectedStateId = _autoPlayer->selectedStateId();
         _display.set_debugStatus("StateId:" + String(_lastAutoPlaySelectedStateId));
     }
+
     if (!_autoPlayer->getCurrentTimelineName().equals(_lastAutoPlayTimelineName))
     {
         // an other timeline was started
@@ -360,8 +361,9 @@ void AwbClient::processPacket(String payload)
             // store the method showMsg in an anonymous function
             _pca9685pwmManager->setTargetValue(channel, value, name);
         }
-        _pca9685pwmManager->updateActuators();
     }
+    if (this->_pca9685pwmManager != NULL)
+        _pca9685pwmManager->updateActuators();
 
     if (jsondoc.containsKey("STS")) // package contains STS bus servo data
     {
@@ -394,10 +396,11 @@ void AwbClient::processPacket(String payload)
             if (!done)
                 showError("STS Servo " + String(id) + " not attached!");
         }
-        _stSerialServoManager->updateActuators();
     }
+    if (this->_stSerialServoManager != NULL)
+        _stSerialServoManager->updateActuators();
 
-    if (jsondoc.containsKey("SCS")) // package contains STS bus servo data
+    if (jsondoc.containsKey("SCS")) // package contains SCS bus servo data
     {
         if (this->_scSerialServoManager == NULL)
         {
@@ -428,8 +431,9 @@ void AwbClient::processPacket(String payload)
             if (!done)
                 showError("SCS Servo " + String(id) + " not attached!");
         }
-        _stSerialServoManager->updateActuators();
     }
+    if (this->_scSerialServoManager != NULL)
+        _scSerialServoManager->updateActuators();
 
     _autoPlayer->stopBecauseOfIncommingPackage();
 

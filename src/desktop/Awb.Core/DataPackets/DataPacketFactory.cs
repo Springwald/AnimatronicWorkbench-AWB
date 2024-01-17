@@ -25,7 +25,7 @@ namespace Awb.Core.DataPackets
                 var scsServos = this.GetStsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Scs);
                 var pwmServos = this.GetPwmServoChanges(servosByClient.Servos);
 
-                if (stsServos != null || pwmServos != null)
+                if (stsServos != null || pwmServos != null || scsServos != null)
                 {
                     yield return new ClientDataPacket
                     {
