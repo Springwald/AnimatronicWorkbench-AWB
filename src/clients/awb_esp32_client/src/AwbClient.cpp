@@ -22,19 +22,23 @@ StaticJsonDocument<1024 * 32> jsondoc;
 void AwbClient::setup()
 {
     _display.setup(_clientId); // set up the display
+    delay(1000);
 
     // set up the wlan connector
+    showSetupMsg("setup wifi");
     const TCallBackErrorOccured wlanErrorOccured = [this](String message)
     { showError(message); };
     _wlanConnector = new WlanConnector(_clientId, _actualStatusInformation, wlanErrorOccured);
     _wlanConnector->setup();
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
+    showSetupMsg("setup neopixel");
     this->_neoPixelStatus = new NeoPixelStatusControl();
     _neoPixelStatus->setStartUpAlert(); // show alarm neopixel on startup to see unexpected restarts
 #endif
 
 #ifdef USE_DAC_SPEAKER
+    showSetupMsg("setup dac speaker");
     this->_dacSpeaker = DacSpeaker();
     this->_dacSpeaker.begin();
 #endif
@@ -54,13 +58,9 @@ void AwbClient::setup()
     { showError(message); };
 
     // set up the actuators
+    showSetupMsg("setup STS servos");
     this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
-
-    this->_scSerialServoManager = new StSerialServoManager(_actualStatusInformation->scsServoValues, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD, SCS_SERVO_SPEED, SCS_SERVO_ACC);
-    this->_scSerialServoManager->setup();
-
-    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
 
     // iterate through all stsServoIds
     for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
@@ -74,6 +74,10 @@ void AwbClient::setup()
         this->_actualStatusInformation->stsServoValues->push_back(actuatorValue);
     }
 
+    showSetupMsg("setup SCS servos");
+    this->_scSerialServoManager = new StSerialServoManager(_actualStatusInformation->scsServoValues, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD, SCS_SERVO_SPEED, SCS_SERVO_ACC);
+    this->_scSerialServoManager->setup();
+
     // iterate through all scsServoIds
     for (int i = 0; i < this->_scSerialServoManager->servoIds->size(); i++)
     {
@@ -86,18 +90,25 @@ void AwbClient::setup()
         this->_actualStatusInformation->scsServoValues->push_back(actuatorValue);
     }
 
+    showSetupMsg("setup PCA9685 PWM servos");
+    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
+
     showMsg("Found " + String(this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager->servoIds->size()) + " SCS servos");
     delay(1000);
 
 #ifdef AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL
+
     auto autoPlayerStateSelectorStsServoChannel = AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL;
 #else
     auto autoPlayerStateSelectorStsServoChannel = -1;
 #endif
+    showSetupMsg("AutoPlayer StateSelector StsServoChannel: " + String(autoPlayerStateSelectorStsServoChannel));
 
+    showSetupMsg("setup autoplay");
     _autoPlayer = new AutoPlayer(_stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
+    showSetupMsg("setup AWB studio packet receiver");
     const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload)
     {
         // process the packet
@@ -110,12 +121,14 @@ void AwbClient::setup()
     this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, packetErrorOccured);
 
 #ifdef USE_DAC_SPEAKER
+    showSetupMsg("init dac speaker");
     this->_dacSpeaker.setVolume(1);
     this->_dacSpeaker.playIntro();
     this->_dacSpeaker.setVolume(DEFAULT_VOLUME);
 #endif
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
+    delay(1000);
 }
 
 /**
@@ -142,6 +155,18 @@ void AwbClient::showMsg(String message)
     int durationMs = 1000;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
     _wlanConnector->logInfo(message);
+}
+
+/**
+ * show an info message on the display (no error)
+ */
+void AwbClient::showSetupMsg(String message)
+{
+    int durationMs = 300;
+    _display.draw_message(message, durationMs, MSG_TYPE_INFO);
+    if (_wlanConnector != NULL) // check if wlan connector is instanciated
+        _wlanConnector->logInfo(message);
+    delay(durationMs);
 }
 
 /**

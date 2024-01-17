@@ -79,6 +79,11 @@ protected:
      */
     void showMsg(String message);
 
+    /**
+     * Show a message during the setup process on the display for only a short moment (no error!)
+     */
+    void showSetupMsg(String message);
+
 public:
     AwbClient(const unsigned int clientId)
     {

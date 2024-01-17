@@ -60,7 +60,6 @@ String AutoPlayer::getCurrentTimelineName()
  */
 void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 {
-
     if (servoHaveErrorsLikeTooHot)
     {
         _actualTimelineIndex = -1;

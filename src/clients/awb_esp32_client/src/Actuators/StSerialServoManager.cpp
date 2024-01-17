@@ -8,8 +8,8 @@
 // It's pretty messy and also a bit unclean that the library creates a global object.
 // But it is the only way I found to use the library.
 // Otherwise it seems to crash in various places - I guess because of memory problems.
-static SMS_STS _serialServo_STS;
-static SCSCL _serialServo_SCS;
+SMS_STS _serialServo_STS;
+SCSCL _serialServo_SCS;
 
 /**
  * Set up the sts servos
@@ -17,15 +17,16 @@ static SCSCL _serialServo_SCS;
 void StSerialServoManager::setup()
 {
 #if defined(USE_STS_SERVO) || defined(USE_SCS_SERVO)
-    Serial1.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
 
     if (this->_servoTypeIsScs)
     {
+        Serial1.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
         _serialServo_SCS.pSerial = &Serial1;
     }
     else
     {
-        _serialServo_STS.pSerial = &Serial1;
+        Serial2.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
+        _serialServo_STS.pSerial = &Serial2;
     }
     delay(100);
 #endif
