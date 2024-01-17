@@ -27,6 +27,7 @@ public:
     ActualStatusInformation()
     {
         stsServoValues = new std::vector<ActuatorValue>();
+        scsServoValues = new std::vector<ActuatorValue>();
         pwmServoValues = new std::vector<ActuatorValue>();
     }
 

@@ -39,8 +39,8 @@ void AwbClient::setup()
 
 #ifdef USE_DAC_SPEAKER
     showSetupMsg("setup dac speaker");
-    this->_dacSpeaker = DacSpeaker();
-    this->_dacSpeaker.begin();
+    this->_dacSpeaker = new DacSpeaker();
+    this->_dacSpeaker->begin();
 #endif
 
     // set up error callbacks for the different components
@@ -58,10 +58,18 @@ void AwbClient::setup()
     { showError(message); };
 
     // set up the actuators
+
+#ifdef USE_STS_SERVO &&USE_SCS_SERVO
+    if (STS_SERVO_RXD == SCS_SERVO_RXD || STS_SERVO_RXD == SCS_SERVO_TXD || STS_SERVO_TXD == SCS_SERVO_RXD || STS_SERVO_TXD == SCS_SERVO_TXD)
+        showError("STS and SCS use the same RXD/TXD pins!");
+    delay(2000);
+    throw "STS and SCS use the same RXD/TXD pins!";
+#endif
+
+#ifdef USE_STS_SERVO
     showSetupMsg("setup STS servos");
     this->_stSerialServoManager = new StSerialServoManager(_actualStatusInformation->stsServoValues, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
     this->_stSerialServoManager->setup();
-
     // iterate through all stsServoIds
     for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
     {
@@ -73,11 +81,12 @@ void AwbClient::setup()
         actuatorValue.name = "no set yet.";
         this->_actualStatusInformation->stsServoValues->push_back(actuatorValue);
     }
+#endif
 
+#ifdef USE_SCS_SERVO
     showSetupMsg("setup SCS servos");
     this->_scSerialServoManager = new StSerialServoManager(_actualStatusInformation->scsServoValues, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD, SCS_SERVO_SPEED, SCS_SERVO_ACC);
     this->_scSerialServoManager->setup();
-
     // iterate through all scsServoIds
     for (int i = 0; i < this->_scSerialServoManager->servoIds->size(); i++)
     {
@@ -89,20 +98,23 @@ void AwbClient::setup()
         actuatorValue.name = "no set yet.";
         this->_actualStatusInformation->scsServoValues->push_back(actuatorValue);
     }
+#endif
 
+#ifdef USE_PCA9685_PWM_SERVO
     showSetupMsg("setup PCA9685 PWM servos");
     this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
+#endif
 
-    showMsg("Found " + String(this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager->servoIds->size()) + " SCS servos");
+    showMsg("Found " + String(this->_stSerialServoManager == NULL ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == NULL ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
+
     delay(1000);
 
 #ifdef AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL
-
     auto autoPlayerStateSelectorStsServoChannel = AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL;
+    showSetupMsg("AutoPlayer StateSelector StsServoChannel: " + String(autoPlayerStateSelectorStsServoChannel));
 #else
     auto autoPlayerStateSelectorStsServoChannel = -1;
 #endif
-    showSetupMsg("AutoPlayer StateSelector StsServoChannel: " + String(autoPlayerStateSelectorStsServoChannel));
 
     showSetupMsg("setup autoplay");
     _autoPlayer = new AutoPlayer(_stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
@@ -120,12 +132,13 @@ void AwbClient::setup()
     char *packetHeader = (char *)"AWB";
     this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, packetErrorOccured);
 
-#ifdef USE_DAC_SPEAKER
-    showSetupMsg("init dac speaker");
-    this->_dacSpeaker.setVolume(1);
-    this->_dacSpeaker.playIntro();
-    this->_dacSpeaker.setVolume(DEFAULT_VOLUME);
-#endif
+    if (this->_dacSpeaker != NULL)
+    {
+        showSetupMsg("init dac speaker");
+        this->_dacSpeaker->setVolume(1);
+        this->_dacSpeaker->playIntro();
+        this->_dacSpeaker->setVolume(DEFAULT_VOLUME);
+    }
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
     delay(1000);
@@ -138,13 +151,15 @@ void AwbClient::showError(String message)
 {
     int durationMs = 2000;
     _display.draw_message(message, durationMs, MSG_TYPE_ERROR);
-    _wlanConnector->logError(message);
-#ifdef USE_NEOPIXEL_STATUS_CONTROL
-    _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
-#endif
-#ifdef USE_DAC_SPEAKER
-    _dacSpeaker.beep();
-#endif
+
+    if (_wlanConnector != NULL)
+        _wlanConnector->logError(message);
+
+    if (_neoPixelStatus != NULL)
+        _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
+
+    if (_dacSpeaker != NULL)
+        _dacSpeaker->beep();
 }
 
 /**
@@ -179,7 +194,13 @@ void AwbClient::loop()
     bool packetReceived = this->_packetSenderReceiver->loop();
 
     // update autoplay timelines and actuators
-    _autoPlayer->update(this->_stSerialServoManager->servoCriticalTemp);
+    auto criticalTemp = false;
+    if (this->_stSerialServoManager != NULL)
+        criticalTemp = this->_stSerialServoManager->servoCriticalTemp;
+    if (this->_scSerialServoManager != NULL)
+        criticalTemp = criticalTemp || this->_scSerialServoManager->servoCriticalTemp;
+    _autoPlayer->update(criticalTemp);
+
     if (_autoPlayer->selectedStateId() != _lastAutoPlaySelectedStateId)
     {
         // an other timeline filter state was selected
@@ -193,11 +214,23 @@ void AwbClient::loop()
         if (!_autoPlayer->isPlaying())
         {
             // no timeline is playing, so turn off torque for all sts servos
-            for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
+            if (this->_stSerialServoManager != NULL)
             {
-                // turn off torque for all sts servos
-                int id = this->_stSerialServoManager->servoIds->at(i);
-                this->_stSerialServoManager->setTorque(id, false);
+                for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
+                {
+                    // turn off torque for all sts servos
+                    int id = this->_stSerialServoManager->servoIds->at(i);
+                    this->_stSerialServoManager->setTorque(id, false);
+                }
+            }
+            if (this->_scSerialServoManager != NULL)
+            {
+                for (int i = 0; i < this->_scSerialServoManager->servoIds->size(); i++)
+                {
+                    // turn off torque for all scs servos
+                    int id = this->_scSerialServoManager->servoIds->at(i);
+                    this->_scSerialServoManager->setTorque(id, false);
+                }
             }
         }
         _display.set_debugStatus("Timeline:" + String(_lastAutoPlayTimelineName));
@@ -207,7 +240,7 @@ void AwbClient::loop()
 
     if (!packetReceived && millis() > _lastStatusMillis + 100) // update status every 100ms
     {
-        if (this->_stSerialServoManager->servoCriticalTemp == true || this->_stSerialServoManager->servoCriticalLoad == true)
+        if (criticalTemp == true)
         {
             // critical temperature or load detected, so only check and show load status
             readActuatorsStatuses();
@@ -250,13 +283,11 @@ void AwbClient::loop()
         }
     }
 
-#ifdef USE_NEOPIXEL_STATUS_CONTROL
-    if (!packetReceived)
+    if (_neoPixelStatus != NULL && !packetReceived)
         _neoPixelStatus->update();
-#endif
-#ifdef USE_DAC_SPEAKER
-    _dacSpeaker.update();
-#endif
+
+    if (_dacSpeaker != NULL)
+        _dacSpeaker->update();
 
     // update display
     if (!packetReceived)
@@ -315,6 +346,11 @@ void AwbClient::processPacket(String payload)
 
     if (jsondoc.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
     {
+        if (this->_pca9685pwmManager == NULL)
+        {
+            showError("Pca9685Pwm not configured!");
+            return;
+        }
         JsonArray servos = jsondoc["Pca9685Pwm"]["Servos"];
         for (size_t i = 0; i < servos.size(); i++)
         {
@@ -324,11 +360,16 @@ void AwbClient::processPacket(String payload)
             // store the method showMsg in an anonymous function
             _pca9685pwmManager->setTargetValue(channel, value, name);
         }
+        _pca9685pwmManager->updateActuators();
     }
-    _pca9685pwmManager->updateActuators();
 
     if (jsondoc.containsKey("STS")) // package contains STS bus servo data
     {
+        if (this->_stSerialServoManager == NULL)
+        {
+            showError("STS not configured!");
+            return;
+        }
         JsonArray servos = jsondoc["STS"]["Servos"];
         int stsCount = 0;
         for (size_t i = 0; i < servos.size(); i++)
@@ -353,11 +394,16 @@ void AwbClient::processPacket(String payload)
             if (!done)
                 showError("STS Servo " + String(id) + " not attached!");
         }
+        _stSerialServoManager->updateActuators();
     }
-    _stSerialServoManager->updateActuators();
 
     if (jsondoc.containsKey("SCS")) // package contains STS bus servo data
     {
+        if (this->_scSerialServoManager == NULL)
+        {
+            showError("SCS not configured!");
+            return;
+        }
         JsonArray servos = jsondoc["SCS"]["Servos"];
         int stsCount = 0;
         for (size_t i = 0; i < servos.size(); i++)
@@ -382,8 +428,8 @@ void AwbClient::processPacket(String payload)
             if (!done)
                 showError("SCS Servo " + String(id) + " not attached!");
         }
+        _stSerialServoManager->updateActuators();
     }
-    _stSerialServoManager->updateActuators();
 
     _autoPlayer->stopBecauseOfIncommingPackage();
 
@@ -398,22 +444,28 @@ void AwbClient::processPacket(String payload)
 void AwbClient::readActuatorsStatuses()
 {
     // check Sts serial bus servos
-    this->readStsScsServoStatuses(this->_stSerialServoManager, this->_actualStatusInformation->stsServoValues);
+    if (this->_stSerialServoManager != NULL)
+        this->readStsScsServoStatuses(this->_stSerialServoManager, this->_actualStatusInformation->stsServoValues, false);
+
     // check Scs serial bus servos
-    this->readStsScsServoStatuses(this->_scSerialServoManager, this->_actualStatusInformation->scsServoValues);
+    if (this->_scSerialServoManager != NULL)
+        this->readStsScsServoStatuses(this->_scSerialServoManager, this->_actualStatusInformation->scsServoValues, true);
 
     // check PWM servos
-    for (int i = 0; i < this->_actualStatusInformation->pwmServoValues->size(); i++)
+    if (this->_pca9685pwmManager != NULL)
     {
-        // PWM servo driver
-        if (this->_actualStatusInformation->pwmServoValues->at(i).name.length() > 0)
+        for (int i = 0; i < this->_actualStatusInformation->pwmServoValues->size(); i++)
         {
-            // PWM Servo support no status information reading
+            // PWM servo driver
+            if (this->_actualStatusInformation->pwmServoValues->at(i).name.length() > 0)
+            {
+                // PWM Servo support no status information reading
+            }
         }
     }
 }
 
-void AwbClient::readStsScsServoStatuses(StSerialServoManager *_serialServoManager, std::vector<ActuatorValue> *servoValues)
+void AwbClient::readStsScsServoStatuses(StSerialServoManager *serialServoManager, std::vector<ActuatorValue> *servoValues, bool isScsServo)
 {
     bool criticalTemp = false;
     bool criticalLoad = false;
@@ -423,24 +475,24 @@ void AwbClient::readStsScsServoStatuses(StSerialServoManager *_serialServoManage
     {
         if (servoValues->at(i).name.length() > 0)
         {
-            servoValues->at(i).temperature = _stSerialServoManager->readTemperature(servoValues->at(i).id);
-            if (this->_actualStatusInformation->stsServoValues->at(i).temperature > STS_SERVO_MAX_TEMPERATURE)
+            servoValues->at(i).temperature = serialServoManager->readTemperature(servoValues->at(i).id);
+            if (servoValues->at(i).temperature > (isScsServo ? SCS_SERVO_MAX_TEMPERATURE : STS_SERVO_MAX_TEMPERATURE))
             {
                 criticalTemp = true;
-                _stSerialServoManager->setTorque(servoValues->at(i).id, false);
+                serialServoManager->setTorque(servoValues->at(i).id, false);
                 showError("Servo " + String(servoValues->at(i).id) + " critical temperature! " + String(servoValues->at(i).temperature) + "C");
             }
-            servoValues->at(i).load = _stSerialServoManager->readLoad(servoValues->at(i).id);
-            if (abs(servoValues->at(i).load) > STS_SERVO_MAX_LOAD)
+            servoValues->at(i).load = serialServoManager->readLoad(servoValues->at(i).id);
+            if (abs(servoValues->at(i).load) > (isScsServo ? SCS_SERVO_MAX_LOAD : STS_SERVO_MAX_LOAD))
             {
                 criticalLoad = true;
-                _stSerialServoManager->setTorque(servoValues->at(i).id, false);
+                serialServoManager->setTorque(servoValues->at(i).id, false);
                 showError("Servo " + String(servoValues->at(i).id) + " critical load! " + String(servoValues->at(i).load));
             }
         }
     }
-    _serialServoManager->servoCriticalTemp = criticalTemp;
-    _serialServoManager->servoCriticalLoad = criticalLoad;
+    serialServoManager->servoCriticalTemp = criticalTemp;
+    serialServoManager->servoCriticalLoad = criticalLoad;
 }
 
 /**

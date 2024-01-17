@@ -22,7 +22,7 @@ class AwbClient
 protected:
     unsigned int _clientId;                      /// The client id of this client
     AwbDisplay _display;                         /// The display, oled or lcd
-    DacSpeaker _dacSpeaker;                      /// The speaker if connected
+    DacSpeaker *_dacSpeaker;                     /// The speaker if connected
     int _displayStateCounter = 0;                /// The counter for the display state
     long _lastStatusMillis = 0;                  /// The last time the status was udated
     long _startMillis = millis();                /// The start millis
@@ -52,7 +52,7 @@ protected:
      * Read the actuators statuses
      */
     void readActuatorsStatuses();
-    void readStsScsServoStatuses(StSerialServoManager *_serialServoManager, std::vector<ActuatorValue> *servoValues);
+    void readStsScsServoStatuses(StSerialServoManager *_serialServoManager, std::vector<ActuatorValue> *servoValues, bool isScsServo);
 
     /**
      * Show the actuator values (=mostly positions) on the display

@@ -8,29 +8,32 @@
 // It's pretty messy and also a bit unclean that the library creates a global object.
 // But it is the only way I found to use the library.
 // Otherwise it seems to crash in various places - I guess because of memory problems.
-SMS_STS _serialServo_STS;
-SCSCL _serialServo_SCS;
+static SMS_STS _serialServo_STS;
+static SCSCL _serialServo_SCS;
 
 /**
  * Set up the sts servos
  */
 void StSerialServoManager::setup()
 {
-#if defined(USE_STS_SERVO) || defined(USE_SCS_SERVO)
-
     if (this->_servoTypeIsScs)
     {
+#ifndef USE_SCS_SERVO
+        this->_errorOccured("SCS setup, but no USE_SCS_SERVO in hardware.h");
+#endif
         Serial1.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
         _serialServo_SCS.pSerial = &Serial1;
     }
     else
     {
+#ifndef USE_STS_SERVO
+        this->_errorOccured("STS setup but no USE_STS_SERVO in hardware.h");
+#endif
         Serial2.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
         _serialServo_STS.pSerial = &Serial2;
     }
-    delay(100);
-#endif
 
+    delay(100);
     scanIds();
 }
 
@@ -39,10 +42,6 @@ void StSerialServoManager::setup()
  */
 void StSerialServoManager::updateActuators()
 {
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return;
-#endif
-
     if (servoCriticalTemp == true || servoCriticalLoad == true)
         return;
 
@@ -104,10 +103,6 @@ void StSerialServoManager::updateActuators()
  */
 void StSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
 {
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return;
-#endif
-
     for (int i = 0; i < servoValues->size(); i++)
     {
         if (servoValues->at(i).id == id)
@@ -124,9 +119,6 @@ void StSerialServoManager::writePositionDetailed(int id, int position, int speed
  */
 void StSerialServoManager::writePosition(int id, int position)
 {
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return;
-#endif
     for (int i = 0; i < servoValues->size(); i++)
     {
         if (servoValues->at(i).id == id)
@@ -141,9 +133,6 @@ void StSerialServoManager::writePosition(int id, int position)
  */
 int StSerialServoManager::readPosition(u8 id)
 {
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return -1;
-#endif
     if (this->_servoTypeIsScs)
     {
         return _serialServo_SCS.ReadPos(id);
@@ -159,9 +148,6 @@ int StSerialServoManager::readPosition(u8 id)
  */
 void StSerialServoManager::setTorque(u8 id, bool on)
 {
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return;
-#endif
     if (this->_servoTypeIsScs)
     {
         _serialServo_SCS.EnableTorque(id, on ? 1 : 0);
@@ -177,9 +163,6 @@ void StSerialServoManager::setTorque(u8 id, bool on)
  */
 int StSerialServoManager::readLoad(int id)
 {
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return -1;
-#endif
     if (this->_servoTypeIsScs)
     {
         return _serialServo_SCS.ReadLoad(id);
@@ -194,10 +177,6 @@ int StSerialServoManager::readLoad(int id)
  */
 int StSerialServoManager::readTemperature(int id)
 {
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return -1;
-#endif
-
     if (this->_servoTypeIsScs)
     {
         return _serialServo_SCS.ReadTemper(id);
@@ -213,9 +192,6 @@ int StSerialServoManager::readTemperature(int id)
  */
 bool StSerialServoManager::servoAvailable(int id)
 {
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return false;
-#endif
     for (int i = 0; i < servoIds->size(); i++)
     {
         if (servoIds->at(i) == id)
@@ -242,10 +218,6 @@ bool StSerialServoManager::servoAvailable(int id)
 void StSerialServoManager::scanIds()
 {
     servoIds = new std::vector<u8>();
-
-#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
-    return;
-#endif
 
     for (int i = 1; i < MAX_STS_SCS_SERVO_ID_SCAN_RANGE; i++)
     {

@@ -23,7 +23,7 @@
 #define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO
 
 /* STS serial servo settings */
-#define USE_STS_SERVO                // if you use a STS serial servo, uncomment this line
+// #define USE_STS_SERVO                // if you use a STS serial servo, uncomment this line
 #define STS_SERVO_SPEED 1500         // speed, default = 1500
 #define STS_SERVO_ACC 10             // acceleration, default = 100
 #define STS_SERVO_RXD 18             // eg. GPIO 18 for waveshare servo driver
@@ -39,7 +39,7 @@
 #define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457
 
 /* SCS serial servo settings */
-// #define USE_SCS_SERVO                // uncomment this line if you want to use SCS servos
+#define USE_SCS_SERVO                // uncomment this line if you want to use SCS servos
 #define SCS_SERVO_SPEED 1500         // speed, default = 1500
 #define SCS_SERVO_ACC 10             // acceleration, default = 100
 #define SCS_SERVO_RXD 18             // eg. GPIO 18 for waveshare servo driver
