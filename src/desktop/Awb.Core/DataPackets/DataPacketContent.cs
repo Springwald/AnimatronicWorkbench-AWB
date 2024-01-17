@@ -19,5 +19,7 @@ namespace Awb.Core.DataPackets
 
         [JsonPropertyName("STS")]
         public StsServosPacketData? StsServos { get; set; }
+        [JsonPropertyName("SCS")]
+        public StsServosPacketData? ScsServos { get; set; }
     }
 }

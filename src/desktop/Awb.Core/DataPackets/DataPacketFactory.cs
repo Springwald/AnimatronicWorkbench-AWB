@@ -21,7 +21,8 @@ namespace Awb.Core.DataPackets
 
             foreach (var servosByClient in servosByClients)
             {
-                var stsServos = this.GetStsServoChanges(servosByClient.Servos);
+                var stsServos = this.GetStsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Sts);
+                var scsServos = this.GetStsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Scs);
                 var pwmServos = this.GetPwmServoChanges(servosByClient.Servos);
 
                 if (stsServos != null || pwmServos != null)
@@ -33,6 +34,7 @@ namespace Awb.Core.DataPackets
                         {
                             DisplayMessage = null,
                             StsServos = stsServos,
+                            ScsServos = scsServos,
                             Pca9685PwmServos = pwmServos
                         }
                     };
@@ -64,14 +66,14 @@ namespace Awb.Core.DataPackets
             }
         }
 
-        private StsServosPacketData? GetStsServoChanges(IServo[] allServos)
+        private StsServosPacketData? GetStsServoChanges(IServo[] allServos, StsScsServo.StsScsTypes servoType)
         {
             var stsServos = new List<StsServoPacketData>();
 
             foreach (var servo in allServos)
             {
                 var stsServo = servo as StsScsServo;
-                if (stsServo != null && stsServo.IsDirty)
+                if (stsServo != null && stsServo.IsDirty && stsServo.StsScsType == servoType)
                 {
                     stsServos.Add(new StsServoPacketData
                     {
