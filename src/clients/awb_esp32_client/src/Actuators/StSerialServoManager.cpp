@@ -8,18 +8,28 @@
 // It's pretty messy and also a bit unclean that the library creates a global object.
 // But it is the only way I found to use the library.
 // Otherwise it seems to crash in various places - I guess because of memory problems.
-SMS_STS _serialServo;
+static SMS_STS _serialServo_STS;
+static SCSCL _serialServo_SCS;
 
 /**
  * Set up the sts servos
  */
 void StSerialServoManager::setup()
 {
-#ifdef USE_STS_SERVO
+#if defined(USE_STS_SERVO) || defined(USE_SCS_SERVO)
     Serial1.begin(1000000, SERIAL_8N1, _gpioRxd, _gpioTxd);
-    _serialServo.pSerial = &Serial1;
+
+    if (this->_servoTypeIsScs)
+    {
+        _serialServo_SCS.pSerial = &Serial1;
+    }
+    else
+    {
+        _serialServo_STS.pSerial = &Serial1;
+    }
     delay(100);
 #endif
+
     scanIds();
 }
 
@@ -28,17 +38,17 @@ void StSerialServoManager::setup()
  */
 void StSerialServoManager::updateActuators()
 {
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return;
 #endif
 
     if (servoCriticalTemp == true || servoCriticalLoad == true)
         return;
 
-    for (int i = 0; i < this->stsServoValues->size(); i++)
+    for (int i = 0; i < this->servoValues->size(); i++)
     {
         // get a pointer to the current servo
-        ActuatorValue *servo = &this->stsServoValues->at(i);
+        ActuatorValue *servo = &this->servoValues->at(i);
         if (servo->targetValue == -1)
         {
             // turn servo off
@@ -54,15 +64,33 @@ void StSerialServoManager::updateActuators()
                 if (speed == -1 && acc == -1)
                 {
                     // use default values for speed and acc
-                    _serialServo.WritePosEx(servo->id, servo->targetValue, STS_SERVO_SPEED, STS_SERVO_ACC);
+                    if (this->_servoTypeIsScs)
+                    {
+                        _serialServo_SCS.WritePosEx(servo->id, servo->targetValue, SCS_SERVO_SPEED, SCS_SERVO_ACC);
+                    }
+                    else
+                    {
+                        _serialServo_STS.WritePosEx(servo->id, servo->targetValue, STS_SERVO_SPEED, STS_SERVO_ACC);
+                    }
                 }
                 else
                 {
-                    if (speed == -1)
-                        speed = STS_SERVO_SPEED;
-                    if (acc == -1)
-                        acc = STS_SERVO_ACC;
-                    _serialServo.WritePosEx(servo->id, servo->targetValue, speed, acc);
+                    if (this->_servoTypeIsScs)
+                    {
+                        if (speed == -1)
+                            speed = SCS_SERVO_SPEED;
+                        if (acc == -1)
+                            acc = SCS_SERVO_ACC;
+                        _serialServo_SCS.WritePosEx(servo->id, servo->targetValue, speed, acc);
+                    }
+                    else
+                    {
+                        if (speed == -1)
+                            speed = STS_SERVO_SPEED;
+                        if (acc == -1)
+                            acc = STS_SERVO_ACC;
+                        _serialServo_STS.WritePosEx(servo->id, servo->targetValue, speed, acc);
+                    }
                 }
                 servo->currentValue = servo->targetValue;
             }
@@ -75,16 +103,17 @@ void StSerialServoManager::updateActuators()
  */
 void StSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
 {
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return;
 #endif
-    for (int i = 0; i < stsServoValues->size(); i++)
+
+    for (int i = 0; i < servoValues->size(); i++)
     {
-        if (stsServoValues->at(i).id == id)
+        if (servoValues->at(i).id == id)
         {
-            stsServoValues->at(i).targetValue = position;
-            stsServoValues->at(i).speed = speed;
-            stsServoValues->at(i).acc = acc;
+            servoValues->at(i).targetValue = position;
+            servoValues->at(i).speed = speed;
+            servoValues->at(i).acc = acc;
         }
     }
 }
@@ -94,14 +123,14 @@ void StSerialServoManager::writePositionDetailed(int id, int position, int speed
  */
 void StSerialServoManager::writePosition(int id, int position)
 {
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return;
 #endif
-    for (int i = 0; i < stsServoValues->size(); i++)
+    for (int i = 0; i < servoValues->size(); i++)
     {
-        if (stsServoValues->at(i).id == id)
+        if (servoValues->at(i).id == id)
         {
-            stsServoValues->at(i).targetValue = position;
+            servoValues->at(i).targetValue = position;
         }
     }
 }
@@ -111,10 +140,17 @@ void StSerialServoManager::writePosition(int id, int position)
  */
 int StSerialServoManager::readPosition(u8 id)
 {
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return -1;
 #endif
-    return _serialServo.ReadPos(id);
+    if (this->_servoTypeIsScs)
+    {
+        return _serialServo_SCS.ReadPos(id);
+    }
+    else
+    {
+        return _serialServo_STS.ReadPos(id);
+    }
 }
 
 /**
@@ -122,10 +158,17 @@ int StSerialServoManager::readPosition(u8 id)
  */
 void StSerialServoManager::setTorque(u8 id, bool on)
 {
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return;
 #endif
-    _serialServo.EnableTorque(id, on ? 1 : 0);
+    if (this->_servoTypeIsScs)
+    {
+        _serialServo_SCS.EnableTorque(id, on ? 1 : 0);
+    }
+    else
+    {
+        _serialServo_STS.EnableTorque(id, on ? 1 : 0);
+    }
 }
 
 /**
@@ -133,21 +176,35 @@ void StSerialServoManager::setTorque(u8 id, bool on)
  */
 int StSerialServoManager::readLoad(int id)
 {
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return -1;
 #endif
-    return _serialServo.ReadLoad(id);
+    if (this->_servoTypeIsScs)
+    {
+        return _serialServo_SCS.ReadLoad(id);
+    }
+    else
+    {
+        return _serialServo_STS.ReadLoad(id);
+    }
 }
-
 /**
  * read the temperature of the servo in degree celsius
  */
 int StSerialServoManager::readTemperature(int id)
 {
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return -1;
 #endif
-    return _serialServo.ReadTemper(id);
+
+    if (this->_servoTypeIsScs)
+    {
+        return _serialServo_SCS.ReadTemper(id);
+    }
+    else
+    {
+        return _serialServo_STS.ReadTemper(id);
+    }
 }
 
 /**
@@ -155,7 +212,7 @@ int StSerialServoManager::readTemperature(int id)
  */
 bool StSerialServoManager::servoAvailable(int id)
 {
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return false;
 #endif
     for (int i = 0; i < servoIds->size(); i++)
@@ -185,16 +242,29 @@ void StSerialServoManager::scanIds()
 {
     servoIds = new std::vector<u8>();
 
-#ifndef USE_STS_SERVO
+#if !defined(USE_STS_SERVO) && !defined(USE_SCS_SERVO)
     return;
 #endif
-    for (int i = 1; i < MAX_STS_SERVO_ID_SCAN_RANGE; i++)
+
+    for (int i = 1; i < MAX_STS_SCS_SERVO_ID_SCAN_RANGE; i++)
     {
         int retries = 5;
         while (retries-- > 0)
         {
-            int id = _serialServo.Ping(i);
-            if (_serialServo.Error != 0)
+            int id = -1;
+            bool error = false;
+
+            if (this->_servoTypeIsScs)
+            {
+                id = _serialServo_SCS.Ping(i);
+                error = (_serialServo_SCS.Error != 0);
+            }
+            else
+            {
+                id = _serialServo_STS.Ping(i);
+                error = (_serialServo_STS.Error != 0);
+            }
+            if (error == true)
             {
                 delay(100);
             }

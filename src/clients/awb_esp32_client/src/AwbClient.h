@@ -29,12 +29,12 @@ protected:
     PacketSenderReceiver *_packetSenderReceiver; /// The packet sender receiver to communicate with the Animatronic Workbench Studio
     Pca9685PwmManager *_pca9685pwmManager;       /// The pwm manager to control the Pca9685 pwm board
     StSerialServoManager *_stSerialServoManager; /// The serial servo manager to control the sts serial servos
+    StSerialServoManager *_scSerialServoManager; /// The serial servo manager to control the scs serial servos
     NeoPixelStatusControl *_neoPixelStatus;      /// The neopixel status control
-
-    AutoPlayer *_autoPlayer;               /// The auto player to play timeline animations
-    int _lastAutoPlaySelectedStateId = -1; /// The last selected state id for autoplay timeline filter
-    String _lastAutoPlayTimelineName = ""; /// The last selected timeline name for autoplay timeline filter
-    WlanConnector *_wlanConnector;         /// The wlan connector to open a WLAN AP and display status information as a web page
+    AutoPlayer *_autoPlayer;                     /// The auto player to play timeline animations
+    int _lastAutoPlaySelectedStateId = -1;       /// The last selected state id for autoplay timeline filter
+    String _lastAutoPlayTimelineName = "";       /// The last selected timeline name for autoplay timeline filter
+    WlanConnector *_wlanConnector;               /// The wlan connector to open a WLAN AP and display status information as a web page
 
     ActualStatusInformation *_actualStatusInformation; /// The actual status information
 
@@ -52,6 +52,7 @@ protected:
      * Read the actuators statuses
      */
     void readActuatorsStatuses();
+    void readStsScsServoStatuses(StSerialServoManager *_serialServoManager, std::vector<ActuatorValue> *servoValues);
 
     /**
      * Show the actuator values (=mostly positions) on the display

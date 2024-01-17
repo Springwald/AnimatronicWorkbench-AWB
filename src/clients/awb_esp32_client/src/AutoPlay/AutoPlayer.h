@@ -22,6 +22,7 @@ protected:
     TCallBackErrorOccured _errorOccured; // the error occured callback
 
     StSerialServoManager *_stSerialServoManager; // the STS serial servo manager
+    StSerialServoManager *_scSerialServoManager; // the SCS serial servo manager
     Pca9685PwmManager *_pca9685PwmManager;       // the PCA9685 PWM manager
 
     AutoPlayData *_data; // the data exported by Animatronic Workbench Studio
@@ -36,8 +37,10 @@ protected:
     bool _stateSelectorAvailable = false; // is a state selector available?
     long _lastStateCheckMillis = -1;      // millis() of last state check
 
+    int calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints);
+
 public:
-    AutoPlayer(StSerialServoManager *stSerialServoManager, Pca9685PwmManager *pca9685PwmManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
+    AutoPlayer(StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
     {
         _lastMsUpdate = millis();
         _data = new AutoPlayData();

@@ -46,7 +46,7 @@ namespace Awb.Core.DataPackets
             {
                 foreach (var servoPacketData in clientDataPacket.Content.StsServos.Servos)
                 {
-                    var stsServo = servos.Select(s => s as StsServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId);
+                    var stsServo = servos.Select(s => s as StsScsServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId);
                     {
                         if (stsServo != null) stsServo.IsDirty = false;
                     }
@@ -70,7 +70,7 @@ namespace Awb.Core.DataPackets
 
             foreach (var servo in allServos)
             {
-                var stsServo = servo as StsServo;
+                var stsServo = servo as StsScsServo;
                 if (stsServo != null && stsServo.IsDirty)
                 {
                     stsServos.Add(new StsServoPacketData

@@ -15,5 +15,5 @@ insert_final_newline = false
 # C# files
 [*.cs]
 
-file_header_template =Animatronic WorkBench\r\nhttps://github.com/Springwald/AnimatronicWorkBench-AWB\r\n\r\n(C) 2023 Daniel Springwald  - 44789 Bochum, Germany\r\nhttps://daniel.springwald.de - daniel@springwald.de\r\nAll rights reserved   -  Licensed under MIT License
+file_header_template =Animatronic WorkBench\r\nhttps://github.com/Springwald/AnimatronicWorkBench-AWB\r\n\r\n(C) 2024 Daniel Springwald  - 44789 Bochum, Germany\r\nhttps://daniel.springwald.de - daniel@springwald.de\r\nAll rights reserved   -  Licensed under MIT License
 

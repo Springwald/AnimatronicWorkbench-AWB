@@ -13,12 +13,20 @@ namespace Awb.Core.Actuators
     /// <summary>
     /// A STS serial servo motor e.g. from the manufacturer "Wavewshare" or "Feebtech" 
     /// </summary>
-    public class StsServo : IServo
+    public class StsScsServo : IServo
     {
+        public enum StsScsTypes
+        {
+            Scs,
+            Sts
+        }
+
         /// <summary>
         /// The requested target value of this servo
         /// </summary>
         private int _targetValue;
+
+        public StsScsTypes StsScsType { get; }
 
         /// <summary>
         /// The unique id of this servo
@@ -76,12 +84,13 @@ namespace Awb.Core.Actuators
         /// </summary>
         public bool IsDirty { get; set; }
 
-        public string Label => $"[C{ClientId}-STS{Channel}] {Name ?? string.Empty}";
+        public string Label => $"[C{ClientId}-{StsScsType.ToString().ToUpper()}{Channel}] {Name ?? string.Empty}";
 
-        public StsServo(StsServoConfig config)
+        public StsScsServo(StsServoConfig config, StsScsTypes type)
         {
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
 
+            StsScsType = type;
             Id = config.Id;
             ClientId = config.ClientId;
             Channel = config.Channel;

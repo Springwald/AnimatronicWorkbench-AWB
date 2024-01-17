@@ -17,24 +17,10 @@ namespace Awb.Core.Project
         {
             get
             {
-                if (_project.StsServos != null)
-                    foreach (var servo in _project.StsServos)
-                    {
-                        if (servo != null)
-                        {
-                            if (servo.MaxValue == servo.MinValue)
-                                yield return $"MaxValue and MinValue of servo [{servo.Id}] {servo.Name} are equal!";
-                            if (servo.MaxValue < servo.MinValue)
-                                yield return $"MaxValue < MinValue at servo [{servo.Id}] {servo.Name}!";
-                            if (servo.DefaultValue != null)
-                            {
-                                if (servo.DefaultValue < servo.MinValue)
-                                    yield return $"DefaultValue < MinValue at servo [{servo.Id}] {servo.Name}!";
-                                if (servo.DefaultValue > servo.MaxValue)
-                                    yield return $"DefaultValue > MaxValue at servo [{servo.Id}] {servo.Name}!";
-                            }
-                        }
-                    }
+                if (_project.StsServos != null) foreach(var problem in StsScsServoProblems(_project.StsServos)) yield return problem;
+                if (_project.ScsServos != null) foreach (var problem in StsScsServoProblems(_project.ScsServos)) yield return problem;
+                //todo: check the pwm servo values
+                //todo: check double servo ids
                 yield break;
             }
         }
@@ -43,5 +29,27 @@ namespace Awb.Core.Project
         {
             _project = awbProject;
         }
+
+        private IEnumerable<string> StsScsServoProblems(StsServoConfig[] stsServoConfigs)
+        {
+            foreach (var servo in stsServoConfigs)
+            {
+                if (servo != null)
+                {
+                    if (servo.MaxValue == servo.MinValue)
+                        yield return $"MaxValue and MinValue of servo [{servo.Id}] {servo.Name} are equal!";
+                    if (servo.MaxValue < servo.MinValue)
+                        yield return $"MaxValue < MinValue at servo [{servo.Id}] {servo.Name}!";
+                    if (servo.DefaultValue != null)
+                    {
+                        if (servo.DefaultValue < servo.MinValue)
+                            yield return $"DefaultValue < MinValue at servo [{servo.Id}] {servo.Name}!";
+                        if (servo.DefaultValue > servo.MaxValue)
+                            yield return $"DefaultValue > MaxValue at servo [{servo.Id}] {servo.Name}!";
+                    }
+                }
+            }
+        }
+
     }
 }

@@ -21,6 +21,7 @@ public:
     int autoPlayerStateSelectorStsServoChannel; /// the channel of the sts servo for the hardware auto player timeline filter state selector
 
     std::vector<ActuatorValue> *stsServoValues; /// the current sts servo status
+    std::vector<ActuatorValue> *scsServoValues; /// the current scs servo status
     std::vector<ActuatorValue> *pwmServoValues; /// the current pwm servo status
 
     ActualStatusInformation()

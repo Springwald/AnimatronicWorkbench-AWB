@@ -9,17 +9,18 @@
 class StSerialServoManager
 {
 
-#define MAX_STS_SERVO_ID_SCAN_RANGE 20
+#define MAX_STS_SCS_SERVO_ID_SCAN_RANGE 20
 
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:
-    std::vector<ActuatorValue> *stsServoValues; /// The sts servo values
-    TCallBackErrorOccured _errorOccured;        /// callback functio to call if an error occured
-    int _speed;                                 /// the speed to use for the sts servos
-    int _acc;                                   /// the acceleration to use for the sts servos
-    int _gpioRxd;                               /// the gpio pin for the rxd communication to the sts servos
-    int _gpioTxd;                               /// the gpio pin for the txd communication to the sts servos
+    std::vector<ActuatorValue> *servoValues; /// The sts / scs servo values
+    TCallBackErrorOccured _errorOccured;     /// callback functio to call if an error occured
+    int _speed;                              /// the speed to use for the sts servos
+    int _acc;                                /// the acceleration to use for the sts servos
+    int _gpioRxd;                            /// the gpio pin for the rxd communication to the sts / scs servos
+    int _gpioTxd;                            /// the gpio pin for the txd communication to the sts / scsservos
+    bool _servoTypeIsScs;                    /// is the servo type SCS or STS?
 
     /**
      * Scan for Ids and store in "servoIds"
@@ -42,7 +43,7 @@ public:
      */
     std::vector<u8> *servoIds;
 
-    StSerialServoManager(std::vector<ActuatorValue> *stsServoValues, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd, int speed, int acc) : _errorOccured(errorOccured), _speed(speed), _acc(acc), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), stsServoValues(stsServoValues){};
+    StSerialServoManager(std::vector<ActuatorValue> *stsServoValues, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd, int speed, int acc) : _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _speed(speed), _acc(acc), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), servoValues(stsServoValues){};
 
     /**
      * Set up the sts servos

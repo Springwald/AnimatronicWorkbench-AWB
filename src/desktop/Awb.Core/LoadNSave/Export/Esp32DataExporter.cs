@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Configs;
 using System.Text;
 
 namespace Awb.Core.LoadNSave.Export
@@ -77,17 +78,10 @@ namespace Awb.Core.LoadNSave.Export
             result.AppendLine();
 
             // export the sts servo informations
-            var stsServos = exportData.StsServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.StsServoConfig>();
-            var stsServoChannels = stsServos.Select(s => s.Channel).ToArray() ;
-            var stsServoAccelerations = stsServos.Select(s => s.Acceleration  ?? -1).ToArray();
-            var stsServoSpeeds = stsServos.Select(s => s.Speed ?? -1).ToArray();
-            var stsServoNames = stsServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
-            result.AppendLine($"\tint stsServoCount = {stsServos.Length};");
-            result.AppendLine($"\tint stsServoChannels[{stsServos.Length}] = {{{string.Join(", ", stsServoChannels.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tint stsServoAccelleration[{stsServos.Length}] = {{{string.Join(", ", stsServoAccelerations.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tint stsServoSpeed[{stsServos.Length}] = {{{string.Join(", ", stsServoSpeeds.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tString stsServoName[{stsServos.Length}] = {{{string.Join(", ", stsServoNames.Select(s => $"\"{s}\""))}}};");
-            result.AppendLine();
+            ExportScsStsServoInformations( servoConfigs: exportData.StsServoConfigs, praefix: "sts", result: result);
+
+            // export the scs servo informations
+            ExportScsStsServoInformations(servoConfigs: exportData.ScsServoConfigs, praefix: "scs", result: result);
 
             // export the pca9685 pwm servo informations
             var pca9685PwmServos = exportData.Pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.Pca9685PwmServoConfig>();
@@ -126,6 +120,7 @@ namespace Awb.Core.LoadNSave.Export
                 }
 
                 result.AppendLine($"\t\tauto *stsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
+                result.AppendLine($"\t\tauto *scsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
                 result.AppendLine($"\t\tauto *pca9685PwmServoPoints{timelineNo} = new std::vector<Pca9685PwmServoPoint>();");
 
                 // Export Servo-Points
@@ -137,6 +132,15 @@ namespace Awb.Core.LoadNSave.Export
                     {
                         var value = (int)(stsServo.MinValue + servoPoint.ValuePercent * (stsServo.MaxValue - stsServo.MinValue) / 100.0);
                         result.AppendLine($"\t\tstsServoPoints{timelineNo}->push_back(StsServoPoint({stsServo.Channel},{servoPoint.TimeMs},{value}));");
+                        continue;
+                    }
+
+                    // find SCS servo
+                    var scsServo = exportData.ScsServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
+                    if (scsServo != null)
+                    {
+                        var value = (int)(scsServo.MinValue + servoPoint.ValuePercent * (scsServo.MaxValue - scsServo.MinValue) / 100.0);
+                        result.AppendLine($"\t\tscsServoPoints{timelineNo}->push_back(StsServoPoint({scsServo.Channel},{servoPoint.TimeMs},{value}));");
                         continue;
                     }
 
@@ -160,7 +164,7 @@ namespace Awb.Core.LoadNSave.Export
                 }
 
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineState({state.Id}, String(\"{state.Name}\"));");
-                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo});");
+                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 
                 result.AppendLine();
@@ -174,6 +178,21 @@ namespace Awb.Core.LoadNSave.Export
                 Ok = true,
                 Code = result.ToString()
             };
+        }
+
+        private static void ExportScsStsServoInformations(StsServoConfig[]? servoConfigs, string praefix, StringBuilder result)
+        {
+            var stsServos = servoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.StsServoConfig>();
+            var chanels = stsServos.Select(s => s.Channel).ToArray();
+            var accelerations = stsServos.Select(s => s.Acceleration ?? -1).ToArray();
+            var speeds = stsServos.Select(s => s.Speed ?? -1).ToArray();
+            var names = stsServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
+            result.AppendLine($"\tint {praefix}ServoCount = {stsServos.Length};");
+            result.AppendLine($"\tint {praefix}ServoChannels[{stsServos.Length}] = {{{string.Join(", ", chanels.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint {praefix}ServoAcceleration[{stsServos.Length}] = {{{string.Join(", ", accelerations.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint {praefix}ServoSpeed[{stsServos.Length}] = {{{string.Join(", ", speeds.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tString {praefix}ServoName[{stsServos.Length}] = {{{string.Join(", ", names.Select(s => $"\"{s}\""))}}};");
+            result.AppendLine();
         }
     }
 }

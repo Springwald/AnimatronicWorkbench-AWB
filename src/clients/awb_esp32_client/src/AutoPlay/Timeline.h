@@ -19,11 +19,12 @@ public:
     String name;                                         /// the name of the timeline
     TimelineState *state;                                /// the state of the timeline
     std::vector<StsServoPoint> *stsServoPoints;          /// the sts servo points of the timeline
+    std::vector<StsServoPoint> *scsServoPoints;          /// the scs servo points of the timeline
     std::vector<Pca9685PwmServoPoint> *pca9685PwmPoints; /// the Pca9685 Pwm servo points of the timeline
     int durationMs;                                      /// the duration of the timeline in milliseconds
 
 public:
-    Timeline(TimelineState *state, String name, std::vector<StsServoPoint> *p_stsPoints, std::vector<Pca9685PwmServoPoint> *p_pca9685PwmPoints) : stsServoPoints(p_stsPoints), pca9685PwmPoints(p_pca9685PwmPoints), name(name), state(state)
+    Timeline(TimelineState *state, String name, std::vector<StsServoPoint> *p_stsPoints, std::vector<StsServoPoint> *p_scsPoints, std::vector<Pca9685PwmServoPoint> *p_pca9685PwmPoints) : stsServoPoints(p_stsPoints), scsServoPoints(p_scsPoints), pca9685PwmPoints(p_pca9685PwmPoints), name(name), state(state)
     {
         durationMs = 0;
 

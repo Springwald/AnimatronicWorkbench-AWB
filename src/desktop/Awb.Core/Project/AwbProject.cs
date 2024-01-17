@@ -21,6 +21,7 @@ namespace Awb.Core.Configs
         public Pca9685PwmServoConfig[]? Pca9685PwmServos { get; set; }
 
         public StsServoConfig[]? StsServos { get; set; }
+        public StsServoConfig[]? ScsServos { get; set; }
 
         public Mp3PlayerYX5300Config? Mp3PlayerYX5300 { get; set; } 
 

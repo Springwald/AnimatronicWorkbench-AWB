@@ -358,7 +358,7 @@ namespace AwbStudio
             };
 
 
-            var stsServos = _actuatorsService.Servos.Select(s => s as StsServo).Where(s => s != null);
+            var stsServos = _actuatorsService.Servos.Select(s => s as StsScsServo).Where(s => s != null);
             foreach (var stsServo in stsServos)
             {
                 var valuePercent = 100d * (stsServo.DefaultValue - stsServo.MinValue) / (stsServo.MaxValue - stsServo.MinValue);
@@ -563,6 +563,7 @@ namespace AwbStudio
                 ProjectName = _project.Title,
                 TimelineStates = _project.TimelinesStates,
                 StsServoConfigs = _project.StsServos,
+                ScsServoConfigs = _project.ScsServos,
                 Pca9685PwmServoConfigs = _project.Pca9685PwmServos,
                 TimelineData = timelines.ToArray()
             };

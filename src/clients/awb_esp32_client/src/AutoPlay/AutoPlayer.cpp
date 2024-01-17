@@ -107,63 +107,42 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     {
         u8 servoChannel = _data->stsServoChannels[servoIndex];
         int servoSpeed = _data->stsServoSpeed[servoIndex];
-        int servoAccelleration = _data->stsServoAccelleration[servoIndex];
+        int servoAccelleration = _data->stsServoAcceleration[servoIndex];
 
-        StsServoPoint *point1 = nullptr;
-        StsServoPoint *point2 = nullptr;
-
-        for (int iPoint = 0; iPoint < actualTimelineData.stsServoPoints->size(); iPoint++)
-        {
-            StsServoPoint *point = &actualTimelineData.stsServoPoints->at(iPoint);
-            if (point->channel == servoChannel)
-            {
-                if (point->ms <= _playPosInActualTimeline)
-                    point1 = point;
-
-                if (point->ms >= _playPosInActualTimeline)
-                {
-                    point2 = point;
-                    break;
-                }
-            }
-        }
-
-        if (point1 == nullptr && point2 == nullptr)
-            continue; // no points found for this object before or after the actual position
-
-        if (point1 == nullptr)
-        {
-            // no point before the actual position found, so we take the first point after the actual position
-            point1 = point2;
-        }
-        else if (point2 == nullptr)
-        {
-            // no point after the actual position found, so we take the last point before the actual position
-            point2 = point1;
-        }
-
-        int pointDistanceMs = point2->ms - point1->ms;
-        int targetValue = 0;
-        if (pointDistanceMs == 0)
-        {
-            targetValue = point1->value;
-        }
-        else
-        {
-            double posBetweenPoints = (_playPosInActualTimeline - point1->ms * 1.0) / pointDistanceMs;
-            targetValue = point1->value + (point2->value - point1->value) * posBetweenPoints;
-        }
-
+        int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.stsServoPoints);
+        if (targetValue == -1)
+            continue;
         if (_stSerialServoManager->servoAvailable(servoChannel))
         {
             _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
         else
         {
-            _errorOccured("Servo channel " + String(servoChannel) + " not attached!");
+            _errorOccured("STS Servo channel " + String(servoChannel) + " not attached!");
         }
     }
     _stSerialServoManager->updateActuators();
+
+    // Play SCS Servos
+    for (int servoIndex = 0; servoIndex < _data->scsServoCount; servoIndex++)
+    {
+        u8 servoChannel = _data->scsServoChannels[servoIndex];
+        int servoSpeed = _data->scsServoSpeed[servoIndex];
+        int servoAccelleration = _data->scsServoAcceleration[servoIndex];
+
+        int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.scsServoPoints);
+        if (targetValue == -1)
+            continue;
+        if (_scSerialServoManager->servoAvailable(servoChannel))
+        {
+            _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
+        }
+        else
+        {
+            _errorOccured("SCS Servo channel " + String(servoChannel) + " not attached!");
+        }
+    }
+    _scSerialServoManager->updateActuators();
 
     // Play PWM Servos
     for (int servoIndex = 0; servoIndex < _data->pca9685PwmServoCount; servoIndex++)
@@ -220,6 +199,56 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
         _pca9685PwmManager->setTargetValue(servoChannel, targetValue, servoName);
     }
     _pca9685PwmManager->updateActuators();
+}
+
+int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints)
+{
+    StsServoPoint *point1 = nullptr;
+    StsServoPoint *point2 = nullptr;
+
+    for (int iPoint = 0; iPoint < servoPoints->size(); iPoint++)
+    {
+        StsServoPoint *point = &servoPoints->at(iPoint);
+        if (point->channel == servoChannel)
+        {
+            if (point->ms <= _playPosInActualTimeline)
+                point1 = point;
+
+            if (point->ms >= _playPosInActualTimeline)
+            {
+                point2 = point;
+                break;
+            }
+        }
+    }
+
+    if (point1 == nullptr && point2 == nullptr)
+        return -1; // no points found for this object before or after the actual position
+
+    if (point1 == nullptr)
+    {
+        // no point before the actual position found, so we take the first point after the actual position
+        point1 = point2;
+    }
+    else if (point2 == nullptr)
+    {
+        // no point after the actual position found, so we take the last point before the actual position
+        point2 = point1;
+    }
+
+    int pointDistanceMs = point2->ms - point1->ms;
+    int targetValue = 0;
+    if (pointDistanceMs == 0)
+    {
+        targetValue = point1->value;
+    }
+    else
+    {
+        double posBetweenPoints = (_playPosInActualTimeline - point1->ms * 1.0) / pointDistanceMs;
+        targetValue = point1->value + (point2->value - point1->value) * posBetweenPoints;
+    }
+
+    return targetValue;
 }
 
 /**
