@@ -18,7 +18,7 @@
                                       // If it does not display correctly, try the following values of the
 
 /* Neopixel status LEDs */
-// #define USE_NEOPIXEL_STATUS_CONTROL
+#define USE_NEOPIXEL_STATUS_CONTROL
 #define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.
 #define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO
 

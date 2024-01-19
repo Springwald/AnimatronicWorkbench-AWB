@@ -4,7 +4,7 @@ root = true
 # C# files
 [*.cs]
 
-file_header_template =Communicate between different devices on dotnet or arduino via COM port or Wifi\r\nhttps://github.com/Springwald/PacketLogistics\r\n\r\n(C) 2023 Daniel Springwald, Bochum Germany\r\nSpringwald Software  -   www.springwald.de\r\ndaniel@springwald.de -  +49 234 298 788 46\r\nAll rights reserved\r\nLicensed under MIT License
+file_header_template =Communicate between different devices on dotnet or arduino via COM port or Wifi\r\nhttps://github.com/Springwald/PacketLogistics\r\n\r\n(C) 2024 Daniel Springwald, Bochum Germany\r\nSpringwald Software  -   www.springwald.de\r\ndaniel@springwald.de -  +49 234 298 788 46\r\nAll rights reserved\r\nLicensed under MIT License
 
 #### Core EditorConfig Options ####
 

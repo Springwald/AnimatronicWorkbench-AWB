@@ -128,6 +128,21 @@ String WlanConnector::GetHtml()
             ptr += "<tr><td>STS " + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
         }
 
+        for (int i = 0; i < this->_actualStatusInformation->scsServoValues->size(); i++)
+        {
+            auto servo = this->_actualStatusInformation->scsServoValues->at(i);
+            auto name = servo.name;
+            for (int a = 0; a < _data->stsServoCount; a++)
+            {
+                if (_data->scsServoChannels[a] == servo.id)
+                {
+                    name = _data->scsServoName[a];
+                    break;
+                }
+            }
+            ptr += "<tr><td>SCS " + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
+        }
+
         for (int i = 0; i < this->_actualStatusInformation->pwmServoValues->size(); i++)
         {
             auto servo = this->_actualStatusInformation->pwmServoValues->at(i);
