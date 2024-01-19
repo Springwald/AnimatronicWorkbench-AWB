@@ -16,7 +16,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 19.01.2024 16:14:30
+// Created on 19.01.2024 16:23:27
 
 class AutoPlayData
 {
@@ -70,11 +70,11 @@ public:
 		scsServoPoints1->push_back(StsServoPoint(1,4000,484));
 		scsServoPoints1->push_back(StsServoPoint(2,4000,525));
 		scsServoPoints1->push_back(StsServoPoint(3,4000,617));
-		scsServoPoints1->push_back(StsServoPoint(2,5000,616));
-		scsServoPoints1->push_back(StsServoPoint(1,5000,355));
-		scsServoPoints1->push_back(StsServoPoint(1,6000,355));
-		scsServoPoints1->push_back(StsServoPoint(2,6000,616));
-		scsServoPoints1->push_back(StsServoPoint(3,6000,617));
+		scsServoPoints1->push_back(StsServoPoint(2,5000,671));
+		scsServoPoints1->push_back(StsServoPoint(1,5000,235));
+		scsServoPoints1->push_back(StsServoPoint(1,6000,235));
+		scsServoPoints1->push_back(StsServoPoint(2,6000,671));
+		scsServoPoints1->push_back(StsServoPoint(3,6000,615));
 		scsServoPoints1->push_back(StsServoPoint(2,7000,523));
 		scsServoPoints1->push_back(StsServoPoint(1,7000,484));
 		scsServoPoints1->push_back(StsServoPoint(3,7000,617));

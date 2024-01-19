@@ -36,6 +36,14 @@ public:
                 durationMs = stsServoPoints->at(i).ms;
         }
 
+        // calculate highest duration for scs servo points
+        for (int i = 0; i < scsServoPoints->size(); i++)
+        {
+            // get the ms value of the point
+            if (scsServoPoints->at(i).ms > durationMs)
+                durationMs = scsServoPoints->at(i).ms;
+        }
+
         // calculate highest duration for Pca9685 Pwm servo points
         for (int i = 0; i < pca9685PwmPoints->size(); i++)
         {
