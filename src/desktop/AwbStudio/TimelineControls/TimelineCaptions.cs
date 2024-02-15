@@ -1,11 +1,11 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
+using Awb.Core.Actuators;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
@@ -25,6 +25,9 @@ namespace AwbStudio.TimelineControls
             new SolidColorBrush(Colors.Pink),
             new SolidColorBrush(Colors.Yellow),
         };
+
+        private Brush _brushBlack = new SolidColorBrush(Colors.Black);
+
         private int _brushIndex = 0;
 
         private List<TimelineCaption> _captions = new List<TimelineCaption>();
@@ -35,33 +38,43 @@ namespace AwbStudio.TimelineControls
         {
         }
 
-        public void AddServo(string servoId, string label)
+        public void AddAktuator(IActuator aktuator, string label)
         {
-            var id = GetIdForServo(servoId);
+            //var id = GetIdForAktuator(aktuator);
             AddCaption(new TimelineCaption
             {
-                Id = id,
+                Id = aktuator.Id,
                 Label = label
+            },
+            inverse: aktuator switch
+            {
+                ISoundPlayer soundPlayer => true,
+                IServo servo => false,
+                _ => false
             });
         }
 
-        public TimelineCaption? GetServoCaption(string servoId) 
+        public TimelineCaption? GetAktuatorCaption(string aktuatorId)
         {
-            var id = GetIdForServo(servoId);
-            return _captions.FirstOrDefault(c => c.Id ==id);
+            return _captions.FirstOrDefault(c => c.Id == aktuatorId);
         }
 
-
-        public void AddCaption(TimelineCaption caption)
+        public void AddCaption(TimelineCaption caption, bool inverse)
         {
-            caption.Color = _brushes[_brushIndex++];
+            if (inverse)
+            {
+                caption.BackgroundColor = _brushes[_brushIndex++];
+                caption.ForegroundColor = _brushBlack;
+            }
+            else
+            {
+                caption.BackgroundColor = null;
+                caption.ForegroundColor = _brushes[_brushIndex++];
+            }
             if (_brushIndex >= _brushes.Length) _brushIndex = 0; // start with first color again
             _captions.Add(caption);
         }
 
-        private static string GetIdForServo(string servoId) => "Servo-" + servoId;
-
-        
     }
 
 }

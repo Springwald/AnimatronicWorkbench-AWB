@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -18,10 +18,16 @@ using System.Windows.Shapes;
 namespace AwbStudio.TimelineControls
 {
     /// <summary>
-    /// Interaction logic for ServoValueViewerControl.xaml
+    /// Interaction logic for SoundValueViewerControl.xaml
     /// </summary>
-    public partial class ServoValueViewerControl : UserControl
+    public partial class SoundValueViewerControl : UserControl
     {
+        public SoundValueViewerControl()
+        {
+            InitializeComponent();
+            Loaded += SoundValueViewerControl_Loaded;
+        }
+
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private const double _paintMarginTopBottom = 30;
 
@@ -39,7 +45,7 @@ namespace AwbStudio.TimelineControls
             set
             {
                 _timelineData = value;
-                PaintServoValues();
+                PaintSoundValues();
             }
         }
 
@@ -73,29 +79,24 @@ namespace AwbStudio.TimelineControls
             get => _viewPos;
         }
 
-        public ServoValueViewerControl()
-        {
-            InitializeComponent();
-            Loaded += ServoValueViewerControl_Loaded;
-        }
 
-        private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
+        private void SoundValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
             DrawOpticalGrid();
-            SizeChanged += ServoValueViewerControl_SizeChanged;
+            SizeChanged += SoundValueViewerControl_SizeChanged;
         }
 
-        private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void SoundValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             DrawOpticalGrid();
         }
 
         private void OnViewPosChanged(object? sender, EventArgs e)
         {
-            MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
+            MyInvoker.Invoke(new Action(() => this.PaintSoundValues()));
         }
 
-        public void PaintServoValues()
+        public void PaintSoundValues()
         {
             PanelLines.Children.Clear();
             GridDots.Children.Clear();
@@ -106,21 +107,21 @@ namespace AwbStudio.TimelineControls
             double height = this.ActualHeight;
             double width = this.ActualWidth;
 
-            if (height < 100 || width < 100) return;
-
-            var servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Distinct().ToArray() ?? Array.Empty<string>();
+            var soundPlayerIds = _timelineData?.SoundPoints?.OfType<SoundPoint>().Select(p => p.SoundPlayerId).Distinct().ToArray() ?? Array.Empty<string>();
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 
             // Update the content points and lines
             // ToDo: cache and only update on changes; or: use model binding and auto update
 
-            foreach (var servoId in servoIds)
+            double y = 0;
+
+            foreach (var soundPlayerId in soundPlayerIds)
             {
-                var caption = _timelineCaptions?.GetAktuatorCaption(servoId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
+                var caption = _timelineCaptions?.GetAktuatorCaption(soundPlayerId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
 
                 // Add polylines with points
-                var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == servoId).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
+                var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == soundPlayerId).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
 
                 // add dots
                 const int dotRadius = 3;
@@ -143,7 +144,7 @@ namespace AwbStudio.TimelineControls
                 }
 
                 var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = _viewPos.GetXPos((int)(p.TimeMs), controlWidth: width, timelineData: _timelineData), Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
-                var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
+                var line = new Polyline { Tag = SoundPlayerTag(soundPlayerId), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
                 this.PanelLines.Children.Add(line);
             }
         }
@@ -166,7 +167,7 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        private static string ServoTag(string servoId) => $"Servo {servoId}";
+        private static string SoundPlayerTag(string soundPlayerId) => $"SoundPlayer {soundPlayerId}";
 
         private void CalculateCaptions()
         {
@@ -176,19 +177,15 @@ namespace AwbStudio.TimelineControls
 
             // Add servos
             int no = 1;
-            foreach (var servo in _actuatorsService.Servos)
+            foreach (var soundPlayer in _actuatorsService.SoundPlayers)
             {
-                _timelineCaptions.AddAktuator(servo, $"({no++}) {servo.Label}");
+                _timelineCaptions.AddAktuator(soundPlayer, $"({no++}) {soundPlayer.Label}");
             }
 
             LineNames.Children.Clear();
             foreach (var caption in _timelineCaptions.Captions)
             {
-                LineNames.Children.Add(
-                    new Label { 
-                        Content = caption.Label, Foreground = caption.ForegroundColor, Background = caption.BackgroundColor , Opacity= 0.7
-                    }
-                );
+                LineNames.Children.Add(new Label { Content = caption.Label, Foreground = caption.ForegroundColor, Background = caption.BackgroundColor, Opacity = 0.7  });
             }
         }
 

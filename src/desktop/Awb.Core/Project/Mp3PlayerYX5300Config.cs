@@ -19,12 +19,12 @@ namespace Awb.Core.Project
         /// <summary>
         /// the RX pin of the serial connection to the YX5300 MP3 player
         /// </summary>
-        public uint RxPin { get; } = 15;
+        public uint RxPin { get; } = 13;
 
         /// <summary>
         /// the TX pin of the serial connection to the YX5300 MP3 player
         /// </summary>
-        public uint TxPin { get; } = 17;
+        public uint TxPin { get; } = 14;
 
         public Mp3PlayerYX5300Config(uint rxPin, uint txPin, string soundPlayerId)
         {

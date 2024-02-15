@@ -6,6 +6,7 @@
 #include "Adafruit_PWMServoDriver.h"
 #include "Actuators/StSerialServoManager.h"
 #include "Actuators/Pca9685PwmManager.h"
+#include "Actuators/Mp3PlayerYX5300Manager.h"
 #include "Actuators/ActuatorValue.h"
 #include "PacketSenderReceiver.h"
 #include "DacSpeaker.h"
@@ -30,6 +31,7 @@ protected:
     Pca9685PwmManager *_pca9685pwmManager;       /// The pwm manager to control the Pca9685 pwm board
     StSerialServoManager *_stSerialServoManager; /// The serial servo manager to control the sts serial servos
     StSerialServoManager *_scSerialServoManager; /// The serial servo manager to control the scs serial servos
+    Mp3PlayerYX5300Manager *_mp3Player;          /// The mp3 player to play sounds
     NeoPixelStatusControl *_neoPixelStatus;      /// The neopixel status control
     AutoPlayer *_autoPlayer;                     /// The auto player to play timeline animations
     int _lastAutoPlaySelectedStateId = -1;       /// The last selected state id for autoplay timeline filter

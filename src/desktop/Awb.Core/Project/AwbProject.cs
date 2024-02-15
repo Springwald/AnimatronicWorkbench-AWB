@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -23,7 +23,7 @@ namespace Awb.Core.Configs
         public StsServoConfig[]? StsServos { get; set; }
         public StsServoConfig[]? ScsServos { get; set; }
 
-        public Mp3PlayerYX5300Config? Mp3PlayerYX5300 { get; set; } 
+        public Mp3PlayerYX5300Config? Mp3PlayerYX5300 { get; set; }
 
         public TimelineState[]? TimelinesStates { get; set; }
 
@@ -38,6 +38,6 @@ namespace Awb.Core.Configs
             Sounds = new SoundManager(Path.Combine(projectFolder, "audio")).Sounds;
         }
 
-        
+
     }
 }

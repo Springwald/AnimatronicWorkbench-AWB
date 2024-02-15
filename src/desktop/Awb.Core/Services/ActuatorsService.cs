@@ -14,7 +14,7 @@ namespace Awb.Core.Services
     {
         IServo[] Servos { get; }
 
-        ISoundPlayer SoundPlayer { get; }
+        ISoundPlayer[] SoundPlayers { get; }
 
          string[] AllIds { get; }
         IActuator[] AllActuators { get; }
@@ -28,7 +28,7 @@ namespace Awb.Core.Services
 
         public IActuator[] AllActuators { get; }
 
-        public ISoundPlayer SoundPlayer { get; }
+        public ISoundPlayer[] SoundPlayers { get; }
 
         public ActuatorsService(AwbProject config, IAwbClientsService awbClientsService, IAwbLogger logger)
         {
@@ -79,13 +79,17 @@ namespace Awb.Core.Services
             // add sound player
             if (config.Mp3PlayerYX5300 != null) 
             {
-                SoundPlayer = new Mp3PlayerYX5300(config.Mp3PlayerYX5300);
+                // actual is only one sound player supported
+                SoundPlayers = new[] { new Mp3PlayerYX5300(config.Mp3PlayerYX5300) };
             }
-
+            else
+            {
+                SoundPlayers = Array.Empty<ISoundPlayer>();
+            }
             
             var allActuators = new List<IActuator>();
             allActuators.AddRange(servos);    
-            if (SoundPlayer != null) allActuators.Add(SoundPlayer);
+            allActuators.AddRange(SoundPlayers);
             AllActuators = allActuators.ToArray();
 
             // check for duplicate Ids

@@ -29,7 +29,7 @@
 #define STS_SERVO_RXD 18             // eg. GPIO 18 for waveshare servo driver
 #define STS_SERVO_TXD 19             // eg. GPIO 19 for waveshare servo driver
 #define STS_SERVO_MAX_TEMPERATURE 45 // max temperature (celsius) before servo is disabled
-#define STS_SERVO_MAX_LOAD 250       // max load before servo is disabled
+#define STS_SERVO_MAX_LOAD 300       // max load before servo is disabled
 
 /* autoplay state selector */
 // if a servo position feedback is used as a state selector, define the servo channel here.
@@ -45,13 +45,18 @@
 #define SCS_SERVO_RXD 18             // eg. GPIO 18 for waveshare servo driver
 #define SCS_SERVO_TXD 19             // eg. GPIO 19 for waveshare servo driver
 #define SCS_SERVO_MAX_TEMPERATURE 45 // max temperature (celsius) before servo is disabled
-#define SCS_SERVO_MAX_LOAD 250       // max load before servo is disabled
+#define SCS_SERVO_MAX_LOAD 400       // max load before servo is disabled
 
 /* PCA9685 PWM servo settings */
 // #define USE_PCA9685_PWM_SERVO    // uncomment this line if you want to use PCA9685 PWM servos
 #define PCA9685_I2C_ADDRESS 0x40
 #define PCA9685_SPEED 1500
 #define PCA9685_ACC 10
+
+/* MP3-Player YX5300 */
+#define USE_MP3_PLAYER_YX5300
+#define MP3_PLAYER_YX5300_RXD 13
+#define MP3_PLAYER_YX5300_TXD 14
 
 /* DAC speaker */
 // #define USE_DAC_SPEAKER

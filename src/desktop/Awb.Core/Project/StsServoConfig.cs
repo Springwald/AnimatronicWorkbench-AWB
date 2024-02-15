@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -19,6 +19,7 @@ namespace Awb.Core.Configs
         public int? DefaultValue { get; set; }
         public int? Acceleration { get; set; }
         public int? Speed { get; set; }
+        public int? PauseSwitchId { get; set; }
 
         public StsServoConfig(string id, uint clientId, uint channel)
         {

@@ -25,7 +25,7 @@ namespace Awb.Core.Timelines
         public string? Description { get; set; }
 
         /// <summary>
-        /// The id of the servo or display or other actuaators
+        /// The id of the servo or display or other actuators
         /// </summary>
         public string TargetObjectId { get; set; }
 

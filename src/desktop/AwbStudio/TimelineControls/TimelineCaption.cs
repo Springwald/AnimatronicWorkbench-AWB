@@ -12,7 +12,8 @@ namespace AwbStudio.TimelineControls
     internal class TimelineCaption
     {
         public string Label { get; set; }
-        public Brush Color { get; set; }
+        public Brush ForegroundColor { get; set; }
+        public Brush? BackgroundColor { get; set; }
         public string Id { get; set; }
     }
 }

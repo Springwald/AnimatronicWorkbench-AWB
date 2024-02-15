@@ -184,6 +184,7 @@ namespace AwbStudio.TimelineControls
             }
 
             ServoValueViewer.PaintServoValues();
+            SoundValueViewer.PaintSoundValues();
 
             // update the play position
             PaintPlayPos(_timelineData);
