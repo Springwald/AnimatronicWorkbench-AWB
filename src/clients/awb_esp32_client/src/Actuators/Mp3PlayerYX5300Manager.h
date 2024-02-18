@@ -18,6 +18,8 @@ class Mp3PlayerYX5300Manager
 private:
     TCallBackErrorOccured _errorOccured;
     TCallBackMessageToShow _messageToShow;
+    SoftwareSerial _mp3Stream; // MP3 player serial stream for comms
+    MD_YX5300 _mp3;
 
     // MP3Stream Serial3;
     //  MP3Stream Serial3(13, 14);
@@ -28,15 +30,11 @@ private:
 
 public:
     // the constructor
-    Mp3PlayerYX5300Manager(int rxPin, int txPin, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow) : _errorOccured(errorOccured), _messageToShow(messageToShow)
+    Mp3PlayerYX5300Manager(int rxPin, int txPin, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow) : _errorOccured(errorOccured), _messageToShow(messageToShow), _mp3Stream(rxPin, txPin), _mp3(MD_YX5300(_mp3Stream))
     {
-        // open md-yx5300 with Serial3
-        //_mp3 = new MD_YX5300(Serial2);
-        // _mp3Stream = SoftwareSerial(rxPin, txPin);
-        // _mp3 = MD_YX5300(_mp3Stream);
-
-        // _mp3Stream.begin(MD_YX5300::SERIAL_BPS);
-        // _mp3.begin();
+        _mp3Stream.begin(MD_YX5300::SERIAL_BPS);
+        _mp3.begin();
+        _mp3.check(); // run the mp3 receiver
     }
 
     void playSound(int trackNo);

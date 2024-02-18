@@ -4,4 +4,5 @@
 
 void Mp3PlayerYX5300Manager::playSound(int trackNo)
 {
+    _mp3.playTrack(trackNo);
 }
