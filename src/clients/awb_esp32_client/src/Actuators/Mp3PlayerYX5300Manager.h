@@ -3,7 +3,12 @@
 
 #include <Arduino.h>
 #include <vector>
+#include <MD_YX5300.h>
 #include "ActuatorValue.h"
+#include <SoftwareSerial.h>
+
+// SoftwareSerial MP3Stream(13, 14);
+//  MD_YX5300 mp3(MP3Stream);
 
 class Mp3PlayerYX5300Manager
 {
@@ -14,16 +19,25 @@ private:
     TCallBackErrorOccured _errorOccured;
     TCallBackMessageToShow _messageToShow;
 
+    // MP3Stream Serial3;
+    //  MP3Stream Serial3(13, 14);
+    // MD_YX5300 _mp3(MP3Stream);
+    // MD_YX5300 mp3(MP3Stream);
+    //  SoftwareSerial _mp3Stream; // MP3 player serial stream for comms
+    //  MD_YX5300 _mp3;
+
 public:
-    Mp3PlayerYX5300Manager(TCallBackErrorOccured errorOccured, int portRx, int portTx) : _errorOccured(errorOccured){
+    // the constructor
+    Mp3PlayerYX5300Manager(int rxPin, int txPin, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow) : _errorOccured(errorOccured), _messageToShow(messageToShow)
+    {
+        // open md-yx5300 with Serial3
+        //_mp3 = new MD_YX5300(Serial2);
+        // _mp3Stream = SoftwareSerial(rxPin, txPin);
+        // _mp3 = MD_YX5300(_mp3Stream);
 
-                                                                                             /*
-                                                                                             this->_pwm = Adafruit_PWMServoDriver(); // called this way, it uses the default address 0x40
-                                                                                             this->_pwm.setPWMFreq(SERVO_FREQ);      // Analog servos run at ~50 Hz updates
-                                                                                             this->_pwm.begin();
-                                                                                             */
-
-                                                                                         };
+        // _mp3Stream.begin(MD_YX5300::SERIAL_BPS);
+        // _mp3.begin();
+    }
 
     void playSound(int trackNo);
 };

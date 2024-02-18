@@ -56,6 +56,8 @@ void AwbClient::setup()
     { showError(message); };
     const TCallBackErrorOccured mp3PlayerErrorOccured = [this](String message)
     { showError(message); };
+    const TCallBackMessageToShow mp3PlayerMessageToShow = [this](String message)
+    { showMsg(message); };
     const TCallBackErrorOccured autoPlayerErrorOccured = [this](String message)
     { showError(message); };
 
@@ -110,7 +112,7 @@ void AwbClient::setup()
 
 #ifdef USE_MP3_PLAYER_YX5300
     showSetupMsg("setup mp3 player YX5300");
-    this->_mp3Player = new Mp3PlayerYX5300Manager(mp3PlayerErrorOccured, MP3_PLAYER_YX5300_RXD, MP3_PLAYER_YX5300_TXD);
+    this->_mp3Player = new Mp3PlayerYX5300Manager(MP3_PLAYER_YX5300_RXD, MP3_PLAYER_YX5300_TXD, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
 #endif
 
     showMsg("Found " + String(this->_stSerialServoManager == NULL ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == NULL ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
