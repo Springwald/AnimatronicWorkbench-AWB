@@ -23,7 +23,7 @@ namespace Awb.Core.Actuators
         public int TargetValue { get; set; }
         public bool IsDirty { get; set; }
 
-        public string Label => $"[C{ClientId}-PWM{Channel}] {Name ?? string.Empty}";
+        public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}PWM{Channel} {Name ?? string.Empty}";
 
         public Pca9685PwmServo(Pca9685PwmServoConfig config)
         {

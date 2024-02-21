@@ -1,12 +1,11 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Configs;
-using Awb.Core.Services;
 
 namespace Awb.Core.Actuators
 {
@@ -84,7 +83,7 @@ namespace Awb.Core.Actuators
         /// </summary>
         public bool IsDirty { get; set; }
 
-        public string Label => $"[C{ClientId}-{StsScsType.ToString().ToUpper()}{Channel}] {Name ?? string.Empty}";
+        public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}{StsScsType.ToString().ToUpper()}{Channel} {Name ?? string.Empty}";
 
         public StsScsServo(StsServoConfig config, StsScsTypes type)
         {

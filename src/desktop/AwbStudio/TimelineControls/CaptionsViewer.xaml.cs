@@ -7,8 +7,10 @@
 
 using Awb.Core.Services;
 using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Controls;
+using System.Xml;
 
 namespace AwbStudio.TimelineControls
 {
@@ -17,11 +19,13 @@ namespace AwbStudio.TimelineControls
     /// </summary>
     public partial class CaptionsViewer : UserControl
     {
+        private readonly Label _protoypeLabel;
         private IActuatorsService? _actuatorsService;
 
         public CaptionsViewer()
         {
             InitializeComponent();
+            this._protoypeLabel = XamlClone(PrototypeLabel);
         }
 
         /// <summary>
@@ -48,14 +52,29 @@ namespace AwbStudio.TimelineControls
                 {
                     foreach (var caption in TimelineCaptions.Captions)
                     {
-                        LineNames.Children.Add(new Label { Content = caption.Label, Foreground = caption.ForegroundColor, Background = caption.BackgroundColor, Opacity = 0.7 });
+                        var label =  XamlClone(PrototypeLabel);
+                        label.Content = caption.Label.Trim();
+                        label.Foreground = caption.ForegroundColor;
+                        label.Background = caption.BackgroundColor;
+                        LineNames.Children.Add(label);
                     }
                 }
-
             }
         }
 
         public TimelineCaptions TimelineCaptions { get; set; } = new TimelineCaptions();
-    
+
+        public T XamlClone<T>(T source)
+        {
+            string savedObject = System.Windows.Markup.XamlWriter.Save(source);
+
+            // Load the XamlObject
+            StringReader stringReader = new StringReader(savedObject);
+            System.Xml.XmlReader xmlReader = System.Xml.XmlReader.Create(stringReader);
+            T target = (T)System.Windows.Markup.XamlReader.Load(xmlReader);
+
+            return target;
+        }
+
     }
 }

@@ -26,8 +26,9 @@ namespace Awb.Core.Project
         /// </summary>
         public uint TxPin { get; } = 14;
 
-        public Mp3PlayerYX5300Config(uint rxPin, uint txPin, string soundPlayerId)
+        public Mp3PlayerYX5300Config(uint clientId, uint rxPin, uint txPin, string soundPlayerId)
         {
+            ClientId = clientId;
             RxPin = rxPin;
             TxPin = txPin;
             SoundPlayerId = soundPlayerId;

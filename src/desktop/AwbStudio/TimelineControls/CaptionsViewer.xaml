@@ -8,7 +8,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <WrapPanel x:Name="LineNames">
-            <Label Foreground="#FFDE1C1C">ABCD</Label>
+            <Label Foreground="#FFDE1C1C" Background="AliceBlue" Padding="1" Margin="3" Opacity="0.7" x:Name="PrototypeLabel">ABCD</Label>
         </WrapPanel>
     </Grid>
 </UserControl>

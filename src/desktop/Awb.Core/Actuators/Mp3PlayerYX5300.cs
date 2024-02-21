@@ -72,7 +72,7 @@ namespace Awb.Core.Actuators
         /// </summary>
         public bool IsDirty { get; set; }
 
-        public string Label => $"[C{ClientId}-MP3{Id}] {Name ?? string.Empty}";
+        public string Label => $"{(ClientId == 1 ? string.Empty :$"C{ClientId}-")}MP3{Id} {Name ?? string.Empty}";
 
         public Mp3PlayerYX5300(Mp3PlayerYX5300Config config)
         {
