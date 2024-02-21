@@ -62,8 +62,6 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-      
-
         /// <summary>
         /// The actual view and scroll position of the timeline
         /// </summary>
@@ -104,10 +102,13 @@ namespace AwbStudio.TimelineControls
         /// </summary>
         public IActuatorsService? ActuatorsService
         {
-            get => _actuatorsService; set
+            get => _actuatorsService; 
+            set
             {
                 _actuatorsService = value;
-                ServoValueViewer.ActuatorsService = value;
+                CaptionsViewer.ActuatorsService = value;
+                ServoValueViewer.TimelineCaptions = CaptionsViewer.TimelineCaptions;
+                SoundValueViewer.TimelineCaptions = CaptionsViewer.TimelineCaptions;
             }
         }
 

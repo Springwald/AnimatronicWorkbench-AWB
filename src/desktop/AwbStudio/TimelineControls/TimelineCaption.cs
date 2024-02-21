@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {
-    internal class TimelineCaption
+    public class TimelineCaption
     {
         public string Label { get; set; }
         public Brush ForegroundColor { get; set; }

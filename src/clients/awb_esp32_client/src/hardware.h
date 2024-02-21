@@ -23,11 +23,11 @@
 #define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO
 
 /* STS serial servo settings */
-// #define USE_STS_SERVO                // if you use a STS serial servo, uncomment this line
+#define USE_STS_SERVO                // if you use a STS serial servo, uncomment this line
 #define STS_SERVO_SPEED 1500         // speed, default = 1500
 #define STS_SERVO_ACC 10             // acceleration, default = 100
-#define STS_SERVO_RXD 18             // eg. GPIO 18 for waveshare servo driver
-#define STS_SERVO_TXD 19             // eg. GPIO 19 for waveshare servo driver
+#define STS_SERVO_RXD 16             // eg. GPIO 18 for waveshare servo driver
+#define STS_SERVO_TXD 17             // eg. GPIO 19 for waveshare servo driver
 #define STS_SERVO_MAX_TEMPERATURE 45 // max temperature (celsius) before servo is disabled
 #define STS_SERVO_MAX_LOAD 300       // max load before servo is disabled
 

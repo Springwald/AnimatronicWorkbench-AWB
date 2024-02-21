@@ -25,7 +25,6 @@ namespace AwbStudio.TimelineControls
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private const double _paintMarginTopBottom = 30;
 
-        private TimelineCaptions? _timelineCaptions;
         private TimelineData? _timelineData;
         private TimelineViewPos? _viewPos;
         private IActuatorsService? _actuatorsService;
@@ -43,17 +42,9 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        /// <summary>
-        /// The service to get the actuators
-        /// </summary>
-        public IActuatorsService? ActuatorsService
-        {
-            get => _actuatorsService; set
-            {
-                _actuatorsService = value;
-                CalculateCaptions();
-            }
-        }
+       
+
+        public TimelineCaptions TimelineCaptions { get; set; }
 
         /// <summary>
         /// The actual view and scroll position of the timeline
@@ -108,7 +99,7 @@ namespace AwbStudio.TimelineControls
 
             if (height < 100 || width < 100) return;
 
-            var servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Distinct().ToArray() ?? Array.Empty<string>();
+            var servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Where(id => id != null).Distinct().ToArray() ?? Array.Empty<string>();
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 
@@ -117,7 +108,7 @@ namespace AwbStudio.TimelineControls
 
             foreach (var servoId in servoIds)
             {
-                var caption = _timelineCaptions?.GetAktuatorCaption(servoId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
+                var caption = TimelineCaptions?.GetAktuatorCaption(servoId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
 
                 // Add polylines with points
                 var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == servoId).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
@@ -168,31 +159,6 @@ namespace AwbStudio.TimelineControls
 
         private static string ServoTag(string servoId) => $"Servo {servoId}";
 
-        private void CalculateCaptions()
-        {
-            if (_actuatorsService == null) throw new ArgumentNullException(nameof(ActuatorsService));
-
-            _timelineCaptions = new TimelineCaptions();
-
-            // Add servos
-            int no = 1;
-            foreach (var servo in _actuatorsService.Servos)
-            {
-                _timelineCaptions.AddAktuator(servo, $"({no++}) {servo.Label}");
-            }
-
-            LineNames.Children.Clear();
-            foreach (var caption in _timelineCaptions.Captions)
-            {
-                LineNames.Children.Add(
-                    new Label { 
-                        Content = caption.Label, Foreground = caption.ForegroundColor, Background = caption.BackgroundColor , Opacity= 0.7
-                    }
-                );
-            }
-        }
-
-        //  rect.ToolTip = $"{servoValueName} {servoValueMsLeft}ms - {servoValueMsRight}ms ({servoValue.DurationMs}ms)";
-
+       
     }
 }

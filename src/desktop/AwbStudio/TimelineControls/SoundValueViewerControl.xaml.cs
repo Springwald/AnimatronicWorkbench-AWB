@@ -31,10 +31,8 @@ namespace AwbStudio.TimelineControls
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private const double _paintMarginTopBottom = 30;
 
-        private TimelineCaptions? _timelineCaptions;
         private TimelineData? _timelineData;
         private TimelineViewPos? _viewPos;
-        private IActuatorsService? _actuatorsService;
 
         /// <summary>
         /// The timeline data to be displayed
@@ -49,17 +47,7 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        /// <summary>
-        /// The service to get the actuators
-        /// </summary>
-        public IActuatorsService? ActuatorsService
-        {
-            get => _actuatorsService; set
-            {
-                _actuatorsService = value;
-                CalculateCaptions();
-            }
-        }
+        public TimelineCaptions TimelineCaptions { get; set; }
 
         /// <summary>
         /// The actual view and scroll position of the timeline
@@ -107,7 +95,7 @@ namespace AwbStudio.TimelineControls
             double height = this.ActualHeight;
             double width = this.ActualWidth;
 
-            var soundPlayerIds = _timelineData?.SoundPoints?.OfType<SoundPoint>().Select(p => p.SoundPlayerId).Distinct().ToArray() ?? Array.Empty<string>();
+            var soundPlayerIds = _timelineData?.SoundPoints?.OfType<SoundPoint>().Select(p => p.SoundPlayerId).Where(id => id != null).Distinct().ToArray() ?? Array.Empty<string>();
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 
@@ -118,7 +106,7 @@ namespace AwbStudio.TimelineControls
 
             foreach (var soundPlayerId in soundPlayerIds)
             {
-                var caption = _timelineCaptions?.GetAktuatorCaption(soundPlayerId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
+                var caption = TimelineCaptions?.GetAktuatorCaption(soundPlayerId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
 
                 // Add polylines with points
                 var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == soundPlayerId).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
@@ -169,25 +157,7 @@ namespace AwbStudio.TimelineControls
 
         private static string SoundPlayerTag(string soundPlayerId) => $"SoundPlayer {soundPlayerId}";
 
-        private void CalculateCaptions()
-        {
-            if (_actuatorsService == null) throw new ArgumentNullException(nameof(ActuatorsService));
-
-            _timelineCaptions = new TimelineCaptions();
-
-            // Add servos
-            int no = 1;
-            foreach (var soundPlayer in _actuatorsService.SoundPlayers)
-            {
-                _timelineCaptions.AddAktuator(soundPlayer, $"({no++}) {soundPlayer.Label}");
-            }
-
-            LineNames.Children.Clear();
-            foreach (var caption in _timelineCaptions.Captions)
-            {
-                LineNames.Children.Add(new Label { Content = caption.Label, Foreground = caption.ForegroundColor, Background = caption.BackgroundColor, Opacity = 0.7  });
-            }
-        }
+      
 
         //  rect.ToolTip = $"{servoValueName} {servoValueMsLeft}ms - {servoValueMsRight}ms ({servoValue.DurationMs}ms)";
 

@@ -12,6 +12,7 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" x:Name="GridTimeline">
+            <local:CaptionsViewer x:Name="CaptionsViewer" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Grid x:Name="OpticalGrid">
             </Grid>
              <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo" >BANK 1 (1-8)</Label>
@@ -26,6 +27,7 @@
                 </Grid.RowDefinitions>
                 <local:ServoValueViewerControl Grid.Row="0" Grid.Column="0" x:Name="ServoValueViewer"/>
                 <local:SoundValueViewerControl Grid.Row="1" Grid.Column="0" x:Name="SoundValueViewer"/>
+              
             </Grid>
         </Grid>
       

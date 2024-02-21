@@ -12,7 +12,7 @@ using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {
-    internal class TimelineCaptions
+    public class TimelineCaptions
     {
         private Brush[] _brushes = new[]
 {
