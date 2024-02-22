@@ -15,6 +15,7 @@ namespace Awb.Core.Timelines
         /// percent in range 0..100 for servo.MinValue...servo.MaxValue
         /// </summary>
         public double ValuePercent { get; set; }
+        public override string? Title => $"{ServoId}: {ValuePercent:0.0}% {TimeMs}ms";
 
         /// <summary>
         /// Move the servo to this position at this time

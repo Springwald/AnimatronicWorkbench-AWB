@@ -80,7 +80,7 @@ namespace Awb.Core.Services
             if (config.Mp3PlayerYX5300 != null) 
             {
                 // actual is only one sound player supported
-                SoundPlayers = new[] { new Mp3PlayerYX5300(config.Mp3PlayerYX5300) };
+                SoundPlayers = new[] { new Mp3PlayerYX5300(config.Mp3PlayerYX5300, soundsCount: config.Sounds.Length) };
             }
             else
             {

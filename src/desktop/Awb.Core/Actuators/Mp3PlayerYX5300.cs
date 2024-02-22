@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -42,16 +42,6 @@ namespace Awb.Core.Actuators
         public uint RxPin { get; }
 
         /// <summary>
-        /// The maximum index of sounds this sound player can play
-        /// </summary>
-        public int MaxSounds { get; } = 32;
-
-        /// <summary>
-        /// The "normal" startup value of this servo
-        /// </summary>
-        public int DefaultValue { get; }
-
-        /// <summary>
         /// The requested target value of this soundplayer
         /// </summary>
         public int TargetValue
@@ -68,24 +58,30 @@ namespace Awb.Core.Actuators
         }
 
         /// <summary>
-        /// Indicates if the servo has changed since the last call>
+        /// Indicates if the sound has changed since the last call>
         /// </summary>
         public bool IsDirty { get; set; }
 
-        public string Label => $"{(ClientId == 1 ? string.Empty :$"C{ClientId}-")}MP3{Id} {Name ?? string.Empty}";
+        public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}MP3{Id} {Name ?? string.Empty}";
 
-        public Mp3PlayerYX5300(Mp3PlayerYX5300Config config)
+        public int SoundsCount { get; }
+
+        public int ActualSoundIndex { get; private set; }
+
+        public Mp3PlayerYX5300(Mp3PlayerYX5300Config config, int soundsCount)
         {
-            var defaultValue = 0;
-
             Id = config.SoundPlayerId;
             ClientId = config.ClientId;
             TxPin = config.TxPin;
             RxPin = config.RxPin;
-            DefaultValue = defaultValue;
-            DefaultValue = defaultValue;
-            TargetValue = defaultValue;
+            ActualSoundIndex = 0;
             IsDirty = true;
+            SoundsCount = soundsCount;
+        }
+
+        public void PlaySound(int soundIndex)
+        {
+            ActualSoundIndex = soundIndex;
         }
 
         public bool TurnOff()

@@ -40,7 +40,6 @@ namespace Awb.Core.LoadNSave.Timelines
                 new ServoPoint(servoId: servoPoint.ServoId, valuePercent: servoPoint.ValuePercent, timeMs: servoPoint.TimeMs)
                 {
                     Description = servoPoint.Description,
-                    Title = servoPoint.Title,
                 };
     }
 }

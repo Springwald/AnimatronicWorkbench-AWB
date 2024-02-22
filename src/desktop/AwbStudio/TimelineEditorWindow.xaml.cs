@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -199,31 +199,56 @@ namespace AwbStudio
 
                 case TimelineControllerEventArgs.EventTypes.ActuatorValueChanged:
                     _unsavedChanges = true;
-                    var servos = _actuatorsService?.Servos;
-                    if (servos == null) return;
-                    if (e.ActuatorIndex >= servos.Length) return;
-                    var servo = servos[e.ActuatorIndex];
+
+                    var allActuators = _actuatorsService?.AllActuators;
+                    if (allActuators == null) return;
+                    if (e.ActuatorIndex >= allActuators.Length) return;
+                    var actuator = allActuators[e.ActuatorIndex];
                     var targetPercent = e.ValueInPercent;
-                    var point = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
-                    if (point == null)
+
+                    switch (actuator)
                     {
-                        point = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
-                        TimelineData?.ServoPoints.Add(point);
+                        case IServo servo:
+                            var servoPoint = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                            if (servoPoint == null)
+                            {
+                                servoPoint = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
+                                TimelineData?.ServoPoints.Add(servoPoint);
+                            }
+                            else
+                            {
+                                servoPoint.ValuePercent = targetPercent;
+                            }
+                            break;
+                        case ISoundPlayer soundPlayer:
+                            if (soundPlayer.SoundsCount > 0)
+                            {
+                                var soundIndex = 1 + (int)((targetPercent * (soundPlayer.SoundsCount - 1)) / 100);
+                                var soundPoint = TimelineData?.ServoPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                                if (soundPoint == null)
+                                {
+                                    soundPoint = new SoundPoint(_timelinePlayer.PositionMs, soundIndex);
+                                    TimelineData?.SoundPoints.Add(soundPoint);
+                                }
+                                else
+                                {
+                                    soundPlayer.PlaySound(soundIndex: soundIndex);
+                                }
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                     }
-                    else
-                    {
-                        point.ValuePercent = targetPercent;
-                    }
+
                     _manualUpdatingValues = true;
                     if (_manualUpdatingValues) await _timelinePlayer.Update();
                     _manualUpdatingValues = false;
                     MyInvoker.Invoke(new Action(() => { TimelineViewerControl.PaintTimeLine(); }));
                     if (_lastActuatorChanged != e.ActuatorIndex)
                     {
-                        ShowValuesOnTimelineInputController(_timelinePlayer.PositionMs);
+                        ShowActuatorValuesOnTimelineInputController(_timelinePlayer.PositionMs);
                         _lastActuatorChanged = e.ActuatorIndex;
                     }
-
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.ActuatorTogglePoint:
@@ -232,38 +257,43 @@ namespace AwbStudio
                     var actuators = _actuatorsService?.AllActuators;
                     if (actuators == null) return;
                     if (e.ActuatorIndex >= actuators.Length) return;
-                    var actuator = actuators[e.ActuatorIndex];
+                    actuator = actuators[e.ActuatorIndex];
 
-                    servo = actuator as IServo;
-                    if (servo != null)
+                    switch (actuator)
                     {
+                        case IServo servo:
+                            var servoPoint = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                            if (servoPoint == null)
+                            {
+                                targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
+                                servoPoint = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
+                                TimelineData?.ServoPoints.Add(servoPoint);
+                            }
+                            else
+                            {
+                                TimelineData?.ServoPoints.Remove(servoPoint);
+                            }
+                            break;
+                        case ISoundPlayer soundPlayer:
+                            if (soundPlayer.SoundsCount > 0)
+                            {
+                                var soundPoint = TimelineData?.ServoPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                                if (soundPoint == null)
+                                {
+                                    soundPoint = new SoundPoint( _timelinePlayer.PositionMs, soundPlayer.ActualSoundIndex);
+                                    TimelineData?.SoundPoints.Add(soundPoint);
+                                }
+                                else
+                                {
+                                    TimelineData?.SoundPoints.Remove(soundPoint);
+                                }
+                            }
+                            break;
+                        default:
 
-                        point = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
-                        if (point == null)
-                        {
-                            targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
-                            point = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
-                            TimelineData?.ServoPoints.Add(point);
-                        }
-                        else
-                        {
-                            TimelineData?.ServoPoints.Remove(point);
-                        }
-                    }
-                    else
-                    {
-                        var mp3PlayerYX5300 = actuator as Mp3PlayerYX5300;
-                        if (mp3PlayerYX5300 != null)
-                        {
-
-                        }
-                        else
-                        {
                             throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Name}/{actuator.Label} is an unhandled actutuator type.");
-                        }
-
-
                     }
+
                     _manualUpdatingValues = true;
                     if (_manualUpdatingValues) await _timelinePlayer.Update();
                     MyInvoker.Invoke(new Action(() => { TimelineViewerControl.PaintTimeLine(); }));
@@ -327,22 +357,39 @@ namespace AwbStudio
             if (!_manualUpdatingPlayPos)
                 MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(e.PositionMs / 1000.0):0.00}s / {e.PlaybackSpeed:0.0}X"));
             if (!_manualUpdatingValues)
-                ShowValuesOnTimelineInputController(e.PositionMs);
+                ShowActuatorValuesOnTimelineInputController(e.PositionMs);
         }
 
-        private void ShowValuesOnTimelineInputController(int playPosMs)
+        private void ShowActuatorValuesOnTimelineInputController(int playPosMs)
         {
             if (_timelineControllers == null) return;
 
-            var servos = _actuatorsService?.Servos;
-            if (servos == null) return;
-            for (int i = 0; i < servos.Length; i++)
+            var actuators = _actuatorsService?.AllActuators;
+            if (actuators == null) return;
+
+            for (int i = 0; i < actuators.Length; i++)
             {
-                var servo = servos[i];
-                foreach (var timelineController in _timelineControllers)
+                switch (actuators[i])
                 {
-                    timelineController.SetActuatorValue(index: i, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * (servo.TargetValue - servo.MinValue * 1.0) / (1.0 * servo.MaxValue - servo.MinValue))));
-                    timelineController.ShowPointButtonState(index: i, pointExists: TimelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
+                    case IServo servo:
+                        foreach (var timelineController in _timelineControllers)
+                        {
+                            timelineController.SetActuatorValue(index: i, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * (servo.TargetValue - servo.MinValue * 1.0) / (1.0 * servo.MaxValue - servo.MinValue))));
+                            timelineController.ShowPointButtonState(index: i, pointExists: TimelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
+                        }
+                        break;
+                    case ISoundPlayer soundPlayer:
+                        foreach (var timelineController in _timelineControllers)
+                        {
+                            if (soundPlayer.SoundsCount > 0)
+                            {
+                                timelineController.SetActuatorValue(index: i, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * soundPlayer.ActualSoundIndex / soundPlayer.SoundsCount)));
+                                timelineController.ShowPointButtonState(index: i, pointExists: TimelineData.SoundPoints.Any(p => p.SoundPlayerId == soundPlayer.Id && p.TimeMs == playPosMs));
+                            }
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException($"{actuators[i].Id}/{actuators[i].Name}/{actuators[i].Label} is an unhandled actutuator type.");
                 }
             }
         }

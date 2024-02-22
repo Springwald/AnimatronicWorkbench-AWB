@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -20,7 +20,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for ServoValueViewerControl.xaml
     /// </summary>
-    public partial class ServoValueViewerControl : UserControl
+    public partial class ServoValueViewerControl : UserControl, ITimelineControl
     {
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private const double _paintMarginTopBottom = 30;
@@ -42,7 +42,7 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-       
+
 
         public TimelineCaptions TimelineCaptions { get; set; }
 
@@ -62,6 +62,11 @@ namespace AwbStudio.TimelineControls
                 }
             }
             get => _viewPos;
+        }
+
+        public IActuatorsService? ActuatorsService
+        {
+            set { }
         }
 
         public ServoValueViewerControl()
@@ -128,12 +133,17 @@ namespace AwbStudio.TimelineControls
                             Stroke = caption.ForegroundColor,
                             Height = dotWidth,
                             Width = dotWidth,
-                            Margin = new Thickness { Left = _viewPos.GetXPos(ms: (int)point.TimeMs, controlWidth: width, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }
+                            Margin = new Thickness { Left = _viewPos.GetXPos(ms: (int)point.TimeMs, controlWidth: width, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }, 
+                            ToolTip = point.Title
+                           
                         });
                     }
                 }
 
-                var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = _viewPos.GetXPos((int)(p.TimeMs), controlWidth: width, timelineData: _timelineData), Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
+                var points = new PointCollection(pointsForThisServo.Select(p => 
+                new Point { 
+                    X = _viewPos.GetXPos((int)(p.TimeMs), controlWidth: width, timelineData: _timelineData), 
+                    Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
                 var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
                 this.PanelLines.Children.Add(line);
             }
@@ -159,6 +169,6 @@ namespace AwbStudio.TimelineControls
 
         private static string ServoTag(string servoId) => $"Servo {servoId}";
 
-       
+
     }
 }

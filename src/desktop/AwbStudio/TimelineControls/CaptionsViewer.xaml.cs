@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Services;
+using Awb.Core.Timelines;
 using System;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for CaptionsViewer.xaml
     /// </summary>
-    public partial class CaptionsViewer : UserControl
+    public partial class CaptionsViewer : UserControl, ITimelineControl
     {
         private readonly Label _protoypeLabel;
         private IActuatorsService? _actuatorsService;
@@ -25,7 +26,7 @@ namespace AwbStudio.TimelineControls
         public CaptionsViewer()
         {
             InitializeComponent();
-            this._protoypeLabel = XamlClone(PrototypeLabel);
+            this._protoypeLabel = WpfToolbox.XamlClone(PrototypeLabel);
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace AwbStudio.TimelineControls
                 {
                     foreach (var caption in TimelineCaptions.Captions)
                     {
-                        var label =  XamlClone(PrototypeLabel);
+                        var label = WpfToolbox.XamlClone(_protoypeLabel);
                         label.Content = caption.Label.Trim();
                         label.Foreground = caption.ForegroundColor;
                         label.Background = caption.BackgroundColor;
@@ -62,19 +63,10 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public TimelineCaptions TimelineCaptions { get; set; } = new TimelineCaptions();
 
-        public T XamlClone<T>(T source)
-        {
-            string savedObject = System.Windows.Markup.XamlWriter.Save(source);
-
-            // Load the XamlObject
-            StringReader stringReader = new StringReader(savedObject);
-            System.Xml.XmlReader xmlReader = System.Xml.XmlReader.Create(stringReader);
-            T target = (T)System.Windows.Markup.XamlReader.Load(xmlReader);
-
-            return target;
-        }
-
+     
+        public TimelineCaptions TimelineCaptions { get; set; }
+        public TimelineData? TimelineData { get; set; }
+        public TimelineViewPos ViewPos { get; set; }
     }
 }

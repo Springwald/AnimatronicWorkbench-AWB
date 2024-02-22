@@ -15,19 +15,19 @@ namespace Awb.Core.LoadNSave.Timelines
         public string TargetObjectId { get; }
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public string SoundId { get; set; }
+        public int SoundIndex { get; set; }
 
-        public SoundPointSaveFormat(int timeMs, string targetObjectId, string soundId)
+        public SoundPointSaveFormat(int timeMs, string targetObjectId, int soundIndex)
         {
             TimeMs = timeMs;
             TargetObjectId = targetObjectId;
-            SoundId = soundId;
+            SoundIndex = soundIndex;
         }
 
         public static SoundPointSaveFormat FromSoundPoint(SoundPoint soundPoint) => new SoundPointSaveFormat(
                 timeMs: soundPoint.TimeMs,
                 targetObjectId: soundPoint.TargetObjectId,
-                soundId: soundPoint.SoundId
+                soundIndex: soundPoint.SoundIndex
                 )
         {
             Title = soundPoint.Title,
@@ -35,10 +35,9 @@ namespace Awb.Core.LoadNSave.Timelines
         };
 
         public static SoundPoint ToSoundPoint(SoundPointSaveFormat soundPointSaveFormat) =>
-                new SoundPoint(timeMs: soundPointSaveFormat.TimeMs, soundId: soundPointSaveFormat.SoundId)
+                new SoundPoint(timeMs: soundPointSaveFormat.TimeMs, soundIndex: soundPointSaveFormat.SoundIndex)
                 {
                     Description = soundPointSaveFormat.Description,
-                    Title = soundPointSaveFormat.Title,
                 };
     }
 }

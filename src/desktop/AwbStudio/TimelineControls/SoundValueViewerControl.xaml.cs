@@ -13,22 +13,22 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls
 {
     /// <summary>
     /// Interaction logic for SoundValueViewerControl.xaml
     /// </summary>
-    public partial class SoundValueViewerControl : UserControl
+    public partial class SoundValueViewerControl : UserControl, ITimelineControl
     {
         public SoundValueViewerControl()
         {
             InitializeComponent();
+            this._protoypeLabel = WpfToolbox.XamlClone(PrototypeLabel);
             Loaded += SoundValueViewerControl_Loaded;
         }
 
-        private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
+        private readonly Label _protoypeLabel;
         private const double _paintMarginTopBottom = 30;
 
         private TimelineData? _timelineData;
@@ -67,16 +67,15 @@ namespace AwbStudio.TimelineControls
             get => _viewPos;
         }
 
+        public IActuatorsService? ActuatorsService { set { } }
 
         private void SoundValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
-            DrawOpticalGrid();
             SizeChanged += SoundValueViewerControl_SizeChanged;
         }
 
         private void SoundValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            DrawOpticalGrid();
         }
 
         private void OnViewPosChanged(object? sender, EventArgs e)
@@ -86,8 +85,7 @@ namespace AwbStudio.TimelineControls
 
         public void PaintSoundValues()
         {
-            PanelLines.Children.Clear();
-            GridDots.Children.Clear();
+            CanvasSounds.Children.Clear();
 
             if (_viewPos == null) return;
             if (_timelineData == null) return;
@@ -109,57 +107,23 @@ namespace AwbStudio.TimelineControls
                 var caption = TimelineCaptions?.GetAktuatorCaption(soundPlayerId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
 
                 // Add polylines with points
-                var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == soundPlayerId).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
+                var pointsForThisSoundplayer = _timelineData?.SoundPoints.OfType<SoundPoint>().Where(p => p.SoundPlayerId == soundPlayerId).OrderBy(p => p.TimeMs).ToList() ?? new List<SoundPoint>();
 
                 // add dots
-                const int dotRadius = 3;
-                const int dotWidth = dotRadius * 2;
-                foreach (var point in pointsForThisServo)
+                foreach (var point in pointsForThisSoundplayer)
                 {
                     if (point.TimeMs >= ViewPos.ScrollOffsetMs && point.TimeMs <= ViewPos.DisplayMs + ViewPos.ScrollOffsetMs) // is inside view
                     {
-                        this.GridDots.Children.Add(new Ellipse
-                        {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Fill = caption.ForegroundColor,
-                            Stroke = caption.ForegroundColor,
-                            Height = dotWidth,
-                            Width = dotWidth,
-                            Margin = new Thickness { Left = _viewPos.GetXPos(ms: (int)point.TimeMs, controlWidth: width, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }
-                        });
+                        var label = WpfToolbox.XamlClone(_protoypeLabel);
+                        label.Content = "Sound" + point.Title;
+                        label.Foreground = caption.ForegroundColor;
+                        label.Background = caption.BackgroundColor;
+                        label.Margin = new Thickness { Left = _viewPos.GetXPos(ms: (int)point.TimeMs, controlWidth: width, timelineData: _timelineData) };
+                        CanvasSounds.Children.Add(label);
                     }
                 }
-
-                var points = new PointCollection(pointsForThisServo.Select(p => new Point { X = _viewPos.GetXPos((int)(p.TimeMs), controlWidth: width, timelineData: _timelineData), Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
-                var line = new Polyline { Tag = SoundPlayerTag(soundPlayerId), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
-                this.PanelLines.Children.Add(line);
             }
         }
-
-        private void DrawOpticalGrid()
-        {
-            OpticalGrid.Children.Clear();
-
-            double height = this.ActualHeight;
-            double width = this.ActualWidth;
-
-            if (height < 100 || width < 100) return;
-
-            double diagramHeight = height - _paintMarginTopBottom * 2;
-
-            foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
-            {
-                var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
-                OpticalGrid.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = _gridLineBrush });
-            }
-        }
-
-        private static string SoundPlayerTag(string soundPlayerId) => $"SoundPlayer {soundPlayerId}";
-
-      
-
-        //  rect.ToolTip = $"{servoValueName} {servoValueMsLeft}ms - {servoValueMsRight}ms ({servoValue.DurationMs}ms)";
 
     }
 }

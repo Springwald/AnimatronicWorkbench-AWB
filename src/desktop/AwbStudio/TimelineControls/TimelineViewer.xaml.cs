@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -24,10 +24,11 @@ namespace AwbStudio.TimelineControls
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
 
-        private IActuatorsService? _actuatorsService;
         private TimelinePlayer? _timelinePlayer;
         private TimelineViewPos _viewPos;
         private int _actualBankIndex = 0;
+
+        private ITimelineControl[] _subTimelineViewerControls;
 
         private void PlayerStateChanged(object? sender, PlayStateEventArgs e)
         {
@@ -74,7 +75,8 @@ namespace AwbStudio.TimelineControls
                     if (_viewPos != null) throw new Exception("ViewPos.Changed is already set");
                     _viewPos = value;
                     _viewPos.Changed += this.OnViewPosChanged;
-                    ServoValueViewer.ViewPos = value;
+                    foreach (var subTimelineViewerControl in _subTimelineViewerControls)
+                        subTimelineViewerControl.ViewPos = value;
                     this.OnViewPosChanged(this, EventArgs.Empty);
                 }
             }
@@ -90,7 +92,8 @@ namespace AwbStudio.TimelineControls
             set
             {
                 _timelineData = value;
-                ServoValueViewer.TimelineData = value;
+                foreach (var subTimelineViewerControl in _subTimelineViewerControls)
+                    subTimelineViewerControl.TimelineData = value;
                 SyncScrollOffsetToNewPlayPos(0, snapToGrid: true);
                 PaintTimeLine();
                 PaintPlayPos(_timelineData);
@@ -102,13 +105,11 @@ namespace AwbStudio.TimelineControls
         /// </summary>
         public IActuatorsService? ActuatorsService
         {
-            get => _actuatorsService; 
             set
             {
                 _actuatorsService = value;
-                CaptionsViewer.ActuatorsService = value;
-                ServoValueViewer.TimelineCaptions = CaptionsViewer.TimelineCaptions;
-                SoundValueViewer.TimelineCaptions = CaptionsViewer.TimelineCaptions;
+                foreach (var subTimelineViewerControl in _subTimelineViewerControls)
+                    subTimelineViewerControl.ActuatorsService = value;
             }
         }
 
@@ -153,6 +154,14 @@ namespace AwbStudio.TimelineControls
             //MyViewModel vm = new MyViewModel();
             Loaded += TimelineViewer_Loaded;
             SizeChanged += TimelineViewer_SizeChanged;
+
+            // set up the sub-timeline-viewers
+            _subTimelineViewerControls = new ITimelineControl[] { CaptionsViewer, ServoValueViewer, SoundValueViewer };
+
+            // connect timeline-caption- calculator to all sub-timeline-viewers
+            var timelineCaptions = new TimelineCaptions();
+            foreach (var subTimelineViewerControl in _subTimelineViewerControls)
+                subTimelineViewerControl.TimelineCaptions = timelineCaptions;
         }
 
         public void PaintTimeLine()
@@ -192,6 +201,7 @@ namespace AwbStudio.TimelineControls
         }
 
         private int _lastBankIndex = -1;
+        private IActuatorsService? _actuatorsService;
 
         private void OnViewPosChanged(object? sender, EventArgs e)
         {
@@ -200,9 +210,10 @@ namespace AwbStudio.TimelineControls
             if (_lastBankIndex != ViewPos.BankIndex && _actuatorsService != null)
             {
                 _lastBankIndex = ViewPos.BankIndex;
-                MyInvoker.Invoke(new Action(() => {
-                    var bankStartItemNo = ViewPos.BankIndex * ViewPos.ItemsPerBank + 1 ; // base 1
-                    labelBankNo.Content = $"Bank {ViewPos.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + ViewPos.ItemsPerBank-1)}]";
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    var bankStartItemNo = ViewPos.BankIndex * ViewPos.ItemsPerBank + 1; // base 1
+                    labelBankNo.Content = $"Bank {ViewPos.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + ViewPos.ItemsPerBank - 1)}]";
                 }));
             }
 

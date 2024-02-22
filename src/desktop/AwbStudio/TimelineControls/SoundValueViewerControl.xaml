@@ -6,15 +6,7 @@
              xmlns:local="clr-namespace:AwbStudio.TimelineControls"
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="800">
-    <Grid>
-        <Grid x:Name="OpticalGrid">
-        </Grid>
-        <Grid x:Name="PanelLines" >
-            <Polyline Height="300"  Name="_myPolyline1" Tag="123213" StrokeThickness="4" Points="10,100 100,200 200,30 250,200 200,150" ></Polyline>
-            <Polyline Height="500"  Name="_myPolyline2" Tag="123213" StrokeThickness="4" Points="10,100 100,200 200,30 250,200 200,150"></Polyline>
-        </Grid>
-        <Grid x:Name="GridDots" >
-            <Ellipse HorizontalAlignment="Left" Height="10" Width="10"  Margin="289,291,0,0" Fill="red" Stroke="Black" VerticalAlignment="Top" />
-        </Grid>
-    </Grid>
+    <Canvas x:Name="CanvasSounds">
+        <Label x:Name="PrototypeLabel" Foreground="#FFDE1C1C" Background="AliceBlue" Padding="1" Margin="3"  MaxWidth="100" HorizontalAlignment="Left"  VerticalAlignment="Top">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</Label>
+    </Canvas>
 </UserControl>
