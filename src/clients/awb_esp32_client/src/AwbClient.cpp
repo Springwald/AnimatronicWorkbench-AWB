@@ -30,19 +30,23 @@ void AwbClient::setup()
     { showError(message); };
     _wlanConnector = new WlanConnector(_clientId, _actualStatusInformation, wlanErrorOccured);
     _wlanConnector->setup();
+    showSetupMsg("setup wifi done");
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     showSetupMsg("setup neopixel");
     this->_neoPixelStatus = new NeoPixelStatusControl();
     _neoPixelStatus->setStartUpAlert(); // show alarm neopixel on startup to see unexpected restarts
+    showSetupMsg("setup neopixel done");
 #endif
 
 #ifdef USE_DAC_SPEAKER
     showSetupMsg("setup dac speaker");
     this->_dacSpeaker = new DacSpeaker();
     this->_dacSpeaker->begin();
+    showSetupMsg("setup dac speaker done");
 #endif
 
+    showSetupMsg("setup callbacks");
     // set up error callbacks for the different components
     const TCallBackErrorOccured packetErrorOccured = [this](String message)
     { showError(message); };
@@ -60,6 +64,7 @@ void AwbClient::setup()
     { showMsg(message); };
     const TCallBackErrorOccured autoPlayerErrorOccured = [this](String message)
     { showError(message); };
+    showSetupMsg("setup callbacks done");
 
     // set up the actuators
 
@@ -67,9 +72,11 @@ void AwbClient::setup()
 
 #ifdef USE_SCS_SERVO
     if (STS_SERVO_RXD == SCS_SERVO_RXD || STS_SERVO_RXD == SCS_SERVO_TXD || STS_SERVO_TXD == SCS_SERVO_RXD || STS_SERVO_TXD == SCS_SERVO_TXD)
+    {
         showError("STS and SCS use the same RXD/TXD pins!");
-    delay(2000);
-    throw "STS and SCS use the same RXD/TXD pins!";
+        delay(2000);
+        throw "STS and SCS use the same RXD/TXD pins!";
+    }
 #endif
 
     showSetupMsg("setup STS servos");
@@ -86,6 +93,7 @@ void AwbClient::setup()
         actuatorValue.name = "no set yet.";
         this->_actualStatusInformation->stsServoValues->push_back(actuatorValue);
     }
+    showSetupMsg("setup STS servos done");
 #endif
 
 #ifdef USE_SCS_SERVO
@@ -103,6 +111,7 @@ void AwbClient::setup()
         actuatorValue.name = "no set yet.";
         this->_actualStatusInformation->scsServoValues->push_back(actuatorValue);
     }
+    showSetupMsg("setup STS servos done");
 #endif
 
     showMsg("Found " + String(this->_stSerialServoManager == NULL ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == NULL ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
@@ -186,7 +195,7 @@ void AwbClient::showMsg(String message)
  */
 void AwbClient::showSetupMsg(String message)
 {
-    int durationMs = 300;
+    int durationMs = 500;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
     if (_wlanConnector != NULL) // check if wlan connector is instanciated
         _wlanConnector->logInfo(message);
@@ -200,6 +209,8 @@ void AwbClient::loop()
 {
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
+
+    _mp3Player->playSound(1);
 
     // update autoplay timelines and actuators
     auto criticalTemp = false;
