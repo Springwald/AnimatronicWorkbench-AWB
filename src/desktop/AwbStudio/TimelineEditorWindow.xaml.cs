@@ -16,7 +16,6 @@ using AwbStudio.Exports;
 using AwbStudio.FileManagement;
 using AwbStudio.Projects;
 using AwbStudio.TimelineControls;
-using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -222,6 +221,7 @@ namespace AwbStudio
                                 servoPoint.ValuePercent = targetPercent;
                             }
                             break;
+
                         case ISoundPlayer soundPlayer:
                             if (_project.Sounds.Length > 0)
                             {
@@ -232,16 +232,18 @@ namespace AwbStudio
                                     var soundPoint = TimelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
                                     if (soundPoint == null)
                                     {
-                                        soundPoint = new SoundPoint(timeMs:_timelinePlayer.PositionMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: sound.Id);;
+                                        soundPoint = new SoundPoint(timeMs: _timelinePlayer.PositionMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: sound.Id); ;
                                         TimelineData?.SoundPoints.Add(soundPoint);
                                     }
                                     else
                                     {
                                         soundPoint.SoundId = sound.Id;
+                                        soundPoint.Title = sound.Title;
                                     }
                                 }
                             }
                             break;
+
                         default:
                             throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                     }
@@ -281,17 +283,20 @@ namespace AwbStudio
                             }
                             break;
                         case ISoundPlayer soundPlayer:
-                            if (_project.Sounds?.Any() ==true)
+                            if (_project.Sounds?.Any() == true)
                             {
-                                
+
                                 var soundPoint = TimelineData?.ServoPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
                                 if (soundPoint == null)
                                 {
                                     var sound = _project.Sounds.FirstOrDefault(s => s.Id == soundPlayer.ActualSoundId);
-                                    if (sound == null) {
+                                    if (sound == null)
+                                    {
                                         MessageBox.Show("Actual sound id" + soundPlayer.ActualSoundId + " not found");
-                                    } else { 
-                                        soundPoint = new SoundPoint(timeMs: _timelinePlayer.PositionMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId : soundPlayer.ActualSoundId);
+                                    }
+                                    else
+                                    {
+                                        soundPoint = new SoundPoint(timeMs: _timelinePlayer.PositionMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: soundPlayer.ActualSoundId);
                                         TimelineData?.SoundPoints.Add(soundPoint);
                                     }
                                 }
@@ -396,14 +401,14 @@ namespace AwbStudio
                             if (_project.Sounds?.Any() == true)
                             {
                                 var soundIndex = -1;
-                                for(int iSnd=0; iSnd < _project.Sounds.Length; iSnd++)
+                                for (int iSnd = 0; iSnd < _project.Sounds.Length; iSnd++)
                                 {
                                     if (_project.Sounds[iSnd].Id == soundPlayer.ActualSoundId)
                                     {
                                         soundIndex = iSnd;
                                         break;
                                     }
-                                }   
+                                }
                                 if (soundIndex != -1)
                                 {
                                     timelineController.SetActuatorValue(index: i, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * soundIndex / _project.Sounds.Length)));

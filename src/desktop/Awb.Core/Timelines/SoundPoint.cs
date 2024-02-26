@@ -20,7 +20,7 @@ namespace Awb.Core.Timelines
         /// </summary>
         public string SoundPlayerId { get; set; }
 
-        public override string Title { get; }
+        public override string Title { get; set; }
 
 
         /// <param name="soundId">The resource id of the sound to be played. What kind of resource this is depends on the implementation of the sound player.</param>

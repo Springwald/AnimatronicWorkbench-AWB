@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -15,7 +15,8 @@ namespace Awb.Core.Timelines
         /// percent in range 0..100 for servo.MinValue...servo.MaxValue
         /// </summary>
         public double ValuePercent { get; set; }
-        public override string Title => $"{ServoId}: {ValuePercent:0.0}% {TimeMs}ms";
+
+        public override string Title { get; set; }
 
         /// <summary>
         /// Move the servo to this position at this time
@@ -25,6 +26,7 @@ namespace Awb.Core.Timelines
         {
             ServoId = servoId;
             ValuePercent = valuePercent;
+            Title = $"{ServoId}: {ValuePercent:0.0}% {TimeMs}ms";
         }
     }
 }

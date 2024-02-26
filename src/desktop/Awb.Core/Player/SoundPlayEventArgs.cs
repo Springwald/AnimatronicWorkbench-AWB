@@ -11,11 +11,11 @@ namespace Awb.Core.Player
 {
     public class SoundPlayEventArgs : EventArgs
     {
-        public int SoundIndex { get; set; }
+        public int SoundId { get; set; }
 
-        public SoundPlayEventArgs(int soundIndex)
+        public SoundPlayEventArgs(int soundId)
         {
-            SoundIndex = soundIndex;
+            SoundId = soundId;
         }
     }
 }

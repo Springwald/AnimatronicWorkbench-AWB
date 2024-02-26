@@ -149,8 +149,11 @@ namespace Awb.Core.Player
             foreach (var soundTargetObjectId in soundTargetObjectIds)
             {
                 // find a point exactly on the position
-                var targetPoint = TimelineData.SoundPoints.Where(p => p.TargetObjectId == soundTargetObjectId && p.TimeMs <= newPositionMs).OrderByDescending(p => p.TimeMs).FirstOrDefault();
-                if (targetPoint == null) continue; // no points found for this object before the actual position
+                var lower = Math.Min(PositionMs, newPositionMs);
+                var higher = Math.Max(PositionMs, newPositionMs);
+                var pointsWithMatchingMs = TimelineData.SoundPoints.Where(p => p.TargetObjectId == soundTargetObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
+                var targetPoint = pointsWithMatchingMs.OrderBy(p => Math.Abs(p.TimeMs - newPositionMs)).FirstOrDefault();
+                if (targetPoint == null) continue; // no points found for this at the actual position
                 if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs (targetPoint.SoundId));
             }
 
@@ -165,6 +168,7 @@ namespace Awb.Core.Player
 
             var ok = await _sender.SendChangesToClients();
             _updating = false;
+           
         }
 
 

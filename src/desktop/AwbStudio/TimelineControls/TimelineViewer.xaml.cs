@@ -10,6 +10,7 @@ using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -127,7 +128,7 @@ namespace AwbStudio.TimelineControls
                 if (_timelinePlayer != null)
                 {
                     _timelinePlayer.OnPlayStateChanged += this.PlayerStateChanged;
-                    _timelinePlayer.OnPlaySound += this.SoundToPlay; 
+                    _timelinePlayer.OnPlaySound += this.SoundToPlay;
                 }
             }
         }
@@ -214,6 +215,8 @@ namespace AwbStudio.TimelineControls
 
         private int _lastBankIndex = -1;
         private IActuatorsService? _actuatorsService;
+        private int _lastPlayedSoundId;
+        private DateTime _lastPlayedSoundUtcTime;
 
         private void OnViewPosChanged(object? sender, EventArgs e)
         {
@@ -240,15 +243,28 @@ namespace AwbStudio.TimelineControls
         {
             if (_mediaPlayer == null) return;
             if (Sounds == null) return;
-            if (e.SoundIndex > 0 && e.SoundIndex < Sounds.Length)
+            var sound = Sounds.FirstOrDefault(s => s.Id == e.SoundId);
+            if (sound == null)
             {
-                var sound = Sounds[e.SoundIndex];
-                MyInvoker.Invoke(new Action(() =>
+                MessageBox.Show("Sound id " + e.SoundId + " not found.");
+            }
+            else
+            {
+                if (_lastPlayedSoundId == sound.Id && (DateTime.UtcNow - _lastPlayedSoundUtcTime).TotalSeconds < 1)
                 {
-                    _mediaPlayer.Stop();
-                    _mediaPlayer.Open(new Uri(sound.Mp3Filename));
-                    _mediaPlayer.Play();
-                }));
+                    // do not spam with sound playing...
+                }
+                else
+                {
+                    _lastPlayedSoundId = sound.Id;
+                    _lastPlayedSoundUtcTime = DateTime.UtcNow;
+                    MyInvoker.Invoke(new Action(() =>
+                    {
+                        _mediaPlayer.Stop();
+                        _mediaPlayer.Open(new Uri(sound.Mp3Filename));
+                        _mediaPlayer.Play();
+                    }));
+                }
             }
         }
 
