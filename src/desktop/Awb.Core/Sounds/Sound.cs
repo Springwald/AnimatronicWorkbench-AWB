@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -12,8 +12,6 @@ namespace Awb.Core.Sounds
         public string Mp3Filename { get; }
 
         public int Id { get; }
-
-        public int FolderId { get; } = 1;
 
         public string Title { get; }
 
@@ -28,13 +26,15 @@ namespace Awb.Core.Sounds
 
             //extract the mp3 file ID
             if (pureFilename.Length < 3) throw new ArgumentException("mp3 filename is not in format 001ABC.M3", nameof(pureFilename));
-            var folderId = pureFilename.Substring(0, 3);
-            if (!int.TryParse(folderId, out var folderIdInt)) throw new ArgumentException("mp3 filename is not in format 001ABC.M3", nameof(pureFilename));
-            FolderId = folderIdInt;
+            var id = pureFilename.Substring(0, 3);
+            if (!int.TryParse(id, out var idInt)) throw new ArgumentException("mp3 filename is not in format 001ABC.M3", nameof(pureFilename));
+
+            Id = idInt;
 
             // extract the title
             var title = pureFilename.Substring(3);
-            Title = string.IsNullOrWhiteSpace(title) ? pureFilename : title;
+            if (string.IsNullOrWhiteSpace(title)) title = pureFilename;
+            Title = title;
         }
 
     }

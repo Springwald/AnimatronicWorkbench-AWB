@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System;
 using System.Collections.Generic;
@@ -91,7 +92,7 @@ namespace AwbStudio.TimelineControls
             if (_timelineData == null) return;
 
             double height = this.ActualHeight;
-            double width = this.ActualWidth;
+            double width = this.ActualWidth; 
 
             var soundPlayerIds = _timelineData?.SoundPoints?.OfType<SoundPoint>().Select(p => p.SoundPlayerId).Where(id => id != null).Distinct().ToArray() ?? Array.Empty<string>();
 

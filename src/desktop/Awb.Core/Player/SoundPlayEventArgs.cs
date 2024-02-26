@@ -5,12 +5,17 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Sounds;
+
 namespace Awb.Core.Player
 {
-    public class PlayStateEventArgs : EventArgs
+    public class SoundPlayEventArgs : EventArgs
     {
-        public TimelinePlayer.PlayStates PlayState { get; set; }
-        public double PlaybackSpeed { get; set; }
-        public int PositionMs { get; set; }
+        public int SoundIndex { get; set; }
+
+        public SoundPlayEventArgs(int soundIndex)
+        {
+            SoundIndex = soundIndex;
+        }
     }
 }

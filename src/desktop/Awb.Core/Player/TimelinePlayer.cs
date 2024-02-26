@@ -1,13 +1,12 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Services;
 using Awb.Core.Timelines;
-using System.Diagnostics;
 
 namespace Awb.Core.Player
 {
@@ -25,7 +24,7 @@ namespace Awb.Core.Player
             Playing
         }
 
-        public  PlayStates PlayState { get; private set; } = PlayStates.Nothing;
+        public PlayStates PlayState { get; private set; } = PlayStates.Nothing;
 
         private volatile bool _timerFiring;
         private volatile bool _updating;
@@ -38,7 +37,8 @@ namespace Awb.Core.Player
         private readonly IAwbLogger _logger;
         private readonly ChangesToClientSender _sender;
 
-        public EventHandler<PlayStateEventArgs> OnPlayStateChanged;
+        public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
+        public EventHandler<SoundPlayEventArgs>? OnPlaySound;
 
         /// <summary>
         /// The timeline to play
@@ -80,7 +80,6 @@ namespace Awb.Core.Player
             PlayState = PlayStates.Playing;
             await Task.CompletedTask;
         }
-
 
         public async void Stop()
         {
@@ -152,7 +151,7 @@ namespace Awb.Core.Player
                 // find a point exactly on the position
                 var targetPoint = TimelineData.SoundPoints.Where(p => p.TargetObjectId == soundTargetObjectId && p.TimeMs <= newPositionMs).OrderByDescending(p => p.TimeMs).FirstOrDefault();
                 if (targetPoint == null) continue; // no points found for this object before the actual position
-                throw new NotImplementedException();
+                if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs (targetPoint.SoundId));
             }
 
             PositionMs = newPositionMs;
@@ -216,7 +215,7 @@ namespace Awb.Core.Player
                 if (ok) break;
                 await Task.Delay(500);
             }
-            
+
         }
     }
 }

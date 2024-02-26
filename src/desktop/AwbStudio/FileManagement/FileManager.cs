@@ -7,6 +7,7 @@
 
 using Awb.Core.Configs;
 using Awb.Core.LoadNSave.TimelineLoadNSave;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System.Collections.Generic;
 using System.IO;

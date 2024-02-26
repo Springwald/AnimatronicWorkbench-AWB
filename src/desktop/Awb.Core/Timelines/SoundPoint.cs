@@ -9,26 +9,26 @@ namespace Awb.Core.Timelines
 {
     public class SoundPoint : TimelinePoint
     {
-        public const string SoundPlayerObjectId = "snd";
-
         /// <summary>
         /// The resource id of the sound to be played.
         /// What kind of resource this is depends on the implementation of the sound player.
         /// </summary>
-        public int SoundIndex { get; set; }
+        public int SoundId { get; set; }
 
         /// <summary>
         /// A specific sound player e.g. for multi puppet scenarios
         /// </summary>
-        public string? SoundPlayerId { get; set; }
+        public string SoundPlayerId { get; set; }
 
-        public override string? Title => $"{SoundPlayerId}: {SoundIndex} {TimeMs}ms";
+        public override string Title { get; }
 
 
         /// <param name="soundId">The resource id of the sound to be played. What kind of resource this is depends on the implementation of the sound player.</param>
-        public SoundPoint(int timeMs, int soundIndex) : base(SoundPlayerObjectId, timeMs)
+        public SoundPoint(int timeMs, string soundPlayerId, string title, int soundId) : base(targetObjectId: soundPlayerId, timeMs: timeMs)
         {
-            this.SoundIndex = soundIndex;
+            this.SoundId = soundId;
+            this.Title = title;
+            this.SoundPlayerId = soundPlayerId;
         }
     }
 }

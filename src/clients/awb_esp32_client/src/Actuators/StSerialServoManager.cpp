@@ -103,14 +103,21 @@ void StSerialServoManager::updateActuators()
  */
 void StSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
 {
-    for (int i = 0; i < servoValues->size(); i++)
+    if (this->servoAvailable(id))
     {
-        if (servoValues->at(i).id == id)
+        for (int i = 0; i < servoValues->size(); i++)
         {
-            servoValues->at(i).targetValue = position;
-            servoValues->at(i).speed = speed;
-            servoValues->at(i).acc = acc;
+            if (servoValues->at(i).id == id)
+            {
+                servoValues->at(i).targetValue = position;
+                servoValues->at(i).speed = speed;
+                servoValues->at(i).acc = acc;
+            }
         }
+    }
+    else
+    {
+        _errorOccured("STS Servo channel " + String(id) + " not attached!");
     }
 }
 

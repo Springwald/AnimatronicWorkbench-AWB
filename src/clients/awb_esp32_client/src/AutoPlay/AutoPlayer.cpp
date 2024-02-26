@@ -113,14 +113,8 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
             int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.stsServoPoints);
             if (targetValue == -1)
                 continue;
-            if (_stSerialServoManager->servoAvailable(servoChannel))
-            {
-                _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
-            }
-            else
-            {
-                _errorOccured("STS Servo channel " + String(servoChannel) + " not attached!");
-            }
+
+            _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
         _stSerialServoManager->updateActuators();
     }
@@ -137,14 +131,8 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
             int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.scsServoPoints);
             if (targetValue == -1)
                 continue;
-            if (_scSerialServoManager->servoAvailable(servoChannel))
-            {
-                _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
-            }
-            else
-            {
-                _errorOccured("SCS Servo channel " + String(servoChannel) + " not attached!");
-            }
+
+            _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
         _scSerialServoManager->updateActuators();
     }

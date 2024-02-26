@@ -64,9 +64,7 @@ namespace Awb.Core.Actuators
 
         public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}MP3{Id} {Name ?? string.Empty}";
 
-        public int SoundsCount { get; }
-
-        public int ActualSoundIndex { get; private set; }
+        public int ActualSoundId { get; private set; }
 
         public Mp3PlayerYX5300(Mp3PlayerYX5300Config config, int soundsCount)
         {
@@ -74,14 +72,13 @@ namespace Awb.Core.Actuators
             ClientId = config.ClientId;
             TxPin = config.TxPin;
             RxPin = config.RxPin;
-            ActualSoundIndex = 0;
+            ActualSoundId = 0;
             IsDirty = true;
-            SoundsCount = soundsCount;
         }
 
-        public void PlaySound(int soundIndex)
+        public void PlaySound(int soundId)
         {
-            ActualSoundIndex = soundIndex;
+            ActualSoundId = soundId;
         }
 
         public bool TurnOff()

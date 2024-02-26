@@ -49,7 +49,7 @@ namespace AwbStudio.Projects
                 DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never,
                 PropertyNameCaseInsensitive = true,
             };
-            project.ProjectFolder = projectFolder;
+            project.SetProjectFolder(projectFolder);
             var jsonStr = JsonSerializer.Serialize<AwbProject>(project, options);
             File.WriteAllText(ProjectConfigFilename(projectFolder), jsonStr);
             return true;
@@ -88,7 +88,7 @@ namespace AwbStudio.Projects
                 errorMessages = new string[] { $"Project config file '{ProjectConfigFilename(projectFolder)}' could not be loaded: Deserialized == null" };
                 return false;
             }
-            projectConfig.ProjectFolder = projectFolder;
+            projectConfig.SetProjectFolder(projectFolder);
             this.ActualProject = projectConfig;
 
             _awbStudioSettingsService.StudioSettings.AddLastProjectFolder(projectFolder);

@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 
 namespace Awb.Core.LoadNSave.Timelines
@@ -13,31 +14,36 @@ namespace Awb.Core.LoadNSave.Timelines
     {
         public int TimeMs { get; }
         public string TargetObjectId { get; }
-        public string? Title { get; set; }
+        public string SoundPlayerId => TargetObjectId;
+        public string Title { get; set; }
         public string? Description { get; set; }
-        public int SoundIndex { get; set; }
+        public int SoundId { get; set; }
 
-        public SoundPointSaveFormat(int timeMs, string targetObjectId, int soundIndex)
+        public SoundPointSaveFormat(int timeMs, string targetObjectId, int soundId)
         {
             TimeMs = timeMs;
             TargetObjectId = targetObjectId;
-            SoundIndex = soundIndex;
+            SoundId = soundId;
         }
 
         public static SoundPointSaveFormat FromSoundPoint(SoundPoint soundPoint) => new SoundPointSaveFormat(
                 timeMs: soundPoint.TimeMs,
-                targetObjectId: soundPoint.TargetObjectId,
-                soundIndex: soundPoint.SoundIndex
+                targetObjectId: soundPoint.SoundPlayerId,
+                soundId: soundPoint.SoundId
                 )
         {
             Title = soundPoint.Title,
             Description = soundPoint.Description,
         };
 
-        public static SoundPoint ToSoundPoint(SoundPointSaveFormat soundPointSaveFormat) =>
-                new SoundPoint(timeMs: soundPointSaveFormat.TimeMs, soundIndex: soundPointSaveFormat.SoundIndex)
-                {
-                    Description = soundPointSaveFormat.Description,
-                };
+        public static SoundPoint ToSoundPoint(SoundPointSaveFormat soundPointSaveFormat)
+        =>    new SoundPoint(
+            timeMs: soundPointSaveFormat.TimeMs,
+            soundPlayerId: soundPointSaveFormat.TargetObjectId,
+            title: soundPointSaveFormat.Title,
+            soundId: soundPointSaveFormat.SoundId)
+                      {
+                          Description = soundPointSaveFormat.Description,
+                      };
     }
 }

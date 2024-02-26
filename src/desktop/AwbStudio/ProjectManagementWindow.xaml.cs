@@ -85,7 +85,7 @@ namespace AwbStudio
                         return;
                     }
 
-                    var project = new AwbProject(projectFolder: projectPath, title: "no project title")
+                    var project = new AwbProject(title: "no project title")
                     {
                         Info = "Description of this AWB project",
                         TimelinesStates = new TimelineState[]
@@ -120,6 +120,8 @@ namespace AwbStudio
                         }, 
                         Mp3PlayerYX5300 = new Awb.Core.Project.Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "Mp3Player")
                     };
+                    project.SetProjectFolder(projectPath);
+
 
                     if (_projectManagerService.SaveProject(project, projectFolder: dialog.SelectedPath))
                     {

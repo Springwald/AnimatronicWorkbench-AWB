@@ -7,6 +7,7 @@
 
 using Awb.Core.Player;
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System;
 using System.Windows;
@@ -20,13 +21,14 @@ namespace AwbStudio.TimelineControls
     {
         private const int ItemsPerBank = 8;
 
+        private int _actualBankIndex = 0;
         private bool _wasPlaying = false;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
 
         private TimelinePlayer? _timelinePlayer;
         private TimelineViewPos _viewPos;
-        private int _actualBankIndex = 0;
+        private MediaPlayer? _mediaPlayer;
 
         private ITimelineControl[] _subTimelineViewerControls;
 
@@ -122,9 +124,17 @@ namespace AwbStudio.TimelineControls
             set
             {
                 _timelinePlayer = value;
-                if (_timelinePlayer != null) _timelinePlayer.OnPlayStateChanged += this.PlayerStateChanged;
+                if (_timelinePlayer != null)
+                {
+                    _timelinePlayer.OnPlayStateChanged += this.PlayerStateChanged;
+                    _timelinePlayer.OnPlaySound += this.SoundToPlay; 
+                }
             }
         }
+
+        public Sound[]? Sounds { get; internal set; }
+
+
 
         /// <summary>
         /// set the scroll offset in a way, that the manual playPos is always at the position chosen in the hardware controller 
@@ -157,6 +167,8 @@ namespace AwbStudio.TimelineControls
 
             // set up the sub-timeline-viewers
             _subTimelineViewerControls = new ITimelineControl[] { CaptionsViewer, ServoValueViewer, SoundValueViewer };
+
+            _mediaPlayer = new MediaPlayer();
 
             // connect timeline-caption- calculator to all sub-timeline-viewers
             var timelineCaptions = new TimelineCaptions();
@@ -224,6 +236,22 @@ namespace AwbStudio.TimelineControls
             });
         }
 
+        private void SoundToPlay(object? sender, SoundPlayEventArgs e)
+        {
+            if (_mediaPlayer == null) return;
+            if (Sounds == null) return;
+            if (e.SoundIndex > 0 && e.SoundIndex < Sounds.Length)
+            {
+                var sound = Sounds[e.SoundIndex];
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    _mediaPlayer.Stop();
+                    _mediaPlayer.Open(new Uri(sound.Mp3Filename));
+                    _mediaPlayer.Play();
+                }));
+            }
+        }
+
         private void TimelineViewer_Loaded(object sender, RoutedEventArgs e)
         {
             Loaded -= TimelineViewer_Loaded;
@@ -235,6 +263,11 @@ namespace AwbStudio.TimelineControls
         {
             Unloaded -= TimelineViewer_Unloaded;
             if (_timelinePlayer != null) _timelinePlayer.OnPlayStateChanged -= this.PlayerStateChanged;
+            if (_mediaPlayer != null)
+            {
+                _mediaPlayer.Stop();
+                _mediaPlayer = null;
+            }
         }
 
         private void TimelineViewer_SizeChanged(object sender, SizeChangedEventArgs e)

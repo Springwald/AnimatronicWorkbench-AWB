@@ -78,7 +78,8 @@ void AwbDisplay::setup(int clientId)
 
     if (_isSmallScreen)
     {
-        font = &fonts::Font0;
+        // font = &fonts::Font0;
+        font = &fonts::DejaVu9;
         // font = &fonts::TomThumb;
         _textSizeFont = 1.0f;
         _textSizePx = _textSizeFont * 8;

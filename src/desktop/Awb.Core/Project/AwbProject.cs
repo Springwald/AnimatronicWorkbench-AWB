@@ -12,11 +12,13 @@ namespace Awb.Core.Configs
 {
     public class AwbProject
     {
+        private Sound[]? _sounds;
+        public string? _projectFolder;
+
         public string Info { get; set; } = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench";
 
         public string Title { get; set; }
 
-        public string ProjectFolder { get; set; }
 
         public Pca9685PwmServoConfig[]? Pca9685PwmServos { get; set; }
 
@@ -29,13 +31,19 @@ namespace Awb.Core.Configs
 
         public string? AutoPlayEsp32ExportFolder { get; set; }
 
-        public Sound[] Sounds { get; }
+        public Sound[] Sounds => _sounds ?? throw new Exception("Sounds not set! Have you set the project folder?");
+        public string ProjectFolder => _projectFolder ?? throw new Exception("Project folder not set!");
 
-        public AwbProject(string title, string projectFolder)
+        public AwbProject(string title)
         {
             Title = title;
-            ProjectFolder = projectFolder;
-            Sounds = new SoundManager(Path.Combine(projectFolder, "audio")).Sounds;
+        }
+
+        public void SetProjectFolder(string folder)
+        {
+            if (!Path.Exists(folder)) throw new DirectoryNotFoundException(folder);
+            _projectFolder = folder;
+            _sounds = new SoundManager(Path.Combine(_projectFolder, "audio")).Sounds;
         }
 
 

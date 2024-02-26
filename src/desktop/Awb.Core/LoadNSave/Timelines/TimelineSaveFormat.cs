@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.LoadNSave.Timelines;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 
 namespace Awb.Core.LoadNSave.TimelineLoadNSave
