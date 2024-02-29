@@ -16,15 +16,15 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 29.02.2024 22:36:24
+// Created on 29.02.2024 23:02:41
 
 class AutoPlayData
 {
 
 protected:
 public:
-	const char *ProjectName = "no project title";   // Project Name
-	const char *WlanSSID = "AWB-no project title";  // WLAN SSID Name
+	const char *ProjectName = "Grogu 2";   // Project Name
+	const char *WlanSSID = "AWB-Grogu 2";  // WLAN SSID Name
 	const char *WlanPassword = "awb12345"; // WLAN Password
 
 	int stsServoCount = 5;
@@ -48,16 +48,16 @@ public:
 
 	int timelineStateIds[5] = {1, 2, 3, 4, 5};
 	int timelineStateCount = 5;
-    std::vector<Timeline> *timelines;
+	std::vector<Timeline> *timelines;
 
-    AutoPlayData()
-    {
-        timelines = new std::vector<Timeline>();
-    }
+	AutoPlayData()
+	{
+		timelines = new std::vector<Timeline>();
+	}
 
-    ~AutoPlayData()
-    {
-    }
+	~AutoPlayData()
+	{
+	}
 };
 
 #endif

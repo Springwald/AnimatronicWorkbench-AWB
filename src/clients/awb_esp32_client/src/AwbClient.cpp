@@ -210,7 +210,7 @@ void AwbClient::loop()
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
-    _mp3Player->playSound(1);
+    //_mp3Player->playSound(1);
 
     // update autoplay timelines and actuators
     auto criticalTemp = false;

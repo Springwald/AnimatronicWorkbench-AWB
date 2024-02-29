@@ -25,7 +25,7 @@
                     <RowDefinition Height="80*"/>
                     <RowDefinition Height="20*"/>
                 </Grid.RowDefinitions>
-                <local:ServoValueViewerControl Grid.Row="0" Grid.Column="0" x:Name="ServoValueViewer"/>
+                <local:ServoValueViewerControl Grid.Row="0" Grid.Column="0" x:Name="ServoValueViewer" />
                 <local:SoundValueViewerControl Grid.Row="1" Grid.Column="0" x:Name="SoundValueViewer"/>
               
             </Grid>
