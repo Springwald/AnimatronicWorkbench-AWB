@@ -10,11 +10,6 @@ namespace Awb.Core.Configs
     internal interface IDeviceConfig
     {
         /// <summary>
-        /// If the device can be paused, this is the switch id to pause the device
-        /// </summary>
-        public int? PauseSwitchId { get; set; }
-
-        /// <summary>
         /// the unqiue id of the device
         /// the unqiue id of the device
         /// </summary>

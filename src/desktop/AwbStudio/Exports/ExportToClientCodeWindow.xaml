@@ -23,7 +23,7 @@
             <Button x:Name="ButtonCopyToClipboard" Content="Copy to clipboard" Click="ButtonCopyToClipboard_Click" />
             <Button x:Name="ButtonCopyToFile" Content="Write to AutoPlayData.h file" Click="ButtonCopyToFile_Click"  />
             <Label Content="Target folder:" />
-            <Label x:Name="LabelTargetFolder" MouseDown="LabelTargetFolder_MouseDown" Content="LabelTargetFolder"/>
+            <Label x:Name="LabelTargetFolder" MouseDown="LabelTargetFolder_MouseDown" Content="LabelTargetFolder" MinHeight="20"/>
         </StackPanel>
 
 

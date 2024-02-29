@@ -19,7 +19,6 @@ namespace Awb.Core.Configs
         public int? DefaultValue { get; set; }
         public int? Acceleration { get; set; }
         public int? Speed { get; set; }
-        public int? PauseSwitchId { get; set; }
 
         public StsServoConfig(string id, uint clientId, uint channel)
         {

@@ -7,31 +7,33 @@
 
 using Awb.Core.Project;
 using Awb.Core.Sounds;
+using System.Text.Json.Serialization;
 
 namespace Awb.Core.Configs
 {
     public class AwbProject
     {
         private Sound[]? _sounds;
+
         public string? _projectFolder;
 
-        public string Info { get; set; } = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench";
+        public string Info { get; set; } 
 
         public string Title { get; set; }
 
-
         public Pca9685PwmServoConfig[]? Pca9685PwmServos { get; set; }
-
         public StsServoConfig[]? StsServos { get; set; }
         public StsServoConfig[]? ScsServos { get; set; }
-
         public Mp3PlayerYX5300Config? Mp3PlayerYX5300 { get; set; }
 
         public TimelineState[]? TimelinesStates { get; set; }
 
         public string? AutoPlayEsp32ExportFolder { get; set; }
 
+        [JsonIgnore]
         public Sound[] Sounds => _sounds ?? throw new Exception("Sounds not set! Have you set the project folder?");
+
+        [JsonIgnore]
         public string ProjectFolder => _projectFolder ?? throw new Exception("Project folder not set!");
 
         public AwbProject(string title)

@@ -19,7 +19,6 @@ namespace Awb.Core.Configs
         public int? DefaultValue { get; set; }
         public int? Acceleration { get; set; }
         public int? Speed { get; set; }
-        public int? PauseSwitchId { get; set; }
 
         public Pca9685PwmServoConfig(string id, uint clientId, uint i2cAdress,  uint channel)
         {

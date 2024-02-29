@@ -10,6 +10,7 @@ using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -246,10 +247,11 @@ namespace AwbStudio.TimelineControls
             var sound = Sounds.FirstOrDefault(s => s.Id == e.SoundId);
             if (sound == null)
             {
-                MessageBox.Show("Sound id " + e.SoundId + " not found.");
+                MessageBox.Show($"Sound id '{e.SoundId}' not found.");
             }
             else
             {
+                Debug.WriteLine((DateTime.UtcNow - _lastPlayedSoundUtcTime).TotalSeconds);
                 if (_lastPlayedSoundId == sound.Id && (DateTime.UtcNow - _lastPlayedSoundUtcTime).TotalSeconds < 1)
                 {
                     // do not spam with sound playing...

@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -87,7 +87,7 @@ namespace AwbStudio
 
                     var project = new AwbProject(title: "no project title")
                     {
-                        Info = "Description of this AWB project",
+                        Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
                         TimelinesStates = new TimelineState[]
                         {
                             new TimelineState(1, "sleep"),
@@ -117,7 +117,7 @@ namespace AwbStudio
                                 MaxValue = 4095,
                                 MinValue = 0,
                             },
-                        }, 
+                        },
                         Mp3PlayerYX5300 = new Awb.Core.Project.Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "Mp3Player")
                     };
                     project.SetProjectFolder(projectPath);
