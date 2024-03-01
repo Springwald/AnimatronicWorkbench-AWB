@@ -61,6 +61,9 @@ namespace AwbStudio.TimelineControls
             }
         }
 
+        public int FirstBankItemNo => BankIndex * ItemsPerBank + 1; // base 1
+        public int LastBankItemNo => FirstBankItemNo + ItemsPerBank - 1; // base 1
+
         /// <summary>
         /// The left offset of the timeline in seconds
         /// </summary>

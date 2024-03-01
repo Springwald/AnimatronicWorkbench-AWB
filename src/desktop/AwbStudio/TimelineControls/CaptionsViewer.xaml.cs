@@ -8,10 +8,8 @@
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using System;
-using System.IO;
 using System.Linq;
 using System.Windows.Controls;
-using System.Xml;
 
 namespace AwbStudio.TimelineControls
 {
@@ -20,13 +18,17 @@ namespace AwbStudio.TimelineControls
     /// </summary>
     public partial class CaptionsViewer : UserControl, ITimelineControl
     {
-        private readonly Label _protoypeLabel;
+        private readonly Border _prototypeLabelBorder;
+        private readonly Border _prototypeLabelBorderInActualBank;
         private IActuatorsService? _actuatorsService;
+        private TimelineViewPos? _viewPos;
+        private int _lastBankIndex;
 
         public CaptionsViewer()
         {
             InitializeComponent();
-            this._protoypeLabel = WpfToolbox.XamlClone(PrototypeLabel);
+            this._prototypeLabelBorder = WpfToolbox.XamlClone(PrototypeLabelBorder);
+            this._prototypeLabelBorderInActualBank = WpfToolbox.XamlClone(PrototypeLabelBorderInActualBank);
         }
 
         /// <summary>
@@ -39,34 +41,71 @@ namespace AwbStudio.TimelineControls
                 if (value != null && _actuatorsService != null) throw new InvalidOperationException("ActuatorsService already set");
                 _actuatorsService = value ?? throw new ArgumentNullException(nameof(ActuatorsService));
 
-                // Add servos
-                int no = 1;
-                foreach (var servo in _actuatorsService.Servos)
-                    TimelineCaptions.AddAktuator(servo, $"({no++}) {servo.Label}");
+                foreach (var actuator in _actuatorsService.AllActuators)
+                    TimelineCaptions.AddAktuator(actuator, actuator.Label);
 
-                // Add soudplayer
-                foreach (var soundPlayer in _actuatorsService.SoundPlayers)
-                    TimelineCaptions.AddAktuator(soundPlayer, $"({no++}) {soundPlayer.Label}");
+                UpdateCaptionView();
+            }
+        }
 
-                LineNames.Children.Clear();
-                if (TimelineCaptions?.Captions?.Any() == true)
+        public TimelineCaptions? TimelineCaptions { get; set; }
+        public TimelineData? TimelineData { get; set; }
+        public TimelineViewPos? ViewPos
+        {
+            get => _viewPos;
+            set
+            {
+                _viewPos = value;
+                if (_viewPos != null) _viewPos.Changed += ViewPos_Changed;
+            }
+        }
+
+        private void UpdateCaptionView()
+        {
+            if (_viewPos == null) return;
+            if (_actuatorsService == null) return;
+
+       
+
+            LineNames.Children.Clear();
+            if (TimelineCaptions?.Captions?.Any() == true)
+            {
+                int no = 0;
+                Border? border = null;
+                foreach (var caption in TimelineCaptions.Captions)
                 {
-                    foreach (var caption in TimelineCaptions.Captions)
+                    no++;
+                    if (no >= _viewPos.FirstBankItemNo && no <= _viewPos.LastBankItemNo)
                     {
-                        var label = WpfToolbox.XamlClone(_protoypeLabel);
-                        label.Content = caption.Label.Trim();
-                        label.Foreground = caption.ForegroundColor;
-                        label.Background = caption.BackgroundColor;
-                        LineNames.Children.Add(label);
+                        // actuator is inside the actual bank
+                        border = WpfToolbox.XamlClone(_prototypeLabelBorderInActualBank);
                     }
+                    else
+                    {
+                        // actuatator is not inside the actual bank
+                        border = WpfToolbox.XamlClone(_prototypeLabelBorder);
+                    }
+
+                    var label = border.Child as Label ?? throw new ApplicationException("label border contains no label control?");
+                    label.Content = no >= _viewPos.FirstBankItemNo && no <= _viewPos.LastBankItemNo ? $"[{no - _viewPos.FirstBankItemNo + 1}] {caption.Label.Trim()}"  : caption.Label.Trim();
+                    label.Foreground = caption.ForegroundColor;
+                    label.Background = caption.BackgroundColor;
+                    LineNames.Children.Add(border);
                 }
             }
         }
 
-
-     
-        public TimelineCaptions TimelineCaptions { get; set; }
-        public TimelineData? TimelineData { get; set; }
-        public TimelineViewPos ViewPos { get; set; }
+        private void ViewPos_Changed(object? sender, EventArgs e)
+        {
+            if (_viewPos == null) return;
+            if (_lastBankIndex != _viewPos.BankIndex && _actuatorsService != null)
+            {
+                _lastBankIndex = _viewPos.BankIndex;
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    this.UpdateCaptionView();  
+                }));
+            }
+        }
     }
 }

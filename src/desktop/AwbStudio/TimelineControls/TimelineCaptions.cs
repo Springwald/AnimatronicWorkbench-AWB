@@ -24,6 +24,14 @@ namespace AwbStudio.TimelineControls
             new SolidColorBrush(Colors.Orange),
             new SolidColorBrush(Colors.Pink),
             new SolidColorBrush(Colors.Yellow),
+            new SolidColorBrush(Colors.Beige),
+            new SolidColorBrush(Colors.Tomato),
+            new SolidColorBrush(Colors.SkyBlue),
+            new SolidColorBrush(Colors.MintCream),
+            new SolidColorBrush(Colors.LightGoldenrodYellow),
+            new SolidColorBrush(Colors.LightPink),
+            new SolidColorBrush(Colors.LightSteelBlue),
+            new SolidColorBrush(Colors.LemonChiffon),
         };
 
         private Brush _brushBlack = new SolidColorBrush(Colors.Black);

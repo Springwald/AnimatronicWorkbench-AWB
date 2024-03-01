@@ -6,7 +6,15 @@
     <ResourceDictionary Source="Styles.Shared.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
-  <!-- ******************************************************** WPF SPECIFIC INLINE-CONTROLS RESOURCES ***********************************************************
+    <Style x:Key="CaptionBorderActiveBank" TargetType="Border">
+        <Setter Property="BorderBrush" Value="LightBlue" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <!-- ******************************************************** WPF SPECIFIC INLINE-CONTROLS RESOURCES ***********************************************************
     ***********************************************************************************************************************************************************************    -->
   <!-- *********************************  ScrollBarButton Style  ********************************* -->
   <Style x:Key="ScrollBarButtonStyle" TargetType="{x:Type RepeatButton}">
