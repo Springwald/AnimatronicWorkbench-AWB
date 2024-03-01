@@ -74,20 +74,20 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
         /// <summary>
         /// number of acturator, zero based
         /// </summary>
-        public int ActuatorIndex { get; }
+        public int ActuatorIndex_ { get; }
 
         public TimelineControllerEventArgs(EventTypes eventType, int actuatorIndex, double valueInPercent)
         {
             EventType = eventType;
             ValueInPercent = valueInPercent;
-            ActuatorIndex = actuatorIndex;
+            ActuatorIndex_ = actuatorIndex;
         }
 
         public TimelineControllerEventArgs(EventTypes eventType)
         {
             EventType = eventType;
             ValueInPercent = -1;
-            ActuatorIndex = -1;
+            ActuatorIndex_ = -1;
         }
 
     }

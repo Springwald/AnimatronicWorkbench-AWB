@@ -34,7 +34,7 @@ namespace AwbStudio
         private readonly AwbProject _project;
         private readonly FileManager _fileManager;
         private readonly ITimelineController[] _timelineControllers;
-
+        private readonly TimelineViewPos _viewPos;
         private TimelinePlayer _timelinePlayer;
         private IActuatorsService _actuatorsService;
         private IAwbClientsService _clientService;
@@ -60,9 +60,8 @@ namespace AwbStudio
             _project = _projectManagerService.ActualProject;
             _fileManager = new FileManager(_project);
             _timelineControllers = inputControllerService.TimelineControllers;
-
-            var viewPos = new TimelineViewPos();
-            TimelineViewerControl.ViewPos = viewPos;
+            _viewPos = new TimelineViewPos();
+            TimelineViewerControl.ViewPos = _viewPos;
 
             Loaded += TimelineEditorWindow_Loaded;
         }
@@ -203,8 +202,11 @@ namespace AwbStudio
 
                     var allActuators = _actuatorsService?.AllActuators;
                     if (allActuators == null) return;
-                    if (e.ActuatorIndex >= allActuators.Length) return;
-                    var actuator = allActuators[e.ActuatorIndex];
+
+                    var actuatorIndex = e.ActuatorIndex_ + _viewPos.BankIndex * _viewPos.ItemsPerBank;
+                    if (actuatorIndex >= allActuators.Length) return;
+
+                    var actuator = allActuators[actuatorIndex];
                     var targetPercent = e.ValueInPercent;
 
                     switch (actuator)
@@ -252,10 +254,10 @@ namespace AwbStudio
                     if (_manualUpdatingValues) await _timelinePlayer.Update();
                     _manualUpdatingValues = false;
                     MyInvoker.Invoke(new Action(() => { TimelineViewerControl.PaintTimeLine(); }));
-                    if (_lastActuatorChanged != e.ActuatorIndex)
+                    if (_lastActuatorChanged != actuatorIndex)
                     {
                         ShowActuatorValuesOnTimelineInputController(_timelinePlayer.PositionMs);
-                        _lastActuatorChanged = e.ActuatorIndex;
+                        _lastActuatorChanged = actuatorIndex;
                     }
                     break;
 
@@ -264,8 +266,11 @@ namespace AwbStudio
                     _lastActuatorChanged = -1;
                     var actuators = _actuatorsService?.AllActuators;
                     if (actuators == null) return;
-                    if (e.ActuatorIndex >= actuators.Length) return;
-                    actuator = actuators[e.ActuatorIndex];
+
+                    actuatorIndex = e.ActuatorIndex_ + _viewPos.BankIndex * _viewPos.ItemsPerBank;
+                    if (actuatorIndex >= actuators.Length) return;
+
+                    actuator = actuators[actuatorIndex];
 
                     switch (actuator)
                     {
