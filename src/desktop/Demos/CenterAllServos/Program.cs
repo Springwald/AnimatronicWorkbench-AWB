@@ -13,7 +13,7 @@ using ResetAllServos;
 var logger = new AwbLoggerConsole(throwWhenInDebugMode: false);
 var clientService = new AwbClientsService(logger);
 await clientService.Init();
-var config = new AwbProject(title:"demo", projectFolder: "")
+var config = new AwbProject(title:"demo")
 {
     StsServos = Enumerable.Range(1, 2).Select(id =>
                          new StsServoConfig(id: $"servo {id}", clientId: 2, channel: (uint)id)

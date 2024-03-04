@@ -12,10 +12,22 @@ namespace Awb.Core.Configs
         public int Id { get; internal set; }
         public string Name { get; internal set; }
 
-        public TimelineState(int id, string name)
+        /// <summary>
+        /// The state is only available when one of this inputs are on
+        /// </summary>
+        public int[] PositiveInputs { get; internal set; }
+
+        /// <summary>
+        /// The state not available when one of this inputs are on
+        /// </summary>
+        public int[] NegativeInputs { get; internal set; }
+
+        public TimelineState(int id, string name, int[]? positiveInputs = null, int[]? negativeInputs= null)
         {
             Id = id;
             Name = name;
+            PositiveInputs = positiveInputs ?? Array.Empty<int>();
+            NegativeInputs = negativeInputs ?? Array.Empty<int>();
         }
 
         public override string ToString() => $"[{Id}] {Name}";
