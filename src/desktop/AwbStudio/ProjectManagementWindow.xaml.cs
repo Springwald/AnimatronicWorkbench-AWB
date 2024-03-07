@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Configs;
+using Awb.Core.Project;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
 using Microsoft.Extensions.DependencyInjection;
@@ -85,43 +85,7 @@ namespace AwbStudio
                         return;
                     }
 
-                    var project = new AwbProject(title: "no project title")
-                    {
-                        Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
-                        TimelinesStates = new TimelineState[]
-                        {
-                            new TimelineState(1, "sleep"),
-                            new TimelineState(2, "action"),
-                            new TimelineState(3, "idle"),
-                            new TimelineState(4, "talk"),
-                            new TimelineState(5, "joint demo"),
-                        },
-                        StsServos = new StsServoConfig[]
-                        {
-                             new StsServoConfig(id: "StsServo1", clientId: 1, channel: 1)
-                             {
-                                 Name ="Demo serial Servo 1",
-                                 Acceleration = 20,
-                                 DefaultValue = 2000,
-                                 MaxValue = 4095,
-                                 MinValue = 0,
-                                 Speed = 1000,
-                             },
-                         },
-                        Pca9685PwmServos = new Pca9685PwmServoConfig[]
-                        {
-                            new Pca9685PwmServoConfig(id: "PwmServo1", clientId: 1, i2cAdress:0x40, channel: 1)
-                            {
-                                Name = "Demo PWM Servo 1",
-                                DefaultValue = 2000,
-                                MaxValue = 4095,
-                                MinValue = 0,
-                            },
-                        },
-                        Mp3PlayerYX5300 = new Awb.Core.Project.Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "Mp3Player")
-                    };
-                    project.SetProjectFolder(projectPath);
-
+                    AwbProject project = CreateNewProject(projectPath);
 
                     if (_projectManagerService.SaveProject(project, projectFolder: dialog.SelectedPath))
                     {
@@ -138,6 +102,52 @@ namespace AwbStudio
                     }
                 }
             }
+        }
+
+        private static AwbProject CreateNewProject(string projectPath)
+        {
+            var project = new AwbProject(title: "no project title")
+            {
+                Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
+                TimelinesStates = new TimelineState[]
+                {
+                            new TimelineState(1, "sleep", positiveInputs: new[] { 1 }),
+                            new TimelineState(2, "action"),
+                            new TimelineState(3, "idle"),
+                            new TimelineState(4, "talk"),
+                            new TimelineState(5, "joint demo"),
+                },
+                StsServos = new StsServoConfig[]
+                {
+                            new StsServoConfig(id: "StsServo1", clientId: 1, channel: 1)
+                            {
+                                Name = "Demo serial Servo 1",
+                                Acceleration = 20,
+                                DefaultValue = 2000,
+                                MaxValue = 4095,
+                                MinValue = 0,
+                                Speed = 1000,
+                            },
+                },
+                Pca9685PwmServos = new Pca9685PwmServoConfig[]
+                {
+                            new Pca9685PwmServoConfig(id: "PwmServo1", clientId: 1, i2cAdress: 0x40, channel: 1)
+                            {
+                                Name = "Demo PWM Servo 1",
+                                DefaultValue = 2000,
+                                MaxValue = 4095,
+                                MinValue = 0,
+                            },
+                },
+                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "Mp3Player") },
+                Inputs = new InputConfig[]
+                {
+                            new InputConfig(id: 1, name:"Sleep") { IoPin = 25 }
+                },
+
+            };
+            project.SetProjectFolder(projectPath);
+            return project;
         }
 
         private void ButtonOpenExisting_Click(object sender, RoutedEventArgs e)

@@ -5,7 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Configs;
+
+using Awb.Core.Project;
 
 namespace MidiControllerLiveControl
 {

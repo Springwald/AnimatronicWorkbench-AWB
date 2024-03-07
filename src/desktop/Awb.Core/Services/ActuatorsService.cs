@@ -6,7 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
-using Awb.Core.Configs;
+using Awb.Core.Project;
 
 namespace Awb.Core.Services
 {
@@ -30,14 +30,14 @@ namespace Awb.Core.Services
 
         public ISoundPlayer[] SoundPlayers { get; }
 
-        public ActuatorsService(AwbProject config, IAwbClientsService awbClientsService, IAwbLogger logger)
+        public ActuatorsService(AwbProject projectConfig, IAwbClientsService awbClientsService, IAwbLogger logger)
         {
             var servos = new List<IServo>();
 
             // add PWM servos
-            if (config.Pca9685PwmServos != null)
+            if (projectConfig.Pca9685PwmServos != null)
             {
-                foreach (var pca9685PwmServoConfig in config.Pca9685PwmServos)
+                foreach (var pca9685PwmServoConfig in projectConfig.Pca9685PwmServos)
                 {
                     if (pca9685PwmServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
                     var client = awbClientsService.GetClient(pca9685PwmServoConfig.ClientId);
@@ -49,9 +49,9 @@ namespace Awb.Core.Services
             }
 
             // add STS servos
-            if (config.StsServos != null)
+            if (projectConfig.StsServos != null)
             {
-                foreach (var stsServoConfig in config.StsServos)
+                foreach (var stsServoConfig in projectConfig.StsServos)
                 {
                     if (stsServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
                     var client = awbClientsService.GetClient(stsServoConfig.ClientId);
@@ -63,9 +63,9 @@ namespace Awb.Core.Services
             }
 
             // add SCS servos
-            if (config.ScsServos != null)
+            if (projectConfig.ScsServos != null)
             {
-                foreach (var scsServoConfig in config.ScsServos)
+                foreach (var scsServoConfig in projectConfig.ScsServos)
                 {
                     if (scsServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
                     var client = awbClientsService.GetClient(scsServoConfig.ClientId);
@@ -77,10 +77,10 @@ namespace Awb.Core.Services
             }
 
             // add sound player
-            if (config.Mp3PlayerYX5300 != null) 
+            if (projectConfig.Mp3PlayersYX5300 != null)
             {
                 // actual is only one sound player supported
-                SoundPlayers = new[] { new Mp3PlayerYX5300(config.Mp3PlayerYX5300, soundsCount: config.Sounds.Length) };
+                SoundPlayers = projectConfig.Mp3PlayersYX5300.Select(p => new Mp3PlayerYX5300(p, soundsCount: projectConfig.Sounds.Length)).ToArray();
             }
             else
             {

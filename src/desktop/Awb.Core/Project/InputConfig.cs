@@ -7,12 +7,16 @@
 
 namespace Awb.Core.Project
 {
-    internal interface IDeviceConfig
+    public class InputConfig
     {
-        /// <summary>
-        /// the unqiue id of the device
-        /// the unqiue id of the device
-        /// </summary>
-        public string Id { get; set; }
+        public int Id { get;  set; }
+        public string Name { get;  set; }
+        public int? IoPin { get;  set; } 
+
+        public InputConfig(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }

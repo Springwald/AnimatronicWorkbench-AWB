@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Configs;
+using Awb.Core.Project;
 using System.Text;
 
 namespace Awb.Core.LoadNSave.Export
@@ -78,25 +78,16 @@ namespace Awb.Core.LoadNSave.Export
             result.AppendLine();
 
             // export the sts servo informations
-            ExportScsStsServoInformations( servoConfigs: exportData.StsServoConfigs, praefix: "sts", result: result);
+            ExportScsStsServoInformations(servoConfigs: exportData.StsServoConfigs, praefix: "sts", result: result);
 
             // export the scs servo informations
             ExportScsStsServoInformations(servoConfigs: exportData.ScsServoConfigs, praefix: "scs", result: result);
 
             // export the pca9685 pwm servo informations
-            var pca9685PwmServos = exportData.Pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.Pca9685PwmServoConfig>();
-            var pca9685PwmServoChannels = pca9685PwmServos.Select(s => s.Channel).ToArray();
-            var pca9685PwmServoI2cAdresses = pca9685PwmServos.Select(s => s.I2cAdress).ToArray();
-            var pca9685PwmServoAccelerations = pca9685PwmServos.Select(s => s.Acceleration ?? -1).ToArray();
-            var pca9685PwmServoSpeeds = pca9685PwmServos.Select(s => s.Speed ?? -1).ToArray();
-            var pca9685PwmServoNames = pca9685PwmServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
-            result.AppendLine($"\tint pca9685PwmServoCount = {pca9685PwmServos.Length};");
-            result.AppendLine($"\tint pca9685PwmServoI2cAdresses[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoI2cAdresses.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tint pca9685PwmServoChannels[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoChannels.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tint pca9685PwmServoAccelleration[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoAccelerations.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tint pca9685PwmServoSpeed[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoSpeeds.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tString pca9685PwmServoName[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoNames.Select(s => $"\"{s}\""))}}};");
-            result.AppendLine();
+            ExportPCS9685PwmServoInformations(pca9685PwmServoConfigs: exportData.Pca9685PwmServoConfigs, result: result);
+
+            // export the sound player informations
+            var soundPlayers = exportData.Mp3PlayerYX5300Configs;
 
             // export the states
             var stateIds = exportData.TimelineStates?.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
@@ -180,9 +171,26 @@ namespace Awb.Core.LoadNSave.Export
             };
         }
 
+        private static void ExportPCS9685PwmServoInformations(Pca9685PwmServoConfig[]? pca9685PwmServoConfigs, StringBuilder result)
+        {
+            var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Project.Pca9685PwmServoConfig>();
+            var pca9685PwmServoChannels = pca9685PwmServos.Select(s => s.Channel).ToArray();
+            var pca9685PwmServoI2cAdresses = pca9685PwmServos.Select(s => s.I2cAdress).ToArray();
+            var pca9685PwmServoAccelerations = pca9685PwmServos.Select(s => s.Acceleration ?? -1).ToArray();
+            var pca9685PwmServoSpeeds = pca9685PwmServos.Select(s => s.Speed ?? -1).ToArray();
+            var pca9685PwmServoNames = pca9685PwmServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
+            result.AppendLine($"\tint pca9685PwmServoCount = {pca9685PwmServos.Length};");
+            result.AppendLine($"\tint pca9685PwmServoI2cAdresses[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoI2cAdresses.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint pca9685PwmServoChannels[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoChannels.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint pca9685PwmServoAccelleration[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoAccelerations.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint pca9685PwmServoSpeed[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoSpeeds.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tString pca9685PwmServoName[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoNames.Select(s => $"\"{s}\""))}}};");
+            result.AppendLine();
+        }
+
         private static void ExportScsStsServoInformations(StsServoConfig[]? servoConfigs, string praefix, StringBuilder result)
         {
-            var stsServos = servoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Configs.StsServoConfig>();
+            var stsServos = servoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Project.StsServoConfig>();
             var chanels = stsServos.Select(s => s.Channel).ToArray();
             var accelerations = stsServos.Select(s => s.Acceleration ?? -1).ToArray();
             var speeds = stsServos.Select(s => s.Speed ?? -1).ToArray();

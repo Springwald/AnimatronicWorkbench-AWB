@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-namespace Awb.Core.Configs
+namespace Awb.Core.Project
 {
     public class Pca9685PwmServoConfig : IDeviceConfig
     {

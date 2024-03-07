@@ -9,7 +9,7 @@ using Awb.Core.Project;
 using Awb.Core.Sounds;
 using System.Text.Json.Serialization;
 
-namespace Awb.Core.Configs
+namespace Awb.Core.Project
 {
     public class AwbProject
     {
@@ -24,9 +24,9 @@ namespace Awb.Core.Configs
         public Pca9685PwmServoConfig[]? Pca9685PwmServos { get; set; }
         public StsServoConfig[]? StsServos { get; set; }
         public StsServoConfig[]? ScsServos { get; set; }
-        public Mp3PlayerYX5300Config? Mp3PlayerYX5300 { get; set; }
-
+        public Mp3PlayerYX5300Config[]? Mp3PlayersYX5300 { get; set; }
         public TimelineState[]? TimelinesStates { get; set; }
+        public InputConfig[]? Inputs { get; set; }  
 
         public string? AutoPlayEsp32ExportFolder { get; set; }
 
