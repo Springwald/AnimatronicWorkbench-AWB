@@ -87,7 +87,7 @@ namespace Awb.Core.LoadNSave.Export
             ExportPCS9685PwmServoInformations(pca9685PwmServoConfigs: exportData.Pca9685PwmServoConfigs, result: result);
 
             // export the sound player informations
-            var soundPlayers = exportData.Mp3PlayerYX5300Configs;
+            ExportMp3PlayerYX5300Informations(mp3PlayerYX5300Configs: exportData.Mp3PlayerYX5300Configs, result: result);
 
             // export the states
             var stateIds = exportData.TimelineStates?.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
@@ -169,6 +169,10 @@ namespace Awb.Core.LoadNSave.Export
                 Ok = true,
                 Code = result.ToString()
             };
+        }
+
+        private void ExportMp3PlayerYX5300Informations(Mp3PlayerYX5300Config[]? mp3PlayerYX5300Configs, StringBuilder result)
+        {
         }
 
         private static void ExportPCS9685PwmServoInformations(Pca9685PwmServoConfig[]? pca9685PwmServoConfigs, StringBuilder result)

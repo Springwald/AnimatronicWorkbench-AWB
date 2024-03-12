@@ -16,10 +16,11 @@
             <Grid x:Name="OpticalGrid">
             </Grid>
              <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo" >BANK 1 (1-8)</Label>
+          
             <Grid x:Name="PlayControls">
                 <Line x:Name="PlayPosLine" Stroke="DarkOrange" StrokeThickness="1" X1="10" X2="50" Y1="10" Y2="200" ></Line>
             </Grid>
-            <Label x:Name="ManualPlayPosAbsolute" Content="🔺" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Foreground="#FF8DA2FA"/>
+            <Label x:Name="LabelManualPlayPosAbsolute" Content="🔺 02:20" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Background="Black" Foreground="#FF8DA2FA"/>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="80*"/>

@@ -1,11 +1,9 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
-
-using Awb.Core.Project;
 
 namespace Awb.Core.Project
 {
@@ -17,10 +15,12 @@ namespace Awb.Core.Project
         {
             get
             {
-                if (_project.StsServos != null) foreach(var problem in StsScsServoProblems(_project.StsServos)) yield return problem;
+                if (_project.StsServos != null) foreach (var problem in StsScsServoProblems(_project.StsServos)) yield return problem;
                 if (_project.ScsServos != null) foreach (var problem in StsScsServoProblems(_project.ScsServos)) yield return problem;
                 //todo: check the pwm servo values
                 //todo: check double servo ids
+                //todo: check not existing input ids
+                //todo: check not existing sound ids
                 yield break;
             }
         }

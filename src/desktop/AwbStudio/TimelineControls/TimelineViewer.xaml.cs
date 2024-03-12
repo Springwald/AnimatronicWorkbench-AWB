@@ -300,7 +300,8 @@ namespace AwbStudio.TimelineControls
 
             // draw the manual midi controller play position as triangle at the bottom
             var x = ((double)(ViewPos.PosSelectorManualMs) / ViewPos.DisplayMs) * this.ActualWidth;
-            ManualPlayPosAbsolute.Margin = new Thickness(x - ManualPlayPosAbsolute.ActualWidth / 2, 0, 0, 0);
+            LabelManualPlayPosAbsolute.Margin = new Thickness(x - LabelManualPlayPosAbsolute.FontSize, 0, 0, 0);
+            LabelManualPlayPosAbsolute.Content = $"🔺 {ViewPos.PosSelectorManualMs+ViewPos.ScrollOffsetMs}ms";
 
             // draw the play position as a vertical line
             var playPosMs = ViewPos.PosSelectorManualMs + ViewPos.ScrollOffsetMs;
