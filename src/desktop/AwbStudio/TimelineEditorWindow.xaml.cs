@@ -441,13 +441,12 @@ namespace AwbStudio
                 Title = title
             };
 
-
-            var stsServos = _actuatorsService.Servos.Select(s => s as StsScsServo).Where(s => s != null);
-            foreach (var stsServo in stsServos)
-            {
-                var valuePercent = 100d * (stsServo.DefaultValue - stsServo.MinValue) / (stsServo.MaxValue - stsServo.MinValue);
-                timelineData.ServoPoints.Add(new ServoPoint(servoId: stsServo.Id, valuePercent: valuePercent, timeMs: 0));
-            }
+            //var stsServos = _actuatorsService.Servos.Select(s => s as StsScsServo).Where(s => s != null);
+            //foreach (var stsServo in stsServos)
+            //{
+            //    var valuePercent = 100d * (stsServo.DefaultValue - stsServo.MinValue) / (stsServo.MaxValue - stsServo.MinValue);
+            //    timelineData.ServoPoints.Add(new ServoPoint(servoId: stsServo.Id, valuePercent: valuePercent, timeMs: 0));
+            //}
 
             return timelineData;
         }
@@ -649,6 +648,8 @@ namespace AwbStudio
                 StsServoConfigs = _project.StsServos,
                 ScsServoConfigs = _project.ScsServos,
                 Pca9685PwmServoConfigs = _project.Pca9685PwmServos,
+                Mp3PlayerYX5300Configs = _project.Mp3PlayersYX5300,
+                InputConfigs = _project.Inputs,
                 TimelineData = timelines.ToArray()
             };
             var exporter = new Esp32DataExporter();

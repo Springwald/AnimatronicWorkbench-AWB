@@ -70,8 +70,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     if (diff < 5) // update interval in milliseconds
         return;
 
-    long rememberLastMsUpdate = _lastMsUpdate;
-    _lastMsUpdate = millis();
+        _lastMsUpdate = millis();
 
     // return of no data is set
     if (_data == nullptr)
@@ -93,6 +92,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     }
 
     auto actualTimelineData = _data->timelines->at(_actualTimelineIndex);
+    int rememberLastPlayPos = _playPosInActualTimeline;
     _playPosInActualTimeline += diff;
 
     if (_playPosInActualTimeline > actualTimelineData.durationMs)
@@ -205,31 +205,12 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
             for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
             {
                 Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
-                if (point->soundPlayerId == servoChannel)
+                if (point->soundPlayerIndex == soundPlayerIndex && point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
                 {
-                    if (point->ms <= _playPosInActualTimeline)
-                        point1 = point;
-
-                    if (point->ms >= _playPosInActualTimeline)
-                    {
-                        point2 = point;
-                        break;
-                    }
+                    _mp3PlayerYX5300Manager->playSound(point->soundId);
                 }
             }
-
-            _mp3PlayerYX5300Manager->playMp3(_data->mp3PlayerYX5300Id[soundPlayerIndex], _playPosInActualTimeline);
-            u8 servoChannel = _data->scsServoChannels[servoIndex];
-            int servoSpeed = _data->scsServoSpeed[servoIndex];
-            int servoAccelleration = _data->scsServoAcceleration[servoIndex];
-
-            int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.scsServoPoints);
-            if (targetValue == -1)
-                continue;
-
-            _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
-        _scSerialServoManager->updateActuators();
     }
 }
 

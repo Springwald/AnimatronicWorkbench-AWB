@@ -17,7 +17,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 14.03.2024 12:38:12
+// Created on 14.03.2024 15:46:30
 
 class AutoPlayData
 {
@@ -50,7 +50,7 @@ public:
 	int mp3PlayerYX5300Count = 1;
 	int mp3PlayerYX5300RxPin[1] = {13};
 	int mp3PlayerYX5300TxPin[1] = {14};
-	String mp3PlayerYX5300Id[1] = {"Mp3Player"};
+	String mp3PlayerYX5300Name[1] = {"YX5300_1"};
 
 	int timelineStateIds[2] = {1, 2};
 	String timelineStateNames[2] = {"InBag", "Standing"};
@@ -65,11 +65,11 @@ public:
 		auto *pca9685PwmServoPoints1 = new std::vector<Pca9685PwmServoPoint>();
 		auto *mp3PlayerYX5300Points1 = new std::vector<Mp3PlayerYX5300Point>();
 		scsServoPoints1->push_back(StsServoPoint(3,875,572));
-		scsServoPoints1->push_back(StsServoPoint(3,2000,471));
-		scsServoPoints1->push_back(StsServoPoint(3,2625,572));
-		mp3PlayerYX5300Points1->push_back(Mp3PlayerYX5300Point(11, 0, 1000));
+		scsServoPoints1->push_back(StsServoPoint(3,1500,435));
+		scsServoPoints1->push_back(StsServoPoint(3,2125,572));
+		mp3PlayerYX5300Points1->push_back(Mp3PlayerYX5300Point(20, 0, 1000));
 		auto state1 = new TimelineState(1, String("InBag"));
-		Timeline *timeline1 = new Timeline(state1, String("Speak Hmmm"), stsServoPoints1, scsServoPoints1, pca9685PwmServoPoints1);
+		Timeline *timeline1 = new Timeline(state1, String("Speak Hmmm"), stsServoPoints1, scsServoPoints1, pca9685PwmServoPoints1, mp3PlayerYX5300Points1);
 		timelines->push_back(*timeline1);
 
     }

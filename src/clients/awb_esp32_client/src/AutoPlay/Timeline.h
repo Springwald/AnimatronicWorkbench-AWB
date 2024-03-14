@@ -7,6 +7,7 @@
 #include <string>
 #include "StsServoPoint.h"
 #include "Pca9685PwmServoPoint.h"
+#include "Mp3PlayerYX5300Point.h"
 #include "TimelineState.h"
 
 using byte = unsigned char;
