@@ -294,7 +294,7 @@ namespace AwbStudio
                             if (_project.Sounds?.Any() == true)
                             {
 
-                                var soundPoint = TimelineData?.ServoPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                                var soundPoint = TimelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
                                 if (soundPoint == null)
                                 {
                                     var sound = _project.Sounds.FirstOrDefault(s => s.Id == soundPlayer.ActualSoundId);

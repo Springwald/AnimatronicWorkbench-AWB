@@ -99,7 +99,11 @@ namespace Awb.Core.Player
         /// <param name="newPositionMs">the new position of the timeline</param>
         public async Task Update(int newPositionMs)
         {
-            if (_updating) return;
+            if (_updating)
+            {
+                PositionMs = newPositionMs;
+                return;
+            }
 
             _updating = true;
 
