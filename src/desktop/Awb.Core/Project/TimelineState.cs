@@ -12,6 +12,8 @@ namespace Awb.Core.Project
         public int Id { get; internal set; }
         public string Name { get; internal set; }
 
+        public bool Export { get; internal set; } = true;
+
         /// <summary>
         /// The state is only available when one of this inputs are on
         /// </summary>
@@ -22,12 +24,13 @@ namespace Awb.Core.Project
         /// </summary>
         public int[] NegativeInputs { get; internal set; }
 
-        public TimelineState(int id, string name, int[]? positiveInputs = null, int[]? negativeInputs= null)
+        public TimelineState(int id, string name, bool export, int[]? positiveInputs = null, int[]? negativeInputs= null)
         {
             Id = id;
             Name = name;
             PositiveInputs = positiveInputs ?? Array.Empty<int>();
             NegativeInputs = negativeInputs ?? Array.Empty<int>();
+            Export = export;
         }
 
         public override string ToString() => $"[{Id}] {Name}";

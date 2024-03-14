@@ -82,7 +82,7 @@ namespace AwbStudio
             _actuatorsService = new ActuatorsService(_project, _clientService, _logger);
 
             // fill timeline state chooser
-            ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => ts.Name).ToList();
+            ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
             TimelineChooser.FileManager = _fileManager;
 
             this.TimelineData = CreateNewTimelineData("");
@@ -114,6 +114,9 @@ namespace AwbStudio
 
             await _timelinePlayer.Update();
         }
+
+        private string GetTimelineStateName(TimelineState ts)
+            => ts.Export ? ts.Name : $"{ts.Name} (no export)";
 
         private async void TimelineChosenToLoad(object? sender, TimelineNameChosenEventArgs e)
         {

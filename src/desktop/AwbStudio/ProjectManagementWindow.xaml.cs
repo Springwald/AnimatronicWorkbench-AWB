@@ -111,11 +111,12 @@ namespace AwbStudio
                 Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
                 TimelinesStates = new TimelineState[]
                 {
-                            new TimelineState(1, "sleep", positiveInputs: new[] { 1 }),
-                            new TimelineState(2, "action"),
-                            new TimelineState(3, "idle"),
-                            new TimelineState(4, "talk"),
-                            new TimelineState(5, "joint demo"),
+                            new TimelineState(1, "sleep", export: true, positiveInputs: new[] { 1 }),
+                            new TimelineState(2, "action", export: true),
+                            new TimelineState(3, "idle", export: true),
+                            new TimelineState(4, "talk", export: true),
+                            new TimelineState(5, "joint demo", export: true),
+                            new TimelineState(6, "tests", export: false),
                 },
                 StsServos = new StsServoConfig[]
                 {

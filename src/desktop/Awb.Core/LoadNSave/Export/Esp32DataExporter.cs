@@ -90,8 +90,10 @@ namespace Awb.Core.LoadNSave.Export
             ExportMp3PlayerYX5300Informations(mp3PlayerYX5300Configs: exportData.Mp3PlayerYX5300Configs, result: result);
 
             // export the states
-            var stateIds = exportData.TimelineStates?.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
-            result.AppendLine($"\tint timelineStateIds[{exportData.TimelineStates?.Length ?? 0}] = {{{string.Join(", ", stateIds)}}};");
+            var exportStates = exportData.TimelineStates?.Where(s => s.Export).ToArray() ?? Array.Empty<TimelineState>();
+            var stateIds = exportStates.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
+            result.AppendLine($"\tint timelineStateIds[{exportStates.Length}] = {{{string.Join(", ", stateIds)}}};");
+            result.AppendLine($"\tString timelineStateNames[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"\"{s.Name}\""))}}};");
             result.AppendLine($"\tint timelineStateCount = {stateIds.Length};");
 
             result.AppendLine(_head2);
@@ -101,6 +103,7 @@ namespace Awb.Core.LoadNSave.Export
             foreach (var timeline in timelines)
             {
                 var state = exportData.TimelineStates?.SingleOrDefault(x => x.Id == timeline.TimelineStateId);
+                
                 if (state == null)
                 {
                     return new Esp32ExportResult
@@ -109,6 +112,8 @@ namespace Awb.Core.LoadNSave.Export
                         Message = $"Timeline '{timeline.Title}' uses an undefined timelineStateId '{timeline.TimelineStateId}",
                     };
                 }
+
+                if (state.Export == false) continue;
 
                 result.AppendLine($"\t\tauto *stsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
                 result.AppendLine($"\t\tauto *scsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
