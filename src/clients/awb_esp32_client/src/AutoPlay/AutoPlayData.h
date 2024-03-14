@@ -16,7 +16,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 14.03.2024 01:01:11
+// Created on 14.03.2024 01:08:59
 
 class AutoPlayData
 {
@@ -29,14 +29,14 @@ public:
 
 	int stsServoCount = 5;
 	int stsServoChannels[5] = {6, 7, 8, 9, 11};
-	int stsServoAcceleration[5] = {10, 10, 10, 20, 20};
-	int stsServoSpeed[5] = {1500, 1500, 1500, 1500, 1500};
+	int stsServoAcceleration[5] = {10, 10, 10, 100, 100};
+	int stsServoSpeed[5] = {1500, 1500, 1500, 500, 500};
 	String stsServoName[5] = {"Head rotate", "Neck right", "Neck left", "Arm right", "Arm left"};
 
 	int scsServoCount = 7;
 	int scsServoChannels[7] = {1, 2, 3, 4, 5, 10, 12};
 	int scsServoAcceleration[7] = {1, 1, 1, 1, 1, 1, 1};
-	int scsServoSpeed[7] = {500, 500, 300, 200, 200, 50, 50};
+	int scsServoSpeed[7] = {500, 500, 300, 200, 200, 500, 500};
 	String scsServoName[7] = {"Eyes up", "Eyes low", "Mouth", "Ear right", "Ear left", "Arm lower right", "Arm lower left"};
 
 	int pca9685PwmServoCount = 0;
