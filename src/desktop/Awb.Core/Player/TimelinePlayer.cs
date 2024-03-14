@@ -99,11 +99,7 @@ namespace Awb.Core.Player
         /// <param name="newPositionMs">the new position of the timeline</param>
         public async Task Update(int newPositionMs)
         {
-            if (_updating)
-            {
-                PositionMs = newPositionMs;
-                return;
-            }
+            if (_updating) return;
 
             _updating = true;
 
@@ -120,7 +116,7 @@ namespace Awb.Core.Player
                 point1 ??= point2;
                 point2 ??= point1;
 
-                var pointDistanceMs = point2.TimeMs - point1.TimeMs;
+                var pointDistanceMs = point2!.TimeMs - point1!.TimeMs;
                 double targetValuePercent = 0;
                 if (pointDistanceMs == 0)
                 {
