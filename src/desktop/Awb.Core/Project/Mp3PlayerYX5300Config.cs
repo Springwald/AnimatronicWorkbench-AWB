@@ -14,7 +14,9 @@ namespace Awb.Core.Project
         /// <summary>
         ///  A specific if for multi puppet / multi loudspeaker scenarios
         /// </summary>
-        public string SoundPlayerId { get; }
+        public string SoundPlayerId { get; set; }
+
+        public string? Name { get; set; } 
 
         /// <summary>
         /// the RX pin of the serial connection to the YX5300 MP3 player
@@ -26,12 +28,13 @@ namespace Awb.Core.Project
         /// </summary>
         public uint TxPin { get; } = 14;
 
-        public Mp3PlayerYX5300Config(uint clientId, uint rxPin, uint txPin, string soundPlayerId)
+        public Mp3PlayerYX5300Config(uint clientId, uint rxPin, uint txPin, string soundPlayerId, string? name)
         {
             ClientId = clientId;
             RxPin = rxPin;
             TxPin = txPin;
             SoundPlayerId = soundPlayerId;
+            Name = name;
         }
 
 

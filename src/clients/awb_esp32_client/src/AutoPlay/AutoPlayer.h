@@ -11,6 +11,7 @@
 #include "AutoPlayData.h"
 #include "../Actuators/StSerialServoManager.h"
 #include "../Actuators/Pca9685PwmManager.h"
+#include "../Actuators/Mp3PlayerYX5300Manager.h"
 
 using byte = unsigned char;
 
@@ -21,9 +22,10 @@ class AutoPlayer
 protected:
     TCallBackErrorOccured _errorOccured; // the error occured callback
 
-    StSerialServoManager *_stSerialServoManager; // the STS serial servo manager
-    StSerialServoManager *_scSerialServoManager; // the SCS serial servo manager
-    Pca9685PwmManager *_pca9685PwmManager;       // the PCA9685 PWM manager
+    StSerialServoManager *_stSerialServoManager;     // the STS serial servo manager
+    StSerialServoManager *_scSerialServoManager;     // the SCS serial servo manager
+    Pca9685PwmManager *_pca9685PwmManager;           // the PCA9685 PWM manager
+    Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager; // the MP3 player manager
 
     AutoPlayData *_data; // the data exported by Animatronic Workbench Studio
 
@@ -40,7 +42,7 @@ protected:
     int calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints);
 
 public:
-    AutoPlayer(StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
+    AutoPlayer(StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
     {
         _lastMsUpdate = millis();
         _data = new AutoPlayData();

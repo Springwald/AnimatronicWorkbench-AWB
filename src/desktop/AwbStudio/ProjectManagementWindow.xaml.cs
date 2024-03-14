@@ -111,36 +111,36 @@ namespace AwbStudio
                 Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
                 TimelinesStates = new TimelineState[]
                 {
-                            new TimelineState(1, "sleep", export: true, positiveInputs: new[] { 1 }),
-                            new TimelineState(2, "action", export: true),
-                            new TimelineState(3, "idle", export: true),
-                            new TimelineState(4, "talk", export: true),
-                            new TimelineState(5, "joint demo", export: true),
-                            new TimelineState(6, "tests", export: false),
+                    new TimelineState(1, "sleep", export: true, positiveInputs: new[] { 1 }),
+                    new TimelineState(2, "action", export: true),
+                    new TimelineState(3, "idle", export: true),
+                    new TimelineState(4, "talk", export: true),
+                    new TimelineState(5, "joint demo", export: true),
+                    new TimelineState(6, "tests", export: false),
                 },
                 StsServos = new StsServoConfig[]
                 {
-                            new StsServoConfig(id: "StsServo1", clientId: 1, channel: 1)
-                            {
-                                Name = "Demo serial Servo 1",
-                                Acceleration = 20,
-                                DefaultValue = 2000,
-                                MaxValue = 4095,
-                                MinValue = 0,
-                                Speed = 1000,
-                            },
+                    new StsServoConfig(id: "StsServo1", clientId: 1, channel: 1)
+                    {
+                        Name = "Demo serial Servo 1",
+                        Acceleration = 20,
+                        DefaultValue = 2000,
+                        MaxValue = 4095,
+                        MinValue = 0,
+                        Speed = 1000,
+                    },
                 },
                 Pca9685PwmServos = new Pca9685PwmServoConfig[]
                 {
-                            new Pca9685PwmServoConfig(id: "PwmServo1", clientId: 1, i2cAdress: 0x40, channel: 1)
-                            {
-                                Name = "Demo PWM Servo 1",
-                                DefaultValue = 2000,
-                                MaxValue = 4095,
-                                MinValue = 0,
-                            },
+                    new Pca9685PwmServoConfig(id: "PwmServo1", clientId: 1, i2cAdress: 0x40, channel: 1)
+                    {
+                        Name = "Demo PWM Servo 1",
+                        DefaultValue = 2000,
+                        MaxValue = 4095,
+                        MinValue = 0,
+                    },
                 },
-                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "Mp3Player") },
+                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", name: "Mp3Player" )},
                 Inputs = new InputConfig[]
                 {
                             new InputConfig(id: 1, name:"Sleep") { IoPin = 25 }

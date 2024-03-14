@@ -17,20 +17,12 @@ namespace Awb.Core.Actuators
         /// <summary>
         /// The optional visible name of the actuator
         /// </summary>
-        string? Name { get; }
+        string Name { get; }
 
         /// <summary>
         /// When multiple clients are used, this is the ID of the client that is currently controlling the actuator
         /// </summary>
         uint ClientId { get; }
-
-        /// <summary>
-        /// A displayable label for the actuator, including the client ID, chanel and name
-        /// </summary>
-        /// <remarks>
-        /// In most cases this is generated automatically from the other properties
-        /// </remarks>
-        string Label { get; }
 
         /// <summary>
         /// Has the target value to be send as update to the client?

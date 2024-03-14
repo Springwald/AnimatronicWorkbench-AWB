@@ -316,7 +316,7 @@ namespace AwbStudio
                             break;
                         default:
 
-                            throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Name}/{actuator.Label} is an unhandled actutuator type.");
+                            throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Name} is an unhandled actutuator type.");
                     }
 
                     _manualUpdatingValues = true;
@@ -426,7 +426,7 @@ namespace AwbStudio
                         }
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException($"{actuators[i].Id}/{actuators[i].Name}/{actuators[i].Label} is an unhandled actutuator type.");
+                        throw new ArgumentOutOfRangeException($"{actuators[i].Id}/{actuators[i].Name} is an unhandled actutuator type.");
                 }
             }
         }

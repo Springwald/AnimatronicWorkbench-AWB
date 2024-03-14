@@ -1,10 +1,11 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Project;
 using System.Text;
 
@@ -22,6 +23,7 @@ namespace Awb.Core.LoadNSave.Export
             #include "TimelineState.h"
             #include "StsServoPoint.h"
             #include "Pca9685PwmServoPoint.h"
+            #include "Mp3PlayerYX5300Point.h"
             
             /// <summary>
             /// This is a prototype for the AutoPlayData class.
@@ -103,7 +105,7 @@ namespace Awb.Core.LoadNSave.Export
             foreach (var timeline in timelines)
             {
                 var state = exportData.TimelineStates?.SingleOrDefault(x => x.Id == timeline.TimelineStateId);
-                
+
                 if (state == null)
                 {
                     return new Esp32ExportResult
@@ -118,6 +120,7 @@ namespace Awb.Core.LoadNSave.Export
                 result.AppendLine($"\t\tauto *stsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
                 result.AppendLine($"\t\tauto *scsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
                 result.AppendLine($"\t\tauto *pca9685PwmServoPoints{timelineNo} = new std::vector<Pca9685PwmServoPoint>();");
+                result.AppendLine($"\t\tauto *mp3PlayerYX5300Points{timelineNo} = new std::vector<Mp3PlayerYX5300Point>();");
 
                 // Export Servo-Points
                 foreach (var servoPoint in timeline.ServoPoints.OrderBy(p => p.TimeMs))
@@ -159,8 +162,44 @@ namespace Awb.Core.LoadNSave.Export
                     };
                 }
 
+                // Export Sound-Points
+                foreach (var soundPoint in timeline.SoundPoints.OrderBy(p => p.TimeMs))
+                {
+                    if (exportData.Mp3PlayerYX5300Configs != null)
+                    {
+                        // find Mp3PlayerYX5300 soundplayer
+                        var soundPlayerIndex = -1;
+                        for (int i = 0; i < exportData.Mp3PlayerYX5300Configs?.Length; i++)
+                        {
+                            if (exportData.Mp3PlayerYX5300Configs[i].SoundPlayerId == soundPoint.SoundPlayerId)
+                            {
+                                soundPlayerIndex = i;
+                                break;
+                            }
+                        }
+                        if (soundPlayerIndex != -1)
+                        {
+                            var soundPlayer = exportData.Mp3PlayerYX5300Configs![soundPlayerIndex];
+                            if (soundPlayer != null)
+                            {
+                                result.AppendLine($"\t\tmp3PlayerYX5300Points{timelineNo}->push_back(Mp3PlayerYX5300Point({soundPoint.SoundId}, {soundPlayerIndex}, {soundPoint.TimeMs}));");
+                                continue;
+                            }
+                        }
+                    }
+
+                    // todo: find other sound player
+
+                    // servo id not sound
+                    return new Esp32ExportResult
+                    {
+                        Ok = false,
+                        Message = $"Soundplayer id '{soundPoint.SoundPlayerId}' not found in project config!",
+                    };
+                }
+
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineState({state.Id}, String(\"{state.Name}\"));");
-                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo});");
+                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo},mp3PlayerYX5300Points{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 
                 result.AppendLine();
@@ -178,6 +217,13 @@ namespace Awb.Core.LoadNSave.Export
 
         private void ExportMp3PlayerYX5300Informations(Mp3PlayerYX5300Config[]? mp3PlayerYX5300Configs, StringBuilder result)
         {
+            var players = mp3PlayerYX5300Configs ?? Array.Empty<Project.Mp3PlayerYX5300Config>();
+            var mp3PlayerYX5300Names = players?.Select(s => s.Name ?? s.SoundPlayerId).ToArray();
+            result.AppendLine($"\tint mp3PlayerYX5300Count = {players.Length};");
+            result.AppendLine($"\tint mp3PlayerYX5300RxPin[{players.Length}] = {{{string.Join(", ", players.Select(s => s.RxPin.ToString()))}}};");
+            result.AppendLine($"\tint mp3PlayerYX5300TxPin[{players.Length}] = {{{string.Join(", ", players.Select(s => s.TxPin.ToString()))}}};");
+            result.AppendLine($"\tString mp3PlayerYX5300Name[{players.Length}] = {{{string.Join(", ", players.Select(s => $"\"{s.SoundPlayerId}\""))}}};");
+            result.AppendLine();
         }
 
         private static void ExportPCS9685PwmServoInformations(Pca9685PwmServoConfig[]? pca9685PwmServoConfigs, StringBuilder result)

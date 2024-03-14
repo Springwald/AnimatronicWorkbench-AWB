@@ -16,15 +16,16 @@ class Timeline
 
 protected:
 public:
-    String name;                                         /// the name of the timeline
-    TimelineState *state;                                /// the state of the timeline
-    std::vector<StsServoPoint> *stsServoPoints;          /// the sts servo points of the timeline
-    std::vector<StsServoPoint> *scsServoPoints;          /// the scs servo points of the timeline
-    std::vector<Pca9685PwmServoPoint> *pca9685PwmPoints; /// the Pca9685 Pwm servo points of the timeline
-    int durationMs;                                      /// the duration of the timeline in milliseconds
+    String name;                                              /// the name of the timeline
+    TimelineState *state;                                     /// the state of the timeline
+    std::vector<StsServoPoint> *stsServoPoints;               /// the sts servo points of the timeline
+    std::vector<StsServoPoint> *scsServoPoints;               /// the scs servo points of the timeline
+    std::vector<Pca9685PwmServoPoint> *pca9685PwmPoints;      /// the Pca9685 Pwm servo points of the timeline
+    std::vector<Mp3PlayerYX5300Point> *mp3PlayerYX5300Points; /// the mp3 sound points of the timeline
+    int durationMs;                                           /// the duration of the timeline in milliseconds
 
 public:
-    Timeline(TimelineState *state, String name, std::vector<StsServoPoint> *p_stsPoints, std::vector<StsServoPoint> *p_scsPoints, std::vector<Pca9685PwmServoPoint> *p_pca9685PwmPoints) : stsServoPoints(p_stsPoints), scsServoPoints(p_scsPoints), pca9685PwmPoints(p_pca9685PwmPoints), name(name), state(state)
+    Timeline(TimelineState *state, String name, std::vector<StsServoPoint> *p_stsPoints, std::vector<StsServoPoint> *p_scsPoints, std::vector<Pca9685PwmServoPoint> *p_pca9685PwmPoints, std::vector<Mp3PlayerYX5300Point> *p_mp3PlayerYX5300Points) : stsServoPoints(p_stsPoints), scsServoPoints(p_scsPoints), pca9685PwmPoints(p_pca9685PwmPoints), mp3PlayerYX5300Points(p_mp3PlayerYX5300Points), name(name), state(state)
     {
         durationMs = 0;
 
@@ -50,6 +51,14 @@ public:
             // get the ms value of the point
             if (pca9685PwmPoints->at(i).ms > durationMs)
                 durationMs = pca9685PwmPoints->at(i).ms;
+        }
+
+        // calculate highest duration for Mp3PlayerYX5300 points
+        for (int i = 0; i < mp3PlayerYX5300Points->size(); i++)
+        {
+            // get the ms value of the point
+            if (mp3PlayerYX5300Points->at(i).ms > durationMs)
+                durationMs = mp3PlayerYX5300Points->at(i).ms;
         }
 
         // calculate duration for other points

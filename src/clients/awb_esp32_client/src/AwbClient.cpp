@@ -135,7 +135,7 @@ void AwbClient::setup()
 #endif
 
     showSetupMsg("setup autoplay");
-    _autoPlayer = new AutoPlayer(_stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
+    _autoPlayer = new AutoPlayer(_stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet receiver");

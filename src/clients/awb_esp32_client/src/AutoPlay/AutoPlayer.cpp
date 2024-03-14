@@ -70,6 +70,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     if (diff < 5) // update interval in milliseconds
         return;
 
+    long rememberLastMsUpdate = _lastMsUpdate;
     _lastMsUpdate = millis();
 
     // return of no data is set
@@ -150,7 +151,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
             Pca9685PwmServoPoint *point1 = nullptr;
             Pca9685PwmServoPoint *point2 = nullptr;
 
-            for (int iPoint = 0; iPoint < actualTimelineData.pca9685PwmPoints->size(); iPoint++)
+            for (int iPoint = 0; iPoint < actualTimelineData.scsServoPoints->size(); iPoint++)
             {
                 Pca9685PwmServoPoint *point = &actualTimelineData.pca9685PwmPoints->at(iPoint);
                 if (point->channel == servoChannel)
@@ -194,6 +195,41 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
             _pca9685PwmManager->setTargetValue(servoChannel, targetValue, servoName);
         }
         _pca9685PwmManager->updateActuators();
+    }
+
+    // Play MP3
+    if (_mp3PlayerYX5300Manager != NULL)
+    {
+        for (int soundPlayerIndex = 0; soundPlayerIndex < _data->mp3PlayerYX5300Count; soundPlayerIndex++)
+        {
+            for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
+            {
+                Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
+                if (point->soundPlayerId == servoChannel)
+                {
+                    if (point->ms <= _playPosInActualTimeline)
+                        point1 = point;
+
+                    if (point->ms >= _playPosInActualTimeline)
+                    {
+                        point2 = point;
+                        break;
+                    }
+                }
+            }
+
+            _mp3PlayerYX5300Manager->playMp3(_data->mp3PlayerYX5300Id[soundPlayerIndex], _playPosInActualTimeline);
+            u8 servoChannel = _data->scsServoChannels[servoIndex];
+            int servoSpeed = _data->scsServoSpeed[servoIndex];
+            int servoAccelleration = _data->scsServoAcceleration[servoIndex];
+
+            int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.scsServoPoints);
+            if (targetValue == -1)
+                continue;
+
+            _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
+        }
+        _scSerialServoManager->updateActuators();
     }
 }
 

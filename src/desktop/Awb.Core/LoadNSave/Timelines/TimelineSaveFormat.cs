@@ -17,7 +17,7 @@ namespace Awb.Core.LoadNSave.TimelineLoadNSave
         public int TimelineStateId { get; set; }
 
         public ServoPointSaveFormat[]? ServoPoints { get; set; }
-        public SoundPointSaveFormat[]? SoundPoints { get; private set; }
+        public SoundPointSaveFormat[]? SoundPoints { get; set; }
 
         public static TimelineSaveFormat FromTimelineData(TimelineData timelineData)
         {

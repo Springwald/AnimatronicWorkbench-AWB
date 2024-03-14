@@ -42,8 +42,7 @@ namespace AwbStudio.TimelineControls
                 _actuatorsService = value ?? throw new ArgumentNullException(nameof(ActuatorsService));
 
                 foreach (var actuator in _actuatorsService.AllActuators)
-                    TimelineCaptions.AddAktuator(actuator, actuator.Label);
-
+                    TimelineCaptions.AddAktuator(actuator);
                 UpdateCaptionView();
             }
         }
@@ -65,7 +64,7 @@ namespace AwbStudio.TimelineControls
             if (_viewPos == null) return;
             if (_actuatorsService == null) return;
 
-       
+
 
             LineNames.Children.Clear();
             if (TimelineCaptions?.Captions?.Any() == true)
@@ -87,7 +86,7 @@ namespace AwbStudio.TimelineControls
                     }
 
                     var label = border.Child as Label ?? throw new ApplicationException("label border contains no label control?");
-                    label.Content = no >= _viewPos.FirstBankItemNo && no <= _viewPos.LastBankItemNo ? $"[{no - _viewPos.FirstBankItemNo + 1}] {caption.Label.Trim()}"  : caption.Label.Trim();
+                    label.Content = no >= _viewPos.FirstBankItemNo && no <= _viewPos.LastBankItemNo ? $"[{no - _viewPos.FirstBankItemNo + 1}] {caption.Label.Trim()}" : caption.Label.Trim();
                     label.Foreground = caption.ForegroundColor;
                     label.Background = caption.BackgroundColor;
                     LineNames.Children.Add(border);
@@ -103,7 +102,7 @@ namespace AwbStudio.TimelineControls
                 _lastBankIndex = _viewPos.BankIndex;
                 MyInvoker.Invoke(new Action(() =>
                 {
-                    this.UpdateCaptionView();  
+                    this.UpdateCaptionView();
                 }));
             }
         }

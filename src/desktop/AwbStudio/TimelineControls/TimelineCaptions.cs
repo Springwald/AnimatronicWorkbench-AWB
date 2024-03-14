@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
@@ -46,15 +47,26 @@ namespace AwbStudio.TimelineControls
         {
         }
 
-        public void AddAktuator(IActuator aktuator, string label)
+        public void AddAktuator(IActuator actuator)
         {
+            var clientIdPraefix = actuator.ClientId == 1 ? string.Empty : $"C{actuator.ClientId}-";
+
+            var label = actuator switch
+            {
+                Mp3PlayerYX5300 mp3 => $"{clientIdPraefix}{(string.IsNullOrWhiteSpace(mp3.Name) ? $"MP3-{mp3.Id}" : mp3.Name)}",
+                Pca9685PwmServo servo => $"{clientIdPraefix}PWM{servo.Channel} {servo.Name ?? string.Empty}",
+                StsScsServo stsScs => $"{clientIdPraefix}{stsScs.StsScsType.ToString()}{stsScs.Channel} {stsScs.Name ?? string.Empty}",
+                 _ => $"{clientIdPraefix}{actuator.Id} {actuator.Name ?? string.Empty}"
+            };
+
+
             //var id = GetIdForAktuator(aktuator);
             AddCaption(new TimelineCaption
             {
-                Id = aktuator.Id,
+                Id = actuator.Id,
                 Label = label
             },
-            inverse: aktuator switch
+            inverse: actuator switch
             {
                 ISoundPlayer soundPlayer => true,
                 IServo servo => false,

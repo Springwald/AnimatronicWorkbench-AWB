@@ -62,7 +62,7 @@ namespace Awb.Core.Actuators
         /// </summary>
         public bool IsDirty { get; set; }
 
-        public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}MP3{Id} {Name ?? string.Empty}";
+        
 
         public int ActualSoundId { get; private set; }
 
