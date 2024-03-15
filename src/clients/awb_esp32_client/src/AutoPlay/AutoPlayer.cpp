@@ -264,6 +264,20 @@ int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed,
     return targetValue;
 }
 
+String AutoPlayer::getStatesDebugInfo()
+{
+    String result = "Active: ";
+    auto stateIds = getActiveStateIdsByInputs();
+    for (auto stateId : stateIds)
+    {
+        for (int iState = 0; iState < _data->timelineStateCount; iState++)
+            if (_data->timelineStateIds[iState] == stateIds[iState])
+                result += String(_data->timelineStateNames[iState]);
+        result += "[" + String(stateId) + "]";
+    }
+    return result;
+}
+
 // function to return the active states as array
 std::vector<int> AutoPlayer::getActiveStateIdsByInputs()
 {

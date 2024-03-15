@@ -24,6 +24,7 @@ public:
     std::vector<ActuatorValue> *scsServoValues; /// the current scs servo status
     std::vector<ActuatorValue> *pwmServoValues; /// the current pwm servo status
     String activeTimelineStateIdsByInput;       /// the active timeline states by input
+    String inputStates;                         /// the active timeline states by input
 
     ActualStatusInformation()
     {

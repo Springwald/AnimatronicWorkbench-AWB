@@ -28,8 +28,7 @@ protected:
     Pca9685PwmManager *_pca9685PwmManager;           // the PCA9685 PWM manager
     Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager; // the MP3 player manager
     InputManager *_inputManager;                     // the input manager
-
-    AutoPlayData *_data; // the data exported by Animatronic Workbench Studio
+    AutoPlayData *_data;                             // the data exported by Animatronic Workbench Studio
 
     long _lastMsUpdate;                  // millis() of last update
     long _lastPacketReceivedMillis = -1; // millis() of last received packet
@@ -44,14 +43,14 @@ protected:
     int calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints);
 
 public:
-    AutoPlayer(StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
+    AutoPlayer(AutoPlayData *data, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _data(data), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
     {
         _lastMsUpdate = millis();
-        _data = new AutoPlayData();
-        _inputManager = new InputManager(_data, errorOccured, errorOccured);
     }
 
     ~AutoPlayer() {}
+
+    String getStatesDebugInfo();
 
     /**
      * Returns true if the player is playing a timeline

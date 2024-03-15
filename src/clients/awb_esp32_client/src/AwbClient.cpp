@@ -32,6 +32,9 @@ void AwbClient::setup()
     _wlanConnector->setup();
     showSetupMsg("setup wifi done");
 
+    // load the AWB project data
+    _data = new AutoPlayData();
+
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     showSetupMsg("setup neopixel");
     this->_neoPixelStatus = new NeoPixelStatusControl();
@@ -63,6 +66,8 @@ void AwbClient::setup()
     const TCallBackMessageToShow mp3PlayerMessageToShow = [this](String message)
     { showMsg(message); };
     const TCallBackErrorOccured autoPlayerErrorOccured = [this](String message)
+    { showError(message); };
+    const TCallBackErrorOccured inputManagerErrorOccured = [this](String message)
     { showError(message); };
     showSetupMsg("setup callbacks done");
 
@@ -134,8 +139,11 @@ void AwbClient::setup()
     auto autoPlayerStateSelectorStsServoChannel = -1;
 #endif
 
+    showSetupMsg("setup input manager");
+    _inputManager = new InputManager(_data, inputManagerErrorOccured);
+
     showSetupMsg("setup autoplay");
-    _autoPlayer = new AutoPlayer(_stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
+    _autoPlayer = new AutoPlayer(_data, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet receiver");
@@ -321,13 +329,10 @@ void AwbClient::loop()
     _actualStatusInformation->autoPlayerStateSelectorAvailable = _autoPlayer->getStateSelectorAvailable();
     _actualStatusInformation->autoPlayerCurrentTimelineName = _autoPlayer->getCurrentTimelineName();
     _actualStatusInformation->autoPlayerStateSelectorStsServoChannel = _autoPlayer->getStateSelectorStsServoChannel();
-    String activeTimelineStateIdsByInput = "";
-    auto stateIds = _autoPlayer->getActiveStateIdsByInputs();
-    for (int i = 0; i < stateIds.size(); i++)
-    {
-        activeTimelineStateIdsByInput += String(stateIds[i]) + ",";
-    }
+    String activeTimelineStateIdsByInput = _autoPlayer->getStatesDebugInfo();
+
     _actualStatusInformation->activeTimelineStateIdsByInput = activeTimelineStateIdsByInput;
+    _actualStatusInformation->inputStates = _inputManager->getDebugInfo();
 
     _wlanConnector->update();
 

@@ -12,16 +12,18 @@ class InputManager
 
 private:
     TCallBackErrorOccured _errorOccured;
-    TCallBackMessageToShow _messageToShow;
     AutoPlayData *_data; // the data exported by Animatronic Workbench Studio
+    void init();
 
 public:
     // the constructor
-    InputManager(AutoPlayData *data, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow) : _errorOccured(errorOccured), _messageToShow(messageToShow), _data(data)
+    InputManager(AutoPlayData *data, TCallBackErrorOccured errorOccured) : _errorOccured(errorOccured), _data(data)
     {
+        init();
     }
 
     bool isInputPressed(int inputIndex);
+    String getDebugInfo();
 };
 
 #endif

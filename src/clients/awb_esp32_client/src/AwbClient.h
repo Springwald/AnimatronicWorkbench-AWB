@@ -31,12 +31,14 @@ protected:
     Pca9685PwmManager *_pca9685pwmManager;       /// The pwm manager to control the Pca9685 pwm board
     StSerialServoManager *_stSerialServoManager; /// The serial servo manager to control the sts serial servos
     StSerialServoManager *_scSerialServoManager; /// The serial servo manager to control the scs serial servos
+    InputManager *_inputManager;                 // the input manager
     Mp3PlayerYX5300Manager *_mp3Player;          /// The mp3 player to play sounds
     NeoPixelStatusControl *_neoPixelStatus;      /// The neopixel status control
     AutoPlayer *_autoPlayer;                     /// The auto player to play timeline animations
     int _lastAutoPlaySelectedStateId = -1;       /// The last selected state id for autoplay timeline filter
     String _lastAutoPlayTimelineName = "";       /// The last selected timeline name for autoplay timeline filter
     WlanConnector *_wlanConnector;               /// The wlan connector to open a WLAN AP and display status information as a web page
+    AutoPlayData *_data;                         // the data exported by Animatronic Workbench Studio
 
     ActualStatusInformation *_actualStatusInformation; /// The actual status information
 
