@@ -281,7 +281,9 @@ namespace AwbStudio
                             var servoPoint = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
                             if (servoPoint == null)
                             {
-                                targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
+                                // Use default value as target value
+                                targetPercent = 100.0 * (servo.DefaultValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
+                                //targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
                                 servoPoint = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
                                 TimelineData?.ServoPoints.Add(servoPoint);
                             }
