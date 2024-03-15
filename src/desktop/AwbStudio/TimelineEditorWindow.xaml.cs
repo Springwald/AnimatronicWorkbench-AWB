@@ -47,6 +47,7 @@ namespace AwbStudio
         private volatile bool _manualUpdatingValues;
         private bool _switchingPages;
         private int _lastActuatorChanged = 1; // prevent double actuator change events to the midi controller
+        private bool _ctrlKeyPressed;
 
         protected TimelineData TimelineData { get; set; }
 
@@ -70,6 +71,8 @@ namespace AwbStudio
         {
             Loaded -= TimelineEditorWindow_Loaded;
             this.IsEnabled = false;
+
+            SetupToasts();
 
             if (_project.TimelinesStates?.Any() == false)
             {
@@ -107,12 +110,43 @@ namespace AwbStudio
 
             Closing += TimelineEditorWindow_Closing;
 
-            this.Topmost = true;
-            this.Topmost = false;
+            KeyDown += TimelineEditorWindow_KeyDown;
+
+            // bring to front
             this.IsEnabled = true;
+            this.Topmost = true;
+            await Task.Delay(100);
+            this.Topmost = false;
+
             _unsavedChanges = false;
 
             await _timelinePlayer.Update();
+        }
+
+        private void SetupToasts()
+        {
+          
+
+        }
+
+
+
+        private void TimelineEditorWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case System.Windows.Input.Key.S:
+                    if (this._ctrlKeyPressed)
+                    {
+                        SaveTimelineData();
+                    }
+                    break;
+
+                case System.Windows.Input.Key.LeftCtrl:
+                case System.Windows.Input.Key.RightCtrl:
+                    this._ctrlKeyPressed = e.IsDown;
+                    break;
+            }
         }
 
         private string GetTimelineStateName(TimelineState ts)
