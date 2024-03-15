@@ -281,14 +281,14 @@ namespace AwbStudio
                             var servoPoint = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
                             if (servoPoint == null)
                             {
-                                // Use default value as target value
-                                targetPercent = 100.0 * (servo.DefaultValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
-                                //targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
+                                // Insert a new servo point
+                                targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
                                 servoPoint = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
                                 TimelineData?.ServoPoints.Add(servoPoint);
                             }
                             else
                             {
+                                // Remove the existing servo point
                                 TimelineData?.ServoPoints.Remove(servoPoint);
                             }
                             break;
@@ -299,10 +299,12 @@ namespace AwbStudio
                                 var soundPoint = TimelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
                                 if (soundPoint == null)
                                 {
-                                    var sound = _project.Sounds.FirstOrDefault(s => s.Id == soundPlayer.ActualSoundId);
+                                    // Insert a new sound point
+                                    var soundId = soundPlayer.ActualSoundId == 0 ? _project.Sounds.FirstOrDefault()?.Id : soundPlayer.ActualSoundId;
+                                    var sound = _project.Sounds.FirstOrDefault(s => s.Id == soundId);
                                     if (sound == null)
                                     {
-                                        MessageBox.Show("Actual sound id" + soundPlayer.ActualSoundId + " not found");
+                                        MessageBox.Show($"Actual sound id{soundPlayer.ActualSoundId} not found");
                                     }
                                     else
                                     {
@@ -312,6 +314,7 @@ namespace AwbStudio
                                 }
                                 else
                                 {
+                                    // Remove the existing sound point
                                     TimelineData?.SoundPoints.Remove(soundPoint);
                                 }
                             }
