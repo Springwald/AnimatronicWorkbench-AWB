@@ -70,7 +70,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     if (diff < 5) // update interval in milliseconds
         return;
 
-        _lastMsUpdate = millis();
+    _lastMsUpdate = millis();
 
     // return of no data is set
     if (_data == nullptr)
@@ -264,10 +264,71 @@ int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed,
     return targetValue;
 }
 
+// function to return the active states as array
+std::vector<int> AutoPlayer::getActiveStateIdsByInputs()
+{
+    std::vector<int> activeStateIds;
+    bool foundAnyPositive = false;
+
+    for (int iState = 0; iState < _data->timelineStateCount; iState++)
+    {
+        // check the positive inputs
+        for (int j = 0; j < sizeof(_data->timelineStatePositiveInputs[iState]); j++)
+        {
+            int input = _data->timelineStatePositiveInputs[iState][j];
+            if (input > 0)
+            {
+                if (_inputManager->isInputPressed(input))
+                {
+                    foundAnyPositive = true;
+                    activeStateIds.push_back(_data->timelineStateIds[iState]);
+                }
+            }
+        }
+    }
+
+    if (activeStateIds.size() > 0) // is any state by positive inputs found, return only them
+        return activeStateIds;
+
+    // return all, which are not disabled by negative inputs
+    for (int iState = 0; iState < _data->timelineStateCount; iState++)
+    {
+        bool hasPositiveInput = false;
+        for (int j = 0; j < sizeof(_data->timelineStatePositiveInputs[iState]); j++)
+        {
+            int input = _data->timelineStatePositiveInputs[iState][j];
+            if (input > 0)
+            {
+                hasPositiveInput = true;
+                break;
+            }
+        }
+
+        if (hasPositiveInput) // has positive input, but this was not presses
+            continue;
+
+        bool negativeInputActive = false;
+        for (int j = 0; j < sizeof(_data->timelineStateNegativeInputs[iState]); j++)
+        {
+            if (_inputManager->isInputPressed(_data->timelineStateNegativeInputs[iState][j]))
+            {
+                negativeInputActive = true;
+                break;
+            }
+        }
+
+        if (negativeInputActive)
+            continue;
+
+        activeStateIds.push_back(_data->timelineStateIds[iState]);
+    }
+    return activeStateIds;
+}
+
 /**
  * If a state selector is used, this is the selected state id
  */
-int AutoPlayer::selectedStateId()
+int AutoPlayer::selectedStateIdFromStsServoSelector()
 {
     if (_stateSelectorStsServoChannel == -1)
         return -1;
@@ -314,9 +375,9 @@ void AutoPlayer::startNewTimeline(int timelineIndex)
  */
 void AutoPlayer::startNewTimelineForSelectedState()
 {
-    auto stateId = selectedStateId();
+    auto stateIdFromStsServoSelector = selectedStateIdFromStsServoSelector();
 
-    if (stateId == 0 || _data == nullptr || _data->timelines->size() == 0)
+    if (stateIdFromStsServoSelector == 0 || _data == nullptr || _data->timelines->size() == 0)
     {
         _actualTimelineIndex = -1;
         return;
@@ -336,11 +397,30 @@ void AutoPlayer::startNewTimelineForSelectedState()
             nextTimelineIndex = 0; // last timeline reached, start from the beginning
         }
 
-        if (_stateSelectorAvailable == false || _data->timelines->at(nextTimelineIndex).state->id == stateId)
+        if (_stateSelectorAvailable == true) // state selector is the most important selector
         {
-            // found the next timeline for the selected state
-            startNewTimeline(nextTimelineIndex);
-            return;
+            // check if the next timeline is for the selected state
+            if (_data->timelines->at(nextTimelineIndex).state->id == stateIdFromStsServoSelector)
+            {
+                // found the next timeline for the selected state
+                startNewTimeline(nextTimelineIndex);
+                return;
+            }
+        }
+        else
+        {
+            // if no state selector is available, we check the inputs
+            auto activeStateIds = getActiveStateIdsByInputs();
+
+            // iterate over the active states and check if the next timeline is for one of them
+            for (int i = 0; i < activeStateIds.size(); i++)
+            {
+                if (_data->timelines->at(nextTimelineIndex).state->id == activeStateIds[i])
+                {
+                    startNewTimeline(nextTimelineIndex);
+                    return;
+                }
+            }
         }
     }
 

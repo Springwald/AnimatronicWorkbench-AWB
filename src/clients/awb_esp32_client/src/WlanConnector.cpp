@@ -163,6 +163,7 @@ String WlanConnector::GetHtml()
         ptr += "<tr><td>selected state id</td><td> " + String(_actualStatusInformation->autoPlayerSelectedStateId) + "</td></tr>\n";
         ptr += "<tr><td>state selector available</td><td> " + String(_actualStatusInformation->autoPlayerStateSelectorAvailable == true ? "yes" : "no") + "</td></tr>\n";
         ptr += "<tr><td>state selector STS servo channel</td><td> " + String(_actualStatusInformation->autoPlayerStateSelectorStsServoChannel) + "</td></tr>\n";
+        ptr += "<tr><td>states active by inputs</td><td> " + _actualStatusInformation->activeTimelineStateIdsByInput + "</td></tr>\n";
 
         ptr += "</table>\n";
         ptr += "</div>\n";

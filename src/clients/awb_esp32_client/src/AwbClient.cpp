@@ -220,10 +220,10 @@ void AwbClient::loop()
         criticalTemp = criticalTemp || this->_scSerialServoManager->servoCriticalTemp;
     _autoPlayer->update(criticalTemp);
 
-    if (_autoPlayer->selectedStateId() != _lastAutoPlaySelectedStateId)
+    if (_autoPlayer->getStateSelectorStsServoChannel() != _lastAutoPlaySelectedStateId)
     {
         // an other timeline filter state was selected
-        _lastAutoPlaySelectedStateId = _autoPlayer->selectedStateId();
+        _lastAutoPlaySelectedStateId = _autoPlayer->getStateSelectorStsServoChannel();
         _display.set_debugStatus("StateId:" + String(_lastAutoPlaySelectedStateId));
     }
 
@@ -316,12 +316,19 @@ void AwbClient::loop()
     // collect all status information for lcd display and WLAN status display
     _wlanConnector->memoryInfo = &_display.memoryInfo;
     _actualStatusInformation->autoPlayerCurrentStateName = _autoPlayer->getCurrentTimelineName();
-    _actualStatusInformation->autoPlayerSelectedStateId = _autoPlayer->selectedStateId();
+    _actualStatusInformation->autoPlayerSelectedStateId = _autoPlayer->selectedStateIdFromStsServoSelector();
     _actualStatusInformation->autoPlayerIsPlaying = _autoPlayer->isPlaying();
-    _actualStatusInformation->autoPlayerSelectedStateId = _autoPlayer->selectedStateId();
     _actualStatusInformation->autoPlayerStateSelectorAvailable = _autoPlayer->getStateSelectorAvailable();
     _actualStatusInformation->autoPlayerCurrentTimelineName = _autoPlayer->getCurrentTimelineName();
     _actualStatusInformation->autoPlayerStateSelectorStsServoChannel = _autoPlayer->getStateSelectorStsServoChannel();
+    String activeTimelineStateIdsByInput = "";
+    auto stateIds = _autoPlayer->getActiveStateIdsByInputs();
+    for (int i = 0; i < stateIds.size(); i++)
+    {
+        activeTimelineStateIdsByInput += String(stateIds[i]) + ",";
+    }
+    _actualStatusInformation->activeTimelineStateIdsByInput = activeTimelineStateIdsByInput;
+
     _wlanConnector->update();
 
     if (millis() - _startMillis < 5000)

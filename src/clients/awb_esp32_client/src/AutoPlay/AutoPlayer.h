@@ -12,6 +12,7 @@
 #include "../Actuators/StSerialServoManager.h"
 #include "../Actuators/Pca9685PwmManager.h"
 #include "../Actuators/Mp3PlayerYX5300Manager.h"
+#include "../Actuators/InputManager.h"
 
 using byte = unsigned char;
 
@@ -26,6 +27,7 @@ protected:
     StSerialServoManager *_scSerialServoManager;     // the SCS serial servo manager
     Pca9685PwmManager *_pca9685PwmManager;           // the PCA9685 PWM manager
     Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager; // the MP3 player manager
+    InputManager *_inputManager;                     // the input manager
 
     AutoPlayData *_data; // the data exported by Animatronic Workbench Studio
 
@@ -51,14 +53,9 @@ public:
     ~AutoPlayer() {}
 
     /**
-     * Returns the data exported by Animatronic Workbench Studio
-     */
-    bool isPlaying();
-
-    /**
      * Returns true if the player is playing a timeline
      */
-    bool isPlaying2();
+    bool isPlaying();
 
     /**
      * The name of the timeline actually playing
@@ -76,9 +73,14 @@ public:
     int getStateSelectorStsServoChannel();
 
     /**
-     * Returns the actual selected state id
+     * Returns the actual selected state id based on the rotation of a sts servo
      */
-    int selectedStateId();
+    int selectedStateIdFromStsServoSelector();
+
+    /**
+     * Check, if the selected state is active by inputs
+     */
+    std::vector<int> getActiveStateIdsByInputs();
 
     /**
      * starts the timeline with the given index
