@@ -95,8 +95,8 @@ namespace Awb.Core.LoadNSave.Export
             var stateIds = exportStates.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
             result.AppendLine($"\tint timelineStateIds[{exportStates.Length}] = {{{string.Join(", ", stateIds)}}};");
             result.AppendLine($"\tString timelineStateNames[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"\"{s.Name}\""))}}};");
-            result.AppendLine($"\tint timelineStatePositiveInputs[{exportStates.Length}][{exportStates.Max(s => s.PositiveInputs.Length)}] = {{{string.Join(", ", exportStates.Select(s =>  $"{{{string.Join(",", s.PositiveInputs)}}}"))}}};");
-            result.AppendLine($"\tint timelineStateNegativeInputs[{exportStates.Length}][{exportStates.Max(s => s.NegativeInputs.Length)}] =  {{{string.Join(", ", exportStates.Select(s => $"{{{string.Join(",", s.NegativeInputs)}}}"))}}};");
+            result.AppendLine($"\tint timelineStatePositiveInput[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s =>  (s.PositiveInputs.FirstOrDefault()).ToString()))}}};");
+            result.AppendLine($"\tint timelineStateNegativeInput[{exportStates.Length}] =  {{{string.Join(", ", exportStates.Select(s => (s.NegativeInputs.FirstOrDefault()).ToString()))}}};");
             result.AppendLine($"\tint timelineStateCount = {stateIds.Length};");
             result.AppendLine();
 
@@ -104,7 +104,7 @@ namespace Awb.Core.LoadNSave.Export
             var exportInputs = exportData.InputConfigs ?? Array.Empty<InputConfig>();   
             result.AppendLine($"\tint inputIds[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(i => i.Id.ToString()))}}};");
             result.AppendLine($"\tString inputNames[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(s => $"\"{s.Name}\""))}}};");
-            result.AppendLine($"\tint inputIoPins[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(s => s.IoPin.ToString()))}}};");
+            result.AppendLine($"\tuint8_t  inputIoPins[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(s => s.IoPin.ToString()))}}};");
             result.AppendLine($"\tint inputCount = {exportInputs.Length};");
             result.AppendLine();
 

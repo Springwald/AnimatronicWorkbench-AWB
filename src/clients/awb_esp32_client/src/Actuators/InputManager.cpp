@@ -3,13 +3,23 @@
 #include <Arduino.h>
 #include "InputManager.h"
 
-bool InputManager::isInputPressed(int inputIndex)
+bool InputManager::isInputPressed(int inputId)
 {
-    if (inputIndex < 1 || inputIndex >= _data->inputCount)
+    int index = -1;
+    for (int i = 0; i < _data->inputCount; i++)
     {
-        _errorOccured("Input index " + String(inputIndex) + " out of range");
-        return false;
+        if (_data->inputIds[i] == inputId)
+        {
+            index = i;
+            break;
+        }
     }
 
-    return digitalRead(_data->inputIoPins[inputIndex]) == HIGH;
+    if (index == -1)
+    {
+        _errorOccured("Input id " + String(inputId) + " not defined!");
+    }
+
+    pinMode(_data->inputIoPins[index], INPUT);
+    return digitalRead(_data->inputIoPins[index]) == HIGH;
 }

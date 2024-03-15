@@ -273,16 +273,13 @@ std::vector<int> AutoPlayer::getActiveStateIdsByInputs()
     for (int iState = 0; iState < _data->timelineStateCount; iState++)
     {
         // check the positive inputs
-        for (int j = 0; j < sizeof(_data->timelineStatePositiveInputs[iState]); j++)
+        int inputId = _data->timelineStatePositiveInput[iState];
+        if (inputId > 0)
         {
-            int input = _data->timelineStatePositiveInputs[iState][j];
-            if (input > 0)
+            if (_inputManager->isInputPressed(inputId))
             {
-                if (_inputManager->isInputPressed(input))
-                {
-                    foundAnyPositive = true;
-                    activeStateIds.push_back(_data->timelineStateIds[iState]);
-                }
+                foundAnyPositive = true;
+                activeStateIds.push_back(_data->timelineStateIds[iState]);
             }
         }
     }
@@ -294,27 +291,21 @@ std::vector<int> AutoPlayer::getActiveStateIdsByInputs()
     for (int iState = 0; iState < _data->timelineStateCount; iState++)
     {
         bool hasPositiveInput = false;
-        for (int j = 0; j < sizeof(_data->timelineStatePositiveInputs[iState]); j++)
+        int inputId = _data->timelineStatePositiveInput[iState];
+        if (inputId > 0)
         {
-            int input = _data->timelineStatePositiveInputs[iState][j];
-            if (input > 0)
-            {
-                hasPositiveInput = true;
-                break;
-            }
+            hasPositiveInput = true;
         }
 
         if (hasPositiveInput) // has positive input, but this was not presses
             continue;
 
         bool negativeInputActive = false;
-        for (int j = 0; j < sizeof(_data->timelineStateNegativeInputs[iState]); j++)
+        inputId = _data->timelineStateNegativeInput[iState];
+        if (inputId > 0)
         {
-            if (_inputManager->isInputPressed(_data->timelineStateNegativeInputs[iState][j]))
-            {
+            if (_inputManager->isInputPressed(inputId))
                 negativeInputActive = true;
-                break;
-            }
         }
 
         if (negativeInputActive)
@@ -322,6 +313,7 @@ std::vector<int> AutoPlayer::getActiveStateIdsByInputs()
 
         activeStateIds.push_back(_data->timelineStateIds[iState]);
     }
+
     return activeStateIds;
 }
 

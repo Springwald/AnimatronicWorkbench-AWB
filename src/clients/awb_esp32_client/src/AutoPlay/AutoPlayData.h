@@ -17,7 +17,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 14.03.2024 23:30:38
+// Created on 15.03.2024 01:57:46
 
 class AutoPlayData
 {
@@ -54,13 +54,13 @@ public:
 
 	int timelineStateIds[2] = {1, 2};
 	String timelineStateNames[2] = {"InBag", "Standing"};
-	int timelineStatePositiveInputs[2][1] = {{1}, {}};
-	int timelineStateNegativeInputs[2][1] = {{}, {1}};
+	int timelineStatePositiveInput[2] = {1, 0};
+	int timelineStateNegativeInput[2] = {0, 1};
 	int timelineStateCount = 2;
 
 	int inputIds[1] = {1};
 	String inputNames[1] = {"InBag"};
-	int inputIoPins[1] = {25};
+	uint8_t inputIoPins[1] = {25};
 	int inputCount = 1;
 
 	std::vector<Timeline> *timelines;

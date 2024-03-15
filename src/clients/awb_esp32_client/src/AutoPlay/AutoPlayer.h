@@ -48,6 +48,7 @@ public:
     {
         _lastMsUpdate = millis();
         _data = new AutoPlayData();
+        _inputManager = new InputManager(_data, errorOccured, errorOccured);
     }
 
     ~AutoPlayer() {}

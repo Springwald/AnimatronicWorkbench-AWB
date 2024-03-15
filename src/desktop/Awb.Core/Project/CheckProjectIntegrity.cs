@@ -17,6 +17,23 @@ namespace Awb.Core.Project
             {
                 if (_project.StsServos != null) foreach (var problem in StsScsServoProblems(_project.StsServos)) yield return problem;
                 if (_project.ScsServos != null) foreach (var problem in StsScsServoProblems(_project.ScsServos)) yield return problem;
+
+                // check the timeline states
+                if (_project.TimelinesStates != null)
+                    foreach (var state in _project.TimelinesStates)
+                    {
+                        if (state.PositiveInputs != null)
+                        {
+                            if (state.PositiveInputs.Length > 1)
+                                yield return $"TimelineState [{state.Id}] {state.Name} has more than 1 positive input. Actually only 1 is supported.";
+                        }
+                        if (state.NegativeInputs != null)
+                        {
+                            if (state.NegativeInputs.Length > 1)
+                                yield return $"TimelineState [{state.Id}] {state.Name} has more than 1 negative inputs. Actually only 1 is supported.";
+                        }
+                    }
+
                 //todo: check the pwm servo values
                 //todo: check double servo ids
                 //todo: check not existing input ids
