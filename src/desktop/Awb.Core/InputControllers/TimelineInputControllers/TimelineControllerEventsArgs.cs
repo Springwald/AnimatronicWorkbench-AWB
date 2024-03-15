@@ -42,6 +42,11 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             ActuatorValueChanged,
 
             /// <summary>
+            /// set the given actuator to its default value
+            /// </summary>
+            ActuatorSetValueToDefault,
+
+            /// <summary>
             /// set or remove a point for the given actuator
             /// </summary>
             ActuatorTogglePoint,

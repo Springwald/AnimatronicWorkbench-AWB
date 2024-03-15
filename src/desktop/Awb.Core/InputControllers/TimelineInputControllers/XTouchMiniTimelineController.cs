@@ -75,6 +75,7 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
                 case XTouchMiniEventArgs.InputTypes.Unknown:
                     break;
 
+
                 case XTouchMiniEventArgs.InputTypes.KnobRotation:
                     OnTimelineEvent.Invoke(this, new TimelineControllerEventArgs(
                         TimelineControllerEventArgs.EventTypes.ActuatorValueChanged,
@@ -83,6 +84,10 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
                     break;
 
                 case XTouchMiniEventArgs.InputTypes.KnobPress:
+                    OnTimelineEvent.Invoke(this, new TimelineControllerEventArgs(
+                      TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault,
+                      actuatorIndex: e.InputIndex - 1,
+                      valueInPercent: -1));
                     break;
 
                 case XTouchMiniEventArgs.InputTypes.ButtonTopLine:

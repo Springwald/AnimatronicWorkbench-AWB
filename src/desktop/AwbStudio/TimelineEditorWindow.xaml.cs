@@ -234,6 +234,7 @@ namespace AwbStudio
                     if (_timelinePlayer.PlaybackSpeed > 0.5) _timelinePlayer.PlaybackSpeed -= 0.5;
                     break;
 
+               
                 case TimelineControllerEventArgs.EventTypes.ActuatorValueChanged:
                     _unsavedChanges = true;
 
@@ -298,6 +299,7 @@ namespace AwbStudio
                     }
                     break;
 
+                case TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault:
                 case TimelineControllerEventArgs.EventTypes.ActuatorTogglePoint:
                     _unsavedChanges = true;
                     _lastActuatorChanged = -1;
@@ -316,14 +318,28 @@ namespace AwbStudio
                             if (servoPoint == null)
                             {
                                 // Insert a new servo point
-                                targetPercent = 100.0 * (servo.TargetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
+                                var targetValue = e.EventType == TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault ? servo.DefaultValue : servo.TargetValue;
+                                targetPercent = 100.0 * (targetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
+                                servo.TargetValue = targetValue;
                                 servoPoint = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
                                 TimelineData?.ServoPoints.Add(servoPoint);
                             }
                             else
                             {
-                                // Remove the existing servo point
-                                TimelineData?.ServoPoints.Remove(servoPoint);
+                                
+                                if (e.EventType == TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault)
+                                {
+                                    // set target value to default
+                                    var targetValue = servo.DefaultValue;
+                                    targetPercent = 100.0 * (targetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
+                                    servoPoint.ValuePercent = targetPercent;
+                                    servo.TargetValue = targetValue;
+                                }
+                                else
+                                {
+                                    // Remove the existing servo point
+                                    TimelineData?.ServoPoints.Remove(servoPoint);
+                                }
                             }
                             break;
                         case ISoundPlayer soundPlayer:
