@@ -329,9 +329,7 @@ void AwbClient::loop()
     _actualStatusInformation->autoPlayerStateSelectorAvailable = _autoPlayer->getStateSelectorAvailable();
     _actualStatusInformation->autoPlayerCurrentTimelineName = _autoPlayer->getCurrentTimelineName();
     _actualStatusInformation->autoPlayerStateSelectorStsServoChannel = _autoPlayer->getStateSelectorStsServoChannel();
-    String activeTimelineStateIdsByInput = _autoPlayer->getStatesDebugInfo();
-
-    _actualStatusInformation->activeTimelineStateIdsByInput = activeTimelineStateIdsByInput;
+    _actualStatusInformation->activeTimelineStateIdsByInput = _autoPlayer->getStatesDebugInfo();
     _actualStatusInformation->inputStates = _inputManager->getDebugInfo();
 
     _wlanConnector->update();

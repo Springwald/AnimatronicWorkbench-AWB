@@ -271,7 +271,7 @@ String AutoPlayer::getStatesDebugInfo()
     for (auto stateId : stateIds)
     {
         for (int iState = 0; iState < _data->timelineStateCount; iState++)
-            if (_data->timelineStateIds[iState] == stateIds[iState])
+            if (_data->timelineStateIds[iState] == stateId)
                 result += String(_data->timelineStateNames[iState]);
         result += "[" + String(stateId) + "]";
     }
