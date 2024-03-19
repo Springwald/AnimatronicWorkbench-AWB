@@ -48,7 +48,7 @@ namespace AwbStudio
                         var projectFolder = (ListLatestProjects.Items[index] as ListBoxItem)?.ToolTip.ToString();
                         if (!string.IsNullOrWhiteSpace(projectFolder))
                         {
-                            var ok = OpenProject(projectFolder);
+                            var ok = OpenProject(projectFolder, editConfig: false);
                         }
                     }
                 }
@@ -92,7 +92,7 @@ namespace AwbStudio
                         if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
                         {
                             // ok, project created and opened
-                            ShowProjectEditor();
+                            ShowProjectConfigEditor();
                         }
                         else
                         {
@@ -159,7 +159,20 @@ namespace AwbStudio
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     var folder = dialog.SelectedPath;
-                    var ok = OpenProject(folder);
+                    var ok = OpenProject(folder, editConfig: false);
+                }
+            }
+        }
+
+        private void ButtonEditExisting_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    var folder = dialog.SelectedPath;
+                    var ok = OpenProject(folder, editConfig: true);
                 }
             }
         }
@@ -169,22 +182,25 @@ namespace AwbStudio
             var folder = (ListLatestProjects.SelectedItem as ListBoxItem)?.ToolTip.ToString();
             if (folder != null)
             {
-                var ok = OpenProject(folder);
+                var ok = OpenProject(folder, editConfig: false);
             }
         }
 
-        private bool OpenProject(string projectPath)
+        private bool OpenProject(string projectPath, bool editConfig)
         {
             if (!_projectManagerService.ExistProject(projectPath))
             {
-                System.Windows.MessageBox.Show($"No Animatronic Workbench project found in folder '{projectPath}'");
+                MessageBox.Show($"No Animatronic Workbench project found in folder '{projectPath}'");
                 return false;
             }
             if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
             {
                 //_projectManagerService.SaveProject(_projectManagerService.ActualProject, projectPath);
                 // ok, project opened
-                ShowProjectEditor();
+                if (editConfig)
+                    ShowProjectConfigEditor();
+                else
+                    ShowProjectTimelineEditor();
                 return true;
             }
             else
@@ -197,7 +213,25 @@ namespace AwbStudio
             }
         }
 
-        private void ShowProjectEditor()
+        private void ShowProjectConfigEditor() { 
+            var project = _projectManagerService.ActualProject;
+            if (project != null)
+            {
+                var configurationEditorWindow = _serviceProvider.GetService<ProjectConfigurationWindow>();
+                if (configurationEditorWindow != null)
+                {
+                    this.Hide();
+                    configurationEditorWindow.Show();
+                    configurationEditorWindow.Closed += (s, args) =>
+                    {
+                        this.Show();
+                        ShowLatestProjects();
+                    };
+                }
+            }
+        }
+
+        private void ShowProjectTimelineEditor()
         {
             var project = _projectManagerService.ActualProject;
             if (project != null)

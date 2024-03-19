@@ -33,8 +33,9 @@ namespace AwbStudio
             services.TryAddSingleton<IAwbStudioSettingsService, AwbStudioSettingsService>();
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
-            services.TryAddSingleton<DebugWindow>();
-            services.TryAddSingleton<ProjectManagementWindow>();
+            services.TryAddTransient<DebugWindow>();
+            services.TryAddTransient<ProjectManagementWindow>();
+            services.TryAddTransient<ProjectConfigurationWindow>();
             services.TryAddTransient<TimelineEditorWindow>();
         }
 
