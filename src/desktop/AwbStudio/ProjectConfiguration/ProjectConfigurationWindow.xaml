@@ -18,23 +18,51 @@
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Content="LabelProjectFolder" x:Name="LabelProjectFolder" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
-        <ScrollViewer Grid.Row="1">
-            <StackPanel Grid.Row="1">
-                <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
-                <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />
-                <Label Content="SCS servos" FontSize="15" FontWeight="Bold" />
-                <Label Content="STS servos" FontSize="15" FontWeight="Bold" />
-                <Label Content="Pca9685 PWM servos" FontSize="15" FontWeight="Bold" />
-                <Label Content="Mp3 player YX5300" FontSize="15" FontWeight="Bold" />
-                <Label Content="Inputs" FontSize="15" FontWeight="Bold" />
-                <Label Content="Timelines states" FontSize="15" FontWeight="Bold" />
-                
-            </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="50*"/>
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer Grid.Column="0">
+                <StackPanel>
+                    <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
+                    <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />
+                    <Label Content="SCS servos" FontSize="15" FontWeight="Bold" />
+                    <Button  Content="Add SCS servo"/>
+
+                    <Label Content="STS servos" FontSize="15" FontWeight="Bold" />
+                    <Button  Content="Add STS servo"/>
+
+                    <Label Content="Pca9685 PWM servos" FontSize="15" FontWeight="Bold" />
+                    <Button  Content="Add Pca9685 servo"/>
+
+                    <Label Content="Mp3 player YX5300" FontSize="15" FontWeight="Bold" />
+                    <Button  Content="Add YX5300 mp3 player"/>
+
+                    <Label Content="Inputs" FontSize="15" FontWeight="Bold" />
+                    <Button  Content="Add input"/>
+
+                    <Label Content="Timelines states" FontSize="15" FontWeight="Bold" />
+                    <Button  Content="add timeline state"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label  Grid.Row="0" Content="Properties" FontSize="15" FontWeight="Bold" />
+                <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" Padding="10 10 10 10" Margin="10 10 10 10"/>
+                <ScrollViewer Grid.Row="1">
+                </ScrollViewer>
+            </Grid>
             
-        </ScrollViewer>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="40 0 0 0" Content="Cancel without saving"/>
-            <Button Margin="40 0 0 0" Content="Save"/>
+        </Grid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10 10 10 10">
+            <Button Margin="40 0 0 0" Content="Cancel without saving" Click="ButtonClose_Click"/>
+            <Button Margin="40 0 0 0" Content="Save" Click="ButtonSave_Click"/>
         </StackPanel>
     </Grid>
 </Window>
