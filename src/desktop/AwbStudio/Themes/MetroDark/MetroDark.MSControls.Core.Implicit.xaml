@@ -63,7 +63,10 @@
   <!-- PassWordBox Brushes -->
   <SolidColorBrush x:Key="PasswordBoxForegroundBrush" Color="{StaticResource Color_024}" />
 
-  <!-- *********************************  TextBlock Style  ********************************* -->
+  
+
+
+    <!-- *********************************  TextBlock Style  ********************************* -->
   <Style x:Key="TextBlockStyle" TargetType="TextBlock">
     <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
     <Setter Property="FontSize" Value="13.333" />
