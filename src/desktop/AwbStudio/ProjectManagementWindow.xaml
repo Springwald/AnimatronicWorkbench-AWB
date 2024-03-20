@@ -22,7 +22,7 @@
         <ListBox x:Name="ListLatestProjects" Grid.Row="2" SelectionChanged="ListLatestProjects_SelectionChanged" SelectionMode="Single">
         </ListBox>
         <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="3" Click="ButtonCreateNew_Click"/>
-        <Button x:Name="ButtonEditExisting" IsEnabled="false" Content="Edit existing project configuration"  Grid.Row="4" Click="ButtonEditExisting_Click"/>
+        <Button x:Name="ButtonEditExisting" Visibility="Collapsed" Content="Edit existing project configuration"  Grid.Row="4" Click="ButtonEditExisting_Click"/>
     </Grid>
 </Window>
 
