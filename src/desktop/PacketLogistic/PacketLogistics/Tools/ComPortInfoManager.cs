@@ -1,14 +1,13 @@
 ﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
 // https://github.com/Springwald/PacketLogistics
 //
-// (C) 2023 Daniel Springwald, Bochum Germany
+// (C) 2024 Daniel Springwald, Bochum Germany
 // Springwald Software  -   www.springwald.de
 // daniel@springwald.de -  +49 234 298 788 46
 // All rights reserved
 // Licensed under MIT License
 
-using System;
-using System.Diagnostics;
+using System.IO.Ports;
 using System.Management;
 using System.Text.Json;
 
@@ -87,6 +86,15 @@ namespace PacketLogistics.Tools
 
         private ComPortInfo[] CalculatePorts()
         {
+            const bool useDirect = false; // true: slower because also scans bluetooth ports, false: slower because all port names have to be checked
+
+            if (useDirect)
+            {
+                // Get a list of serial port names.
+                string[] portsSimple = SerialPort.GetPortNames();
+                return portsSimple.Select(p => new ComPortInfo(deviceId: p, caption: p, comPort: p)).ToArray();
+            }
+
             using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity"))
             {
                 var raw = searcher.Get().Cast<ManagementBaseObject>();
@@ -95,7 +103,7 @@ namespace PacketLogistics.Tools
                     .Where(p =>
                     p != null &&
                     p.ComPort != null &&
-                    p.ComPort.StartsWith("com", ignoreCase: true, null) &&
+                    p.ComPort.StartsWith("com", ignoreCase: true,culture: null) &&
                     (_ignoreBluetoothPorts == false || !p.Caption.Contains("bluetooth", StringComparison.OrdinalIgnoreCase)))
                     .Select(p => p!)
                     .ToArray();
@@ -103,7 +111,7 @@ namespace PacketLogistics.Tools
                 return ports;
             }
         }
-       
+
         public void ClearCache()
         {
             _portInfos = null;

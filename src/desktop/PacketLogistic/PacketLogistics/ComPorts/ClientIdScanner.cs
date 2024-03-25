@@ -11,6 +11,7 @@ using PacketLogistics.ComPorts.ComportPackets;
 using PacketLogistics.ComPorts.Serialization;
 using PacketLogistics.Tools;
 using System.Diagnostics;
+using System.IO.Ports;
 
 namespace PacketLogistics.ComPorts
 {
@@ -54,20 +55,26 @@ namespace PacketLogistics.ComPorts
 
         private async Task<uint?> DetectClientIdOnPortAsync(string portName)
         {
-            TimeSpan timeout = TimeSpan.FromSeconds(10);
+            TimeSpan timeout = TimeSpan.FromSeconds(1);
 
             OnLog?.Invoke(this, $"ClientIdScanner: Scanning port {portName}");
             var serialPort = new Esp32SerialPort(portName);
             uint? found = null;
             try
             {
+                OnLog?.Invoke(this, $"ClientIdScanner open port {portName}");
                 serialPort.Open();
+                if (serialPort.IsOpen == false)
+                {
+                    OnLog?.Invoke(this, $"ClientIdScanner port {portName} could not be opened");
+                    return null;
+                }
+                OnLog?.Invoke(this, $"ClientIdScanner port {portName} is open");
                 var waitUntil = DateTime.UtcNow + timeout;
 
                 var receiveBuffer = new List<byte>();
 
-                serialPort.DiscardInBuffer();
-                serialPort.DiscardOutBuffer();
+                serialPort.WriteTimeout = 500;
                 serialPort.Write(new[] { _comPortCommandConfig.SearchForClientByte }, offset: 0, count: 1);
 
                 while (DateTime.UtcNow < waitUntil && found == null)

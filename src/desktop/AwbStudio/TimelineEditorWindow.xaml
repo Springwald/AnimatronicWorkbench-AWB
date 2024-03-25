@@ -54,6 +54,7 @@
                     <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 client" Click="ButtonExportEsp32_Click" />
                     <Button x:Name="ButtonPlay" Content="▶ Play" Click="ButtonPlay_Click" />
                     <Button x:Name="ButtonStop" Content="⏹ Stop" Click="ButtonStop_Click" />
+                    <Label x:Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left" DockPanel.Dock="Bottom" Opacity="0.3"/>
                 </StackPanel>
             </ScrollViewer>
 

@@ -58,6 +58,11 @@ namespace AwbStudio
                     TextBoxDebugOutput.Text += msg + "\r\n";
                 }));
             };
+
+            Loaded+= (s, args) =>
+            {
+                BringIntoView();
+            };
         }
 
         private async void OnKeyDown(object sender, KeyEventArgs e)

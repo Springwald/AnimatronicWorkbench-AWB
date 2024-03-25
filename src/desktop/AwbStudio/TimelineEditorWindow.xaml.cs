@@ -56,6 +56,27 @@ namespace AwbStudio
         {
             InitializeComponent();
 
+            DebugOutputLabel.Content = string.Empty;
+
+            awbLogger.OnLog += (s, args) =>
+            {
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    var msg = args;
+                    if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
+                    DebugOutputLabel.Content += msg + "\r\n";
+                }));
+            };
+            awbLogger.OnError += (s, args) =>
+            {
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    var msg = args;
+                    if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
+                    DebugOutputLabel.Content += msg + "\r\n";
+                }));
+            };
+
             _clientsService = clientsService;
             _projectManagerService = projectManagerService;
             _logger = awbLogger;
@@ -67,6 +88,11 @@ namespace AwbStudio
             TimelineViewerControl.ViewPos = _viewPos;
 
             Loaded += TimelineEditorWindow_Loaded;
+        }
+
+        private void AwbLogger_OnLog(object? sender, string e)
+        {
+            throw new NotImplementedException();
         }
 
         private async void TimelineEditorWindow_Loaded(object sender, RoutedEventArgs e)

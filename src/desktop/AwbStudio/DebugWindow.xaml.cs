@@ -25,19 +25,23 @@ namespace AwbStudio
         public DebugWindow()
         {
             InitializeComponent();
-            TextBoxDebugOutput.Text = "";
+            TextBoxDebugOutput.Text = string.Empty;
             ShowInTaskbar = true;
-            //WindowState =  WindowState.Minimized;
-            WindowState = Debugger.IsAttached ? WindowState.Normal :  WindowState.Minimized;
+            WindowState = WindowState.Minimized;
             Loaded += DebugWindow_Loaded;
         }
 
         private void DebugWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += Timer_Tick;
-            timer.Start();
+            if (false && Debugger.IsAttached)
+            {
+                WindowState = WindowState.Normal;
+                timer = new DispatcherTimer();
+                timer.Interval = TimeSpan.FromSeconds(1);
+                timer.Tick += Timer_Tick;
+                timer.Start();
+            } 
+            
         }
 
         private void Timer_Tick(object? sender, EventArgs e)

@@ -4,6 +4,7 @@ var config = new ComPortCommandConfig(packetHeader: "AWB");
 
 Console.WriteLine("Scanning for clients...");
 var clientIdScanner = new ClientIdScanner(config);
+clientIdScanner.OnLog += (s, e) => Console.WriteLine(e);
 var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
 
 Console.WriteLine($"Scanning for clients done. Found {clients.Length} clients.");
