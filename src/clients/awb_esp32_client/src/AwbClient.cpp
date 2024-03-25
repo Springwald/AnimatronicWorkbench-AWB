@@ -124,7 +124,7 @@ void AwbClient::setup()
 
 #ifdef USE_PCA9685_PWM_SERVO
     showSetupMsg("setup PCA9685 PWM servos");
-    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_SPEED, PCA9685_ACC);
+    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS);
 #endif
 
 #ifdef USE_MP3_PLAYER_YX5300

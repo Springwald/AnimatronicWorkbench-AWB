@@ -113,13 +113,13 @@ namespace AwbStudio.TimelineControls
                 // add dots
                 foreach (var point in pointsForThisSoundplayer)
                 {
-                    if (point.TimeMs >= ViewPos.ScrollOffsetMs && point.TimeMs <= ViewPos.DisplayMs + ViewPos.ScrollOffsetMs) // is inside view
+                    if (point.TimeMs >= 0 && point.TimeMs <= ViewPos.DurationMs) // is inside view
                     {
                         var label = WpfToolbox.XamlClone(_protoypeLabel);
                         label.Content = "Sound" + point.Title;
                         label.Foreground = caption.ForegroundColor;
                         label.Background = caption.BackgroundColor;
-                        label.Margin = new Thickness { Left = _viewPos.GetXPos(ms: (int)point.TimeMs, controlWidth: width, timelineData: _timelineData) };
+                        label.Margin = new Thickness { Left = _viewPos.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) };
                         CanvasSounds.Children.Add(label);
                     }
                 }

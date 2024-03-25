@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -14,7 +14,9 @@ namespace Awb.Core.Services
     {
         Esp32ComPortClient[] ComPortClients { get; }
 
-        Task Init();
+        event EventHandler? ClientsLoaded;
+
+        Task InitAsync();
 
         Esp32ComPortClient? GetClient(uint clientId);
     }
@@ -23,6 +25,8 @@ namespace Awb.Core.Services
     {
         private Esp32ComPortClient[]? _clients;
         private readonly IAwbLogger? _logger;
+
+        public event EventHandler? ClientsLoaded;
 
         public AwbClientsService(IAwbLogger? logger)
         {
@@ -33,33 +37,42 @@ namespace Awb.Core.Services
         {
             get
             {
-                if (_clients == null) throw new InvalidOperationException("Not initialized.");
+                if (_clients == null)
+                {
+                    _logger?.Log($"Access to clients not available because still searching clients...");
+                    return Array.Empty<Esp32ComPortClient>();
+                }
                 return _clients;
             }
         }
 
-        public async Task Init()
+        public async Task InitAsync()
         {
             _logger?.Log($"Searching clients...");
 
             var config = new AwbEsp32ComportClientConfig();
             var clientIdScanner = new ClientIdScanner(config);
-            var foundComPortClients = await clientIdScanner.FindAllClients(useComPortCache: true);
+            var foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
             if (foundComPortClients.Any() == false)
             {
-                foundComPortClients = await clientIdScanner.FindAllClients(useComPortCache: false);
-            }
-            _clients = foundComPortClients.Select(c => new Esp32ComPortClient(c.ComPortName, c.ClientId)).ToArray();
-            foreach (var client in _clients)
-            {
-                var ok = await client.Init();
-                if (ok == false)
-                {
-                    _logger?.LogError($"Can't init client {client.ClientId}/{client.FriendlyName}");
-                }
+                foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
             }
 
+            var clients = foundComPortClients.Select(c => new Esp32ComPortClient(c.ComPortName, c.ClientId)).ToArray();
+            var clientTasks = clients.Select(async c =>
+            {
+                _logger?.Log("Init client " + c.ClientId + "/" + c.FriendlyName);
+                var ok = await c.InitAsync();
+                if (ok == false) _logger?.LogError($"Can't init client {c.ClientId}/{c.FriendlyName}");
+            }).ToArray();
+
+            await Task.WhenAll(clientTasks);
+
+            _clients = clients;
             _logger?.Log($"Found {_clients.Length} clients. ({string.Join(", ", _clients.Select(c => c.ClientId))})");
+
+            if (ClientsLoaded != null)
+                ClientsLoaded(this, EventArgs.Empty);
         }
 
         public Esp32ComPortClient? GetClient(uint clientId)

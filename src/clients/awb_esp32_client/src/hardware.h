@@ -48,10 +48,8 @@
 #define SCS_SERVO_MAX_LOAD 600       // max load before servo is disabled
 
 /* PCA9685 PWM servo settings */
-// #define USE_PCA9685_PWM_SERVO    // uncomment this line if you want to use PCA9685 PWM servos
+#define USE_PCA9685_PWM_SERVO // uncomment this line if you want to use PCA9685 PWM servos
 #define PCA9685_I2C_ADDRESS 0x40
-#define PCA9685_SPEED 1500
-#define PCA9685_ACC 10
 
 /* MP3-Player YX5300 */
 #define USE_MP3_PLAYER_YX5300

@@ -15,7 +15,7 @@ namespace Awb.Core.Clients
 
         public EventHandler<IAwbClient.ReceivedEventArgs> Received => throw new NotImplementedException();
 
-        public async Task<bool> Init()
+        public async Task<bool> InitAsync()
         {
             throw new NotImplementedException();
         }

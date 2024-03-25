@@ -35,7 +35,7 @@ namespace Awb.Core.Clients
             comPortCommandConfig: new AwbEsp32ComportClientConfig());
         }
 
-        public async Task<bool> Init()
+        public async Task<bool> InitAsync()
         {
             _comPortReceiver.PacketReceived += _comPortReceiver_PacketReceived;
             _connected = await _comPortReceiver.Connect();

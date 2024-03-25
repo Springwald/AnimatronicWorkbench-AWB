@@ -22,28 +22,30 @@ namespace PacketLogistics.ComPorts
             _comPortCommandConfig = comPortCommandConfig;
         }
 
-        public async Task<string?> FindComPortName(int clientId)
-        {
-            var portInfoManager = new ComPortInfoManager();
-            var ports = portInfoManager.PortInfos;
-            foreach (var port in ports)
-            {
-                var foundId = await DetectClientIdOnPort(port.ComPort);
-                if (foundId == clientId) return port.ComPort;
-            }
-            return null;
-        }
-        public async Task<FoundClient[]> FindAllClients(bool useComPortCache)
+        //public async Task<string?> FindComPortNameAsync(int clientId)
+        //{
+        //    var portInfoManager = new ComPortInfoManager();
+        //    var ports = portInfoManager.PortInfos;
+        //    foreach (var port in ports)
+        //    {
+        //        var foundId = await DetectClientIdOnPortAsync(port.ComPort);
+        //        if (foundId == clientId) return port.ComPort;
+        //    }
+        //    return null;
+        //}
+
+        public async Task<FoundClient[]> FindAllClientsAsync(bool useComPortCache)
         {
             var clients = new List<FoundClient>();
             var portInfoManager = new ComPortInfoManager();
             if (!useComPortCache) portInfoManager.ClearCache();
             var ports = portInfoManager.PortInfos;
-            foreach (var port in ports)
+
+            var portTasks = ports.Select(async port =>
             {
                 if (port != null)
                 {
-                    var clientId = await DetectClientIdOnPort(port.ComPort);
+                    var clientId = await DetectClientIdOnPortAsync(port.ComPort);
                     if (clientId != null)
                     {
                         clients.Add(new FoundClient(
@@ -53,11 +55,13 @@ namespace PacketLogistics.ComPorts
                             deviceId: port.DeviceId));
                     }
                 }
-            }
+            }).ToArray();
+            await Task.WhenAll(portTasks);
+
             return clients.ToArray();
         }
 
-        private async Task<uint?> DetectClientIdOnPort(string portName)
+        private async Task<uint?> DetectClientIdOnPortAsync(string portName)
         {
             TimeSpan timeout = TimeSpan.FromSeconds(10);
 

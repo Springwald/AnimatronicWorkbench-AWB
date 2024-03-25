@@ -27,6 +27,8 @@ namespace AwbStudio
 {
     public partial class TimelineEditorWindow : Window
     {
+        const int msPerScreenWidth = 20 * 1000; // todo: zoom in/out
+
         const int pageSizeMs = 2000; // 2 seconds per page when scrolling
 
         private readonly IProjectManagerService _projectManagerService;
@@ -80,13 +82,22 @@ namespace AwbStudio
             }
 
             _clientService = new AwbClientsService(_logger);
-            await _clientService.Init();
+            _clientService.ClientsLoaded += _clientService_ClientsLoaded;
+            _ = Task.Run(() => _clientService.InitAsync()); ;
+
+            
+        }
+
+        private async void _clientService_ClientsLoaded(object? sender, EventArgs e)
+        {
+            MyInvoker.Invoke(new Action(() => { this.ClientsLoaded(); }));
+        }
+
+        private async void ClientsLoaded() { 
 
             _actuatorsService = new ActuatorsService(_project, _clientService, _logger);
 
-            // fill timeline state chooser
-            ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
-            TimelineChooser.FileManager = _fileManager;
+            TimelineViewerControl.ActuatorsService = _actuatorsService;
 
             this.TimelineData = CreateNewTimelineData("");
             await TimelineDataLoaded();
@@ -97,7 +108,6 @@ namespace AwbStudio
 
             TimelineViewerControl.TimelineData = TimelineData;
             TimelineViewerControl.Timelineplayer = _timelinePlayer;
-            TimelineViewerControl.ActuatorsService = _actuatorsService;
             TimelineViewerControl.Sounds = _project.Sounds;
 
             TimelineChooser.OnTimelineChosen += TimelineChosenToLoad;
@@ -108,8 +118,14 @@ namespace AwbStudio
                 timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
             }
 
-            Closing += TimelineEditorWindow_Closing;
+            // fill timeline state chooser
+            ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
+            TimelineChooser.FileManager = _fileManager;
 
+            this.SizeChanged += TimelineEditorWindow_SizeChanged;
+            CalculateSizeAndPixelPerMs();
+
+            Closing += TimelineEditorWindow_Closing;
             KeyDown += TimelineEditorWindow_KeyDown;
 
             // bring to front
@@ -123,13 +139,16 @@ namespace AwbStudio
             await _timelinePlayer.Update();
         }
 
-        private void SetupToasts()
+        private void CalculateSizeAndPixelPerMs()
         {
-          
-
+            this.TimelineViewerControl.ViewPos.PixelPerMs = this.ActualWidth / msPerScreenWidth;
         }
 
+        private void TimelineEditorWindow_SizeChanged(object sender, SizeChangedEventArgs e) => CalculateSizeAndPixelPerMs();
 
+        private void SetupToasts()
+        {
+        }
 
         private void TimelineEditorWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -192,7 +211,8 @@ namespace AwbStudio
             {
                 case TimelineControllerEventArgs.EventTypes.PlayPosAbsoluteChanged:
                     var viewPos = TimelineViewerControl.ViewPos;
-                    viewPos.SetPosSelectorManualMsByPercent(e.ValueInPercent);
+
+                    //viewPos.SetPosSelectorManualMsByPercent(e.ValueInPercent);
 
                     switch (_timelinePlayer.PlayState)
                     {
@@ -201,8 +221,8 @@ namespace AwbStudio
 
                         case TimelinePlayer.PlayStates.Nothing:
 
-                            int newPos = _timelinePlayer.PositionMs;
-                            newPos = viewPos.ScrollOffsetMs + viewPos.PosSelectorManualMs;
+                            //int newPos = _timelinePlayer.PositionMs;
+                            int newPos = viewPos.PlayPosMs;
                             _manualUpdatingPlayPos = true;
                             await _timelinePlayer.Update(newPositionMs: newPos);
                             _manualUpdatingPlayPos = false;
@@ -234,7 +254,7 @@ namespace AwbStudio
                     if (_timelinePlayer.PlaybackSpeed > 0.5) _timelinePlayer.PlaybackSpeed -= 0.5;
                     break;
 
-               
+
                 case TimelineControllerEventArgs.EventTypes.ActuatorValueChanged:
                     _unsavedChanges = true;
 
@@ -326,7 +346,7 @@ namespace AwbStudio
                             }
                             else
                             {
-                                
+
                                 if (e.EventType == TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault)
                                 {
                                     // set target value to default
@@ -420,8 +440,11 @@ namespace AwbStudio
             int scrollSpeedMs = (howManyMs > 0 ? 1 : -1) * (1000 / fps) * speed;
             for (int i = 0; i < howManyMs / scrollSpeedMs; i++)
             {
-                var newOffset = TimelineViewerControl.ViewPos.ScrollOffsetMs + scrollSpeedMs;
-                TimelineViewerControl.ViewPos.ScrollOffsetMs = Math.Max(0, newOffset);
+                var newScrollOffset = timelineScrollViewer.HorizontalOffset + TimelineViewerControl.ViewPos.DurationMs / scrollSpeedMs;
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    timelineScrollViewer.ScrollToHorizontalOffset(newScrollOffset);
+                }));
                 newPosMs = TimelineViewerControl.Timelineplayer.PositionMs + scrollSpeedMs;
                 await TimelineViewerControl.Timelineplayer.Update(newPosMs);
                 MyInvoker.Invoke(new Action(() => TimelineViewerControl.PaintTimeLine()));
@@ -600,7 +623,7 @@ namespace AwbStudio
         private async void Stop()
         {
             // snap scrollpos to snap positions 
-            TimelineViewerControl.ViewPos.ScrollOffsetMs = (TimelineViewerControl.ViewPos.ScrollOffsetMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
+            TimelineViewerControl.ViewPos.PlayPosMs = (TimelineViewerControl.ViewPos.PlayPosMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
             if (_timelinePlayer != null)
             {
                 _timelinePlayer.Stop();

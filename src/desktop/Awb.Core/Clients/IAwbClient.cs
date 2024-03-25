@@ -39,7 +39,7 @@ namespace Awb.Core.Clients
 
         EventHandler<ReceivedEventArgs> Received { get; }
 
-        Task<bool> Init();
+        Task<bool> InitAsync();
         Task<SendResult> Send(byte[] payload);
     }
 }

@@ -36,7 +36,7 @@ namespace AwbStudio.TimelineControls
 
         private void PlayerStateChanged(object? sender, PlayStateEventArgs e)
         {
-            ViewPos.PosSelectorManualMs = e.PositionMs - ViewPos.ScrollOffsetMs;
+            ViewPos.PlayPosMs = e.PositionMs;
             var scrollingChanged = false;
 
             switch (e.PlayState)
@@ -146,14 +146,14 @@ namespace AwbStudio.TimelineControls
         {
             if (this._timelinePlayer != null)
             {
-                if (snapToGrid)
-                {
-                    this.ViewPos.ScrollOffsetMs = ((newPlayPosMs - this.ViewPos.PosSelectorManualMs) / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
-                }
-                else
-                {
-                    this.ViewPos.ScrollOffsetMs = newPlayPosMs - this.ViewPos.PosSelectorManualMs;
-                }
+                //if (snapToGrid)
+                //{
+                //    this.ViewPos.ScrollOffsetMs = ((newPlayPosMs - this.ViewPos.ActualPositionMs) / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
+                //}
+                //else
+                //{
+                //    this.ViewPos.ScrollOffsetMs = newPlayPosMs - this.ViewPos.ActualPositionMs;
+                //}
                 return true;
             }
             return false;
@@ -194,16 +194,15 @@ namespace AwbStudio.TimelineControls
 
             // update the data optical grid lines
             OpticalGrid.Children.Clear();
-            var duration = ViewPos.DisplayMs;
+            var duration = ViewPos.DurationMs;
             const int STEP = 1000;
-            for (int msRaw = 0; msRaw < duration + ViewPos.DisplayMs; msRaw += STEP)
+            for (int ms = 0; ms < duration ; ms += STEP)
             {
-                int ms = msRaw - ViewPos.ScrollOffsetMs;
-                var x = ms * width / duration;
+                var x = ViewPos.GetXPos(ms);
                 if (x > 0 && x < width)
                 {
                     OpticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = height - _paintMarginTopBottom, Stroke = _gridLineBrush });
-                    OpticalGrid.Children.Add(new Label { Content = ((ms + ViewPos.ScrollOffsetMs) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: height - 30, right: 0, bottom: 0) });
+                    OpticalGrid.Children.Add(new Label { Content = ((ms) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: height - 30, right: 0, bottom: 0) });
                 }
             }
 
@@ -233,9 +232,12 @@ namespace AwbStudio.TimelineControls
                 }));
             }
 
+            var newWidth = this.ViewPos.PixelPerMs * this.ViewPos.DurationMs;
+
             // update the scrollbar
             MyInvoker.Invoke(() =>
             {
+                this.Width = newWidth;
                 PaintTimeLine();  // update the timeline
             });
         }
@@ -299,19 +301,19 @@ namespace AwbStudio.TimelineControls
             if (ViewPos == null) return;
 
             // draw the manual midi controller play position as triangle at the bottom
-            var x = ((double)(ViewPos.PosSelectorManualMs) / ViewPos.DisplayMs) * this.ActualWidth;
+            var x = ViewPos.GetXPos(ViewPos.PlayPosMs);
             LabelManualPlayPosAbsolute.Margin = new Thickness(x - LabelManualPlayPosAbsolute.FontSize, 0, 0, 0);
-            LabelManualPlayPosAbsolute.Content = $"🔺 {ViewPos.PosSelectorManualMs+ViewPos.ScrollOffsetMs}ms";
+            LabelManualPlayPosAbsolute.Content = $"🔺 {ViewPos.PlayPosMs}ms";
 
             // draw the play position as a vertical line
-            var playPosMs = ViewPos.PosSelectorManualMs + ViewPos.ScrollOffsetMs;
-            if (timeline == null || playPosMs < 0 || playPosMs > ViewPos.ScrollOffsetMs + ViewPos.DisplayMs)
+            var playPosMs = ViewPos.PlayPosMs;
+            if (timeline == null || playPosMs < 0 || playPosMs > ViewPos.DurationMs)
             {
                 PlayPosLine.Visibility = Visibility.Hidden;
             }
             else
             {
-                x = this.ViewPos.GetXPos(ms: playPosMs, controlWidth: this.ActualWidth);
+                x = this.ViewPos.GetXPos(timeMs: playPosMs);
                 PlayPosLine.X1 = x;
                 PlayPosLine.X2 = x;
                 PlayPosLine.Y1 = 0;

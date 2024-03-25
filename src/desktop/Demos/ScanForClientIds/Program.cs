@@ -10,10 +10,10 @@ var config = new ComPortCommandConfig(packetHeader: "AWB");
 
 Console.WriteLine("Scanning for clients...");
 var clientIdScanner = new ClientIdScanner(config);
-var clients = await clientIdScanner.FindAllClients(useComPortCache: true);
+var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
 if (clients.Any() == false)
 {
-    clients = await clientIdScanner.FindAllClients(useComPortCache: false);
+    clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
 }
 
 Console.WriteLine($"Scanning for clients done. Found {clients.Length} clients.");

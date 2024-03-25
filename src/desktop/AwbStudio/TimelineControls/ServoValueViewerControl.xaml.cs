@@ -42,8 +42,6 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-
-
         public TimelineCaptions TimelineCaptions { get; set; }
 
         /// <summary>
@@ -123,7 +121,7 @@ namespace AwbStudio.TimelineControls
                 const int dotWidth = dotRadius * 2;
                 foreach (var point in pointsForThisServo)
                 {
-                    if (point.TimeMs >= ViewPos.ScrollOffsetMs && point.TimeMs <= ViewPos.DisplayMs + ViewPos.ScrollOffsetMs) // is inside view
+                    if (point.TimeMs >= 0 && point.TimeMs <= ViewPos.DurationMs) // is inside view
                     {
                         this.GridDots.Children.Add(new Ellipse
                         {
@@ -133,7 +131,7 @@ namespace AwbStudio.TimelineControls
                             Stroke = caption.ForegroundColor,
                             Height = dotWidth,
                             Width = dotWidth,
-                            Margin = new Thickness { Left = _viewPos.GetXPos(ms: (int)point.TimeMs, controlWidth: width, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }, 
+                            Margin = new Thickness { Left = _viewPos.GetXPos(timeMs: (int)point.TimeMs,  timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }, 
                             ToolTip = point.Title
                            
                         });
@@ -142,7 +140,7 @@ namespace AwbStudio.TimelineControls
 
                 var points = new PointCollection(pointsForThisServo.Select(p => 
                 new Point { 
-                    X = _viewPos.GetXPos((int)(p.TimeMs), controlWidth: width, timelineData: _timelineData), 
+                    X = _viewPos.GetXPos((int)(p.TimeMs),  timelineData: _timelineData), 
                     Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
                 var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
                 this.PanelLines.Children.Add(line);

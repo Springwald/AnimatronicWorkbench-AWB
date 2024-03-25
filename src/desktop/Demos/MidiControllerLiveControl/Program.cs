@@ -4,7 +4,7 @@ using MidiControllerLiveControl;
 var logger = new AwbLoggerConsole(throwWhenInDebugMode: false);
 
 var clientService = new AwbClientsService(logger);
-await clientService.Init();
+await clientService.InitAsync();
 var config = MockConfig.ConfigDemoPuppetTest;
 IActuatorsService actuatorsService = new ActuatorsService(config, clientService, logger);
 
