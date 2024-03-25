@@ -144,8 +144,6 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
         for (int servoIndex = 0; servoIndex < _data->pca9685PwmServoCount; servoIndex++)
         {
             int servoChannel = _data->pca9685PwmServoChannels[servoIndex];
-            int servoSpeed = _data->pca9685PwmServoSpeed[servoIndex];
-            int servoAccelleration = _data->pca9685PwmServoAccelleration[servoIndex];
             auto servoName = _data->pca9685PwmServoName[servoIndex];
 
             Pca9685PwmServoPoint *point1 = nullptr;
