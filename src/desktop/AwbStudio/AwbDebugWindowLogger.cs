@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -16,15 +16,25 @@ namespace AwbStudio
     {
         private DebugWindow? _debugWindow;
         private List<string> _output = new List<string>();
+        public event EventHandler<string>? OnError;
+        public event EventHandler<string>? OnLog;
 
         public AwbDebugWindowLogger(DebugWindow debugWindow)
         {
             _debugWindow = debugWindow;
         }
 
-        public async Task LogError(string message) => await ShowMsg($"## Error ## {message}");
+        public async Task LogError(string message)
+        {
+            OnError?.Invoke(this, message);
+            await ShowMsg($"## Error ## {message}");
+        }
 
-        public async Task Log(string message) => await ShowMsg(message);
+        public async Task Log(string message)
+        {
+            OnLog?.Invoke(this, message);
+            await ShowMsg(message);
+        }
 
         private async Task ShowMsg(string msg)
         {

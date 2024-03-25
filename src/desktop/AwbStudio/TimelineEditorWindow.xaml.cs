@@ -30,7 +30,7 @@ namespace AwbStudio
         const int msPerScreenWidth = 20 * 1000; // todo: zoom in/out
 
         const int pageSizeMs = 2000; // 2 seconds per page when scrolling
-
+        private readonly IAwbClientsService _clientsService;
         private readonly IProjectManagerService _projectManagerService;
         private readonly IAwbLogger _logger;
         private readonly AwbProject _project;
@@ -39,7 +39,6 @@ namespace AwbStudio
         private readonly TimelineViewPos _viewPos;
         private TimelinePlayer _timelinePlayer;
         private IActuatorsService _actuatorsService;
-        private IAwbClientsService _clientService;
 
         private bool _unsavedChanges;
 
@@ -53,16 +52,17 @@ namespace AwbStudio
 
         protected TimelineData TimelineData { get; set; }
 
-        public TimelineEditorWindow(IInputControllerService inputControllerService, IProjectManagerService projectManagerService, IAwbLogger awbLogger)
+        public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IAwbLogger awbLogger)
         {
             InitializeComponent();
 
+            _clientsService = clientsService;
             _projectManagerService = projectManagerService;
             _logger = awbLogger;
 
             _project = _projectManagerService.ActualProject;
             _fileManager = new FileManager(_project);
-            _timelineControllers = inputControllerService.TimelineControllers;
+            _timelineControllers = timelineControllers;
             _viewPos = new TimelineViewPos();
             TimelineViewerControl.ViewPos = _viewPos;
 
@@ -81,28 +81,14 @@ namespace AwbStudio
                 MessageBox.Show("Project file has no timelineStates defined!");
             }
 
-            _clientService = new AwbClientsService(_logger);
-            _clientService.ClientsLoaded += _clientService_ClientsLoaded;
-            _ = Task.Run(() => _clientService.InitAsync()); ;
-
-            
-        }
-
-        private async void _clientService_ClientsLoaded(object? sender, EventArgs e)
-        {
-            MyInvoker.Invoke(new Action(() => { this.ClientsLoaded(); }));
-        }
-
-        private async void ClientsLoaded() { 
-
-            _actuatorsService = new ActuatorsService(_project, _clientService, _logger);
+            _actuatorsService = new ActuatorsService(_project, _clientsService, _logger);
 
             TimelineViewerControl.ActuatorsService = _actuatorsService;
 
             this.TimelineData = CreateNewTimelineData("");
             await TimelineDataLoaded();
 
-            _timelinePlayer = new TimelinePlayer(timelineData: this.TimelineData, actuatorsService: _actuatorsService, awbClientsService: _clientService, logger: _logger);
+            _timelinePlayer = new TimelinePlayer(timelineData: this.TimelineData, actuatorsService: _actuatorsService, awbClientsService: _clientsService, logger: _logger);
 
             _timelinePlayer.OnPlayStateChanged += OnPlayStateChanged;
 

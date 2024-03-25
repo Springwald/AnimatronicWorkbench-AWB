@@ -5,12 +5,15 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Project;
+using Awb.Core.Services;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,18 +28,39 @@ namespace AwbStudio
         private readonly IProjectManagerService _projectManagerService;
         private readonly IServiceProvider _serviceProvider;
         private readonly IAwbStudioSettingsService _awbStudioSettingsService;
+        private readonly IAwbLogger _awbLogger;
 
-        public ProjectManagementWindow(IProjectManagerService projectManagerService, IAwbStudioSettingsService awbStudioSettingsService, IServiceProvider serviceProvider)
+        public ProjectManagementWindow(IProjectManagerService projectManagerService, IAwbStudioSettingsService awbStudioSettingsService, IServiceProvider serviceProvider, IAwbLogger awbLogger)
         {
             InitializeComponent();
             _projectManagerService = projectManagerService;
             _serviceProvider = serviceProvider;
             _awbStudioSettingsService = awbStudioSettingsService;
+            _awbLogger = awbLogger;
             ShowLatestProjects();
             this.KeyDown += OnKeyDown;
+
+            _awbLogger.OnLog += (s, args) =>
+            {
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    var msg = args;
+                    if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
+                    TextBoxDebugOutput.Text += msg + "\r\n";
+                }));
+            };
+            _awbLogger.OnError += (s, args) =>
+            {
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    var msg = args;
+                    if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
+                    TextBoxDebugOutput.Text += msg + "\r\n";
+                }));
+            };
         }
 
-        private void OnKeyDown(object sender, KeyEventArgs e)
+        private async void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (this.IsVisible)
             {
@@ -48,7 +72,7 @@ namespace AwbStudio
                         var projectFolder = (ListLatestProjects.Items[index] as ListBoxItem)?.ToolTip.ToString();
                         if (!string.IsNullOrWhiteSpace(projectFolder))
                         {
-                            var ok = OpenProject(projectFolder, editConfig: false);
+                            var ok = await OpenProject(projectFolder, editConfig: false);
                         }
                     }
                 }
@@ -140,7 +164,7 @@ namespace AwbStudio
                         MinValue = 0,
                     },
                 },
-                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", name: "Mp3Player" )},
+                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", name: "Mp3Player") },
                 Inputs = new InputConfig[]
                 {
                             new InputConfig(id: 1, name:"Sleep") { IoPin = 25 }
@@ -151,7 +175,7 @@ namespace AwbStudio
             return project;
         }
 
-        private void ButtonOpenExisting_Click(object sender, RoutedEventArgs e)
+        private async void ButtonOpenExisting_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
@@ -159,12 +183,12 @@ namespace AwbStudio
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     var folder = dialog.SelectedPath;
-                    var ok = OpenProject(folder, editConfig: false);
+                    var ok = await OpenProject(folder, editConfig: false);
                 }
             }
         }
 
-        private void ButtonEditExisting_Click(object sender, RoutedEventArgs e)
+        private async void ButtonEditExisting_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
@@ -172,21 +196,21 @@ namespace AwbStudio
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     var folder = dialog.SelectedPath;
-                    var ok = OpenProject(folder, editConfig: true);
+                    var ok = await OpenProject(folder, editConfig: true);
                 }
             }
         }
 
-        private void ListLatestProjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ListLatestProjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var folder = (ListLatestProjects.SelectedItem as ListBoxItem)?.ToolTip.ToString();
             if (folder != null)
             {
-                var ok = OpenProject(folder, editConfig: false);
+                var ok = await OpenProject(folder, editConfig: false);
             }
         }
 
-        private bool OpenProject(string projectPath, bool editConfig)
+        private async Task<bool> OpenProject(string projectPath, bool editConfig)
         {
             if (!_projectManagerService.ExistProject(projectPath))
             {
@@ -195,12 +219,11 @@ namespace AwbStudio
             }
             if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
             {
-                //_projectManagerService.SaveProject(_projectManagerService.ActualProject, projectPath);
                 // ok, project opened
                 if (editConfig)
                     ShowProjectConfigEditor();
                 else
-                    ShowProjectTimelineEditor();
+                    await LoadProject();
                 return true;
             }
             else
@@ -213,7 +236,8 @@ namespace AwbStudio
             }
         }
 
-        private void ShowProjectConfigEditor() { 
+        private void ShowProjectConfigEditor()
+        {
             var project = _projectManagerService.ActualProject;
             if (project != null)
             {
@@ -231,25 +255,60 @@ namespace AwbStudio
             }
         }
 
-        private void ShowProjectTimelineEditor()
+        private async Task LoadProject()
         {
             var project = _projectManagerService.ActualProject;
             if (project != null)
             {
-                var timelineEditorWindow = _serviceProvider.GetService<TimelineEditorWindow>();
-                if (timelineEditorWindow != null)
+                // show the loading screen
+                TextBoxDebugOutput.Text = $"loading project\r\n'{project.ProjectFolder}'...\r\n\r\n";
+                this.ShowLoadingScreen(true);
+
+                var inputControllerService = _serviceProvider.GetService<IInputControllerService>();
+                if (inputControllerService == null)
                 {
-                    this.Hide();
-                    timelineEditorWindow.Show();
-                    timelineEditorWindow.Closed += (s, args) =>
-                    {
-                        this.Show();
-                        ShowLatestProjects();
-                    };
+                    MessageBox.Show("No input controller service available");
+                    this.ShowLoadingScreen(false);
+                    return;
                 }
+                var timelineControllers = inputControllerService.TimelineControllers;
+
+                var clientsService = _serviceProvider.GetService<IAwbClientsService>();
+                if (clientsService == null)
+                {
+                    MessageBox.Show("No clients service available");
+                    this.ShowLoadingScreen(false);
+                    return;
+                }
+                clientsService.ClientsLoaded += (s, args) =>
+                {
+                    ShowProjectTimelineEditor(clientsService, timelineControllers);
+                };
+                await clientsService.InitAsync();
             }
         }
 
+        private void ShowProjectTimelineEditor(IAwbClientsService clientsService, ITimelineController[] timelineControllers)
+        {
+            var timelineEditorWindow = new TimelineEditorWindow(timelineControllers, _projectManagerService, clientsService, _awbLogger);
+            if (timelineEditorWindow != null)
+            {
+                // hide the loading screen
+                ShowLoadingScreen(false);
+                this.Hide();
+                timelineEditorWindow.Show();
+                timelineEditorWindow.Closed += (s, args) =>
+                {
+                    this.Show();
+                    ShowLatestProjects();
+                };
+            }
+        }
 
+        private void ShowLoadingScreen(bool show)
+        {
+            GridProjectManagement.Visibility = show ? Visibility.Collapsed : Visibility.Visible;
+            GridLoadingProject.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 }

@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Services;
 using AwbStudio.DependencyInjection;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
@@ -33,6 +34,7 @@ namespace AwbStudio
             services.TryAddSingleton<IAwbStudioSettingsService, AwbStudioSettingsService>();
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
+            services.TryAddTransient<IAwbClientsService, AwbClientsService>();
             services.TryAddTransient<DebugWindow>();
             services.TryAddTransient<ProjectManagementWindow>();
             services.TryAddTransient<ProjectConfigurationWindow>();
@@ -42,7 +44,6 @@ namespace AwbStudio
         private void OnStartup(object sender, StartupEventArgs e)
         {
             var projectManagementWindow = serviceProvider.GetService<ProjectManagementWindow>();
-
             if (projectManagementWindow != null)
             {
                 projectManagementWindow.Show();

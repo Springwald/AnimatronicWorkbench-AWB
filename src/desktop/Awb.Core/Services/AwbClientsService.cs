@@ -48,10 +48,11 @@ namespace Awb.Core.Services
 
         public async Task InitAsync()
         {
-            _logger?.Log($"Searching clients...");
+            _logger?.Log($"\r\nSearching clients...");
 
             var config = new AwbEsp32ComportClientConfig();
             var clientIdScanner = new ClientIdScanner(config);
+            clientIdScanner.OnLog += (s, e) => _logger?.Log(e);
             var foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
             if (foundComPortClients.Any() == false)
             {

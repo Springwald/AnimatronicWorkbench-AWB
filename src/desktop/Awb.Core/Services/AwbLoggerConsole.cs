@@ -13,11 +13,16 @@ namespace Awb.Core.Services
     {
         Task Log(string message);
         Task LogError(string message);
+        event EventHandler<string>? OnError;
+        event EventHandler<string>? OnLog;
     }
 
     public class AwbLoggerConsole : IAwbLogger
     {
         private bool _throwWhenInDebugMode;
+
+        public event EventHandler<string>? OnError;
+        public event EventHandler<string>? OnLog;
 
         public AwbLoggerConsole(bool throwWhenInDebugMode)
         {
@@ -26,6 +31,7 @@ namespace Awb.Core.Services
 
         public async Task LogError(string message)
         {
+            OnError?.Invoke(this, message);
             if (_throwWhenInDebugMode && Debugger.IsAttached) throw new Exception(message);
             Console.BackgroundColor = ConsoleColor.Red;
             Console.ForegroundColor = ConsoleColor.White;
@@ -37,6 +43,7 @@ namespace Awb.Core.Services
 
         public async Task Log(string message)
         {
+            OnLog?.Invoke(this, message);
             SetStandardColor();
             Console.WriteLine(message);
             await Task.CompletedTask;

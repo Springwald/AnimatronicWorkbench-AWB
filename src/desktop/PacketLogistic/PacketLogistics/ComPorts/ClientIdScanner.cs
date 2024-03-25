@@ -1,7 +1,7 @@
 ﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
 // https://github.com/Springwald/PacketLogistics
 //
-// (C) 2023 Daniel Springwald, Bochum Germany
+// (C) 2024 Daniel Springwald, Bochum Germany
 // Springwald Software  -   www.springwald.de
 // daniel@springwald.de -  +49 234 298 788 46
 // All rights reserved
@@ -17,6 +17,9 @@ namespace PacketLogistics.ComPorts
     public class ClientIdScanner
     {
         private readonly IComPortCommandConfig _comPortCommandConfig;
+
+        public event EventHandler<string>? OnLog;
+
         public ClientIdScanner(IComPortCommandConfig comPortCommandConfig)
         {
             _comPortCommandConfig = comPortCommandConfig;
@@ -65,7 +68,7 @@ namespace PacketLogistics.ComPorts
         {
             TimeSpan timeout = TimeSpan.FromSeconds(10);
 
-            Debug.WriteLine($"ClientIdScanner: Scanning port {portName}"); ;
+            OnLog?.Invoke(this, $"ClientIdScanner: Scanning port {portName}");
             var serialPort = new Esp32SerialPort(portName);
             uint? found = null;
             try
@@ -104,7 +107,7 @@ namespace PacketLogistics.ComPorts
                                     {
                                         if (errorMsg != null)
                                         {
-                                            Console.WriteLine($"ClientIdScanner: Error deserializing packet: {errorMsg}");
+                                            OnLog?.Invoke(this, $"ClientIdScanner port {portName}: Error deserializing packet: {errorMsg}");
                                         }
                                     }
                                     else
@@ -125,7 +128,10 @@ namespace PacketLogistics.ComPorts
                                                 break;
 
                                             default:
-                                                throw new ArgumentOutOfRangeException($"Unknown packet type '{packet.PacketType}'");
+                                                OnLog?.Invoke(this, $"ClientIdScanner port {portName}: Unknown packet type '{packet.PacketType}'");
+                                                if (Debugger.IsAttached)
+                                                    throw new ArgumentOutOfRangeException($"ClientIdScanner port {portName}: Unknown packet type '{packet.PacketType}'");
+                                                break;
                                         }
                                     }
                                 }
