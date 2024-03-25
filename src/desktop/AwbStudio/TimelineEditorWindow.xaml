@@ -57,7 +57,7 @@
                         <Button x:Name="ButtonStop" Content="⏹ Stop" Click="ButtonStop_Click" />
                     </StackPanel>
                 </ScrollViewer>
-                <ScrollViewer>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <Label x:Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left"  Opacity="0.3"/>
                 </ScrollViewer>
             </DockPanel>

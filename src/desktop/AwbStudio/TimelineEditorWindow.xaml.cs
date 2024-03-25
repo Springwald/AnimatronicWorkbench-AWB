@@ -63,8 +63,7 @@ namespace AwbStudio
                 MyInvoker.Invoke(new Action(() =>
                 {
                     var msg = args;
-                    if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
-                    DebugOutputLabel.Content += msg + "\r\n";
+                    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: {msg}\r\n{DebugOutputLabel.Content}";
                 }));
             };
             awbLogger.OnError += (s, args) =>
@@ -72,8 +71,7 @@ namespace AwbStudio
                 MyInvoker.Invoke(new Action(() =>
                 {
                     var msg = args;
-                    if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
-                    DebugOutputLabel.Content += msg + "\r\n";
+                    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: ERR: {msg}\r\n{DebugOutputLabel.Content}";
                 }));
             };
 
