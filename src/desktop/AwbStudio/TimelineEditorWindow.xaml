@@ -46,17 +46,21 @@
             <!--ItemsSource="{Binding Path={_config.TimelinesStates}}"
                         SelectedItem="{Binding Path={_config.TimelinesStates}}">-->
 
-            <ScrollViewer Grid.Column="2" Grid.Row="1">
-                <StackPanel >
-                    <Label x:Name="LabelPlayTime" Content="Playtime" HorizontalAlignment="Center" />
-                    <Button x:Name="ButtonSave" Content="Save"  Click="ButtonSave_Click" />
-                    <Button x:Name="ButtonClear" Content="Clear" Click="ButtonClear_Click" />
-                    <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 client" Click="ButtonExportEsp32_Click" />
-                    <Button x:Name="ButtonPlay" Content="▶ Play" Click="ButtonPlay_Click" />
-                    <Button x:Name="ButtonStop" Content="⏹ Stop" Click="ButtonStop_Click" />
-                    <Label x:Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left" DockPanel.Dock="Bottom" Opacity="0.3"/>
-                </StackPanel>
-            </ScrollViewer>
+            <DockPanel LastChildFill="true" Grid.Column="2" Grid.Row="1">
+                <ScrollViewer DockPanel.Dock="Top">
+                    <StackPanel >
+                        <Label x:Name="LabelPlayTime" Content="Playtime" HorizontalAlignment="Center" />
+                        <Button x:Name="ButtonSave" Content="Save"  Click="ButtonSave_Click" />
+                        <Button x:Name="ButtonClear" Content="Clear" Click="ButtonClear_Click" />
+                        <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 client" Click="ButtonExportEsp32_Click" />
+                        <Button x:Name="ButtonPlay" Content="▶ Play" Click="ButtonPlay_Click" />
+                        <Button x:Name="ButtonStop" Content="⏹ Stop" Click="ButtonStop_Click" />
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer>
+                    <Label x:Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left"  Opacity="0.3"/>
+                </ScrollViewer>
+            </DockPanel>
 
 
         </Grid>
