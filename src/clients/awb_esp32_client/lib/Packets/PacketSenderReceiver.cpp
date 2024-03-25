@@ -8,71 +8,71 @@ bool PacketSenderReceiver::loop()
 {
     bool receivedPacket = false;
 
-    // send alife packet
-    if (millis() > _next_alife_packet_to_send)
-    {
-        // send alife packet header with client id
-        byte packetType = 1; // 1 = alife packet
-        this->sendPacketStart(packetType);
-
-        // 4 bytes - clientId
-        byte *clientIdArr = ByteArrayConverter::UintTo4Bytes(_clientId);
-        Serial.write(clientIdArr[0]);
-        Serial.write(clientIdArr[1]);
-        Serial.write(clientIdArr[2]);
-        Serial.write(clientIdArr[3]);
-        free(clientIdArr);
-
-        this->sendPacketEnd();
-
-        _next_alife_packet_to_send = millis() + ALIFE_PACKET_INTERVAL_MS;
-    }
-
-    // receive packet
+    // receive data
     for (int i = 0; i < 1000; i++)
     {
         if (Serial.available() > 0)
         {
             char value = Serial.read();
-            _receiveBuffer += value;
 
-            // check if _receiveBuffer ends with _packetHeader
-            if (_receiveBuffer.endsWith(_packetHeaderString))
-            // if (StringToolbox::stringEndsWith(_receiveBuffer, _packetHeader))
+            if (value == REQUEST_ALIFE_PACKET_BYTE) // request for alife packet
             {
-                // packet start/end byte found
-                if (_receiveBuffer.length() <= 9)
+                // send alife packet header with client id
+                byte packetType = 1; // 1 = alife packet
+                this->sendPacketStart(packetType);
+
+                // 4 bytes - clientId
+                byte *clientIdArr = ByteArrayConverter::UintTo4Bytes(_clientId);
+                Serial.write(clientIdArr[0]);
+                Serial.write(clientIdArr[1]);
+                Serial.write(clientIdArr[2]);
+                Serial.write(clientIdArr[3]);
+                free(clientIdArr);
+
+                this->sendPacketEnd();
+            }
+            else
+            {
+                // normal data received
+                _receiveBuffer += value;
+
+                // check if _receiveBuffer ends with _packetHeader
+                if (_receiveBuffer.endsWith(_packetHeaderString))
+                // if (StringToolbox::stringEndsWith(_receiveBuffer, _packetHeader))
                 {
-                    // only packet header received
+                    // packet start/end byte found
+                    if (_receiveBuffer.length() <= 9)
+                    {
+                        // only packet header received
+                        _receiveBuffer = "";
+                        return false;
+                    }
+
+                    // get packet type
+                    byte packetType = _receiveBuffer[0];
+
+                    // switch packet type
+                    switch (packetType)
+                    {
+
+                    case 1: // alife packet
+                        break;
+
+                    case 2:                                                                          // data packet
+                        processDataPacket(_receiveBuffer.substring(1, _receiveBuffer.length() - 9)); // remove packet header and packet type
+                        receivedPacket = true;
+                        break;
+
+                    case 3: // packet response packet
+                        break;
+
+                    default: // unknown packet type
+                        break;
+                    }
+
+                    // clear receive buffer
                     _receiveBuffer = "";
-                    return false;
                 }
-
-                // get packet type
-                byte packetType = _receiveBuffer[0];
-
-                // switch packet type
-                switch (packetType)
-                {
-
-                case 1: // alife packet
-                    break;
-
-                case 2:                                                                          // data packet
-                    processDataPacket(_receiveBuffer.substring(1, _receiveBuffer.length() - 9)); // remove packet header and packet type
-                    receivedPacket = true;
-                    break;
-
-                case 3: // packet response packet
-                    break;
-
-                default: // unknown packet type
-                    break;
-                }
-
-                // clear receive buffer
-                _receiveBuffer = "";
-                _next_alife_packet_to_send = millis() + ALIFE_PACKET_INTERVAL_MS; // reset alife packet interval, too
             }
         }
     }

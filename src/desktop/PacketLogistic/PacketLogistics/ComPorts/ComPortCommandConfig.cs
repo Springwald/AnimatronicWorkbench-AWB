@@ -1,7 +1,7 @@
 ﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
 // https://github.com/Springwald/PacketLogistics
 //
-// (C) 2023 Daniel Springwald, Bochum Germany
+// (C) 2024 Daniel Springwald, Bochum Germany
 // Springwald Software  -   www.springwald.de
 // daniel@springwald.de -  +49 234 298 788 46
 // All rights reserved
@@ -18,6 +18,7 @@ namespace PacketLogistics.ComPorts
     {
         string PacketHeader { get; }
         byte[] PacketHeaderBytes { get; }
+        byte SearchForClientByte { get; }
     }
 
     public class ComPortCommandConfig : IComPortCommandConfig
@@ -32,17 +33,22 @@ namespace PacketLogistics.ComPorts
         /// </summary>
         public byte[] PacketHeaderBytes { get; }
 
-        public ComPortCommandConfig(string packetHeader, byte headerStartByte = (byte)255, byte headerEndByte = (byte)254)
+        public byte SearchForClientByte { get; }
+
+        public ComPortCommandConfig(string packetHeader, byte headerStartByte = (byte)255, byte headerEndByte = (byte)254, byte searchForClientByte = (byte)253)
         {
             if (packetHeader?.Length != 3) throw new System.ArgumentOutOfRangeException(nameof(packetHeader), "must have 3 chars");
 
+            SearchForClientByte = searchForClientByte;
+
             var headerInBytes = ByteArrayConverter.AsciiStringToBytes(packetHeader);
 
+            if (headerInBytes.Contains(searchForClientByte)) throw new System.ArgumentOutOfRangeException(nameof(packetHeader), "must not contain search-for-client byte");
             if (headerInBytes.Contains(headerStartByte)) throw new System.ArgumentOutOfRangeException(nameof(packetHeader), "must not contain start byte");
             if (headerInBytes.Contains(headerEndByte)) throw new System.ArgumentOutOfRangeException(nameof(packetHeader), "must not contain end byte");
 
             this.PacketHeader = packetHeader;
-            this.PacketHeaderBytes = new [] {
+            this.PacketHeaderBytes = new[] {
                 headerStartByte, headerStartByte, headerStartByte,
                 headerInBytes[0], headerInBytes[1], headerInBytes[2],
                 headerEndByte, headerEndByte, headerEndByte

@@ -25,18 +25,6 @@ namespace PacketLogistics.ComPorts
             _comPortCommandConfig = comPortCommandConfig;
         }
 
-        //public async Task<string?> FindComPortNameAsync(int clientId)
-        //{
-        //    var portInfoManager = new ComPortInfoManager();
-        //    var ports = portInfoManager.PortInfos;
-        //    foreach (var port in ports)
-        //    {
-        //        var foundId = await DetectClientIdOnPortAsync(port.ComPort);
-        //        if (foundId == clientId) return port.ComPort;
-        //    }
-        //    return null;
-        //}
-
         public async Task<FoundClient[]> FindAllClientsAsync(bool useComPortCache)
         {
             var clients = new List<FoundClient>();
@@ -77,13 +65,17 @@ namespace PacketLogistics.ComPorts
                 var waitUntil = DateTime.UtcNow + timeout;
 
                 var receiveBuffer = new List<byte>();
-                bool firstPacketReceived = false;
+
+                serialPort.DiscardInBuffer();
+                serialPort.DiscardOutBuffer();
+                serialPort.Write(new[] { _comPortCommandConfig.SearchForClientByte }, offset: 0, count: 1);
 
                 while (DateTime.UtcNow < waitUntil && found == null)
                 {
                     if (serialPort.BytesToRead > 0)
                     {
-                        receiveBuffer.Add((byte)serialPort.ReadByte());
+                        var bt = (byte)serialPort.ReadByte();
+                        receiveBuffer.Add(bt);
 
                         if (receiveBuffer.EndsWith(_comPortCommandConfig.PacketHeaderBytes))
                         {
@@ -92,47 +84,43 @@ namespace PacketLogistics.ComPorts
                             if (packetContent.Length > 0)
                             {
 
-                                if (firstPacketReceived == false)
+                                OnLog?.Invoke(this, $"ClientIdScanner port {portName}: received packet.");
+
+                                // deserialize packet
+                                var serializer = new PacketSerializer(_comPortCommandConfig);
+                                var packet = serializer.GetPacketFromByteArray(packetContent, errorMsg: out string? errorMsg);
+                                if (packet == null)
                                 {
-                                    // Skip first packet, because it is catched in the middle of the transmission
-                                    firstPacketReceived = true;
+                                    if (errorMsg != null)
+                                    {
+                                        OnLog?.Invoke(this, $"ClientIdScanner port {portName}: Error deserializing packet: {errorMsg}");
+                                    }
                                 }
                                 else
                                 {
-
-                                    // deserialize packet
-                                    var serializer = new PacketSerializer(_comPortCommandConfig);
-                                    var packet = serializer.GetPacketFromByteArray(packetContent, errorMsg: out string? errorMsg);
-                                    if (packet == null)
+                                    switch (packet.PacketType)
                                     {
-                                        if (errorMsg != null)
-                                        {
-                                            OnLog?.Invoke(this, $"ClientIdScanner port {portName}: Error deserializing packet: {errorMsg}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        switch (packet.PacketType)
-                                        {
-                                            case PacketBase.PacketTypes.AlifePacket:
-                                                var alifePacket = (AlifePacket)packet;
-                                                found = alifePacket?.ClientId;
-                                                break;
+                                        case PacketBase.PacketTypes.AlifePacket:
+                                            var alifePacket = (AlifePacket)packet;
+                                            found = alifePacket?.ClientId;
+                                            OnLog?.Invoke(this, $"ClientIdScanner port {portName}: AlifePacket 👍!");
+                                            break;
 
-                                            case PacketBase.PacketTypes.DataPacket:
-                                                var dataPacket = (DataPacket)packet;
-                                                found = dataPacket?.SenderId;
-                                                break;
+                                        case PacketBase.PacketTypes.DataPacket:
+                                            var dataPacket = (DataPacket)packet;
+                                            found = dataPacket?.SenderId;
+                                            OnLog?.Invoke(this, $"ClientIdScanner port {portName}: DataPacket 🤔...");
+                                            break;
 
-                                            case PacketBase.PacketTypes.ResponsePacket:
-                                                break;
+                                        case PacketBase.PacketTypes.ResponsePacket:
+                                            var responsePacket = (ResponsePacket)packet; OnLog?.Invoke(this, $"ClientIdScanner port {portName}: ResponsePacket🤔...");
+                                            break;
 
-                                            default:
-                                                OnLog?.Invoke(this, $"ClientIdScanner port {portName}: Unknown packet type '{packet.PacketType}'");
-                                                if (Debugger.IsAttached)
-                                                    throw new ArgumentOutOfRangeException($"ClientIdScanner port {portName}: Unknown packet type '{packet.PacketType}'");
-                                                break;
-                                        }
+                                        default:
+                                            OnLog?.Invoke(this, $"ClientIdScanner port {portName}: Unknown packet type '{packet.PacketType}' 😬");
+                                            if (Debugger.IsAttached)
+                                                throw new ArgumentOutOfRangeException($"ClientIdScanner port {portName}: Unknown packet type '{packet.PacketType}'");
+                                            break;
                                     }
                                 }
                             }

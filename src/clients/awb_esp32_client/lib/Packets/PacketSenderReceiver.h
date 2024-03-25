@@ -6,7 +6,7 @@
 
 #define PACKET_HEADER_START_BYTE 255
 #define PACKET_HEADER_END_BYTE 254
-#define ALIFE_PACKET_INTERVAL_MS 500
+#define REQUEST_ALIFE_PACKET_BYTE 253
 
 using byte = unsigned char;
 
@@ -24,10 +24,9 @@ private:
     char *_packetHeader;        /// the packet header to identify the software sending the packet
     String _packetHeaderString; /// the packet header to identify the software sending the packet
 
-    TCallBackPacketReceived _packetReceived;  /// callback function to call if a packet was received
-    TCallBackErrorOccured _errorOccured;      /// callback function to call if an error occured
-    unsigned long _next_alife_packet_to_send; /// the time when the next alife packet should be sent
-    String _receiveBuffer;                    /// the buffer to store the received data
+    TCallBackPacketReceived _packetReceived; /// callback function to call if a packet was received
+    TCallBackErrorOccured _errorOccured;     /// callback function to call if an error occured
+    String _receiveBuffer;                   /// the buffer to store the received data
 
     /**
      * process a received data packet
@@ -62,8 +61,6 @@ private:
 public:
     PacketSenderReceiver(int clientId, char *packetHeader, TCallBackPacketReceived packetReceived, TCallBackErrorOccured errorOccured) : _clientId(clientId), _packetReceived(packetReceived), _errorOccured(errorOccured)
     {
-        _next_alife_packet_to_send = millis();
-
         _packetHeader = new char[10]{
             (char)PACKET_HEADER_START_BYTE,
             (char)PACKET_HEADER_START_BYTE,

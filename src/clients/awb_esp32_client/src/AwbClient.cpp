@@ -376,14 +376,14 @@ void AwbClient::processPacket(String payload)
 
     if (jsondoc.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
     {
-        if (this->_pca9685pwmManager == NULL)
-        {
-            showError("Pca9685Pwm not configured!");
-            return;
-        }
         JsonArray servos = jsondoc["Pca9685Pwm"]["Servos"];
         for (size_t i = 0; i < servos.size(); i++)
         {
+            if (this->_pca9685pwmManager == NULL)
+            {
+                showError("Pca9685Pwm not configured!");
+                return;
+            }
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
             String name = servos[i]["Name"];
@@ -396,15 +396,16 @@ void AwbClient::processPacket(String payload)
 
     if (jsondoc.containsKey("STS")) // package contains STS bus servo data
     {
-        if (this->_stSerialServoManager == NULL)
-        {
-            showError("STS not configured!");
-            return;
-        }
         JsonArray servos = jsondoc["STS"]["Servos"];
         int stsCount = 0;
         for (size_t i = 0; i < servos.size(); i++)
         {
+            if (this->_stSerialServoManager == NULL)
+            {
+                showError("STS not configured!");
+                return;
+            }
+
             int id = servos[i]["Ch"];
             int value = servos[i]["TVal"];
             String name = servos[i]["Name"];
@@ -431,15 +432,15 @@ void AwbClient::processPacket(String payload)
 
     if (jsondoc.containsKey("SCS")) // package contains SCS bus servo data
     {
-        if (this->_scSerialServoManager == NULL)
-        {
-            showError("SCS not configured!");
-            return;
-        }
         JsonArray servos = jsondoc["SCS"]["Servos"];
         int stsCount = 0;
         for (size_t i = 0; i < servos.size(); i++)
         {
+            if (this->_scSerialServoManager == NULL)
+            {
+                showError("SCS not configured!");
+                return;
+            }
             int id = servos[i]["Ch"];
             int value = servos[i]["TVal"];
             String name = servos[i]["Name"];
