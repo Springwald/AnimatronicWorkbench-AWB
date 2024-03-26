@@ -1,4 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// Animatronic WorkBench
+// https://github.com/Springwald/AnimatronicWorkBench-AWB
+//
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
+// https://daniel.springwald.de - daniel@springwald.de
+// All rights reserved   -  Licensed under MIT License
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PacketLogistics.ComPorts.ComportPackets;
 using PacketLogistics.ComPorts.Serialization;
 
@@ -46,16 +53,18 @@ namespace PacketLogistics.ComPorts.Tests
             };
 
             byte[] packetIdBytes = ByteArrayConverter.UintTo4Bytes(testPacket.Id);
+            byte[] packetIdBytesSplit = ByteArrayConverter.SplitBytes(packetIdBytes).ToArray();
 
             var checksum = ChecksumCalculator.Calculate(testPacket);
+            var checksumSplit = ByteArrayConverter.SplitByte(checksum).ToArray();
 
             var testPacketBytes = new byte[]
             {
                 (byte)PacketBase.PacketTypes.DataPacket,        // packet type
-                0,0,0,129,                                      // client id
-                packetIdBytes[0],packetIdBytes[1],packetIdBytes[2],packetIdBytes[3], // packet id
+                0,0,0,0,0,0,129,0,                                // client id
+                packetIdBytesSplit[0],packetIdBytesSplit[1],packetIdBytesSplit[2],packetIdBytesSplit[3],packetIdBytesSplit[4],packetIdBytesSplit[5],packetIdBytesSplit[6],packetIdBytesSplit[7], // packet id
                 (byte)'H', (byte)'e', (byte)'l', (byte)'l', (byte)'o', (byte)' ', (byte)'W', (byte)'o', (byte)'r', (byte)'l', (byte)'d', (byte)'!',
-                checksum,                                       // checksum
+                checksumSplit[0], checksumSplit[1]              // checksum
             };
 
             var reversedTestPacket = serializer.ByteArray2DataPacket(testPacketBytes, out string? errorMsg);
@@ -75,7 +84,7 @@ namespace PacketLogistics.ComPorts.Tests
         {
             uint testClientId = 234;
 
-            var config = new ComPortCommandConfig( packetHeader: "XYZ");
+            var config = new ComPortCommandConfig(packetHeader: "XYZ");
             var serializer = new DataPacketSerializer(config);
 
             var testPacket = new DataPacket(id: 1234567890)
@@ -89,10 +98,10 @@ namespace PacketLogistics.ComPorts.Tests
 
             var expectedBytes = new List<byte>();
             expectedBytes.Add((byte)PacketBase.PacketTypes.DataPacket);
-            expectedBytes.AddRange(ByteArrayConverter.UintTo4Bytes(testClientId));
-            expectedBytes.AddRange(ByteArrayConverter.UintTo4Bytes(testPacket.Id));
+            expectedBytes.AddRange(ByteArrayConverter.SplitBytes(ByteArrayConverter.UintTo4Bytes(testClientId)));
+            expectedBytes.AddRange(ByteArrayConverter.SplitBytes(ByteArrayConverter.UintTo4Bytes(testPacket.Id)));
             expectedBytes.AddRange(testPacket.Payload);
-            expectedBytes.Add(checksum);
+            expectedBytes.AddRange(ByteArrayConverter.SplitByte(checksum));
 
             Assert.AreEqual(expectedBytes.Count, testPacketBytes.Length, nameof(expectedBytes.Count));
             for (int i = 0; i < expectedBytes.Count; i++)

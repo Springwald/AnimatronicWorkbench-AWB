@@ -1,7 +1,7 @@
 ﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
 // https://github.com/Springwald/PacketLogistics
 //
-// (C) 2023 Daniel Springwald, Bochum Germany
+// (C) 2024 Daniel Springwald, Bochum Germany
 // Springwald Software  -   www.springwald.de
 // daniel@springwald.de -  +49 234 298 788 46
 // All rights reserved
@@ -15,6 +15,37 @@ namespace PacketLogistics.ComPorts
 {
     public static class ByteArrayConverter
     {
+        /// <summary>
+        /// to prevent usage of the reserved bytes for packet headers, we split the bytes into 2 parts
+        /// </summary>
+        public static IEnumerable<byte> SplitByte(byte b) => SplitBytes(new byte[] { b });
+
+        /// <summary>
+        /// to prevent usage of the reserved bytes for packet headers, we split the bytes into 2 parts
+        /// </summary>
+        public static IEnumerable<byte> SplitBytes(byte[] bytes)
+        {
+            foreach (var b in bytes)
+            {
+                if (b > 200)
+                {
+                    yield return 200;
+                    yield return (byte)(b - 200);
+                }
+                else
+                {
+                    yield return b;
+                    yield return 0;
+                }
+            }
+        }
+
+        public static IEnumerable<byte> UnSplitBytes(byte[] bytes)
+        {
+            for (var i = 0; i < bytes.Length - 1; i += 2)
+                yield return (byte)(bytes[i] + bytes[i + 1]);
+        }
+
         public static byte[] UintTo4Bytes(uint value)
         {
             return new byte[4] { (byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)value };

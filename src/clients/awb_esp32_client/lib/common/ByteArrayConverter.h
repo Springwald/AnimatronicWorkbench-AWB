@@ -21,7 +21,10 @@ public:
      */
     static unsigned int UintFrom4Bytes(byte value[4]);
 
-    // static bool EndsWith(byte value[], byte ending[]);
+    static byte *SplitBytes4(byte value[4]);
+    static byte *SplitByte(byte value);
+    static byte *UnSplitBytes8(byte value[8]);
+    static byte UnSplitBytes2(byte value[2]);
 };
 
 #endif

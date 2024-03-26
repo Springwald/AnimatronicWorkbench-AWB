@@ -119,11 +119,8 @@ namespace PacketLogistics
             if (State == States.Idle)
             {
                 this.State = States.WaitingForAnswer;
-
                 var answer = await this.SendPacketInternal(payload);
-
                 this.State = States.Idle;
-
                 if (answer == null)
                     return new PacketSendResult { Ok = false, Message = "Packet answer == null!" };
 

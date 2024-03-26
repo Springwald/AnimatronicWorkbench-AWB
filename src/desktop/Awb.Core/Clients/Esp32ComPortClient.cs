@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -20,7 +20,8 @@ namespace Awb.Core.Clients
 
         public string FriendlyName { get; }
 
-        public EventHandler<IAwbClient.ReceivedEventArgs> Received { get; set; }
+        public EventHandler<IAwbClient.ReceivedEventArgs>? Received { get; set; }
+        public EventHandler<string>? OnError { get; set; }
 
         public Esp32ComPortClient(string comPortName, uint clientId)
         {
@@ -33,6 +34,7 @@ namespace Awb.Core.Clients
             serialPortName: comPortName,
             clientID: clientId,
             comPortCommandConfig: new AwbEsp32ComportClientConfig());
+            _comPortReceiver.ErrorOccured += (sender, args) => OnError?.Invoke(this, args.Message);
         }
 
         public async Task<bool> InitAsync()
@@ -40,12 +42,6 @@ namespace Awb.Core.Clients
             _comPortReceiver.PacketReceived += _comPortReceiver_PacketReceived;
             _connected = await _comPortReceiver.Connect();
             return _connected;
-        }
-
-        private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver.PacketReceivedEventArgs e)
-        {
-            if (Received != null)
-                Received(this, new IAwbClient.ReceivedEventArgs(payload: e.Payload));
         }
 
         public void Dispose()
@@ -62,6 +58,10 @@ namespace Awb.Core.Clients
             return new SendResult(result.Ok, result.Message, $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
         }
 
+        private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver.PacketReceivedEventArgs e)
+        {
+            Received?.Invoke(this, new IAwbClient.ReceivedEventArgs(payload: e.Payload));
+        }
 
     }
 }

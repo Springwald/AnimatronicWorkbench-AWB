@@ -21,14 +21,13 @@ bool PacketSenderReceiver::loop()
                 byte packetType = 1; // 1 = alife packet
                 this->sendPacketStart(packetType);
 
-                // 4 bytes - clientId
-                byte *clientIdArr = ByteArrayConverter::UintTo4Bytes(_clientId);
-                Serial.write(clientIdArr[0]);
-                Serial.write(clientIdArr[1]);
-                Serial.write(clientIdArr[2]);
-                Serial.write(clientIdArr[3]);
-                free(clientIdArr);
+                // 4*2 bytes - clientId
+                byte *clientIdArrRaw = ByteArrayConverter::UintTo4Bytes(_clientId);
+                auto clientIdArr = ByteArrayConverter::SplitBytes4(clientIdArrRaw);
+                for (int i = 0; i < 8; i++)
+                    Serial.write(clientIdArr[i]);
 
+                free(clientIdArr);
                 this->sendPacketEnd();
             }
             else
@@ -131,7 +130,7 @@ void PacketSenderReceiver::processDataPacket(String packetContent)
 {
     int pos = 0;
 
-    if (packetContent.length() < 9) // sender id (4 bytes), packet id (4 bytes), checksum (1 byte)
+    if (packetContent.length() < 18) // sender id (4*2 bytes), packet id (4*2 bytes), checksum (1*2 byte)
     {
         // packet content not long enough
         errorReceiving("Packet content not long enough");
@@ -139,28 +138,32 @@ void PacketSenderReceiver::processDataPacket(String packetContent)
     }
 
     // sender id
-    byte senderIdArr[4] = {packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++]}; // get 4 byte packet id
-    unsigned int senderId = ByteArrayConverter::UintFrom4Bytes(senderIdArr);                                        // convert 4 bytes to int
+    byte senderIdArrRaw[8] = {packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++]}; // get 4*2 byte packet id
+    byte *senderIdArr = ByteArrayConverter::UnSplitBytes8(senderIdArrRaw);                                                                                                                                     // split 8 bytes to 4 bytes
+    unsigned int senderId = ByteArrayConverter::UintFrom4Bytes(senderIdArr);                                                                                                                                   // convert 4 bytes to int
 
     // packet id
-    byte packetIdArr[4] = {packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++]}; // get 4 byte packet id
-    unsigned int packetId = ByteArrayConverter::UintFrom4Bytes(packetIdArr);                                        // convert 4 bytes to int
+    byte packetIdArrRaw[8] = {packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++]}; // get 4 byte packet id
+    byte *packetIdArr = ByteArrayConverter::UnSplitBytes8(packetIdArrRaw);                                                                                                                                     // split 8 bytes to 4 bytes
+    unsigned int packetId = ByteArrayConverter::UintFrom4Bytes(packetIdArr);                                                                                                                                   // convert 4 bytes to int
 
     // get payload
-    // get all bytes from _receiveBuffer except first 13 bytes (header, client id, packet type, packet id, checksum) till end byte
-    uint payloadLength = packetContent.length() - pos - 1;
+    // get all bytes from _receiveBuffer except first 28 bytes (header 9, client id 4*2, packet type 1, packet id 4*2 checksum * 2) till end byte
+    uint payloadLength = packetContent.length() - pos - 2;
     byte payloadArr[payloadLength];
     for (int i = 0; i < payloadLength; i++)
         payloadArr[i] = packetContent[i + pos];
 
     // get checksum
-    byte checksum = packetContent[packetContent.length() - 1];
+    byte checksumRaw[2] = {packetContent[packetContent.length() - 2], packetContent[packetContent.length() - 1]};
+    byte checksum = ByteArrayConverter::UnSplitBytes2(checksumRaw);
 
     // calculate checksum
     byte checksumExpected = CalculateChecksumForDataPacket(payloadArr, payloadLength, packetIdArr);
     if (checksum != checksumExpected)
     {
         errorReceiving("check " + String(checksum) + "!=" + String(checksumExpected) + " packet " + String(packetId));
+        sendResponsePacket(packetId, false, "packet " + String(packetId) + ": check " + String(checksum) + "!=" + String(checksumExpected) + " packet " + String(packetId));
         return; // checksum not valid
     }
 
@@ -180,6 +183,7 @@ void PacketSenderReceiver::processDataPacket(String packetContent)
     free(packet);
 
     // send response packet
+    // sendResponsePacket(packetId, true, "packet " + String(packetId) + " ok");
     sendResponsePacket(packetId, true, "ok");
 }
 
@@ -189,12 +193,11 @@ void PacketSenderReceiver::sendResponsePacket(unsigned int packetId, bool ok, St
     byte packetType = 3; // 3 = response packet
     this->sendPacketStart(packetType);
 
-    // 4 bytes - packet id
-    byte *packetIdArr = ByteArrayConverter::UintTo4Bytes(packetId);
-    Serial.write(packetIdArr[0]);
-    Serial.write(packetIdArr[1]);
-    Serial.write(packetIdArr[2]);
-    Serial.write(packetIdArr[3]);
+    // 4*2 bytes - packet id
+    byte *packetIdArrRaw = ByteArrayConverter::UintTo4Bytes(packetId);
+    auto packetIdArr = ByteArrayConverter::SplitBytes4(packetIdArrRaw);
+    for (int i = 0; i < 8; i++)
+        Serial.write(packetIdArr[i]);
 
     // 1 byte - ok
     Serial.write(ok ? (byte)1 : (byte)0);
@@ -202,9 +205,11 @@ void PacketSenderReceiver::sendResponsePacket(unsigned int packetId, bool ok, St
     // message
     Serial.print(message);
 
-    // 1 byte - checksum
-    byte checksum = CalculateChecksumForResponsePacket(message, packetIdArr, ok);
-    Serial.write(checksum);
+    // 1*2 byte - checksum
+    byte checksumRaw = CalculateChecksumForResponsePacket(message, packetIdArrRaw, ok);
+    auto checksum = ByteArrayConverter::SplitByte(checksumRaw);
+    Serial.write(checksum[0]);
+    Serial.write(checksum[1]);
 
     free(packetIdArr);
 

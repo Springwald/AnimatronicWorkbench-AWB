@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 #include "Adafruit_PWMServoDriver.h"
+#include <Wire.h>
 #include <vector>
+#include "ActuatorValue.h"
 #include "ActuatorValue.h"
 
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
@@ -25,8 +27,14 @@ private:
     void setOscillatorFrequency(uint8_t adr, uint32_t freq);
 
 public:
-    Pca9685PwmManager(std::vector<ActuatorValue> *pwmServoValues, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow, uint i2cAdress) : _errorOccured(errorOccured), _messageToShow(messageToShow), _i2cAdress(i2cAdress), pwmServoValues(pwmServoValues)
+    Pca9685PwmManager(std::vector<ActuatorValue> *pwmServoValues, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow, uint i2cAdress, uint32_t osc_frequency) : _errorOccured(errorOccured), _messageToShow(messageToShow), _i2cAdress(i2cAdress), pwmServoValues(pwmServoValues)
     {
+        if (i2cAdress != 0x40)
+        {
+            _errorOccured("Pca9685PwmManager: adr != 0x40 not implemented yet");
+            return;
+        }
+
         this->_pwm = Adafruit_PWMServoDriver(); // called this way, it uses the default address 0x40
         this->_pwm.setPWMFreq(SERVO_FREQ);      // Analog servos run at ~50 Hz updates
         this->_pwm.begin();
@@ -47,7 +55,7 @@ public:
          * affects the calculations for the PWM update frequency.
          * Failure to correctly set the int.osc value will cause unexpected PWM results
          */
-        // this->setOscillatorFrequency(oscillatorFrequency);
+        this->setOscillatorFrequency(i2cAdress, osc_frequency);
 
         // delay(10);
 

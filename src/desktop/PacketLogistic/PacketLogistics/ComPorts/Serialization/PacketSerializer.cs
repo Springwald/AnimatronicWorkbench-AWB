@@ -26,26 +26,21 @@ namespace PacketLogistics.ComPorts.Serialization
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (value.Length == 0) throw new ArgumentOutOfRangeException(nameof(value));
 
-            int pos = 0;
-
             // packet type
-            var packetTypeByte = ByteArrayConverter.GetNextBytes(value, 1, ref pos)?.FirstOrDefault();
-            if (packetTypeByte == null)
-            {
-                errorMsg = $"Packet type byte is null ?!?";
-                return null;
-            }
+            var packetTypeByte = value[0];
 
+            int pos = 1;
             switch (packetTypeByte)
             {
                 case (byte)PacketTypes.AlifePacket:
                     // client id
-                    var clientIdBytes = ByteArrayConverter.GetNextBytes(value, 4, ref pos);
-                    if (clientIdBytes == null)
+                    var clientIdBytesRaw = ByteArrayConverter.GetNextBytes(value, 8, ref pos);
+                    if (clientIdBytesRaw == null)
                     {
                         errorMsg = $"No client Id in alife packet?!?";
                         return null;
                     }
+                    var clientIdBytes = ByteArrayConverter.UnSplitBytes(clientIdBytesRaw).ToArray();
                     var clientId = ByteArrayConverter.UintFrom4Bytes(clientIdBytes);
                     errorMsg = null;
                     return new AlifePacket(clientId);

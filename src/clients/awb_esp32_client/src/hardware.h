@@ -50,6 +50,7 @@
 /* PCA9685 PWM servo settings */
 #define USE_PCA9685_PWM_SERVO // uncomment this line if you want to use PCA9685 PWM servos
 #define PCA9685_I2C_ADDRESS 0x40
+#define PCA9685_OSC_FREQUENCY 25000000
 
 /* MP3-Player YX5300 */
 #define USE_MP3_PLAYER_YX5300

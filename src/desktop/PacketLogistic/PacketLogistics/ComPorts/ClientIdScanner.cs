@@ -38,7 +38,7 @@ namespace PacketLogistics.ComPorts
                 if (port != null)
                 {
                     var clientId = await DetectClientIdOnPortAsync(port.ComPort);
-                    if (clientId != null)
+                    if (clientId != null && clientId > 0)
                     {
                         clients.Add(new FoundClient(
                             clientId: clientId.Value,

@@ -1,7 +1,7 @@
 ﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
 // https://github.com/Springwald/PacketLogistics
 //
-// (C) 2023 Daniel Springwald, Bochum Germany
+// (C) 2024 Daniel Springwald, Bochum Germany
 // Springwald Software  -   www.springwald.de
 // daniel@springwald.de -  +49 234 298 788 46
 // All rights reserved
@@ -39,36 +39,37 @@ namespace PacketLogistics.ComPorts.Serialization
             }
 
             // client id
-            var senderIdBytes = ByteArrayConverter.GetNextBytes(value, 4, ref pos);
+            var senderIdBytes = ByteArrayConverter.GetNextBytes(value, 8, ref pos).ToArray();
             if (senderIdBytes == null)
             {
                 errorMsg = "Sender Id not found";
                 return null;
             }
-            var senderIdFromPacket = ByteArrayConverter.UintFrom4Bytes(senderIdBytes);
+            var senderIdFromPacket = ByteArrayConverter.UintFrom4Bytes(ByteArrayConverter.UnSplitBytes(senderIdBytes).ToArray());
 
             // packet id
-            var packetIdBytes = ByteArrayConverter.GetNextBytes(value, 4, ref pos);
+            var packetIdBytes = ByteArrayConverter.GetNextBytes(value, 8, ref pos);
             if (packetIdBytes == null)
             {
                 errorMsg = "PacketId not found";
                 return null;
             }
-            var paketId = ByteArrayConverter.UintFrom4Bytes(packetIdBytes);
-            
+            var paketId = ByteArrayConverter.UintFrom4Bytes(ByteArrayConverter.UnSplitBytes(packetIdBytes).ToArray());
+
             var dataPacket = new DataPacket(id: paketId)
             {
                 SenderId = senderIdFromPacket,
-                Payload = ByteArrayConverter.GetNextBytes(value, value.Length - pos - 1, ref pos)
+                Payload = ByteArrayConverter.GetNextBytes(value, value.Length - pos - 2, ref pos)
             };
 
             // checksum
-            var checksum = ByteArrayConverter.GetNextBytes(value, 1, ref pos)?.FirstOrDefault();
-            if (checksum == null)
+            var checksumBytesRaw = ByteArrayConverter.GetNextBytes(value, 2, ref pos);
+            if (checksumBytesRaw == null)
             {
                 errorMsg = "Checksum not found";
                 return null;
             }
+            var checksum = ByteArrayConverter.UnSplitBytes(checksumBytesRaw).FirstOrDefault();
 
             // check checksum
             var expectedChecksum = ChecksumCalculator.Calculate(dataPacket);
@@ -86,18 +87,19 @@ namespace PacketLogistics.ComPorts.Serialization
         {
             if (packet == null) throw new ArgumentNullException(nameof(packet));
             if (packet.Payload == null) throw new ArgumentNullException(nameof(packet.Payload));
-            if (packet.Payload.Contains(_comPortCommandConfig.PacketHeaderBytes)) throw new ArgumentOutOfRangeException($"{nameof(packet.Payload)} contains packet-header!");
+            if (packet.Payload.Contains(_comPortCommandConfig.PacketHeaderBytes)) throw new ArgumentOutOfRangeException($"{nameof(packet.Payload)} contains packet-header bytes!");
+            if (packet.Payload.Contains(_comPortCommandConfig.SearchForClientByte)) throw new ArgumentOutOfRangeException($"{nameof(packet.Payload)} contains search-for-client byte!");
             if (senderId < 1) throw new ArgumentOutOfRangeException(paramName: nameof(senderId), message: "senderId must be >= 0 but is " + senderId);
 
             var checksum = ChecksumCalculator.Calculate(packet);
 
-            var packetString = new List<byte>();
-            packetString.Add((byte)PacketBase.PacketTypes.DataPacket);          // 1 byte
-            packetString.AddRange(ByteArrayConverter.UintTo4Bytes(senderId));   // 4 bytes
-            packetString.AddRange(ByteArrayConverter.UintTo4Bytes(packet.Id));  // 4 bytes
-            packetString.AddRange(packet.Payload);                              // ...
-            packetString.Add(checksum);                                         // 1 byte
-            return packetString.ToArray();
+            var packetBytes = new List<byte>();
+            packetBytes.Add((byte)PacketBase.PacketTypes.DataPacket);          // 1 byte
+            packetBytes.AddRange(ByteArrayConverter.SplitBytes(ByteArrayConverter.UintTo4Bytes(senderId)));   // 4*2 bytes
+            packetBytes.AddRange(ByteArrayConverter.SplitBytes(ByteArrayConverter.UintTo4Bytes(packet.Id)));  // 4*2 bytes
+            packetBytes.AddRange(packet.Payload);                              // ...
+            packetBytes.AddRange(ByteArrayConverter.SplitByte(checksum));       // 1*2 byte
+            return packetBytes.ToArray();
         }
     }
 }

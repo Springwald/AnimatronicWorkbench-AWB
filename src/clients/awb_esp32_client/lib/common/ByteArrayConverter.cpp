@@ -14,23 +14,52 @@ unsigned int ByteArrayConverter::UintFrom4Bytes(byte value[])
     return (unsigned int)(value[0] << 24 | value[1] << 16 | value[2] << 8 | value[3]);
 }
 
-// bool ByteArrayConverter::EndsWith(String value[], byte ending[])
-// {
-//     int valueLength = sizeof(value);
-//     int endingLength = sizeof(ending);
+// to prevent usage of the reserved bytes for packet headers, we split the bytes into 2 parts
+byte *ByteArrayConverter::SplitByte(byte value)
+{
+    auto result = new byte[2];
+    if (value > 200)
+    {
+        result[0] = 200;
+        result[1] = (byte)(value - 200);
+    }
+    else
+    {
+        result[0] = value;
+        result[1] = 0;
+    }
+    return result;
+}
 
-//     if (endingLength > valueLength)
-//     {
-//         return false;
-//     }
+// to prevent usage of the reserved bytes for packet headers, we split the bytes into 2 parts
+byte *ByteArrayConverter::SplitBytes4(byte value[4])
+{
+    auto result = new byte[8];
+    for (int i = 0; i < 4; i++)
+    {
+        if (value[i] > 200)
+        {
+            result[i * 2] = 200;
+            result[i * 2 + 1] = (byte)(value[i] - 200);
+        }
+        else
+        {
+            result[i * 2] = value[i];
+            result[i * 2 + 1] = 0;
+        }
+    }
+    return result;
+}
 
-//     for (int i = 0; i < endingLength; i++)
-//     {
-//         if (value[valueLength - endingLength + i] != ending[i])
-//         {
-//             return false;
-//         }
-//     }
+byte *ByteArrayConverter::UnSplitBytes8(byte value[8])
+{
+    auto result = new byte[4];
+    for (int i = 0; i < 4; i++)
+        result[i] = (byte)(value[i * 2] + value[i * 2 + 1]);
+    return result;
+}
 
-//     return true;
-// }
+byte ByteArrayConverter::UnSplitBytes2(byte value[2])
+{
+    return (byte)(value[0] + value[1]);
+}

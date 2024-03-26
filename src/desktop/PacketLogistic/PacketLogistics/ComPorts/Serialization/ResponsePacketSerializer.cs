@@ -27,10 +27,9 @@ namespace PacketLogistics.ComPorts.Serialization
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (value.Length == 0) throw new ArgumentOutOfRangeException(nameof(value));
 
-            int pos = 0;
-
+            
             // packet type
-            var packetType = ByteArrayConverter.GetNextBytes(value, 1, ref pos)?.FirstOrDefault();
+            var packetType = value[0];
             if (packetType != (byte)PacketBase.PacketTypes.ResponsePacket)
             {
                 errorMsg = $"Packet type is '{packetType}' not '{(byte)PacketBase.PacketTypes.ResponsePacket}'";
@@ -38,13 +37,14 @@ namespace PacketLogistics.ComPorts.Serialization
             }
 
             // original packet id
-            var originalPacketIdBytes = ByteArrayConverter.GetNextBytes(value, 4, ref pos);
-            if (originalPacketIdBytes == null)
+            int pos = 1;
+            var originalPacketIdBytesRaw = ByteArrayConverter.GetNextBytes(value, 8, ref pos); // 4*2 bytes
+            if (originalPacketIdBytesRaw == null)
             {
                 errorMsg = "OriginalPacketId not found";
                 return null;
             }
-
+            var originalPacketIdBytes = ByteArrayConverter.UnSplitBytes(originalPacketIdBytesRaw).ToArray();
             var id = ByteArrayConverter.UintFrom4Bytes(originalPacketIdBytes);
             var packetResponse = new ResponsePacket(id: id);
 
@@ -58,11 +58,12 @@ namespace PacketLogistics.ComPorts.Serialization
             packetResponse.Ok = ok == 1;
 
             // message
-            var message = ByteArrayConverter.GetNextBytes(value, value.Length - pos - 1, ref pos);
+            var message = ByteArrayConverter.GetNextBytes(value, value.Length - pos - 2, ref pos);
             packetResponse.Message = ByteArrayConverter.BytesToAsciiString(message ?? Array.Empty<byte>());
 
             // checksum
-            var checksum = ByteArrayConverter.GetNextBytes(value, 1, ref pos)?.FirstOrDefault();
+            var checksumRawBytes = ByteArrayConverter.GetNextBytes(value, 2, ref pos);
+            var checksum = ByteArrayConverter.UnSplitBytes(checksumRawBytes)?.FirstOrDefault();
             if (checksum == null)
             {
                 errorMsg = "Checksum not found";
@@ -82,7 +83,7 @@ namespace PacketLogistics.ComPorts.Serialization
             // check checksum
             if (checksum != expectedChecksum)
             {
-                errorMsg = $"Checksum is '{checksum}' not '{expectedChecksum}'";
+                errorMsg = $"Checksum is '{checksum}' not '{expectedChecksum}', message: '{packetResponse.Message}'";
                 return null;
             }
 
@@ -98,10 +99,10 @@ namespace PacketLogistics.ComPorts.Serialization
 
             var packetBytes = new List<byte>();
             packetBytes.Add((byte)PacketBase.PacketTypes.ResponsePacket);
-            packetBytes.AddRange(ByteArrayConverter.UintTo4Bytes(packetResponse.Id));
+            packetBytes.AddRange(ByteArrayConverter.SplitBytes(ByteArrayConverter.UintTo4Bytes(packetResponse.Id)));
             packetBytes.Add(packetResponse.Ok ? (byte)1 : (byte)0);
             packetBytes.AddRange(ByteArrayConverter.AsciiStringToBytes(packetResponse.Message ?? string.Empty));
-            packetBytes.Add(checkSum);
+            packetBytes.AddRange(ByteArrayConverter.SplitByte(checkSum));
             return packetBytes.ToArray();
         }
     }

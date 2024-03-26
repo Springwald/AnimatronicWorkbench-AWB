@@ -54,7 +54,9 @@ if (clients.Any())
             var result = await senderReceiver.SendPacket(Encoding.ASCII.GetBytes(jsonStr));
             if (result.Ok == false)
             {
-                Console.WriteLine($"Error sending packet to client {senderReceiver.ClientId}: {result.Message}");
+                Console.WriteLine($"Error sending packet {result.OriginalPacketId} to client {senderReceiver.ClientId}: {result.Message}");
+            } else { 
+                Console.WriteLine($"Sent packet {result.OriginalPacketId} to client {senderReceiver.ClientId}: {result.Message}");
             }
             // await Task.Delay(150);
         }

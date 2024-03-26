@@ -1,4 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// Animatronic WorkBench
+// https://github.com/Springwald/AnimatronicWorkBench-AWB
+//
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
+// https://daniel.springwald.de - daniel@springwald.de
+// All rights reserved   -  Licensed under MIT License
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PacketLogistics.ComPorts.ComportPackets;
 using PacketLogistics.ComPorts.Serialization;
 
@@ -20,7 +27,6 @@ namespace PacketLogistics.ComPorts.Tests
             };
 
             var testPacketResponseBytes = serializer.PacketResponse2ByteArray(testPacketResponse);
-
             var reversedTestPacketResponse = serializer.ByteArray2PacketResponse(testPacketResponseBytes, out string? errorMsg);
 
             Assert.AreEqual(null, errorMsg);
@@ -33,7 +39,7 @@ namespace PacketLogistics.ComPorts.Tests
         [TestMethod()]
         public void ByteArray2PacketResponseTest()
         {
-            var config = new ComPortCommandConfig( packetHeader: "XYZ");
+            var config = new ComPortCommandConfig(packetHeader: "XYZ");
             var serializer = new ResponsePacketSerializer(config);
 
             var testPacketResponse = new ResponsePacket(id: 123)
@@ -43,14 +49,15 @@ namespace PacketLogistics.ComPorts.Tests
             };
 
             var checkSum = ChecksumCalculator.Calculate(testPacketResponse);
+            var checkSumSplit = ByteArrayConverter.SplitByte(checkSum).ToArray();
 
             var testPacketResponseBytes = new byte[]
             {
                 (byte)PacketBase.PacketTypes.ResponsePacket,    // packet type
-                0, 0, 0, 123,                                   // original packet id
+                0, 0, 0, 0, 0, 0, 123, 0,                          // original packet id
                 (byte)(testPacketResponse.Ok ? 1: 0),           // ok
                 (byte)'H', (byte)'e', (byte)'l', (byte)'l', (byte)'o', (byte)' ', (byte)'W', (byte)'o', (byte)'r', (byte)'l', (byte)'d', (byte)'!',
-                checkSum,                                       // checksum
+                checkSumSplit[0], checkSumSplit[1]                               // checksum
             };
 
             var testPacketResponseAsBytes = serializer.ByteArray2PacketResponse(testPacketResponseBytes, out string? errorMsg);
@@ -65,7 +72,7 @@ namespace PacketLogistics.ComPorts.Tests
         [TestMethod()]
         public void PacketResponse2ByteArrayTest()
         {
-            var config = new ComPortCommandConfig( packetHeader: "XYZ");
+            var config = new ComPortCommandConfig(packetHeader: "XYZ");
             var serializer = new ResponsePacketSerializer(config);
 
             var testPacketResponse = new ResponsePacket(id: 123)

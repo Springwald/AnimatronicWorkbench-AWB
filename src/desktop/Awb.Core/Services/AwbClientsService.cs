@@ -69,6 +69,11 @@ namespace Awb.Core.Services
 
             await Task.WhenAll(clientTasks);
 
+            foreach (var client in clients)
+            {
+                client.OnError += (s, e) => _logger?.LogError($"Client {client.ClientId}/{client.FriendlyName}: {e}");
+            }
+
             _clients = clients;
             _logger?.Log($"Found {_clients.Length} clients. ({string.Join(", ", _clients.Select(c => c.ClientId))})");
 

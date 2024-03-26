@@ -124,7 +124,7 @@ void AwbClient::setup()
 
 #ifdef USE_PCA9685_PWM_SERVO
     showSetupMsg("setup PCA9685 PWM servos");
-    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS);
+    this->_pca9685pwmManager = new Pca9685PwmManager(_actualStatusInformation->pwmServoValues, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_OSC_FREQUENCY);
 #endif
 
 #ifdef USE_MP3_PLAYER_YX5300
@@ -203,7 +203,7 @@ void AwbClient::showMsg(String message)
  */
 void AwbClient::showSetupMsg(String message)
 {
-    int durationMs = 500;
+    int durationMs = 200;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
     if (_wlanConnector != NULL) // check if wlan connector is instanciated
         _wlanConnector->logInfo(message);

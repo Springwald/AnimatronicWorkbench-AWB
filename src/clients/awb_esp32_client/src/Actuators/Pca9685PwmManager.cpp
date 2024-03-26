@@ -74,19 +74,12 @@ void Pca9685PwmManager::updateActuators()
             // set new target value if changed
             if (servo->currentValue != servo->targetValue)
             {
-                int speed = servo->speed;
-                int acc = servo->acc;
-
-                if (speed == -1 && acc == -1)
-                {
-                    // use default values for speed and acc
-                }
-                else
-                {
-                }
 
                 uint8_t servoNo = servo->id;
                 uint16_t microseconds = servo->targetValue;
+
+                this->_messageToShow("pwm servo no " + String(servoNo) + " to " + String(microseconds));
+
                 _pwm.writeMicroseconds(servoNo, microseconds);
                 servo->currentValue = servo->targetValue;
             }
