@@ -22,14 +22,48 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace AwbStudio
 {
     public partial class TimelineEditorWindow : Window
     {
+        private class TimelineControllerPlayViewPos
+        {
+            /// <summary>
+            /// The range in which the PlayPos can be moved by the controller
+            /// </summary>
+            public int PageWidthMs { get; set; } = 10 * 1000; // 10 seconds
+
+            /// <summary>
+            /// The PlayPos in ms, which represents the start of the ScrollPageWidthMs
+            /// </summary>
+            public int OriginMs { get; set; }
+
+            /// <summary>
+            ///  a value between 0 and PageWidthMs, which represents the position of the PlayPos in the PageWidthMs
+            /// </summary>
+            public int PlayPosRelativeToOriginMs { get; set; }
+
+            /// <summary>
+            ///  The absolute position of the PlayPos set by in ms
+            /// </summary>
+            public int PlayPosAbsoluteMs => OriginMs + PlayPosRelativeToOriginMs;
+
+            public void SetPlayPosFromTimelineControl(int playPosMs)
+            {
+                OriginMs = playPosMs - PlayPosRelativeToOriginMs;
+            }
+
+            public void SetFromValueInPercent(double valueInPercent)
+            {
+                PlayPosRelativeToOriginMs = (int)(PageWidthMs * valueInPercent / 100.0);
+            }
+        }
+
         const int msPerScreenWidth = 20 * 1000; // todo: zoom in/out
 
-        const int pageSizeMs = 2000; // 2 seconds per page when scrolling
+
         private readonly IAwbClientsService _clientsService;
         private readonly IProjectManagerService _projectManagerService;
         private readonly IAwbLogger _logger;
@@ -39,6 +73,8 @@ namespace AwbStudio
         private readonly TimelineViewPos _viewPos;
         private TimelinePlayer _timelinePlayer;
         private IActuatorsService _actuatorsService;
+
+        private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
 
         private bool _unsavedChanges;
 
@@ -230,12 +266,13 @@ namespace AwbStudio
                             break;
 
                         case TimelinePlayer.PlayStates.Nothing:
-
+                            _logger?.Log(e.ValueInPercent.ToString());
+                            _timelineControllerPlayViewPos.SetFromValueInPercent(e.ValueInPercent);
+                            _timelinePlayer?.Update(_timelineControllerPlayViewPos.PlayPosAbsoluteMs);
                             //int newPos = _timelinePlayer.PositionMs;
-                            int newPos = viewPos.PlayPosMs;
-                            _manualUpdatingPlayPos = true;
+                            /*int newPos = 
                             await _timelinePlayer.Update(newPositionMs: newPos);
-                            _manualUpdatingPlayPos = false;
+                            _manualUpdatingPlayPos = false;*/
                             break;
 
                         default:
@@ -411,12 +448,12 @@ namespace AwbStudio
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.NextPage:
-                    await ScrollPaging(pageSizeMs);
+                    await ScrollPaging(_timelineControllerPlayViewPos.PageWidthMs);
                     _lastActuatorChanged = -1;
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.PreviousPage:
-                    await ScrollPaging(-pageSizeMs);
+                    await ScrollPaging(_timelineControllerPlayViewPos.PageWidthMs);
                     _lastActuatorChanged = -1;
                     break;
 
@@ -471,6 +508,7 @@ namespace AwbStudio
                 MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(e.PositionMs / 1000.0):0.00}s / {e.PlaybackSpeed:0.0}X"));
             if (!_manualUpdatingValues)
                 ShowActuatorValuesOnTimelineInputController(e.PositionMs);
+            _timelineControllerPlayViewPos.SetPlayPosFromTimelineControl(e.PositionMs);
         }
 
         private void ShowActuatorValuesOnTimelineInputController(int playPosMs)
@@ -747,8 +785,27 @@ namespace AwbStudio
             exportWindow.ShowResult(result);
         }
 
-
         #endregion Button Events
+
+        #region mouse events
+
+        private async void timelineViewerControl_MouseDown(object sender, MouseButtonEventArgs e) =>
+            await SetPlayPosByMouse(e.GetPosition(TimelineViewerControl).X);
+
+        private async void TimelineViewerControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                await SetPlayPosByMouse(e.GetPosition(TimelineViewerControl).X);
+        }
+
+        private async Task SetPlayPosByMouse(double mouseX)
+        {
+            var newPlayPosMs = (int)((timelineScrollViewer.HorizontalOffset + mouseX) / TimelineViewerControl.ViewPos.PixelPerMs) + TimelinePlayer.PlayPosSnapMs / 2;
+            newPlayPosMs =  (newPlayPosMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
+            await _timelinePlayer.Update(newPlayPosMs);
+        }
+
+        #endregion
 
 
     }

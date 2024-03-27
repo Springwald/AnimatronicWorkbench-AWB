@@ -18,8 +18,10 @@
             <RowDefinition Height="4*" />
         </Grid.RowDefinitions>
 
-        <ScrollViewer x:Name="timelineScrollViewer" Grid.Column="0" Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" >
-            <TimelineControls:TimelineViewer x:Name="TimelineViewerControl" />
+        <ScrollViewer x:Name="timelineScrollViewer" Grid.Column="0" Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <TimelineControls:TimelineViewer  x:Name="TimelineViewerControl" 
+                                              MouseDown="timelineViewerControl_MouseDown" 
+                                              MouseMove="TimelineViewerControl_MouseMove" />
         </ScrollViewer>
 
         <Grid Grid.Column="0" Grid.Row="1">
@@ -58,7 +60,7 @@
                     </StackPanel>
                 </ScrollViewer>
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <Label x:Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left"  Opacity="0.3"/>
+                    <Label Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left" Opacity="0.3"/>
                 </ScrollViewer>
             </DockPanel>
 
