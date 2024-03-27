@@ -501,9 +501,12 @@ namespace AwbStudio
 
         private void PlayPos_Changed(object? sender, int newPlayPosMs)
         {
+            
             MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X"));
+            
             if (!_manualUpdatingValues)
                 ShowActuatorValuesOnTimelineInputController();
+
             _timelineControllerPlayViewPos.SetPlayPosFromTimelineControl(newPlayPosMs);
         }
 
@@ -520,15 +523,18 @@ namespace AwbStudio
             var actuators = _actuatorsService?.AllActuators;
             if (actuators == null) return;
 
-            for (int i = 0; i < actuators.Length; i++)
+            for (int iActuator = 0; iActuator < actuators.Length; iActuator++)
             {
-                switch (actuators[i])
+                var timelineControllerIndex = iActuator - _viewContext.BankIndex * _viewContext.ItemsPerBank;
+                if (timelineControllerIndex < 0 || timelineControllerIndex >= _viewContext.ItemsPerBank) continue;
+
+                switch (actuators[iActuator])
                 {
                     case IServo servo:
                         foreach (var timelineController in _timelineControllers)
                         {
-                            timelineController.SetActuatorValue(index: i, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * (servo.TargetValue - servo.MinValue * 1.0) / (1.0 * servo.MaxValue - servo.MinValue))));
-                            timelineController.ShowPointButtonState(index: i, pointExists: TimelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
+                            timelineController.SetActuatorValue(index: timelineControllerIndex, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * (servo.TargetValue - servo.MinValue * 1.0) / (1.0 * servo.MaxValue - servo.MinValue))));
+                            timelineController.ShowPointButtonState(index: timelineControllerIndex, pointExists: TimelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
                         }
                         break;
                     case ISoundPlayer soundPlayer:
@@ -547,14 +553,14 @@ namespace AwbStudio
                                 }
                                 if (soundIndex != -1)
                                 {
-                                    timelineController.SetActuatorValue(index: i, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * soundIndex / _project.Sounds.Length)));
-                                    timelineController.ShowPointButtonState(index: i, pointExists: TimelineData.SoundPoints.Any(p => p.SoundPlayerId == soundPlayer.Id && p.TimeMs == playPosMs));
+                                    timelineController.SetActuatorValue(index: timelineControllerIndex, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * soundIndex / _project.Sounds.Length)));
+                                    timelineController.ShowPointButtonState(index: timelineControllerIndex, pointExists: TimelineData.SoundPoints.Any(p => p.SoundPlayerId == soundPlayer.Id && p.TimeMs == playPosMs));
                                 }
                             }
                         }
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException($"{actuators[i].Id}/{actuators[i].Name} is an unhandled actutuator type.");
+                        throw new ArgumentOutOfRangeException($"{actuators[iActuator].Id}/{actuators[iActuator].Name} is an unhandled actutuator type.");
                 }
             }
         }
@@ -806,7 +812,7 @@ namespace AwbStudio
         private async Task SetPlayPosByMouse(double mouseX)
         {
             var newPlayPosMs = (int)((timelineScrollViewer.HorizontalOffset + mouseX) + PlayPosSynchronizer.SnapMs / 2);
-            _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
+           _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
         }
 
         #endregion
