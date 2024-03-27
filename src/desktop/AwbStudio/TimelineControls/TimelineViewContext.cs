@@ -5,15 +5,13 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Player;
 using Awb.Core.Timelines;
 using System;
 
 namespace AwbStudio.TimelineControls
 {
-    public class TimelineViewPos
+    public class TimelineViewContext
     {
-        private int _playPos = 0;
         private int _durationMs = 20 * 1000;
 
         /// <summary>
@@ -71,21 +69,8 @@ namespace AwbStudio.TimelineControls
         public int FirstBankItemNo => BankIndex * ItemsPerBank + 1; // base 1
         public int LastBankItemNo => FirstBankItemNo + ItemsPerBank - 1; // base 1
 
-        /// <summary>
-        /// The position of the midi-input controller fader in milli seconds
-        /// </summary>
-        public int PlayPosMs
-        {
-            get => _playPos;
-            set
-            {
-                if (_playPos == value) return;
-                _playPos = value;
-                Changed?.Invoke(this, EventArgs.Empty);
-            }
-        }
 
         public double GetXPos(int timeMs, TimelineData? timelineData) => timelineData == null ? 0 : GetXPos(timeMs);
-        public double GetXPos(int timeMs) =>  timeMs * PixelPerMs;
+        public double GetXPos(int timeMs) => timeMs * PixelPerMs;
     }
 }

@@ -11,6 +11,5 @@ namespace Awb.Core.Player
     {
         public TimelinePlayer.PlayStates PlayState { get; set; }
         public double PlaybackSpeed { get; set; }
-        public int PositionMs { get; set; }
     }
 }

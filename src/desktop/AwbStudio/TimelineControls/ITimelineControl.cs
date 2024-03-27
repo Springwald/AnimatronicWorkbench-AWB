@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 
@@ -12,18 +13,13 @@ namespace AwbStudio.TimelineControls
 {
     internal interface ITimelineControl
     {
-        /// <summary>
-        /// The timeline data to be displayed
-        /// </summary>
-        TimelineData? TimelineData { set; }
+        void Init(
+            TimelineViewContext viewContext,
+            TimelineCaptions timelineCaptions,
+            PlayPosSynchronizer playPosSynchronizer, 
+            IActuatorsService actuatorsService
+            );
 
-        TimelineCaptions TimelineCaptions { set; }
-
-        /// <summary>
-        /// The actual view and scroll position of the timeline
-        /// </summary>
-        TimelineViewPos ViewPos { set;  }
-
-        IActuatorsService? ActuatorsService { set;  }
+        void TimelineDataLoaded(TimelineData timelineData);
     }
 }

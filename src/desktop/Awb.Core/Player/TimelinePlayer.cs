@@ -16,8 +16,6 @@ namespace Awb.Core.Player
     //todo: no concept for ramping behaviour yet: Value changes are submittet to the actuatator imidiatelly
     public class TimelinePlayer : IDisposable
     {
-        public const int PlayPosSnapMs = 125;
-
         public enum PlayStates
         {
             Nothing,
@@ -28,6 +26,7 @@ namespace Awb.Core.Player
 
         private volatile bool _timerFiring;
         private volatile bool _updating;
+        private int _playPosMsOnLastUpdate;
 
         private int _updatePlayPeriodMs = 50;
         private Timer? _playTimer;
@@ -35,10 +34,14 @@ namespace Awb.Core.Player
 
         private readonly IActuatorsService _actuatorsService;
         private readonly IAwbLogger _logger;
+        
         private readonly ChangesToClientSender _sender;
 
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
         public EventHandler<SoundPlayEventArgs>? OnPlaySound;
+
+
+        public readonly PlayPosSynchronizer PlayPosSynchronizer;
 
         /// <summary>
         /// The timeline to play
@@ -50,24 +53,23 @@ namespace Awb.Core.Player
         /// </summary>
         public double PlaybackSpeed { get; set; } = 1;
 
-        /// <summary>
-        /// The actual play position
-        /// </summary>
-        public int PositionMs { get; private set; }
-
         /// <remarks>
         /// After construction the player the "Play" method should be called with zero TimeSpan
         /// to set the actuators to the initial position. Because of the async character of Play 
         /// this is not dont automatically.
         /// </remarks>
-        public TimelinePlayer(TimelineData timelineData, IActuatorsService actuatorsService, IAwbClientsService awbClientsService, IAwbLogger logger)
+        public TimelinePlayer(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, IAwbClientsService awbClientsService, IAwbLogger logger)
         {
             if (timelineData == null) throw new ArgumentNullException(nameof(timelineData));
 
             _logger = logger;
+            
             _actuatorsService = actuatorsService;
             _sender = new ChangesToClientSender(actuatorsService, awbClientsService, _logger);
             TimelineData = timelineData;
+
+            PlayPosSynchronizer = playPosSynchronizer;
+            PlayPosSynchronizer.OnPlayPosChanged += async (sender, playPosMs) => await this.UpdateActuators();
         }
 
         public async void Play()
@@ -77,6 +79,7 @@ namespace Awb.Core.Player
                 _playTimer = new Timer(PlayTimerCallback);
                 _playTimer.Change(dueTime: _updatePlayPeriodMs, period: _updatePlayPeriodMs);
             }
+            PlayPosSynchronizer.InSnapMode = true;
             PlayState = PlayStates.Playing;
             await Task.CompletedTask;
         }
@@ -84,27 +87,26 @@ namespace Awb.Core.Player
         public async void Stop()
         {
             PlayState = PlayStates.Nothing;
+            PlayPosSynchronizer.InSnapMode = false;
             await Task.CompletedTask;
         }
 
-        public async Task Update()
-        {
-            await Update(PositionMs);
-        }
+
+        
 
         /// <summary>
         /// Move the actual play position to the given new position.
         /// Needed changes on the actuators will be communicated to the servos etc..
         /// </summary>
-        /// <param name="newPositionMs">the new position of the timeline</param>
-        public async Task Update(int newPositionMs)
+        public async Task UpdateActuators()
         {
             if (_updating)
             {
-                PositionMs = newPositionMs;
                 return;
             }
 
+            var playPos = PlayPosSynchronizer.PlayPosMs;
+    
             _updating = true;
 
             var start = DateTime.UtcNow;
@@ -113,8 +115,8 @@ namespace Awb.Core.Player
             var servoTargetObjectIds = TimelineData.ServoPoints.Select(p => p.TargetObjectId).Distinct().ToArray();
             foreach (var servoTargetObjectId in servoTargetObjectIds)
             {
-                var point1 = TimelineData.ServoPoints.Where(p => p.TargetObjectId == servoTargetObjectId && p.TimeMs <= newPositionMs).OrderByDescending(p => p.TimeMs).FirstOrDefault();
-                var point2 = TimelineData.ServoPoints.Where(p => p.TargetObjectId == servoTargetObjectId && p.TimeMs >= newPositionMs).OrderBy(p => p.TimeMs).FirstOrDefault();
+                var point1 = TimelineData.ServoPoints.Where(p => p.TargetObjectId == servoTargetObjectId && p.TimeMs <= playPos).OrderByDescending(p => p.TimeMs).FirstOrDefault();
+                var point2 = TimelineData.ServoPoints.Where(p => p.TargetObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
 
                 if (point1 == null && point2 == null) continue; // no points found for this object before or after the actual position
                 point1 ??= point2;
@@ -128,14 +130,14 @@ namespace Awb.Core.Player
                 }
                 else
                 {
-                    var posBetweenPoints = (newPositionMs - point1.TimeMs * 1.0) / pointDistanceMs;
+                    var posBetweenPoints = (playPos - point1.TimeMs * 1.0) / pointDistanceMs;
                     targetValuePercent = point1.ValuePercent + (point2.ValuePercent - point1.ValuePercent) * posBetweenPoints;
                 }
 
                 var targetServo = _actuatorsService.Servos.SingleOrDefault(o => o.Id.Equals(servoTargetObjectId));
                 if (targetServo == null)
                 {
-                    await _logger.LogError($"{nameof(Update)}: Target object with id {servoTargetObjectId} not found.");
+                    await _logger.LogError($"{nameof(UpdateActuators)}: Target object with id {servoTargetObjectId} not found.");
                 }
                 else
                 {
@@ -152,29 +154,20 @@ namespace Awb.Core.Player
             var soundTargetObjectIds = TimelineData.SoundPoints.Select(p => p.TargetObjectId).Distinct().ToArray();
             foreach (var soundTargetObjectId in soundTargetObjectIds)
             {
-                // find a point exactly on the position
-                var lower = Math.Min(PositionMs, newPositionMs);
-                var higher = Math.Max(PositionMs, newPositionMs);
+                var lower = Math.Min(_playPosMsOnLastUpdate, playPos);
+                var higher = Math.Max(_playPosMsOnLastUpdate, playPos);
                 var pointsWithMatchingMs = TimelineData.SoundPoints.Where(p => p.TargetObjectId == soundTargetObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
-                var targetPoint = pointsWithMatchingMs.OrderBy(p => Math.Abs(p.TimeMs - newPositionMs)).FirstOrDefault();
+                var targetPoint = pointsWithMatchingMs.OrderBy(p => Math.Abs(p.TimeMs - playPos)).FirstOrDefault();
                 if (targetPoint == null) continue; // no points found for this at the actual position
                 if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs (targetPoint.SoundId));
             }
 
-            PositionMs = newPositionMs;
-
-            if (OnPlayStateChanged != null) OnPlayStateChanged.Invoke(this, new PlayStateEventArgs
-            {
-                PlayState = PlayState,
-                PlaybackSpeed = PlaybackSpeed,
-                PositionMs = newPositionMs,
-            });
+            _playPosMsOnLastUpdate = playPos;
 
             var ok = await _sender.SendChangesToClients();
             _updating = false;
            
         }
-
 
         private async void PlayTimerCallback(object? state)
         {
@@ -193,16 +186,16 @@ namespace Awb.Core.Player
 
             if (PlayState == PlayStates.Playing)
             {
-                if (PositionMs >= TimelineData.DurationMs)
+                if (PlayPosSynchronizer.PlayPosMs >= TimelineData.DurationMs)
                 {
-                    await this.Update(newPositionMs: 0);
+                    PlayPosSynchronizer.SetNewPlayPos(0);
                 }
                 else
                 {
 
-                    var newPos = PositionMs + (int)(diff.TotalMilliseconds * PlaybackSpeed);
+                    var newPos = PlayPosSynchronizer.PlayPosMs + (int)(diff.TotalMilliseconds * PlaybackSpeed);
                     if (newPos > TimelineData.DurationMs) newPos = TimelineData.DurationMs;
-                    await this.Update(newPositionMs: newPos);
+                    PlayPosSynchronizer.SetNewPlayPos(newPos);
                 }
             }
 

@@ -14,6 +14,8 @@ namespace Awb.Core.Player
 {
     public class ChangesToClientSender
     {
+        private Dictionary<uint, DateTime> _notFoundClients = new Dictionary<uint, DateTime>();
+
         private readonly IAwbLogger _logger;
         private readonly IActuatorsService _actuatorsService;
         private readonly IAwbClientsService _awbClientsService;
@@ -41,7 +43,21 @@ namespace Awb.Core.Player
                 var client = _awbClientsService.GetClient(clientID);
                 if (client == null)
                 {
+                    if (_notFoundClients.ContainsKey(clientID) == false)
+                    {
+                        // not requested yet
+                    }
+                    else
+                    {
+                        if ((DateTime.Now - _notFoundClients[clientID]).TotalSeconds < 30)
+                        {
+                            // reported already and not too long ago
+                            continue; // dont show message again
+                        }
+                    }
+                    _notFoundClients[clientID] = DateTime.Now;
                     await _logger.LogError($"ClientId '{clientID}' not found!");
+
                     continue;
                 }
 

@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using System;
@@ -26,8 +27,9 @@ namespace AwbStudio.TimelineControls
         private const double _paintMarginTopBottom = 30;
 
         private TimelineData? _timelineData;
-        private TimelineViewPos? _viewPos;
-        private IActuatorsService? _actuatorsService;
+        private TimelineViewContext? _viewContext;
+
+        private bool _isInitialized;
 
         /// <summary>
         /// The timeline data to be displayed
@@ -44,22 +46,10 @@ namespace AwbStudio.TimelineControls
 
         public TimelineCaptions TimelineCaptions { get; set; }
 
-        /// <summary>
-        /// The actual view and scroll position of the timeline
-        /// </summary>
-        public TimelineViewPos ViewPos
+
+        private void ViewContext_Changed(object? sender, EventArgs e)
         {
-            set
-            {
-                if (value != null)
-                {
-                    if (_viewPos != null) throw new Exception("ViewPos.Changed is already set");
-                    _viewPos = value;
-                    _viewPos.Changed += this.OnViewPosChanged;
-                    this.OnViewPosChanged(this, EventArgs.Empty);
-                }
-            }
-            get => _viewPos;
+            MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
         }
 
         public IActuatorsService? ActuatorsService
@@ -73,6 +63,19 @@ namespace AwbStudio.TimelineControls
             Loaded += ServoValueViewerControl_Loaded;
         }
 
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        {
+            _viewContext = viewContext;
+            _viewContext.Changed += ViewContext_Changed;
+
+            _isInitialized = true;
+        }
+
+        public void TimelineDataLoaded(TimelineData timelineData)
+        {
+            _timelineData = timelineData;
+        }
+
         private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
             DrawOpticalGrid();
@@ -84,18 +87,14 @@ namespace AwbStudio.TimelineControls
             DrawOpticalGrid();
         }
 
-        private void OnViewPosChanged(object? sender, EventArgs e)
-        {
-            MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
-        }
-
         public void PaintServoValues()
         {
+            if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
+
+            if (_timelineData == null) return;
+
             PanelLines.Children.Clear();
             GridDots.Children.Clear();
-
-            if (_viewPos == null) return;
-            if (_timelineData == null) return;
 
             double height = this.ActualHeight;
             double width = this.ActualWidth;
@@ -121,7 +120,7 @@ namespace AwbStudio.TimelineControls
                 const int dotWidth = dotRadius * 2;
                 foreach (var point in pointsForThisServo)
                 {
-                    if (point.TimeMs >= 0 && point.TimeMs <= ViewPos.DurationMs) // is inside view
+                    if (point.TimeMs >= 0 && point.TimeMs <= _viewContext!.DurationMs) // is inside view
                     {
                         this.GridDots.Children.Add(new Ellipse
                         {
@@ -131,16 +130,15 @@ namespace AwbStudio.TimelineControls
                             Stroke = caption.ForegroundColor,
                             Height = dotWidth,
                             Width = dotWidth,
-                            Margin = new Thickness { Left = _viewPos.GetXPos(timeMs: (int)point.TimeMs,  timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }, 
+                            Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs,  timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }, 
                             ToolTip = point.Title
-                           
                         });
                     }
                 }
 
                 var points = new PointCollection(pointsForThisServo.Select(p => 
                 new Point { 
-                    X = _viewPos.GetXPos((int)(p.TimeMs),  timelineData: _timelineData), 
+                    X = _viewContext!.GetXPos((int)(p.TimeMs),  timelineData: _timelineData), 
                     Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
                 var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
                 this.PanelLines.Children.Add(line);
@@ -167,6 +165,6 @@ namespace AwbStudio.TimelineControls
 
         private static string ServoTag(string servoId) => $"Servo {servoId}";
 
-
+      
     }
 }

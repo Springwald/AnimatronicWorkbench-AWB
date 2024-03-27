@@ -15,24 +15,17 @@
             <local:CaptionsViewer x:Name="CaptionsViewer" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Grid x:Name="OpticalGrid">
             </Grid>
-             <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo" >BANK 1 (1-8)</Label>
-          
+            <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo" >BANK 1 (1-8)</Label>
+
             <Grid x:Name="PlayControls">
                 <Line x:Name="PlayPosLine" Stroke="DarkOrange" StrokeThickness="1" X1="10" X2="50" Y1="10" Y2="200" ></Line>
             </Grid>
             <Label x:Name="LabelManualPlayPosAbsolute" Content="🔺 02:20" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Background="Black" Foreground="#FF8DA2FA"/>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="80*"/>
-                    <RowDefinition Height="20*"/>
-                </Grid.RowDefinitions>
-                <local:ServoValueViewerControl Grid.Row="0" Grid.Column="0" x:Name="ServoValueViewer" />
-                <local:SoundValueViewerControl Grid.Row="1" Grid.Column="0" x:Name="SoundValueViewer"/>
-              
+            <Grid x:Name="AllValueActuatorsGrid">
+                <local:ServoValueViewerControl  x:Name="ServoValueViewer" />
+                <local:SoundValueViewerControl  x:Name="SoundValueViewer"/>
             </Grid>
         </Grid>
-      
-
     </Grid>
 
 </UserControl>

@@ -63,16 +63,18 @@ namespace AwbStudio
 
         const int msPerScreenWidth = 20 * 1000; // todo: zoom in/out
 
-
+        private readonly PlayPosSynchronizer _playPosSynchronizer ;
         private readonly IAwbClientsService _clientsService;
         private readonly IProjectManagerService _projectManagerService;
         private readonly IAwbLogger _logger;
         private readonly AwbProject _project;
         private readonly FileManager _fileManager;
         private readonly ITimelineController[] _timelineControllers;
-        private readonly TimelineViewPos _viewPos;
+        private readonly TimelineViewContext _viewContext;
         private TimelinePlayer _timelinePlayer;
         private IActuatorsService _actuatorsService;
+
+        private TimelineViewContext _timeLineViewContext;
 
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
 
@@ -80,7 +82,6 @@ namespace AwbStudio
 
         public ValueTuningWindow ValueTuningWin { get; private set; }
 
-        private volatile bool _manualUpdatingPlayPos;
         private volatile bool _manualUpdatingValues;
         private bool _switchingPages;
         private int _lastActuatorChanged = 1; // prevent double actuator change events to the midi controller
@@ -118,11 +119,15 @@ namespace AwbStudio
             _project = _projectManagerService.ActualProject;
             _fileManager = new FileManager(_project);
             _timelineControllers = timelineControllers;
-            _viewPos = new TimelineViewPos();
-            TimelineViewerControl.ViewPos = _viewPos;
+
+            _viewContext = new TimelineViewContext();
+
+            _playPosSynchronizer = new PlayPosSynchronizer();
 
             Loaded += TimelineEditorWindow_Loaded;
         }
+
+      
 
         private void AwbLogger_OnLog(object? sender, string e)
         {
@@ -132,7 +137,10 @@ namespace AwbStudio
         private async void TimelineEditorWindow_Loaded(object sender, RoutedEventArgs e)
         {
             Loaded -= TimelineEditorWindow_Loaded;
+
             this.IsEnabled = false;
+          
+            _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;
 
             SetupToasts();
 
@@ -141,20 +149,24 @@ namespace AwbStudio
                 MessageBox.Show("Project file has no timelineStates defined!");
             }
 
+            this.SizeChanged += TimelineEditorWindow_SizeChanged;
+            CalculateSizeAndPixelPerMs();
+
             _actuatorsService = new ActuatorsService(_project, _clientsService, _logger);
 
-            TimelineViewerControl.ActuatorsService = _actuatorsService;
-
             this.TimelineData = CreateNewTimelineData("");
-            await TimelineDataLoaded();
 
-            _timelinePlayer = new TimelinePlayer(timelineData: this.TimelineData, actuatorsService: _actuatorsService, awbClientsService: _clientsService, logger: _logger);
-
+            _timelinePlayer = new TimelinePlayer(timelineData: this.TimelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, awbClientsService: _clientsService, logger: _logger);
             _timelinePlayer.OnPlayStateChanged += OnPlayStateChanged;
+            _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
-            TimelineViewerControl.TimelineData = TimelineData;
+            var timelineCaptions = new TimelineCaptions();
+            TimelineViewerControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
+            TimelineViewerControl.TimelineDataLoaded(TimelineData);
             TimelineViewerControl.Timelineplayer = _timelinePlayer;
-            TimelineViewerControl.Sounds = _project.Sounds;
+            SoundPlayer.Sounds = _project.Sounds;
+
+            await TimelineDataLoaded();
 
             TimelineChooser.OnTimelineChosen += TimelineChosenToLoad;
 
@@ -168,8 +180,7 @@ namespace AwbStudio
             ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
             TimelineChooser.FileManager = _fileManager;
 
-            this.SizeChanged += TimelineEditorWindow_SizeChanged;
-            CalculateSizeAndPixelPerMs();
+          
 
             Closing += TimelineEditorWindow_Closing;
             KeyDown += TimelineEditorWindow_KeyDown;
@@ -181,13 +192,13 @@ namespace AwbStudio
             this.Topmost = false;
 
             _unsavedChanges = false;
-
-            await _timelinePlayer.Update();
         }
+
+
 
         private void CalculateSizeAndPixelPerMs()
         {
-            this.TimelineViewerControl.ViewPos.PixelPerMs = this.ActualWidth / msPerScreenWidth;
+            this._viewContext.PixelPerMs = this.ActualWidth / msPerScreenWidth;
         }
 
         private void TimelineEditorWindow_SizeChanged(object sender, SizeChangedEventArgs e) => CalculateSizeAndPixelPerMs();
@@ -256,23 +267,14 @@ namespace AwbStudio
             switch (e.EventType)
             {
                 case TimelineControllerEventArgs.EventTypes.PlayPosAbsoluteChanged:
-                    var viewPos = TimelineViewerControl.ViewPos;
-
-                    //viewPos.SetPosSelectorManualMsByPercent(e.ValueInPercent);
-
                     switch (_timelinePlayer.PlayState)
                     {
                         case TimelinePlayer.PlayStates.Playing:
                             break;
 
                         case TimelinePlayer.PlayStates.Nothing:
-                            _logger?.Log(e.ValueInPercent.ToString());
                             _timelineControllerPlayViewPos.SetFromValueInPercent(e.ValueInPercent);
-                            _timelinePlayer?.Update(_timelineControllerPlayViewPos.PlayPosAbsoluteMs);
-                            //int newPos = _timelinePlayer.PositionMs;
-                            /*int newPos = 
-                            await _timelinePlayer.Update(newPositionMs: newPos);
-                            _manualUpdatingPlayPos = false;*/
+                            _playPosSynchronizer.SetNewPlayPos(_timelineControllerPlayViewPos.PlayPosAbsoluteMs);
                             break;
 
                         default:
@@ -308,7 +310,7 @@ namespace AwbStudio
                     var allActuators = _actuatorsService?.AllActuators;
                     if (allActuators == null) return;
 
-                    var actuatorIndex = e.ActuatorIndex_ + _viewPos.BankIndex * _viewPos.ItemsPerBank;
+                    var actuatorIndex = e.ActuatorIndex_ + _viewContext.BankIndex * _viewContext.ItemsPerBank;
                     if (actuatorIndex >= allActuators.Length) return;
 
                     var actuator = allActuators[actuatorIndex];
@@ -317,10 +319,10 @@ namespace AwbStudio
                     switch (actuator)
                     {
                         case IServo servo:
-                            var servoPoint = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                            var servoPoint = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
                             if (servoPoint == null)
                             {
-                                servoPoint = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
+                                servoPoint = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMs);
                                 TimelineData?.ServoPoints.Add(servoPoint);
                             }
                             else
@@ -336,10 +338,10 @@ namespace AwbStudio
                                 if (soundIndex > 0 && soundIndex < _project.Sounds.Length)
                                 {
                                     var sound = _project.Sounds[soundIndex];
-                                    var soundPoint = TimelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                                    var soundPoint = TimelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
                                     if (soundPoint == null)
                                     {
-                                        soundPoint = new SoundPoint(timeMs: _timelinePlayer.PositionMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: sound.Id); ;
+                                        soundPoint = new SoundPoint(timeMs: _playPosSynchronizer.PlayPosMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: sound.Id); ;
                                         TimelineData?.SoundPoints.Add(soundPoint);
                                     }
                                     else
@@ -355,13 +357,10 @@ namespace AwbStudio
                             throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                     }
 
-                    _manualUpdatingValues = true;
-                    if (_manualUpdatingValues) await _timelinePlayer.Update();
-                    _manualUpdatingValues = false;
                     MyInvoker.Invoke(new Action(() => { TimelineViewerControl.PaintTimeLine(); }));
                     if (_lastActuatorChanged != actuatorIndex)
                     {
-                        ShowActuatorValuesOnTimelineInputController(_timelinePlayer.PositionMs);
+                        ShowActuatorValuesOnTimelineInputController();
                         _lastActuatorChanged = actuatorIndex;
                     }
                     break;
@@ -373,7 +372,7 @@ namespace AwbStudio
                     var actuators = _actuatorsService?.AllActuators;
                     if (actuators == null) return;
 
-                    actuatorIndex = e.ActuatorIndex_ + _viewPos.BankIndex * _viewPos.ItemsPerBank;
+                    actuatorIndex = e.ActuatorIndex_ + _viewContext.BankIndex * _viewContext.ItemsPerBank;
                     if (actuatorIndex >= actuators.Length) return;
 
                     actuator = actuators[actuatorIndex];
@@ -381,14 +380,14 @@ namespace AwbStudio
                     switch (actuator)
                     {
                         case IServo servo:
-                            var servoPoint = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                            var servoPoint = TimelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
                             if (servoPoint == null)
                             {
                                 // Insert a new servo point
                                 var targetValue = e.EventType == TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault ? servo.DefaultValue : servo.TargetValue;
                                 targetPercent = 100.0 * (targetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
                                 servo.TargetValue = targetValue;
-                                servoPoint = new ServoPoint(servo.Id, targetPercent, _timelinePlayer.PositionMs);
+                                servoPoint = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMs);
                                 TimelineData?.ServoPoints.Add(servoPoint);
                             }
                             else
@@ -413,7 +412,7 @@ namespace AwbStudio
                             if (_project.Sounds?.Any() == true)
                             {
 
-                                var soundPoint = TimelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _timelinePlayer.PositionMs); // check existing point
+                                var soundPoint = TimelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
                                 if (soundPoint == null)
                                 {
                                     // Insert a new sound point
@@ -425,7 +424,7 @@ namespace AwbStudio
                                     }
                                     else
                                     {
-                                        soundPoint = new SoundPoint(timeMs: _timelinePlayer.PositionMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: soundPlayer.ActualSoundId);
+                                        soundPoint = new SoundPoint(timeMs: _playPosSynchronizer.PlayPosMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: soundPlayer.ActualSoundId);
                                         TimelineData?.SoundPoints.Add(soundPoint);
                                     }
                                 }
@@ -442,7 +441,7 @@ namespace AwbStudio
                     }
 
                     _manualUpdatingValues = true;
-                    if (_manualUpdatingValues) await _timelinePlayer.Update();
+                    if (_manualUpdatingValues) await _timelinePlayer.UpdateActuators();
                     MyInvoker.Invoke(new Action(() => { TimelineViewerControl.PaintTimeLine(); }));
                     _manualUpdatingValues = false;
                     break;
@@ -469,10 +468,10 @@ namespace AwbStudio
 
         private void SwitchToNextBank()
         {
-            var newBankIndex = TimelineViewerControl.ViewPos.BankIndex + 1;
-            var maxBankIndex = _actuatorsService.AllIds.Length / TimelineViewerControl.ViewPos.ItemsPerBank;
+            var newBankIndex = _viewContext.BankIndex + 1;
+            var maxBankIndex = _actuatorsService.AllIds.Length / _viewContext.ItemsPerBank;
             if (newBankIndex > maxBankIndex) newBankIndex = 0;
-            TimelineViewerControl.ViewPos.BankIndex = newBankIndex;
+            _viewContext.BankIndex = newBankIndex;
         }
 
         private async Task ScrollPaging(int howManyMs)
@@ -487,33 +486,36 @@ namespace AwbStudio
             int scrollSpeedMs = (howManyMs > 0 ? 1 : -1) * (1000 / fps) * speed;
             for (int i = 0; i < howManyMs / scrollSpeedMs; i++)
             {
-                var newScrollOffset = timelineScrollViewer.HorizontalOffset + TimelineViewerControl.ViewPos.DurationMs / scrollSpeedMs;
+                var newScrollOffset = timelineScrollViewer.HorizontalOffset + _viewContext.DurationMs / scrollSpeedMs;
                 MyInvoker.Invoke(new Action(() =>
                 {
                     timelineScrollViewer.ScrollToHorizontalOffset(newScrollOffset);
                 }));
-                newPosMs = TimelineViewerControl.Timelineplayer.PositionMs + scrollSpeedMs;
-                await TimelineViewerControl.Timelineplayer.Update(newPosMs);
+                newPosMs = _playPosSynchronizer.PlayPosMs + scrollSpeedMs;
+                _playPosSynchronizer.SetNewPlayPos(newPosMs);
                 MyInvoker.Invoke(new Action(() => TimelineViewerControl.PaintTimeLine()));
                 await Task.Delay(1000 / fps);
             }
-            await TimelineViewerControl.Timelineplayer.Update((newPosMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs);
-            TimelineViewerControl.SyncScrollOffsetToNewPlayPos(newPosMs, snapToGrid: true);
             _switchingPages = false;
+        }
+
+        private void PlayPos_Changed(object? sender, int newPlayPosMs)
+        {
+            MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X"));
+            if (!_manualUpdatingValues)
+                ShowActuatorValuesOnTimelineInputController();
+            _timelineControllerPlayViewPos.SetPlayPosFromTimelineControl(newPlayPosMs);
         }
 
         private void OnPlayStateChanged(object? sender, PlayStateEventArgs e)
         {
-            if (!_manualUpdatingPlayPos)
-                MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(e.PositionMs / 1000.0):0.00}s / {e.PlaybackSpeed:0.0}X"));
-            if (!_manualUpdatingValues)
-                ShowActuatorValuesOnTimelineInputController(e.PositionMs);
-            _timelineControllerPlayViewPos.SetPlayPosFromTimelineControl(e.PositionMs);
         }
 
-        private void ShowActuatorValuesOnTimelineInputController(int playPosMs)
+        private void ShowActuatorValuesOnTimelineInputController()
         {
             if (_timelineControllers == null) return;
+
+            var playPosMs = _playPosSynchronizer.PlayPosMs;
 
             var actuators = _actuatorsService?.AllActuators;
             if (actuators == null) return;
@@ -576,6 +578,7 @@ namespace AwbStudio
 
             return timelineData;
         }
+
         private async Task TimelineDataLoaded()
         {
             var data = TimelineData;
@@ -585,7 +588,7 @@ namespace AwbStudio
 
             this.Title = TimelineData == null ? "No Timeline" : $"Timeline '{TimelineData.Title}'";
             if (_timelinePlayer != null) _timelinePlayer.TimelineData = data;
-            TimelineViewerControl.TimelineData = TimelineData;
+            TimelineViewerControl.TimelineDataLoaded(data);
             TxtActualTimelineName.Text = TimelineData?.Title ?? string.Empty;
             _unsavedChanges = false;
 
@@ -604,9 +607,11 @@ namespace AwbStudio
             }
             ComboTimelineStates.SelectedIndex = _project.TimelinesStates?.TakeWhile(t => t.Id != data.TimelineStateId).Count() ?? 0;
 
+            _playPosSynchronizer.SetNewPlayPos(0);
+
             if (_timelinePlayer != null)
             {
-                await _timelinePlayer.Update(0);
+                await _timelinePlayer.UpdateActuators();
             }
 
             _unsavedChanges = changesAfterLoading;
@@ -663,6 +668,7 @@ namespace AwbStudio
 
         private void Play()
         {
+            _playPosSynchronizer.InSnapMode = false;
             _timelinePlayer?.Play();
             foreach (var timelineController in _timelineControllers)
                 timelineController?.SetPlayState(ITimelineController.PlayStates.Playing);
@@ -671,16 +677,11 @@ namespace AwbStudio
         private async void Stop()
         {
             // snap scrollpos to snap positions 
-            TimelineViewerControl.ViewPos.PlayPosMs = (TimelineViewerControl.ViewPos.PlayPosMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
-            if (_timelinePlayer != null)
-            {
-                _timelinePlayer.Stop();
-
-                // snap playpos to snap positions 
-                await _timelinePlayer.Update((_timelinePlayer.PositionMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs);
-            }
+            _timelinePlayer?.Stop();
+            _playPosSynchronizer.InSnapMode = true;
             foreach (var timelineController in _timelineControllers)
-                timelineController.SetPlayState(ITimelineController.PlayStates.Editor);
+                timelineController?.SetPlayState(ITimelineController.PlayStates.Editor);
+
             MyInvoker.Invoke(new Action(() => TimelineViewerControl.PaintTimeLine()));
         }
 
@@ -695,6 +696,7 @@ namespace AwbStudio
         private void ComboTimelineStates_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TimelineData == null) return;
+            if (_project == null) return;
             TimelineData.TimelineStateId = _project.TimelinesStates[ComboTimelineStates.SelectedIndex].Id;
             _unsavedChanges = true;
         }
@@ -789,20 +791,22 @@ namespace AwbStudio
 
         #region mouse events
 
+        double _mouseX = 0;
+
         private async void timelineViewerControl_MouseDown(object sender, MouseButtonEventArgs e) =>
-            await SetPlayPosByMouse(e.GetPosition(TimelineViewerControl).X);
+            await SetPlayPosByMouse(_mouseX);
 
         private async void TimelineViewerControl_MouseMove(object sender, MouseEventArgs e)
         {
+            _mouseX = e.GetPosition(TimelineViewerControl).X;
             if (e.LeftButton == MouseButtonState.Pressed)
-                await SetPlayPosByMouse(e.GetPosition(TimelineViewerControl).X);
+                await SetPlayPosByMouse(_mouseX);
         }
 
         private async Task SetPlayPosByMouse(double mouseX)
         {
-            var newPlayPosMs = (int)((timelineScrollViewer.HorizontalOffset + mouseX) / TimelineViewerControl.ViewPos.PixelPerMs) + TimelinePlayer.PlayPosSnapMs / 2;
-            newPlayPosMs =  (newPlayPosMs / TimelinePlayer.PlayPosSnapMs) * TimelinePlayer.PlayPosSnapMs;
-            await _timelinePlayer.Update(newPlayPosMs);
+            var newPlayPosMs = (int)((timelineScrollViewer.HorizontalOffset + mouseX) + PlayPosSynchronizer.SnapMs / 2);
+            _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
         }
 
         #endregion

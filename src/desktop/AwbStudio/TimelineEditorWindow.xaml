@@ -13,15 +13,18 @@
         <DrawingImage />
     </Window.Icon>
     <Grid>
+       
         <Grid.RowDefinitions>
             <RowDefinition Height="6*" />
             <RowDefinition Height="4*" />
         </Grid.RowDefinitions>
 
+        <TimelineControls:SoundPlayerControl x:Name="SoundPlayer"  Grid.Column="0" Grid.Row="0" Visibility="Collapsed"/>
+        
         <ScrollViewer x:Name="timelineScrollViewer" Grid.Column="0" Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
             <TimelineControls:TimelineViewer  x:Name="TimelineViewerControl" 
                                               MouseDown="timelineViewerControl_MouseDown" 
-                                              MouseMove="TimelineViewerControl_MouseMove" />
+                                              MouseMove="TimelineViewerControl_MouseMove"  />
         </ScrollViewer>
 
         <Grid Grid.Column="0" Grid.Row="1">

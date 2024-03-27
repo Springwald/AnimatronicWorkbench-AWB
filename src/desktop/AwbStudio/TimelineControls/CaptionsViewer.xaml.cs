@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using System;
@@ -20,9 +21,13 @@ namespace AwbStudio.TimelineControls
     {
         private readonly Border _prototypeLabelBorder;
         private readonly Border _prototypeLabelBorderInActualBank;
+
         private IActuatorsService? _actuatorsService;
-        private TimelineViewPos? _viewPos;
+        private TimelineViewContext? _viewContext;
+        private TimelineCaptions? _timelineCaptions;
+
         private int _lastBankIndex;
+        private bool _isInitialized;
 
         public CaptionsViewer()
         {
@@ -31,50 +36,42 @@ namespace AwbStudio.TimelineControls
             this._prototypeLabelBorderInActualBank = WpfToolbox.XamlClone(PrototypeLabelBorderInActualBank);
         }
 
-        /// <summary>
-        /// The service to get the actuators
-        /// </summary>
-        public IActuatorsService? ActuatorsService
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
-            get => _actuatorsService; set
-            {
-                if (value != null && _actuatorsService != null) throw new InvalidOperationException("ActuatorsService already set");
-                _actuatorsService = value ?? throw new ArgumentNullException(nameof(ActuatorsService));
+            _viewContext = viewContext;
+            _actuatorsService = actuatorsService;
+            _timelineCaptions = timelineCaptions;
 
-                foreach (var actuator in _actuatorsService.AllActuators)
-                    TimelineCaptions.AddAktuator(actuator);
-                UpdateCaptionView();
-            }
+            _viewContext.Changed += ViewContext_Changed;
+
+            foreach (var actuator in _actuatorsService!.AllActuators)
+                _timelineCaptions.AddAktuator(actuator);
+
+            _isInitialized = true;
         }
 
-        public TimelineCaptions? TimelineCaptions { get; set; }
-        public TimelineData? TimelineData { get; set; }
-        public TimelineViewPos? ViewPos
+        public void TimelineDataLoaded(TimelineData timelineData)
         {
-            get => _viewPos;
-            set
-            {
-                _viewPos = value;
-                if (_viewPos != null) _viewPos.Changed += ViewPos_Changed;
-            }
+            if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
+            UpdateCaptionView();
         }
+
 
         private void UpdateCaptionView()
         {
-            if (_viewPos == null) return;
-            if (_actuatorsService == null) return;
+            if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
-
+            if (_timelineCaptions == null) return;
 
             LineNames.Children.Clear();
-            if (TimelineCaptions?.Captions?.Any() == true)
+            if (_timelineCaptions?.Captions?.Any() == true)
             {
                 int no = 0;
                 Border? border = null;
-                foreach (var caption in TimelineCaptions.Captions)
+                foreach (var caption in _timelineCaptions.Captions)
                 {
                     no++;
-                    if (no >= _viewPos.FirstBankItemNo && no <= _viewPos.LastBankItemNo)
+                    if (no >= _viewContext!.FirstBankItemNo && no <= _viewContext.LastBankItemNo)
                     {
                         // actuator is inside the actual bank
                         border = WpfToolbox.XamlClone(_prototypeLabelBorderInActualBank);
@@ -86,7 +83,7 @@ namespace AwbStudio.TimelineControls
                     }
 
                     var label = border.Child as Label ?? throw new ApplicationException("label border contains no label control?");
-                    label.Content = no >= _viewPos.FirstBankItemNo && no <= _viewPos.LastBankItemNo ? $"[{no - _viewPos.FirstBankItemNo + 1}] {caption.Label.Trim()}" : caption.Label.Trim();
+                    label.Content = no >= _viewContext.FirstBankItemNo && no <= _viewContext.LastBankItemNo ? $"[{no - _viewContext.FirstBankItemNo + 1}] {caption.Label.Trim()}" : caption.Label.Trim();
                     label.Foreground = caption.ForegroundColor;
                     label.Background = caption.BackgroundColor;
                     LineNames.Children.Add(border);
@@ -94,12 +91,14 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        private void ViewPos_Changed(object? sender, EventArgs e)
+        private void ViewContext_Changed(object? sender, EventArgs e)
         {
-            if (_viewPos == null) return;
-            if (_lastBankIndex != _viewPos.BankIndex && _actuatorsService != null)
+            if (_viewContext == null) return;
+            if (_timelineCaptions == null) return;
+
+            if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
             {
-                _lastBankIndex = _viewPos.BankIndex;
+                _lastBankIndex = _viewContext.BankIndex;
                 MyInvoker.Invoke(new Action(() =>
                 {
                     this.UpdateCaptionView();

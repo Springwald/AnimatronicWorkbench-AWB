@@ -5,8 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Player;
 using Awb.Core.Services;
-using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,14 @@ namespace AwbStudio.TimelineControls
     /// </summary>
     public partial class SoundValueViewerControl : UserControl, ITimelineControl
     {
+        private readonly Label _protoypeLabel;
+        private const double _paintMarginTopBottom = 30;
+
+        private TimelineData? _timelineData;
+        private TimelineCaptions _timelineCaptions;
+        private TimelineViewContext? _viewContext;
+        private bool _isInitialized;
+
         public SoundValueViewerControl()
         {
             InitializeComponent();
@@ -29,46 +37,22 @@ namespace AwbStudio.TimelineControls
             Loaded += SoundValueViewerControl_Loaded;
         }
 
-        private readonly Label _protoypeLabel;
-        private const double _paintMarginTopBottom = 30;
-
-        private TimelineData? _timelineData;
-        private TimelineViewPos? _viewPos;
-
-        /// <summary>
-        /// The timeline data to be displayed
-        /// </summary>
-        public TimelineData? TimelineData
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
-            get { return _timelineData; }
-            set
-            {
-                _timelineData = value;
-                PaintSoundValues();
-            }
+            _viewContext = viewContext;
+            _viewContext.Changed += ViewContext_Changed;
+            _timelineCaptions = timelineCaptions;
+            _isInitialized = true;
         }
 
-        public TimelineCaptions TimelineCaptions { get; set; }
-
-        /// <summary>
-        /// The actual view and scroll position of the timeline
-        /// </summary>
-        public TimelineViewPos ViewPos
+        public void TimelineDataLoaded(TimelineData timelineData)
         {
-            set
-            {
-                if (value != null)
-                {
-                    if (_viewPos != null) throw new Exception("ViewPos.Changed is already set");
-                    _viewPos = value;
-                    _viewPos.Changed += this.OnViewPosChanged;
-                    this.OnViewPosChanged(this, EventArgs.Empty);
-                }
-            }
-            get => _viewPos;
+            if (!_isInitialized) throw new InvalidOperationException(Name + " is not initialized!");
+
+            _timelineData = timelineData;
+            PaintSoundValues();
         }
 
-        public IActuatorsService? ActuatorsService { set { } }
 
         private void SoundValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -79,20 +63,21 @@ namespace AwbStudio.TimelineControls
         {
         }
 
-        private void OnViewPosChanged(object? sender, EventArgs e)
+        private void ViewContext_Changed(object? sender, EventArgs e)
         {
             MyInvoker.Invoke(new Action(() => this.PaintSoundValues()));
         }
 
         public void PaintSoundValues()
         {
-            CanvasSounds.Children.Clear();
+            if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
-            if (_viewPos == null) return;
             if (_timelineData == null) return;
 
+            CanvasSounds.Children.Clear();
+
             double height = this.ActualHeight;
-            double width = this.ActualWidth; 
+            double width = this.ActualWidth;
 
             var soundPlayerIds = _timelineData?.SoundPoints?.OfType<SoundPoint>().Select(p => p.SoundPlayerId).Where(id => id != null).Distinct().ToArray() ?? Array.Empty<string>();
 
@@ -105,7 +90,7 @@ namespace AwbStudio.TimelineControls
 
             foreach (var soundPlayerId in soundPlayerIds)
             {
-                var caption = TimelineCaptions?.GetAktuatorCaption(soundPlayerId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
+                var caption = _timelineCaptions?.GetAktuatorCaption(soundPlayerId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
 
                 // Add polylines with points
                 var pointsForThisSoundplayer = _timelineData?.SoundPoints.OfType<SoundPoint>().Where(p => p.SoundPlayerId == soundPlayerId).OrderBy(p => p.TimeMs).ToList() ?? new List<SoundPoint>();
@@ -113,18 +98,19 @@ namespace AwbStudio.TimelineControls
                 // add dots
                 foreach (var point in pointsForThisSoundplayer)
                 {
-                    if (point.TimeMs >= 0 && point.TimeMs <= ViewPos.DurationMs) // is inside view
+                    if (point.TimeMs >= 0 && point.TimeMs <= _viewContext.DurationMs) // is inside view
                     {
                         var label = WpfToolbox.XamlClone(_protoypeLabel);
                         label.Content = "Sound" + point.Title;
                         label.Foreground = caption.ForegroundColor;
                         label.Background = caption.BackgroundColor;
-                        label.Margin = new Thickness { Left = _viewPos.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) };
+                        label.Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) };
                         CanvasSounds.Children.Add(label);
                     }
                 }
             }
         }
 
+     
     }
 }
