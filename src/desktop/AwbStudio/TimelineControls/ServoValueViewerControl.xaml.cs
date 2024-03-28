@@ -70,6 +70,7 @@ namespace AwbStudio.TimelineControls
             if (_timelineData != null) _timelineData!.OnContentChanged -= TimeLineContent_Changed;
             _timelineData = timelineData;
             _timelineData.OnContentChanged += TimeLineContent_Changed;
+            PaintServoValues();
         }
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)

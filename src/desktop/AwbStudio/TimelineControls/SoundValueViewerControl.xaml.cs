@@ -48,11 +48,9 @@ namespace AwbStudio.TimelineControls
         public void TimelineDataLoaded(TimelineData timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " is not initialized!");
-
             _timelineData = timelineData;
             PaintSoundValues();
         }
-
 
         private void SoundValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -68,7 +66,7 @@ namespace AwbStudio.TimelineControls
             MyInvoker.Invoke(new Action(() => this.PaintSoundValues()));
         }
 
-        public void PaintSoundValues()
+        private void PaintSoundValues()
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
