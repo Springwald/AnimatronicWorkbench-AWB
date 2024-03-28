@@ -55,7 +55,7 @@ namespace AwbStudio
                 OriginMs = playPosMs - PlayPosRelativeToOriginMs;
             }
 
-            public void SetFromValueInPercent(double valueInPercent)
+            public void SetPositionFromValueInPercent(double valueInPercent)
             {
                 PlayPosRelativeToOriginMs = (int)(PageWidthMs * valueInPercent / 100.0);
             }
@@ -127,7 +127,6 @@ namespace AwbStudio
             Loaded += TimelineEditorWindow_Loaded;
         }
 
-      
 
         private void AwbLogger_OnLog(object? sender, string e)
         {
@@ -180,8 +179,6 @@ namespace AwbStudio
             ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
             TimelineChooser.FileManager = _fileManager;
 
-          
-
             Closing += TimelineEditorWindow_Closing;
             KeyDown += TimelineEditorWindow_KeyDown;
 
@@ -192,9 +189,14 @@ namespace AwbStudio
             this.Topmost = false;
 
             _unsavedChanges = false;
+
+            Unloaded += TimelineEditorWindow_Unloaded;  
         }
 
-
+        private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _playPosSynchronizer.Dispose();
+        }
 
         private void CalculateSizeAndPixelPerMs()
         {
@@ -264,6 +266,8 @@ namespace AwbStudio
         }
         private async void TimelineController_OnTimelineEvent(object? sender, TimelineControllerEventArgs e)
         {
+            if (TimelineData == null) return;
+
             switch (e.EventType)
             {
                 case TimelineControllerEventArgs.EventTypes.PlayPosAbsoluteChanged:
@@ -273,7 +277,7 @@ namespace AwbStudio
                             break;
 
                         case TimelinePlayer.PlayStates.Nothing:
-                            _timelineControllerPlayViewPos.SetFromValueInPercent(e.ValueInPercent);
+                            _timelineControllerPlayViewPos.SetPositionFromValueInPercent(e.ValueInPercent);
                             _playPosSynchronizer.SetNewPlayPos(_timelineControllerPlayViewPos.PlayPosAbsoluteMs);
                             break;
 
@@ -342,7 +346,7 @@ namespace AwbStudio
                                     if (soundPoint == null)
                                     {
                                         soundPoint = new SoundPoint(timeMs: _playPosSynchronizer.PlayPosMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: sound.Id); ;
-                                        TimelineData?.SoundPoints.Add(soundPoint);
+                                        TimelineData!.SoundPoints.Add(soundPoint);
                                     }
                                     else
                                     {
@@ -357,7 +361,8 @@ namespace AwbStudio
                             throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                     }
 
-                    MyInvoker.Invoke(new Action(() => { TimelineViewerControl.PaintTimeLine(); }));
+                    TimelineData!.SetContentChanged();
+
                     if (_lastActuatorChanged != actuatorIndex)
                     {
                         ShowActuatorValuesOnTimelineInputController();
@@ -769,7 +774,7 @@ namespace AwbStudio
                 var timelineData = _fileManager.LoadTimelineData(timelineFilename);
                 if (timelineData == null)
                 {
-                    MessageBox.Show("Can't load timeline '" + timelineFilename + "'. Export canceled.");
+                    MessageBox.Show($"Can't load timeline '{timelineFilename}'. Export canceled.");
                     return;
                 }
                 timelines.Add(timelineData);

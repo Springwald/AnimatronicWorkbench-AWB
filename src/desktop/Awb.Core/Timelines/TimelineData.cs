@@ -14,6 +14,11 @@ namespace Awb.Core.Timelines
         public string Title { get; set; } = "no name";
 
         /// <summary>
+        /// The content of the timeline has changed
+        /// </summary>
+        public EventHandler OnContentChanged;
+
+        /// <summary>
         /// What is the duration of the timeline filled with points?
         /// </summary>
         public int DurationMs => AllPoints?.Any() == true ? AllPoints.Max(p => p.TimeMs) : 0;
@@ -44,5 +49,9 @@ namespace Awb.Core.Timelines
             ServoPoints = servoPoints;
             SoundPoints = soundPoints;
         }
+        public void SetContentChanged()
+        {
+            OnContentChanged?.Invoke(this, new EventArgs());
+        }   
     }
 }

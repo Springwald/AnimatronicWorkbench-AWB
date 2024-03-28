@@ -7,7 +7,6 @@
 
 using Awb.Core.Player;
 using Awb.Core.Services;
-using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System;
 using System.Windows;
@@ -25,9 +24,14 @@ namespace AwbStudio.TimelineControls
         private bool _wasPlaying = false;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
-
+        private int _lastBankIndex = -1;
+        private IActuatorsService? _actuatorsService;
+        private TimelineCaptions _timelineCaptions;
+        private TimelineViewContext _viewContext;
+        private PlayPosSynchronizer _playPosSynchronizer;
+        private bool _isInitialized;
         private TimelinePlayer? _timelinePlayer;
-       
+
 
         private ITimelineControl[] _subTimelineViewerControls;
 
@@ -65,6 +69,9 @@ namespace AwbStudio.TimelineControls
             _playPosSynchronizer = playPosSynchronizer;
             _actuatorsService = actuatorsService;
 
+            _viewContext.Changed += OnViewContextChanged;
+            _playPosSynchronizer.OnPlayPosChanged += (sender, e) => MyInvoker.Invoke(new Action(() => { PaintPlayPos(); }));
+
             foreach (var subTimelineViewerControl in _subTimelineViewerControls)
                 subTimelineViewerControl.Init(viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
 
@@ -79,7 +86,7 @@ namespace AwbStudio.TimelineControls
                 subTimelineViewerControl.TimelineDataLoaded(timelineData);
 
             PaintTimeLine();
-            PaintPlayPos(_timelineData);
+            PaintPlayPos();
         }
 
         public void PaintTimeLine()
@@ -112,22 +119,13 @@ namespace AwbStudio.TimelineControls
                 }
             }
 
-            ServoValueViewer.PaintServoValues();
-            SoundValueViewer.PaintSoundValues();
-
             // update the play position
-            PaintPlayPos(_timelineData);
+            PaintPlayPos();
         }
 
-        private int _lastBankIndex = -1;
-        private IActuatorsService? _actuatorsService;
-        private TimelineCaptions _timelineCaptions;
-        
-        private TimelineViewContext _viewContext;
-        private PlayPosSynchronizer _playPosSynchronizer;
-        private bool _isInitialized;
 
-        private void OnViewPosChanged(object? sender, EventArgs e)
+
+        private void OnViewContextChanged(object? sender, EventArgs e)
         {
             if (_timelineData == null) return;
 
@@ -151,20 +149,17 @@ namespace AwbStudio.TimelineControls
             });
         }
 
-      
-
         private void TimelineViewer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!_isInitialized) return;
 
             PaintTimeLine();
-            PaintPlayPos(_timelineData);
+
         }
 
-        private void PaintPlayPos(TimelineData? timeline)
+        private void PaintPlayPos()
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-
 
             // draw the manual midi controller play position as triangle at the bottom
             var x = _viewContext.GetXPos(_playPosSynchronizer.PlayPosMs);
@@ -173,7 +168,7 @@ namespace AwbStudio.TimelineControls
 
             // draw the play position as a vertical line
             var playPosMs = _playPosSynchronizer.PlayPosMs;
-            if (timeline == null || playPosMs < 0 || playPosMs > _viewContext.DurationMs)
+            if (_timelineData == null || playPosMs < 0 || playPosMs > _viewContext.DurationMs)
             {
                 PlayPosLine.Visibility = Visibility.Hidden;
             }
@@ -187,8 +182,5 @@ namespace AwbStudio.TimelineControls
                 PlayPosLine.Visibility = Visibility.Visible;
             }
         }
-
-
     }
-
 }

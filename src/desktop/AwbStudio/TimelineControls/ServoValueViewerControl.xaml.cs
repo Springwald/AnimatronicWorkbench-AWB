@@ -28,33 +28,12 @@ namespace AwbStudio.TimelineControls
 
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
-
+        private TimelineCaptions _timelineCaptions;
         private bool _isInitialized;
-
-        /// <summary>
-        /// The timeline data to be displayed
-        /// </summary>
-        public TimelineData? TimelineData
-        {
-            get { return _timelineData; }
-            set
-            {
-                _timelineData = value;
-                PaintServoValues();
-            }
-        }
-
-        public TimelineCaptions TimelineCaptions { get; set; }
-
 
         private void ViewContext_Changed(object? sender, EventArgs e)
         {
             MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
-        }
-
-        public IActuatorsService? ActuatorsService
-        {
-            set { }
         }
 
         public ServoValueViewerControl()
@@ -62,24 +41,35 @@ namespace AwbStudio.TimelineControls
             InitializeComponent();
             Loaded += ServoValueViewerControl_Loaded;
         }
+        private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            DrawOpticalGrid();
+            SizeChanged += ServoValueViewerControl_SizeChanged;
+            Unloaded+= ServoValueViewerControl_Unloaded;    
+        }
+
+        private void ServoValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Unloaded -= ServoValueViewerControl_Unloaded;
+            if (_viewContext != null) _viewContext.Changed -= ViewContext_Changed;
+            if (_timelineData != null) _timelineData.OnContentChanged -= TimeLineContent_Changed;
+        }
 
         public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
             _viewContext = viewContext;
             _viewContext.Changed += ViewContext_Changed;
 
+            _timelineCaptions = timelineCaptions;
+
             _isInitialized = true;
         }
 
         public void TimelineDataLoaded(TimelineData timelineData)
         {
+            if (_timelineData != null) _timelineData!.OnContentChanged -= TimeLineContent_Changed;
             _timelineData = timelineData;
-        }
-
-        private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            DrawOpticalGrid();
-            SizeChanged += ServoValueViewerControl_SizeChanged;
+            _timelineData.OnContentChanged += TimeLineContent_Changed;
         }
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -87,7 +77,10 @@ namespace AwbStudio.TimelineControls
             DrawOpticalGrid();
         }
 
-        public void PaintServoValues()
+        private void TimeLineContent_Changed(object? sender, EventArgs e) =>
+            MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
+
+        private void PaintServoValues()
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
@@ -110,7 +103,7 @@ namespace AwbStudio.TimelineControls
 
             foreach (var servoId in servoIds)
             {
-                var caption = TimelineCaptions?.GetAktuatorCaption(servoId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
+                var caption = _timelineCaptions?.GetAktuatorCaption(servoId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
 
                 // Add polylines with points
                 var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == servoId).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
