@@ -110,7 +110,7 @@ namespace AwbStudio
                     var projectPath = dialog.SelectedPath;
                     if (_projectManagerService.ExistProject(projectPath))
                     {
-                        System.Windows.MessageBox.Show($"Folder '{projectPath}' already contains an Animatronic Workbench project.");
+                        System.Windows.MessageBox.Show($"Folder '{projectPath}' already contains an Animatronic WorkBench project.");
                         return;
                     }
 
@@ -219,7 +219,7 @@ namespace AwbStudio
         {
             if (!_projectManagerService.ExistProject(projectPath))
             {
-                MessageBox.Show($"No Animatronic Workbench project found in folder '{projectPath}'");
+                MessageBox.Show($"No Animatronic WorkBench project found in folder '{projectPath}'");
                 return false;
             }
             if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
