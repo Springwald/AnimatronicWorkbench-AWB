@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:AwbStudio.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Margin="20">
+    <StackPanel Margin="15">
         <Label>
             <TextBlock TextWrapping="Wrap" Text="Animatronic WorkBench (AWB) Studio" FontSize="24" FontWeight="Bold" Margin="5"  />
             </Label>
@@ -26,6 +26,14 @@
                 </Hyperlink>
             </TextBlock>
         </Label>
+        <Label>
+            <TextBlock Margin="5">           
+        <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB/AnimatronicWorkbench-Setup-EN" RequestNavigate="Hyperlink_RequestNavigate">
+           show setup / installation instructions
+        </Hyperlink>
+            </TextBlock>
+        </Label>
+        
         <Label>
         <TextBlock TextWrapping="Wrap" Margin="5">
             Copyright (c) 2024 Daniel Springwald, licensed under the MIT license.

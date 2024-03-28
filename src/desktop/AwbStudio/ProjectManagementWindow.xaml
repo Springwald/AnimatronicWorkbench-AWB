@@ -24,12 +24,14 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Button x:Name="ButtonOpenExisting" Content="Open existing project"  Grid.Row="0" Click="ButtonOpenExisting_Click"/>
                 <Label Content="Latest projects:" Grid.Row="1"/>
                 <ListBox x:Name="ListLatestProjects" Grid.Row="2" SelectionChanged="ListLatestProjects_SelectionChanged" SelectionMode="Single"/>
-                <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="3" Click="ButtonCreateNew_Click"/>
-                <Button x:Name="ButtonEditExisting" Visibility="Collapsed" Content="Edit existing project configuration"  Grid.Row="4" Click="ButtonEditExisting_Click"/>
+                <Label Content="" Grid.Row="3"/>
+                <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="4" Click="ButtonCreateNew_Click"/>
+                <Button x:Name="ButtonEditExisting" Visibility="Collapsed" Content="Edit existing project configuration"  Grid.Row="5" Click="ButtonEditExisting_Click"/>
             </Grid>
             <Grid x:Name="GridLoadingProject" Visibility="Collapsed" Margin="20">
                 <Grid.RowDefinitions>
