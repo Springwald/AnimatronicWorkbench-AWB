@@ -82,18 +82,18 @@ namespace AwbStudio.TimelineControls
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
+            _timelineData = timelineData;
+
             foreach (var subTimelineViewerControl in _subTimelineViewerControls)
                 subTimelineViewerControl.TimelineDataLoaded(timelineData);
 
-            PaintTimeLine();
+            PaintGrid();
             PaintPlayPos();
         }
 
-        public void PaintTimeLine()
+        public void PaintGrid()
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-
-            if (_timelineData == null) return;
 
             const double _paintMarginTopBottom = 30;
             double height = GridTimeline.ActualHeight;
@@ -118,43 +118,6 @@ namespace AwbStudio.TimelineControls
                     OpticalGrid.Children.Add(new Label { Content = ((ms) / STEP).ToString(), BorderThickness = new Thickness(left: x, top: height - 30, right: 0, bottom: 0) });
                 }
             }
-
-            // update the play position
-            PaintPlayPos();
-        }
-
-
-
-        private void OnViewContextChanged(object? sender, EventArgs e)
-        {
-            if (_timelineData == null) return;
-
-            if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
-            {
-                _lastBankIndex = _viewContext.BankIndex;
-                MyInvoker.Invoke(new Action(() =>
-                {
-                    var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
-                    labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
-                }));
-            }
-
-            var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
-
-            // update the scrollbar
-            MyInvoker.Invoke(() =>
-            {
-                this.Width = newWidth;
-                PaintTimeLine();  // update the timeline
-            });
-        }
-
-        private void TimelineViewer_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (!_isInitialized) return;
-
-            PaintTimeLine();
-
         }
 
         private void PaintPlayPos()
@@ -181,6 +144,38 @@ namespace AwbStudio.TimelineControls
                 PlayPosLine.Y2 = this.ActualHeight;
                 PlayPosLine.Visibility = Visibility.Visible;
             }
+        }
+
+
+
+        private void OnViewContextChanged(object? sender, EventArgs e)
+        {
+            if (_timelineData == null) return;
+
+            if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
+            {
+                _lastBankIndex = _viewContext.BankIndex;
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
+                    labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
+                }));
+            }
+
+            var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
+
+            // update the scrollbar
+            MyInvoker.Invoke(() =>
+            {
+                this.Width = newWidth;
+                PaintGrid();  // update the timeline
+            });
+        }
+
+        private void TimelineViewer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (!_isInitialized) return;
+            PaintGrid();
         }
     }
 }
