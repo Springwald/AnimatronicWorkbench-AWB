@@ -11,15 +11,8 @@ using Awb.Core.Timelines;
 
 namespace AwbStudio.TimelineControls
 {
-    internal interface ITimelineControl
+    internal interface ITimelineEditorControl
     {
-        void Init(
-            TimelineViewContext viewContext,
-            TimelineCaptions timelineCaptions,
-            PlayPosSynchronizer playPosSynchronizer, 
-            IActuatorsService actuatorsService
-            );
-
         void TimelineDataLoaded(TimelineData timelineData);
     }
 }

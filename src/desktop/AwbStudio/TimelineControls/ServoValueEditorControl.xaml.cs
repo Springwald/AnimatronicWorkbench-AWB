@@ -21,7 +21,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for ServoValueViewerControl.xaml
     /// </summary>
-    public partial class ServoValueViewerControl : UserControl, ITimelineControl
+    public partial class ServoValueEditorControl : UserControl, ITimelineEditorControl
     {
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private const double _paintMarginTopBottom = 30;
@@ -36,7 +36,7 @@ namespace AwbStudio.TimelineControls
             MyInvoker.Invoke(new Action(() => this.PaintServoValues()));
         }
 
-        public ServoValueViewerControl()
+        public ServoValueEditorControl()
         {
             InitializeComponent();
             Loaded += ServoValueViewerControl_Loaded;
@@ -55,7 +55,7 @@ namespace AwbStudio.TimelineControls
             if (_timelineData != null) _timelineData.OnContentChanged -= TimeLineContent_Changed;
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(Awb.Core.Actuators.IServo servo, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
             _viewContext = viewContext;
             _viewContext.Changed += ViewContext_Changed;

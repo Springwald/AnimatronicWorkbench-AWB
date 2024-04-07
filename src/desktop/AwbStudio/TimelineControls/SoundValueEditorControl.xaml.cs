@@ -20,7 +20,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for SoundValueViewerControl.xaml
     /// </summary>
-    public partial class SoundValueViewerControl : UserControl, ITimelineControl
+    public partial class SoundValueEditorControl : UserControl, ITimelineEditorControl
     {
         private readonly Label _protoypeLabel;
         private const double _paintMarginTopBottom = 30;
@@ -30,14 +30,14 @@ namespace AwbStudio.TimelineControls
         private TimelineViewContext? _viewContext;
         private bool _isInitialized;
 
-        public SoundValueViewerControl()
+        public SoundValueEditorControl()
         {
             InitializeComponent();
             this._protoypeLabel = WpfToolbox.XamlClone(PrototypeLabel);
             Loaded += SoundValueViewerControl_Loaded;
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(Awb.Core.Actuators.ISoundPlayer soundPlayer, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
             _viewContext = viewContext;
             _viewContext.Changed += ViewContext_Changed;

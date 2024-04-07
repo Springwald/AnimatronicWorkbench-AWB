@@ -8,7 +8,9 @@
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using AwbStudio.TimelineValuePainters;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -16,7 +18,7 @@ using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls
 {
-    public partial class TimelineViewer : UserControl, ITimelineControl
+    public partial class TimelineViewer : UserControl, ITimelineEditorControl
     {
         private const int ItemsPerBank = 8;
 
@@ -33,7 +35,9 @@ namespace AwbStudio.TimelineControls
         private TimelinePlayer? _timelinePlayer;
 
 
-        private ITimelineControl[] _subTimelineViewerControls;
+        private List<ITimelineEditorControl> _timelineEditorControls;
+        private List<ITimelineValuePainter> _timelineValuePainters;
+
 
         /// <summary>
         /// The timeline player to control the timeline playback
@@ -58,8 +62,7 @@ namespace AwbStudio.TimelineControls
             //MyViewModel vm = new MyViewModel();
             SizeChanged += TimelineViewer_SizeChanged;
 
-            // set up the sub-timeline-viewers
-            _subTimelineViewerControls = new ITimelineControl[] { CaptionsViewer, ServoValueViewer, SoundValueViewer };
+
         }
 
         public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
@@ -72,8 +75,35 @@ namespace AwbStudio.TimelineControls
             _viewContext.Changed += OnViewContextChanged;
             _playPosSynchronizer.OnPlayPosChanged += (sender, e) => MyInvoker.Invoke(new Action(() => { PaintPlayPos(); }));
 
-            foreach (var subTimelineViewerControl in _subTimelineViewerControls)
-                subTimelineViewerControl.Init(viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
+
+            // set up the actuator value painters and editors
+            _timelineEditorControls = new List<ITimelineEditorControl>();
+            _timelineValuePainters = new List<ITimelineValuePainter>();
+
+            // add servo painter + editors
+            foreach (var servoActuator in actuatorsService.Servos)
+            {
+                _timelineValuePainters.Add(new ServoValuePainter(servo: servoActuator, paintControl: this.GridTimeline));
+
+                var editorControl = new ServoValueEditorControl();
+                editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
+                AllValueEditorControlsScrollViewer.Children.Add(editorControl);
+                _timelineEditorControls.Add(editorControl);
+            }
+
+            // add sound painter + editors
+            foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
+            {
+                _timelineValuePainters.Add(new SoundValuePainter(soundPlayer: soundPlayerActuator, paintControl: this.GridTimeline));
+
+                var editorControl = new SoundValueEditorControl();
+                editorControl.Init(soundPlayer: soundPlayerActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
+                AllValueEditorControlsScrollViewer.Children.Add(editorControl);
+                _timelineEditorControls.Add(editorControl);
+              
+            }
+
+            // todo: add nested timelines painter + editors
 
             _isInitialized = true;
         }
@@ -84,7 +114,7 @@ namespace AwbStudio.TimelineControls
 
             _timelineData = timelineData;
 
-            foreach (var subTimelineViewerControl in _subTimelineViewerControls)
+            foreach (var subTimelineViewerControl in _timelineEditorControls)
                 subTimelineViewerControl.TimelineDataLoaded(timelineData);
 
             PaintGrid();

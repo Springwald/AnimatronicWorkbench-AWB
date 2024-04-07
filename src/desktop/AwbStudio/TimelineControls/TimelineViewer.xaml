@@ -8,8 +8,8 @@
              d:DesignHeight="450" d:DesignWidth="800" Background="Black" >
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="60*" />
+            <RowDefinition Height="40*" MinHeight="200"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" x:Name="GridTimeline">
             <local:CaptionsViewer x:Name="CaptionsViewer" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -21,11 +21,11 @@
                 <Line x:Name="PlayPosLine" Stroke="DarkOrange" StrokeThickness="1" X1="10" X2="50" Y1="10" Y2="200" ></Line>
             </Grid>
             <Label x:Name="LabelManualPlayPosAbsolute" Content="🔺 02:20" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Background="Black" Foreground="#FF8DA2FA"/>
-            <Grid x:Name="AllValueActuatorsGrid">
-                <local:ServoValueViewerControl  x:Name="ServoValueViewer" />
-                <local:SoundValueViewerControl  x:Name="SoundValueViewer"/>
-            </Grid>
         </Grid>
+        <ScrollViewer Grid.Row="1">
+            <StackPanel x:Name="AllValueEditorControlsScrollViewer"  >
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 
 </UserControl>

@@ -17,7 +17,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for CaptionsViewer.xaml
     /// </summary>
-    public partial class CaptionsViewer : UserControl, ITimelineControl
+    public partial class CaptionsViewer : UserControl, ITimelineEditorControl
     {
         private readonly Border _prototypeLabelBorder;
         private readonly Border _prototypeLabelBorderInActualBank;

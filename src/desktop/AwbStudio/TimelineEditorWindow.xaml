@@ -16,7 +16,7 @@
        
         <Grid.RowDefinitions>
             <RowDefinition Height="6*" />
-            <RowDefinition Height="4*" />
+            <RowDefinition Height="4*" MaxHeight="250" />
         </Grid.RowDefinitions>
 
         <TimelineControls:SoundPlayerControl x:Name="SoundPlayer"  Grid.Column="0" Grid.Row="0" Visibility="Collapsed"/>
