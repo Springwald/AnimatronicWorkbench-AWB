@@ -20,13 +20,12 @@ namespace AwbStudio.TimelineControls
 {
     public partial class TimelineViewer : UserControl, ITimelineEditorControl
     {
-        private const int ItemsPerBank = 8;
+    
 
-        private int _actualBankIndex = 0;
         private bool _wasPlaying = false;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
-        private int _lastBankIndex = -1;
+       
         private IActuatorsService? _actuatorsService;
         private TimelineCaptions _timelineCaptions;
         private TimelineViewContext _viewContext;
@@ -182,15 +181,7 @@ namespace AwbStudio.TimelineControls
         {
             if (_timelineData == null) return;
 
-            if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
-            {
-                _lastBankIndex = _viewContext.BankIndex;
-                MyInvoker.Invoke(new Action(() =>
-                {
-                    var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
-                    labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
-                }));
-            }
+           
 
             var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
 

@@ -74,6 +74,9 @@ namespace AwbStudio
         private TimelinePlayer _timelinePlayer;
         protected TimelineData _timelineData;
         private IActuatorsService _actuatorsService;
+        private const int ItemsPerBank = 8;
+        private int _lastBankIndex = -1;
+        private int _actualBankIndex = 0;
 
         private TimelineViewContext _timeLineViewContext;
 
@@ -120,12 +123,25 @@ namespace AwbStudio
             _timelineControllers = timelineControllers;
 
             _viewContext = new TimelineViewContext();
+            _viewContext.Changed+= ViewContext_Changed; 
 
             _playPosSynchronizer = new PlayPosSynchronizer();
 
             Loaded += TimelineEditorWindow_Loaded;
         }
 
+        private void ViewContext_Changed(object? sender, EventArgs e)
+        {
+            if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
+            {
+                _lastBankIndex = _viewContext.BankIndex;
+                MyInvoker.Invoke(new Action(() =>
+                {
+                    var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
+                    labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
+                }));
+            }
+        }
 
         private void AwbLogger_OnLog(object? sender, string e)
         {
@@ -159,8 +175,9 @@ namespace AwbStudio
             _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
             var timelineCaptions = new TimelineCaptions();
+            TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);   
+          
             TimelineViewerControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
-            TimelineViewerControl.TimelineDataLoaded(_timelineData);
             TimelineViewerControl.Timelineplayer = _timelinePlayer;
             SoundPlayer.Sounds = _project.Sounds;
 
@@ -599,6 +616,7 @@ namespace AwbStudio
             this.Title = _timelineData == null ? "No Timeline" : $"Timeline '{_timelineData.Title}'";
             if (_timelinePlayer != null) _timelinePlayer.TimelineData = data;
             TimelineViewerControl.TimelineDataLoaded(data);
+            TimelineCaptionsViewer.TimelineDataLoaded(data);
             TxtActualTimelineName.Text = _timelineData?.Title ?? string.Empty;
             _unsavedChanges = false;
 

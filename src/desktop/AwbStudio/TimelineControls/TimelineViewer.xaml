@@ -7,25 +7,30 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="Black" >
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60*" />
-            <RowDefinition Height="40*" MinHeight="200"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0" x:Name="GridTimeline">
-            <local:CaptionsViewer x:Name="CaptionsViewer" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Grid x:Name="OpticalGrid">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60*" />
+                <RowDefinition Height="40*" MinHeight="200"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" x:Name="GridTimeline">
+             
+                <Grid x:Name="OpticalGrid">
+                </Grid>
+             
             </Grid>
-            <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo" >BANK 1 (1-8)</Label>
-
+            <ScrollViewer Grid.Row="1">
+                <StackPanel x:Name="AllValueEditorControlsScrollViewer"  >
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+        <Grid>
             <Grid x:Name="PlayControls">
                 <Line x:Name="PlayPosLine" Stroke="DarkOrange" StrokeThickness="1" X1="10" X2="50" Y1="10" Y2="200" ></Line>
             </Grid>
             <Label x:Name="LabelManualPlayPosAbsolute" Content="🔺 02:20" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Background="Black" Foreground="#FF8DA2FA"/>
         </Grid>
-        <ScrollViewer Grid.Row="1">
-            <StackPanel x:Name="AllValueEditorControlsScrollViewer"  >
-            </StackPanel>
-        </ScrollViewer>
+
+
     </Grid>
 
 </UserControl>
