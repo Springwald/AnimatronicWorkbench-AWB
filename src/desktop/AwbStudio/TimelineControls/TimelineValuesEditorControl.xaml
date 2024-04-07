@@ -12,11 +12,12 @@
                 <RowDefinition Height="40*"  MaxHeight="300" />
                 <RowDefinition Height="60*" MinHeight="200"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" x:Name="GridTimeline">
-                <Grid x:Name="OpticalGrid">
+            <Border  BorderBrush="Gray" BorderThickness="1" >
+                <Grid Grid.Row="0">
+                    <Grid x:Name="OpticalGrid"></Grid>
+                    <Grid x:Name="AllValuesGrid"></Grid>
                 </Grid>
-                <Grid x:Name="AllValuesGrid"></Grid>
-            </Grid>
+            </Border>
             <ScrollViewer Grid.Row="1">
                 <StackPanel x:Name="AllValueEditorControlsScrollViewer"  >
                 </StackPanel>

@@ -94,7 +94,7 @@ namespace AwbStudio.TimelineControls
             // add sound painter + editors
             foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
             {
-                _timelineValuePainters.Add(new SoundValuePainter(soundPlayer: soundPlayerActuator, paintControl: this.GridTimeline));
+                _timelineValuePainters.Add(new SoundValuePainter(soundPlayer: soundPlayerActuator, paintControl: this.AllValuesGrid));
 
                 var editorControl = new SoundValueEditorControl();
                 editorControl.Init(
@@ -133,7 +133,7 @@ namespace AwbStudio.TimelineControls
 
         private void PaintValues()
         {
-            GridTimeline.Children.Clear();
+            AllValuesGrid.Children.Clear();
             foreach (var valuePainter in _timelineValuePainters)
             {
                 valuePainter.PaintValues();
@@ -151,14 +151,10 @@ namespace AwbStudio.TimelineControls
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
             const double _paintMarginTopBottom = 30;
-            double height = GridTimeline.ActualHeight;
-            double width = GridTimeline.ActualWidth;
+            double height = OpticalGrid.ActualHeight;
+            double width = OpticalGrid.ActualWidth;
 
             if (height < 10 || width < 100) return;
-
-            //r servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Distinct().ToArray() ?? Array.Empty<string>();
-
-            double diagramHeight = height - _paintMarginTopBottom * 2;
 
             // update the data optical grid lines
             OpticalGrid.Children.Clear();
