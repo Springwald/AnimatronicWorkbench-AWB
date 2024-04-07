@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System.Windows.Controls;
+using AwbStudio.TimelineEditing;
 
 namespace AwbStudio.TimelineControls
 {

@@ -8,6 +8,7 @@
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using AwbStudio.TimelineEditing;
 using System;
 using System.Linq;
 using System.Windows.Controls;
@@ -17,7 +18,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for CaptionsViewer.xaml
     /// </summary>
-    public partial class CaptionsViewer : UserControl, ITimelineEditorControl
+    public partial class CaptionsViewerControl : UserControl, ITimelineEditorControl
     {
         private readonly Border _prototypeLabelBorder;
         private readonly Border _prototypeLabelBorderInActualBank;
@@ -26,10 +27,9 @@ namespace AwbStudio.TimelineControls
         private TimelineViewContext? _viewContext;
         private TimelineCaptions? _timelineCaptions;
 
-        private int _lastBankIndex;
         private bool _isInitialized;
 
-        public CaptionsViewer()
+        public CaptionsViewerControl()
         {
             InitializeComponent();
             this._prototypeLabelBorder = WpfToolbox.XamlClone(PrototypeLabelBorder);
@@ -41,8 +41,6 @@ namespace AwbStudio.TimelineControls
             _viewContext = viewContext;
             _actuatorsService = actuatorsService;
             _timelineCaptions = timelineCaptions;
-
-            _viewContext.Changed += ViewContext_Changed;
 
             foreach (var actuator in _actuatorsService!.AllActuators)
                 _timelineCaptions.AddAktuator(actuator);
@@ -91,19 +89,5 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        private void ViewContext_Changed(object? sender, EventArgs e)
-        {
-            if (_viewContext == null) return;
-            if (_timelineCaptions == null) return;
-
-            if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
-            {
-                _lastBankIndex = _viewContext.BankIndex;
-                MyInvoker.Invoke(new Action(() =>
-                {
-                    this.UpdateCaptionView();
-                }));
-            }
-        }
     }
 }

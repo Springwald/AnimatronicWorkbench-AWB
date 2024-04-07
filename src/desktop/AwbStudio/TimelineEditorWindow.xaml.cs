@@ -16,6 +16,7 @@ using AwbStudio.Exports;
 using AwbStudio.FileManagement;
 using AwbStudio.Projects;
 using AwbStudio.TimelineControls;
+using AwbStudio.TimelineEditing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,39 +29,6 @@ namespace AwbStudio
 {
     public partial class TimelineEditorWindow : Window
     {
-        private class TimelineControllerPlayViewPos
-        {
-            /// <summary>
-            /// The range in which the PlayPos can be moved by the controller
-            /// </summary>
-            public int PageWidthMs { get; set; } = 10 * 1000; // 10 seconds
-
-            /// <summary>
-            /// The PlayPos in ms, which represents the start of the ScrollPageWidthMs
-            /// </summary>
-            public int OriginMs { get; set; }
-
-            /// <summary>
-            ///  a value between 0 and PageWidthMs, which represents the position of the PlayPos in the PageWidthMs
-            /// </summary>
-            public int PlayPosRelativeToOriginMs { get; set; }
-
-            /// <summary>
-            ///  The absolute position of the PlayPos set by in ms
-            /// </summary>
-            public int PlayPosAbsoluteMs => OriginMs + PlayPosRelativeToOriginMs;
-
-            public void SetPlayPosFromTimelineControl(int playPosMs)
-            {
-                OriginMs = playPosMs - PlayPosRelativeToOriginMs;
-            }
-
-            public void SetPositionFromValueInPercent(double valueInPercent)
-            {
-                PlayPosRelativeToOriginMs = (int)(PageWidthMs * valueInPercent / 100.0);
-            }
-        }
-
         const int msPerScreenWidth = 10 * 1000; // todo: zoom in/out
 
         private readonly PlayPosSynchronizer _playPosSynchronizer ;
@@ -130,6 +98,8 @@ namespace AwbStudio
             Loaded += TimelineEditorWindow_Loaded;
         }
 
+
+
         private void ViewContext_Changed(object? sender, EventArgs e)
         {
             if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
@@ -141,11 +111,6 @@ namespace AwbStudio
                     labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
                 }));
             }
-        }
-
-        private void AwbLogger_OnLog(object? sender, string e)
-        {
-            throw new NotImplementedException();
         }
 
         private async void TimelineEditorWindow_Loaded(object sender, RoutedEventArgs e)

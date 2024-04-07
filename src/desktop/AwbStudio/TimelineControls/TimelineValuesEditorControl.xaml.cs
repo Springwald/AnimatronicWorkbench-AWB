@@ -8,6 +8,7 @@
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;

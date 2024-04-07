@@ -7,8 +7,7 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.Timelines;
-using AwbStudio.TimelineControls;
-using System;
+using AwbStudio.TimelineEditing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -25,8 +24,7 @@ namespace AwbStudio.TimelineValuePainters
         private readonly IServo _servo;
         private readonly TimelineViewContext _viewContext;
         private readonly TimelineCaptions _timelineCaptions;
-        private TimelineData _timelineData;
-
+        private TimelineData? _timelineData;
 
         public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions)
         {
@@ -44,16 +42,12 @@ namespace AwbStudio.TimelineValuePainters
 
         public void PaintValues()
         {
-            //if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-
             if (_timelineData == null) return;
 
             double height = PaintControl.ActualHeight;
             double width = PaintControl.ActualWidth;
 
             if (height < 20 || width < 100) return;
-
-            var servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Where(id => id != null).Distinct().ToArray() ?? Array.Empty<string>();
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 

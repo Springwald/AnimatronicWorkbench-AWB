@@ -8,7 +8,7 @@
 using Awb.Core.Timelines;
 using System;
 
-namespace AwbStudio.TimelineControls
+namespace AwbStudio.TimelineEditing
 {
     public class TimelineViewContext
     {

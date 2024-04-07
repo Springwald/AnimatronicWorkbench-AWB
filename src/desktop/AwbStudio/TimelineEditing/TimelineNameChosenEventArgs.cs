@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-namespace AwbStudio.TimelineControls
+namespace AwbStudio.TimelineEditing
 {
     public class TimelineNameChosenEventArgs
     {

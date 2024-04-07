@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
-namespace AwbStudio.TimelineControls
+namespace AwbStudio.TimelineEditing
 {
     public class TimelineCaptions
     {
@@ -56,7 +56,7 @@ namespace AwbStudio.TimelineControls
                 Mp3PlayerYX5300 mp3 => $"{clientIdPraefix}{(string.IsNullOrWhiteSpace(mp3.Name) ? $"MP3-{mp3.Id}" : mp3.Name)}",
                 Pca9685PwmServo servo => $"{clientIdPraefix}PWM{servo.Channel} {servo.Name ?? string.Empty}",
                 StsScsServo stsScs => $"{clientIdPraefix}{stsScs.StsScsType.ToString()}{stsScs.Channel} {stsScs.Name ?? string.Empty}",
-                 _ => $"{clientIdPraefix}{actuator.Id} {actuator.Name ?? string.Empty}"
+                _ => $"{clientIdPraefix}{actuator.Id} {actuator.Name ?? string.Empty}"
             };
 
 

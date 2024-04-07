@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using AwbStudio.FileManagement;
+using AwbStudio.TimelineEditing;
 using System;
 using System.Windows.Controls;
 

@@ -25,7 +25,7 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TimelineControls:CaptionsViewer  x:Name="TimelineCaptionsViewer" Grid.Column="0"/>
+            <TimelineControls:CaptionsViewerControl  x:Name="TimelineCaptionsViewer" Grid.Column="0"/>
             <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo"  Grid.Column="1">BANK 1 (1-8)</Label>
         </Grid>
 

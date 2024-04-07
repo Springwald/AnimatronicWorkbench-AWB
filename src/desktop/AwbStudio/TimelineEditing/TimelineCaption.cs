@@ -7,7 +7,7 @@
 
 using System.Windows.Media;
 
-namespace AwbStudio.TimelineControls
+namespace AwbStudio.TimelineEditing
 {
     public class TimelineCaption
     {

@@ -9,6 +9,7 @@ using Awb.Core.Actuators;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using AwbStudio.TimelineEditing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
