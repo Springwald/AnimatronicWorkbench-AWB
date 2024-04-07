@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using Awb.Core.Timelines;
 using System;
 using System.Windows.Controls;
 
@@ -25,8 +26,10 @@ namespace AwbStudio.TimelineValuePainters
 
         public void PaintValues()
         {
-            throw new NotImplementedException();
         }
 
+        public void TimelineDataLoaded(TimelineData timelineData)
+        {
+        }
     }
 }

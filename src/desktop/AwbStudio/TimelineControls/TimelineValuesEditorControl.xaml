@@ -15,6 +15,7 @@
             <Grid Grid.Row="0" x:Name="GridTimeline">
                 <Grid x:Name="OpticalGrid">
                 </Grid>
+                <Grid x:Name="AllValuesGrid"></Grid>
             </Grid>
             <ScrollViewer Grid.Row="1">
                 <StackPanel x:Name="AllValueEditorControlsScrollViewer"  >

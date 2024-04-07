@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
@@ -29,6 +30,8 @@ namespace AwbStudio.TimelineControls
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
         private TimelineCaptions _timelineCaptions;
+        private IServo _servo;
+        private TimelineCaption _caption;
         private bool _isInitialized;
 
         private void ViewContext_Changed(object? sender, EventArgs e)
@@ -45,7 +48,7 @@ namespace AwbStudio.TimelineControls
         {
             DrawOpticalGrid();
             SizeChanged += ServoValueViewerControl_SizeChanged;
-            Unloaded+= ServoValueViewerControl_Unloaded;    
+            Unloaded += ServoValueViewerControl_Unloaded;
         }
 
         private void ServoValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
@@ -55,12 +58,15 @@ namespace AwbStudio.TimelineControls
             if (_timelineData != null) _timelineData.OnContentChanged -= TimeLineContent_Changed;
         }
 
-        public void Init(Awb.Core.Actuators.IServo servo, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(IServo servo, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
             _viewContext = viewContext;
             _viewContext.Changed += ViewContext_Changed;
-
             _timelineCaptions = timelineCaptions;
+            _servo = servo;
+
+            _caption = _timelineCaptions?.GetAktuatorCaption(servo.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
+            HeaderControl.TimelineCaption = _caption;
 
             _isInitialized = true;
         }
@@ -99,44 +105,40 @@ namespace AwbStudio.TimelineControls
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 
-            // Update the content points and lines
             // ToDo: cache and only update on changes; or: use model binding and auto update
 
-            foreach (var servoId in servoIds)
+            // Add polylines with points
+            var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
+
+            // add dots
+            const int dotRadius = 3;
+            const int dotWidth = dotRadius * 2;
+            foreach (var point in pointsForThisServo)
             {
-                var caption = _timelineCaptions?.GetAktuatorCaption(servoId) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
-
-                // Add polylines with points
-                var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == servoId).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
-
-                // add dots
-                const int dotRadius = 3;
-                const int dotWidth = dotRadius * 2;
-                foreach (var point in pointsForThisServo)
+                if (point.TimeMs >= 0 && point.TimeMs <= _viewContext!.DurationMs) // is inside view
                 {
-                    if (point.TimeMs >= 0 && point.TimeMs <= _viewContext!.DurationMs) // is inside view
+                    this.GridDots.Children.Add(new Ellipse
                     {
-                        this.GridDots.Children.Add(new Ellipse
-                        {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Fill = caption.ForegroundColor,
-                            Stroke = caption.ForegroundColor,
-                            Height = dotWidth,
-                            Width = dotWidth,
-                            Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs,  timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius }, 
-                            ToolTip = point.Title
-                        });
-                    }
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Fill = _caption.ForegroundColor,
+                        Stroke = _caption.ForegroundColor,
+                        Height = dotWidth,
+                        Width = dotWidth,
+                        Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius },
+                        ToolTip = point.Title
+                    });
                 }
-
-                var points = new PointCollection(pointsForThisServo.Select(p => 
-                new Point { 
-                    X = _viewContext!.GetXPos((int)(p.TimeMs),  timelineData: _timelineData), 
-                    Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight }));
-                var line = new Polyline { Tag = ServoTag(servoId), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
-                this.PanelLines.Children.Add(line);
             }
+
+            var points = new PointCollection(pointsForThisServo.Select(p =>
+            new Point
+            {
+                X = _viewContext!.GetXPos((int)(p.TimeMs), timelineData: _timelineData),
+                Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight
+            }));
+            var line = new Polyline { Tag = ServoTag(_servo.Id), Stroke = _caption.ForegroundColor, StrokeThickness = 1, Points = points };
+            this.PanelLines.Children.Add(line);
         }
 
         private void DrawOpticalGrid()
@@ -159,6 +161,6 @@ namespace AwbStudio.TimelineControls
 
         private static string ServoTag(string servoId) => $"Servo {servoId}";
 
-      
+
     }
 }

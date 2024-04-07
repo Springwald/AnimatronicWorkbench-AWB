@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Timelines;
 using System.Windows.Controls;
 
 namespace AwbStudio.TimelineValuePainters
@@ -14,5 +15,6 @@ namespace AwbStudio.TimelineValuePainters
         Grid PaintControl { get; }
 
         void PaintValues();
+        void TimelineDataLoaded(TimelineData timelineData);
     }
 }

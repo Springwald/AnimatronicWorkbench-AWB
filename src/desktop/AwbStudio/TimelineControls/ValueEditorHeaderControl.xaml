@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="AwbStudio.TimelineControls.ValueEditorHeaderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AwbStudio.TimelineControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="800" Background="#333333">
+    <StackPanel Height="auto">
+        <Label x:Name="LabelTitle" Content="Label" HorizontalAlignment="Left" Height="auto" />
+    </StackPanel>
+</UserControl>

@@ -61,7 +61,7 @@ namespace AwbStudio
             }
         }
 
-        const int msPerScreenWidth = 20 * 1000; // todo: zoom in/out
+        const int msPerScreenWidth = 10 * 1000; // todo: zoom in/out
 
         private readonly PlayPosSynchronizer _playPosSynchronizer ;
         private readonly IAwbClientsService _clientsService;

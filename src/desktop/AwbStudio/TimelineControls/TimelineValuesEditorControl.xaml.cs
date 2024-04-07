@@ -23,7 +23,7 @@ namespace AwbStudio.TimelineControls
         private bool _wasPlaying = false;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
-       
+
         private IActuatorsService? _actuatorsService;
         private TimelineCaptions _timelineCaptions;
         private TimelineViewContext _viewContext;
@@ -35,6 +35,7 @@ namespace AwbStudio.TimelineControls
         private List<ITimelineEditorControl> _timelineEditorControls;
         private List<ITimelineValuePainter> _timelineValuePainters;
 
+        private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
 
         /// <summary>
         /// The timeline player to control the timeline playback
@@ -78,7 +79,11 @@ namespace AwbStudio.TimelineControls
             // add servo painter + editors
             foreach (var servoActuator in actuatorsService.Servos)
             {
-                _timelineValuePainters.Add(new ServoValuePainter(servo: servoActuator, paintControl: this.GridTimeline));
+                _timelineValuePainters.Add(new ServoValuePainter(
+                    servo: servoActuator,
+                    paintControl: this.AllValuesGrid,
+                    viewContext: _viewContext,
+                    timelineCaptions: _timelineCaptions));
 
                 var editorControl = new ServoValueEditorControl();
                 editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
@@ -92,13 +97,19 @@ namespace AwbStudio.TimelineControls
                 _timelineValuePainters.Add(new SoundValuePainter(soundPlayer: soundPlayerActuator, paintControl: this.GridTimeline));
 
                 var editorControl = new SoundValueEditorControl();
-                editorControl.Init(soundPlayer: soundPlayerActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
+                editorControl.Init(
+                    soundPlayer: soundPlayerActuator, 
+                    viewContext, 
+                    timelineCaptions, 
+                    playPosSynchronizer, 
+                    actuatorsService);
                 AllValueEditorControlsScrollViewer.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
-              
             }
 
             // todo: add nested timelines painter + editors
+
+            ZoomChanged();
 
             _isInitialized = true;
         }
@@ -109,11 +120,30 @@ namespace AwbStudio.TimelineControls
 
             _timelineData = timelineData;
 
-            foreach (var subTimelineViewerControl in _timelineEditorControls)
-                subTimelineViewerControl.TimelineDataLoaded(timelineData);
+            foreach (var subTimelineEditorControl in _timelineEditorControls)
+                subTimelineEditorControl.TimelineDataLoaded(timelineData);
+
+            foreach (var valuePainter in _timelineValuePainters)
+                valuePainter.TimelineDataLoaded(timelineData);
 
             PaintGrid();
             PaintPlayPos();
+            PaintValues();
+        }
+
+        private void PaintValues()
+        {
+            GridTimeline.Children.Clear();
+            foreach (var valuePainter in _timelineValuePainters)
+            {
+                valuePainter.PaintValues();
+            }
+        }
+
+        private void ZoomChanged()
+        {
+            foreach (UserControl editorControl in _timelineEditorControls)
+                editorControl.Height = _zoomVerticalHeightPerValueEditor;
         }
 
         public void PaintGrid()
@@ -124,7 +154,7 @@ namespace AwbStudio.TimelineControls
             double height = GridTimeline.ActualHeight;
             double width = GridTimeline.ActualWidth;
 
-            if (height < 100 || width < 100) return;
+            if (height < 10 || width < 100) return;
 
             //r servoIds = _timelineData?.ServoPoints?.OfType<ServoPoint>().Select(p => p.ServoId).Distinct().ToArray() ?? Array.Empty<string>();
 
@@ -177,7 +207,7 @@ namespace AwbStudio.TimelineControls
         {
             if (_timelineData == null) return;
 
-           
+
 
             var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
 
@@ -185,7 +215,7 @@ namespace AwbStudio.TimelineControls
             MyInvoker.Invoke(() =>
             {
                 this.Width = newWidth;
-                PaintGrid();  // update the timeline
+                PaintValues();
             });
         }
 
@@ -193,6 +223,9 @@ namespace AwbStudio.TimelineControls
         {
             if (!_isInitialized) return;
             PaintGrid();
+            PaintValues();
         }
+
+
     }
 }
