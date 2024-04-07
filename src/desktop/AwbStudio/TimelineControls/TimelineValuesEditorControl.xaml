@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="AwbStudio.TimelineControls.TimelineViewer"
+﻿<UserControl x:Class="AwbStudio.TimelineControls.TimelineValuesEditorControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,14 +9,12 @@
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="60*" />
-                <RowDefinition Height="40*" MinHeight="200"/>
+                <RowDefinition Height="40*"  MaxHeight="300" />
+                <RowDefinition Height="60*" MinHeight="200"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" x:Name="GridTimeline">
-             
                 <Grid x:Name="OpticalGrid">
                 </Grid>
-             
             </Grid>
             <ScrollViewer Grid.Row="1">
                 <StackPanel x:Name="AllValueEditorControlsScrollViewer"  >
@@ -29,8 +27,5 @@
             </Grid>
             <Label x:Name="LabelManualPlayPosAbsolute" Content="🔺 02:20" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Background="Black" Foreground="#FF8DA2FA"/>
         </Grid>
-
-
     </Grid>
-
 </UserControl>

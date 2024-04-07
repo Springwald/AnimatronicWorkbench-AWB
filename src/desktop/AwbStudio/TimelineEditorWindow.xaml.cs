@@ -175,10 +175,10 @@ namespace AwbStudio
             _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
             var timelineCaptions = new TimelineCaptions();
-            TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);   
-          
-            TimelineViewerControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
-            TimelineViewerControl.Timelineplayer = _timelinePlayer;
+            TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
+
+            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
+            ValuesEditorControl.Timelineplayer = _timelinePlayer;
             SoundPlayer.Sounds = _project.Sounds;
 
             await TimelineDataLoaded();
@@ -205,7 +205,7 @@ namespace AwbStudio
             this.Topmost = false;
 
             _unsavedChanges = false;
-            TimelineViewerControl.TimelineDataLoaded(_timelineData);
+            ValuesEditorControl.TimelineDataLoaded(_timelineData);
 
             Unloaded += TimelineEditorWindow_Unloaded;  
         }
@@ -498,8 +498,8 @@ namespace AwbStudio
 
         private async Task ScrollPaging(int howManyMs)
         {
-            if (TimelineViewerControl == null) return;
-            if (TimelineViewerControl.Timelineplayer == null) return;
+            if (ValuesEditorControl == null) return;
+            if (ValuesEditorControl.Timelineplayer == null) return;
             if (_switchingPages) return;
             int fps = 20;
             int speed = 4; // speed (x seconds per second)
@@ -615,7 +615,7 @@ namespace AwbStudio
 
             this.Title = _timelineData == null ? "No Timeline" : $"Timeline '{_timelineData.Title}'";
             if (_timelinePlayer != null) _timelinePlayer.TimelineData = data;
-            TimelineViewerControl.TimelineDataLoaded(data);
+            ValuesEditorControl.TimelineDataLoaded(data);
             TimelineCaptionsViewer.TimelineDataLoaded(data);
             TxtActualTimelineName.Text = _timelineData?.Title ?? string.Empty;
             _unsavedChanges = false;
@@ -824,7 +824,7 @@ namespace AwbStudio
 
         private async void TimelineViewerControl_MouseMove(object sender, MouseEventArgs e)
         {
-            _mouseX = e.GetPosition(TimelineViewerControl).X;
+            _mouseX = e.GetPosition(ValuesEditorControl).X;
             if (e.LeftButton == MouseButtonState.Pressed)
                 await SetPlayPosByMouse(_mouseX);
         }

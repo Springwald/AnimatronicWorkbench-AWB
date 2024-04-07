@@ -18,10 +18,8 @@ using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls
 {
-    public partial class TimelineViewer : UserControl, ITimelineEditorControl
+    public partial class TimelineValuesEditorControl : UserControl, ITimelineEditorControl
     {
-    
-
         private bool _wasPlaying = false;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private TimelineData? _timelineData;
@@ -54,14 +52,12 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public TimelineViewer()
+        public TimelineValuesEditorControl()
         {
             InitializeComponent();
 
             //MyViewModel vm = new MyViewModel();
             SizeChanged += TimelineViewer_SizeChanged;
-
-
         }
 
         public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)

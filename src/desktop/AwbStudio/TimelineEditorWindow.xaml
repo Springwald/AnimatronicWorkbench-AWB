@@ -32,7 +32,7 @@
         <TimelineControls:SoundPlayerControl x:Name="SoundPlayer"  Grid.Column="0" Grid.Row="0" Visibility="Collapsed"/>
 
         <ScrollViewer x:Name="timelineScrollViewer" Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-            <TimelineControls:TimelineViewer  x:Name="TimelineViewerControl" 
+            <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" 
                                               MouseDown="timelineViewerControl_MouseDown" 
                                  
                                               
