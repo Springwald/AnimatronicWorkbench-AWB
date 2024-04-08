@@ -48,9 +48,11 @@ namespace AwbStudio.TimelineValuePainters
 
         protected abstract void PaintValues();
 
-        private void TimelineData_OnContentChanged(object? sender, EventArgs e)
+        protected abstract bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs);
+
+        private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
-            PaintValues();
+            if (this.IsChangedEventSuitableForThisPainter(e)) PaintValues();
         }
 
         private void PaintControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -71,7 +73,7 @@ namespace AwbStudio.TimelineValuePainters
                 this.PaintControl.Children.Remove(control);
             }
             _valueControls.Clear();
-        }       
+        }
 
 
         public void Dispose()

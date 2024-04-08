@@ -313,6 +313,7 @@ namespace AwbStudio
                             {
                                 servoPoint.ValuePercent = targetPercent;
                             }
+                            _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servoPoint.ServoId);
                             break;
 
                         case ISoundPlayer soundPlayer:
@@ -333,6 +334,8 @@ namespace AwbStudio
                                         soundPoint.SoundId = sound.Id;
                                         soundPoint.Title = sound.Title;
                                     }
+                                    _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPoint.SoundPlayerId);
+
                                 }
                             }
                             break;
@@ -340,8 +343,6 @@ namespace AwbStudio
                         default:
                             throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                     }
-
-                    _timelineData!.SetContentChanged();
 
                     if (_lastActuatorChanged != actuatorIndex)
                     {
@@ -392,6 +393,7 @@ namespace AwbStudio
                                     _timelineData?.ServoPoints.Remove(servoPoint);
                                 }
                             }
+                            _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servoPoint.ServoId);
                             break;
                         case ISoundPlayer soundPlayer:
                             if (_project.Sounds?.Any() == true)
@@ -418,6 +420,7 @@ namespace AwbStudio
                                     // Remove the existing sound point
                                     _timelineData?.SoundPoints.Remove(soundPoint);
                                 }
+                                _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPlayer.Id);
                             }
                             break;
                         default:
@@ -427,7 +430,6 @@ namespace AwbStudio
 
                     _manualUpdatingValues = true;
                     if (_manualUpdatingValues) await _timelinePlayer.UpdateActuators();
-                    _timelineData.SetContentChanged();
                     _manualUpdatingValues = false;
                     break;
 

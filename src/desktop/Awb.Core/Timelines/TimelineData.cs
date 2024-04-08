@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -16,7 +16,7 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// The content of the timeline has changed
         /// </summary>
-        public EventHandler OnContentChanged;
+        public EventHandler<TimelineDataChangedEventArgs>? OnContentChanged;
 
         /// <summary>
         /// What is the duration of the timeline filled with points?
@@ -49,9 +49,9 @@ namespace Awb.Core.Timelines
             ServoPoints = servoPoints;
             SoundPoints = soundPoints;
         }
-        public void SetContentChanged()
+        public void SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes changeType, string? changedObjectId)
         {
-            OnContentChanged?.Invoke(this, new EventArgs());
-        }   
+            OnContentChanged?.Invoke(this, new TimelineDataChangedEventArgs(changeType, changedObjectId));
+        }
     }
 }

@@ -31,7 +31,6 @@ namespace AwbStudio.TimelineValuePainters
             _timelineCaptions = timelineCaptions;
         }
 
-
         protected override void TimelineDataLoadedInternal()
         {
         }
@@ -96,6 +95,12 @@ namespace AwbStudio.TimelineValuePainters
         public new void Dispose()
         {
             base.Dispose();
+        }
+
+        protected override bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs)
+        {
+            if (changedEventArgs.ChangeType != TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged) return false;
+            return changedEventArgs.ChangedObjectId == _servo.Id;
         }
     }
 }

@@ -82,5 +82,11 @@ namespace AwbStudio.TimelineValuePainters
         {
             base.Dispose();
         }
+
+        protected override bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs)
+        {
+            if (changedEventArgs.ChangeType != TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged) return false;
+            return this._soundPlayer.Id == changedEventArgs.ChangedObjectId;
+        }
     }
 }
