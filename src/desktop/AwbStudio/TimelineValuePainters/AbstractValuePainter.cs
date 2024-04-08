@@ -8,6 +8,7 @@
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -18,6 +19,7 @@ namespace AwbStudio.TimelineValuePainters
         protected TimelineData? _timelineData;
         protected readonly TimelineViewContext _viewContext;
         protected readonly TimelineCaptions _captions;
+        protected List<UIElement> _valueControls;
 
         public Grid PaintControl { get; }
 
@@ -27,6 +29,8 @@ namespace AwbStudio.TimelineValuePainters
 
             _viewContext = viewContext ?? throw new ArgumentNullException(nameof(viewContext));
             _viewContext.Changed += OnViewContextChanged;
+
+            _valueControls = new List<UIElement>();
 
             this.PaintControl = paintControl ?? throw new ArgumentNullException(nameof(paintControl));
             this.PaintControl.SizeChanged += PaintControl_SizeChanged;
@@ -59,9 +63,20 @@ namespace AwbStudio.TimelineValuePainters
             PaintValues();
         }
 
+        public void CleanUpValueControls()
+        {
+            // todo: only remove changed or not confirmed controls
+            foreach (var control in _valueControls)
+            {
+                this.PaintControl.Children.Remove(control);
+            }
+            _valueControls.Clear();
+        }       
+
 
         public void Dispose()
         {
+            CleanUpValueControls();
             this.PaintControl.SizeChanged -= PaintControl_SizeChanged;
             if (_timelineData != null)
             {

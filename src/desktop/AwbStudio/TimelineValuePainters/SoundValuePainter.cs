@@ -38,9 +38,12 @@ namespace AwbStudio.TimelineValuePainters
         {
             if (_timelineData == null) return;
 
+            base.CleanUpValueControls(); // todo: only remove changed or not confirmed controls
 
             double height = PaintControl.ActualHeight;
             double width = PaintControl.ActualWidth;
+
+            if (height < _paintMarginTopBottom * 2 || width < 100) return;
 
             //var soundPlayerIds = _timelineData?.SoundPoints?.OfType<SoundPoint>().Select(p => p.SoundPlayerId).Where(id => id != null).Distinct().ToArray() ?? Array.Empty<string>();
 

@@ -40,10 +40,12 @@ namespace AwbStudio.TimelineValuePainters
         {
             if (_timelineData == null) return;
 
+            base.CleanUpValueControls(); // todo: only remove changed or not confirmed controls
+
             double height = PaintControl.ActualHeight;
             double width = PaintControl.ActualWidth;
 
-            if (height < 20 || width < 100) return;
+            if (height < _paintMarginTopBottom * 2 || width < 100) return;
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 
@@ -62,7 +64,7 @@ namespace AwbStudio.TimelineValuePainters
             {
                 if (point.TimeMs >= 0 && point.TimeMs <= _viewContext!.DurationMs) // is inside view
                 {
-                    this.PaintControl.Children.Add(new Ellipse
+                    var ellipse = new Ellipse
                     {
                         HorizontalAlignment = HorizontalAlignment.Left,
                         VerticalAlignment = VerticalAlignment.Top,
@@ -72,7 +74,9 @@ namespace AwbStudio.TimelineValuePainters
                         Width = dotWidth,
                         Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius },
                         ToolTip = point.Title
-                    });
+                    };
+                    this.PaintControl.Children.Add(ellipse);
+                    _valueControls.Add(ellipse);
                 }
             }
 
@@ -84,6 +88,7 @@ namespace AwbStudio.TimelineValuePainters
             }));
             var line = new Polyline { Tag = ServoTag(_servo.Id), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
             this.PaintControl.Children.Add(line);
+            this._valueControls.Add(line);
         }
 
         private static string ServoTag(string servoId) => $"Servo {servoId}";

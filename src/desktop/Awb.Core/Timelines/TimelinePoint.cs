@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -18,6 +18,11 @@ namespace Awb.Core.Timelines
         /// The title of this point
         /// </summary>
         public abstract string Title { get; set; }
+
+        /// <summary>
+        /// A checksum of the content of this point, e.g. for detecting changes
+        /// </summary>
+        public abstract string PainterCheckSum { get; }
 
         /// <summary>
         /// A description of this point, e.g. for documentation 

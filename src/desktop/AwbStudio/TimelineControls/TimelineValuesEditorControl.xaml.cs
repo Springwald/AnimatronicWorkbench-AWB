@@ -134,8 +134,6 @@ namespace AwbStudio.TimelineControls
             PaintGrid();
             PaintPlayPos();
         }
-
-
         private void ZoomChanged()
         {
             foreach (UserControl editorControl in _timelineEditorControls)
@@ -150,7 +148,7 @@ namespace AwbStudio.TimelineControls
             double height = OpticalGrid.ActualHeight;
             double width = OpticalGrid.ActualWidth;
 
-            if (height < 10 || width < 100) return;
+            if (height < _paintMarginTopBottom * 2 || width < 100) return;
 
             // update the data optical grid lines
             OpticalGrid.Children.Clear();
@@ -192,8 +190,6 @@ namespace AwbStudio.TimelineControls
                 PlayPosLine.Visibility = Visibility.Visible;
             }
         }
-
-
 
         private void OnViewContextChanged(object? sender, EventArgs e)
         {
