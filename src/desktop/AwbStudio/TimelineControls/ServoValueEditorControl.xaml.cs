@@ -10,6 +10,7 @@ using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
+using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,10 +31,10 @@ namespace AwbStudio.TimelineControls
 
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
-        private TimelineCaptions _timelineCaptions;
-        private IServo _servo;
-        private TimelineCaption _caption;
+        private IServo? _servo;
+        private TimelineCaption? _caption;
         private bool _isInitialized;
+        private ServoValuePainter? _servoValuePainter;
 
         private void ViewContext_Changed(object? sender, EventArgs e)
         {
@@ -63,10 +64,9 @@ namespace AwbStudio.TimelineControls
         {
             _viewContext = viewContext;
             _viewContext.Changed += ViewContext_Changed;
-            _timelineCaptions = timelineCaptions;
             _servo = servo;
-
-            _caption = _timelineCaptions?.GetAktuatorCaption(servo.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
+            _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions);
+            _caption = timelineCaptions?.GetAktuatorCaption(servo.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
             HeaderControl.TimelineCaption = _caption;
 
             _isInitialized = true;
@@ -94,8 +94,7 @@ namespace AwbStudio.TimelineControls
 
             if (_timelineData == null) return;
 
-            PanelLines.Children.Clear();
-            GridDots.Children.Clear();
+            AllValuesGrid.Children.Clear();
 
             double height = this.ActualHeight;
             double width = this.ActualWidth;
@@ -118,7 +117,7 @@ namespace AwbStudio.TimelineControls
             {
                 if (point.TimeMs >= 0 && point.TimeMs <= _viewContext!.DurationMs) // is inside view
                 {
-                    this.GridDots.Children.Add(new Ellipse
+                    this.AllValuesGrid.Children.Add(new Ellipse
                     {
                         HorizontalAlignment = HorizontalAlignment.Left,
                         VerticalAlignment = VerticalAlignment.Top,
@@ -139,7 +138,7 @@ namespace AwbStudio.TimelineControls
                 Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight
             }));
             var line = new Polyline { Tag = ServoTag(_servo.Id), Stroke = _caption.ForegroundColor, StrokeThickness = 1, Points = points };
-            this.PanelLines.Children.Add(line);
+            this.AllValuesGrid.Children.Add(line);
         }
 
         private void DrawOpticalGrid()
@@ -161,7 +160,5 @@ namespace AwbStudio.TimelineControls
         }
 
         private static string ServoTag(string servoId) => $"Servo {servoId}";
-
-
     }
 }

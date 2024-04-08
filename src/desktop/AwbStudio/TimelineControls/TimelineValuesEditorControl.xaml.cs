@@ -95,7 +95,11 @@ namespace AwbStudio.TimelineControls
             // add sound painter + editors
             foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
             {
-                _timelineValuePainters.Add(new SoundValuePainter(soundPlayer: soundPlayerActuator, paintControl: this.AllValuesGrid));
+                _timelineValuePainters.Add(new SoundValuePainter(
+                    soundPlayer: soundPlayerActuator, 
+                    paintControl: this.AllValuesGrid,
+                    viewContext: _viewContext,
+                    timelineCaptions: _timelineCaptions));
 
                 var editorControl = new SoundValueEditorControl();
                 editorControl.Init(

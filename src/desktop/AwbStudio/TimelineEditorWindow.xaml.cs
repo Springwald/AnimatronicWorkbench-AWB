@@ -52,8 +52,6 @@ namespace AwbStudio
 
         private bool _unsavedChanges;
 
-        public ValueTuningWindow ValueTuningWin { get; private set; }
-
         private volatile bool _manualUpdatingValues;
         private bool _switchingPages;
         private int _lastActuatorChanged = 1; // prevent double actuator change events to the midi controller
