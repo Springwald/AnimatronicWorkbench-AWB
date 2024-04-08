@@ -34,7 +34,7 @@ namespace AwbStudio.TimelineControls
 
 
         private List<ITimelineEditorControl> _timelineEditorControls;
-        private List<ITimelineValuePainter> _timelineValuePainters;
+        private List<AbstractValuePainter> _timelineValuePainters;
 
         private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
 
@@ -75,7 +75,7 @@ namespace AwbStudio.TimelineControls
 
             // set up the actuator value painters and editors
             _timelineEditorControls = new List<ITimelineEditorControl>();
-            _timelineValuePainters = new List<ITimelineValuePainter>();
+            _timelineValuePainters = new List<AbstractValuePainter>();
 
             // add servo painter + editors
             foreach (var servoActuator in actuatorsService.Servos)
@@ -133,17 +133,8 @@ namespace AwbStudio.TimelineControls
 
             PaintGrid();
             PaintPlayPos();
-            PaintValues();
         }
 
-        private void PaintValues()
-        {
-            AllValuesGrid.Children.Clear();
-            foreach (var valuePainter in _timelineValuePainters)
-            {
-                valuePainter.PaintValues();
-            }
-        }
 
         private void ZoomChanged()
         {
@@ -208,15 +199,12 @@ namespace AwbStudio.TimelineControls
         {
             if (_timelineData == null) return;
 
-
-
             var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
 
             // update the scrollbar
             MyInvoker.Invoke(() =>
             {
                 this.Width = newWidth;
-                PaintValues();
             });
         }
 
@@ -224,7 +212,6 @@ namespace AwbStudio.TimelineControls
         {
             if (!_isInitialized) return;
             PaintGrid();
-            PaintValues();
         }
 
 

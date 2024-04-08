@@ -17,30 +17,26 @@ using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineValuePainters
 {
-    class ServoValuePainter : ITimelineValuePainter
+    class ServoValuePainter : AbstractValuePainter
     {
         private const double _paintMarginTopBottom = 0;
 
         private readonly IServo _servo;
-        private readonly TimelineViewContext _viewContext;
         private readonly TimelineCaptions _timelineCaptions;
-        private TimelineData? _timelineData;
 
         public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions)
+            : base(paintControl, viewContext, timelineCaptions)
         {
             _servo = servo;
-            _viewContext = viewContext;
             _timelineCaptions = timelineCaptions;
-            this.PaintControl = paintControl;
         }
-        public Grid PaintControl { get; }
 
-        public void TimelineDataLoaded(TimelineData timelineDate)
+
+        protected override void TimelineDataLoadedInternal()
         {
-            _timelineData = timelineDate;
         }
 
-        public void PaintValues()
+        protected override void PaintValues()
         {
             if (_timelineData == null) return;
 
@@ -91,5 +87,10 @@ namespace AwbStudio.TimelineValuePainters
         }
 
         private static string ServoTag(string servoId) => $"Servo {servoId}";
+
+        public new void Dispose()
+        {
+            base.Dispose();
+        }
     }
 }
