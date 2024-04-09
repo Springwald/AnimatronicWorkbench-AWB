@@ -84,8 +84,7 @@
 
             <ScrollViewer x:Name="timelineScrollViewer" Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                 <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" 
-                                    MouseDown="timelineViewerControl_MouseDown" 
-                                    MouseMove="TimelineViewerControl_MouseMove"  />
+                                 />
             </ScrollViewer>
             
         </Grid>

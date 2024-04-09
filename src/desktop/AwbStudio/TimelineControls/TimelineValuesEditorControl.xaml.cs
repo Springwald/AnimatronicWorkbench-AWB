@@ -14,19 +14,13 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls
 {
     public partial class TimelineValuesEditorControl : UserControl, ITimelineEditorControl
     {
-        private bool _wasPlaying = false;
-     
         private TimelineData? _timelineData;
 
-        private IActuatorsService? _actuatorsService;
-        private TimelineCaptions _timelineCaptions;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private bool _isInitialized;
@@ -37,7 +31,7 @@ namespace AwbStudio.TimelineControls
 
         private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
         private PlayPosPainter? _playPosPainter;
-        private GridPainter? _gridPainter;
+        private GridTimePainter? _gridPainter;
 
         /// <summary>
         /// The timeline player to control the timeline playback
@@ -76,12 +70,9 @@ namespace AwbStudio.TimelineControls
         public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
             _viewContext = viewContext;
-            _timelineCaptions = timelineCaptions;
             _playPosSynchronizer = playPosSynchronizer;
-            _actuatorsService = actuatorsService;
-
             _viewContext.Changed += OnViewContextChanged;
-           // _playPosSynchronizer.OnPlayPosChanged += (sender, e) => MyInvoker.Invoke(new Action(() => { PaintPlayPos(); }));
+            // _playPosSynchronizer.OnPlayPosChanged += (sender, e) => MyInvoker.Invoke(new Action(() => { PaintPlayPos(); }));
 
             // set up the actuator value painters and editors
             _timelineEditorControls = [];
@@ -101,10 +92,10 @@ namespace AwbStudio.TimelineControls
             {
                 var editorControl = new SoundValueEditorControl();
                 editorControl.Init(
-                    soundPlayer: soundPlayerActuator, 
-                    viewContext, 
-                    timelineCaptions, 
-                    playPosSynchronizer, 
+                    soundPlayer: soundPlayerActuator,
+                    viewContext,
+                    timelineCaptions,
+                    playPosSynchronizer,
                     actuatorsService);
                 AllValueEditorControlsScrollViewer.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
@@ -112,9 +103,8 @@ namespace AwbStudio.TimelineControls
 
 
             // todo: add nested timelines painter + editors
-
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
-            _gridPainter = new GridPainter(OpticalGrid, _viewContext);
+            _gridPainter = new GridTimePainter(OpticalTimeGrid, _viewContext);
 
             ZoomChanged();
 
@@ -142,7 +132,7 @@ namespace AwbStudio.TimelineControls
                 editorControl.Height = _zoomVerticalHeightPerValueEditor;
         }
 
-       
+
 
         private void OnViewContextChanged(object? sender, EventArgs e)
         {

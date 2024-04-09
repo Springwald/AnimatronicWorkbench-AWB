@@ -12,8 +12,10 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -28,7 +30,7 @@ namespace AwbStudio.TimelineControls
         private TimelineData? _timelineData;
         private IActuatorsService? _actuatorsService;
         private PlayPosPainter? _playPosPainter;
-        private GridPainter _gridPainter;
+        private GridTimePainter _gridPainter;
         private TimelineCaptions? _timelineCaptions;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
@@ -69,7 +71,7 @@ namespace AwbStudio.TimelineControls
             _actuatorsService = actuatorsService;
 
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
-            _gridPainter = new GridPainter(OpticalGrid, _viewContext);
+            _gridPainter = new GridTimePainter(OpticalGrid, _viewContext);
 
             _viewContext.Changed += OnViewContextChanged;
 
@@ -147,6 +149,28 @@ namespace AwbStudio.TimelineControls
             });
         }
 
+
+        #region mouse events
+
+        double _mouseX = 0;
+
+        private async void timelineViewerControl_MouseDown(object sender, MouseButtonEventArgs e) =>
+            await SetPlayPosByMouse(_mouseX);
+
+        private async void TimelineViewerControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            _mouseX = e.GetPosition(AllValuesGrid).X;
+            if (e.LeftButton == MouseButtonState.Pressed)
+                await SetPlayPosByMouse(_mouseX);
+        }
+
+        private async Task SetPlayPosByMouse(double mouseX)
+        {
+            var newPlayPosMs = (int)(((MyScrollViewer.HorizontalOffset + mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
+            _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
+        }
+
+        #endregion
 
     }
 }

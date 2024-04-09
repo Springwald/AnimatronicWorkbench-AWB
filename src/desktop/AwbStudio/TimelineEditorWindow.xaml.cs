@@ -787,27 +787,7 @@ namespace AwbStudio
 
         #endregion Button Events
 
-        #region mouse events
-
-        double _mouseX = 0;
-
-        private async void timelineViewerControl_MouseDown(object sender, MouseButtonEventArgs e) =>
-            await SetPlayPosByMouse(_mouseX);
-
-        private async void TimelineViewerControl_MouseMove(object sender, MouseEventArgs e)
-        {
-            _mouseX = e.GetPosition(ValuesEditorControl).X;
-            if (e.LeftButton == MouseButtonState.Pressed)
-                await SetPlayPosByMouse(_mouseX);
-        }
-
-        private async Task SetPlayPosByMouse(double mouseX)
-        {
-            var newPlayPosMs = (int)(((timelineScrollViewer.HorizontalOffset + mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
-           _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
-        }
-
-        #endregion
+      
 
 
     }

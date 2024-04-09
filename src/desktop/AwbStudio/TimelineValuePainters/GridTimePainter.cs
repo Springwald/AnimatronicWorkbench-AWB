@@ -14,13 +14,13 @@ using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineValuePainters
 {
-    class GridPainter: IDisposable
+    class GridTimePainter: IDisposable
     {
-        private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
+        private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 60));
         private readonly Grid _opticalGrid;
         private readonly TimelineViewContext _viewContext;
 
-        public GridPainter(Grid opticalGrid, TimelineViewContext viewContext)
+        public GridTimePainter(Grid opticalGrid, TimelineViewContext viewContext)
         {
             _opticalGrid = opticalGrid;
             _viewContext = viewContext;
