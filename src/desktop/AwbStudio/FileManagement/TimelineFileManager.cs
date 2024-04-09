@@ -26,7 +26,6 @@ namespace AwbStudio.FileManagement
         {
             _project = project;
             ProjectTitle = project.Title;
-
             ConvertOldFilenamesIfNeeded(deleteOldFiles: false);
         }
 

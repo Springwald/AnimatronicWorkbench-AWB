@@ -28,6 +28,8 @@ namespace Awb.Core.Project
         public TimelineState[]? TimelinesStates { get; set; }
         public InputConfig[]? Inputs { get; set; }  
 
+        public int ItemsPerBank { get; set; } = 8;  
+
         public string? AutoPlayEsp32ExportFolder { get; set; }
 
         [JsonIgnore]

@@ -38,7 +38,7 @@ namespace Awb.Core.Project
                 //todo: check double servo ids
                 //todo: check not existing input ids
                 //todo: check not existing sound ids
-                yield break;
+                //todo: check not existing nested timeline ids
             }
         }
 

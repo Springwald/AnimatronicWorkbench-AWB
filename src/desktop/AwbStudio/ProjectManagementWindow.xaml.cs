@@ -25,6 +25,8 @@ namespace AwbStudio
     /// </summary>
     public partial class ProjectManagementWindow : Window
     {
+        private const bool editConfigAvailable = false; // planned for future release
+
         private readonly IProjectManagerService _projectManagerService;
         private readonly IServiceProvider _serviceProvider;
         private readonly IAwbStudioSettingsService _awbStudioSettingsService;
@@ -62,6 +64,10 @@ namespace AwbStudio
             Loaded+= (s, args) =>
             {
                 BringIntoView();
+                if (editConfigAvailable == false)
+                {
+                    ButtonEditExisting.Visibility = Visibility.Collapsed;
+                }
             };
         }
 
@@ -225,7 +231,7 @@ namespace AwbStudio
             if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
             {
                 // ok, project opened
-                if (editConfig)
+                if (editConfigAvailable == true && editConfig == true)
                     ShowProjectConfigEditor();
                 else
                     await LoadProject();
