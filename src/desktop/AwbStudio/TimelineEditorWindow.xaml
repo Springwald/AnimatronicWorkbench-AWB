@@ -13,80 +13,117 @@
         <DrawingImage />
     </Window.Icon>
     <Grid>
-       
+
+
+
         <Grid.RowDefinitions>
-            <RowDefinition  Height="auto"/>
+            <RowDefinition Height="4*" />
+            <!-- global timeline viewer with all timeline points -->
             <RowDefinition Height="6*" />
-            <RowDefinition Height="4*" MaxHeight="200" />
+            <!-- the editor controls, one for each actuatator -->
         </Grid.RowDefinitions>
 
-        <Grid Grid.Column="0">
+        <Grid Grid.Row="0">
+            <!-- global timeline viewer with all timeline points -->
+
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="auto"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TimelineControls:CaptionsViewerControl  x:Name="TimelineCaptionsViewer" Grid.Column="0"/>
-            <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo"  Grid.Column="1">BANK 1 (1-8)</Label>
-        </Grid>
-
-        <TimelineControls:SoundPlayerControl x:Name="SoundPlayer"  Grid.Column="0" Grid.Row="0" Visibility="Collapsed"/>
-
-        <ScrollViewer x:Name="timelineScrollViewer" Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-            <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" 
-                                              MouseDown="timelineViewerControl_MouseDown" 
-                                 
-                                              
-                                              MouseMove="TimelineViewerControl_MouseMove"  />
-        </ScrollViewer>
-
-     
-
-        <Grid Grid.Column="0" Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="80*"></ColumnDefinition>
+                <ColumnDefinition Width="20*" MinWidth="200" MaxWidth="300"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <ScrollViewer Grid.Column="0" Grid.Row="1">
-                <!-- timeline chooser for the actual project -->
-                <TimelineControls:TimelineChoiceControl x:Name="TimelineChooser" Height="Auto" />
-            </ScrollViewer>
+            <Grid Grid.Column="0" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                </Grid.RowDefinitions>
 
-            <StackPanel Grid.Column="1" Grid.Row="1">
+                <!-- global timeline viewer-->
+                <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" Grid.Column="0"/>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Label x:Name="LabelPlayTime" Width="150" Content="Playtime" HorizontalAlignment="Center"  />
+                    <Button x:Name="ButtonPlay" Content="▶ Play" Click="ButtonPlay_Click" />
+                    <Button x:Name="ButtonStop"  Content="⏹ Stop" Click="ButtonStop_Click" />
+                    <Button x:Name="ButtonSave" Content="Save"  Click="ButtonSave_Click" />
+                </StackPanel>
+            </Grid>
+
+
+            <!-- right column: Timeline metadata and file editing -->
+            <StackPanel Grid.Column="1" Margin="5">
+                <!-- project data and export -->
+                <Label>Project:</Label>
+                <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 client" Click="ButtonExportEsp32_Click" />
+
                 <!-- Actual timeline metadata -->
-                <Label Grid.Row="0">Actual timeline name:</Label>
+                <Label >Actual timeline name:</Label>
                 <TextBox x:Name="TxtActualTimelineName" Grid.Row="1" TextChanged="TxtActualTimelineName_TextChanged">Testing</TextBox>
-                <Label Grid.Row="0">Type:</Label>
+                <Label>Type:</Label>
                 <ComboBox x:Name="ComboTimelineStates" SelectionChanged="ComboTimelineStates_SelectionChanged">
                 </ComboBox>
-            </StackPanel>
+             
+                <Button x:Name="ButtonClear" Content="New Timeline" Click="ButtonClear_Click" />
 
-            <!--ItemsSource="{Binding Path={_config.TimelinesStates}}"
+                <Label >Load existing timeline:</Label>
+                <ScrollViewer>
+                    <!-- timeline chooser for the actual project -->
+                    <TimelineControls:TimelineChoiceControl x:Name="TimelineChooser" Height="Auto" />
+                </ScrollViewer>
+
+                <!-- a place for the hidden sound player:-->
+                <TimelineControls:SoundPlayerControl x:Name="SoundPlayer"  Visibility="Collapsed"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <!-- the editor controls, one for each actuatator -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80*"></ColumnDefinition>
+                <ColumnDefinition Width="20*" MinWidth="200" MaxWidth="300"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer x:Name="timelineScrollViewer" Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" 
+                                    MouseDown="timelineViewerControl_MouseDown" 
+                                    MouseMove="TimelineViewerControl_MouseMove"  />
+            </ScrollViewer>
+            
+        </Grid>
+
+        <Grid Visibility="Collapsed">
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TimelineControls:CaptionsViewerControl  x:Name="TimelineCaptionsViewer" Grid.Column="0"/>
+                <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo"  Grid.Column="1">BANK 1 (1-8)</Label>
+            </Grid>
+
+          
+
+            <Grid Grid.Column="0" Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <!--ItemsSource="{Binding Path={_config.TimelinesStates}}"
                         SelectedItem="{Binding Path={_config.TimelinesStates}}">-->
 
-            <DockPanel LastChildFill="true" Grid.Column="2" Grid.Row="1">
-                <ScrollViewer DockPanel.Dock="Top">
-                    <StackPanel>
-                        <Label x:Name="LabelPlayTime" Content="Playtime" HorizontalAlignment="Center"  />
-                        <UniformGrid Columns="2"  >
-                            <Button x:Name="ButtonSave" Content="Save"  Click="ButtonSave_Click" />
-                            <Button x:Name="ButtonClear" Content="Clear" Click="ButtonClear_Click" />
-                            <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 client" Click="ButtonExportEsp32_Click" />
-                            <Button x:Name="ButtonPlay" Content="▶ Play" Click="ButtonPlay_Click" />
-                            <Button x:Name="ButtonStop" Content="⏹ Stop" Click="ButtonStop_Click" />
-                        </UniformGrid>
-                    </StackPanel>
-                </ScrollViewer>
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <Label Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left" Opacity="0.3"/>
-                </ScrollViewer>
-            </DockPanel>
+                <DockPanel LastChildFill="true" Grid.Column="2" Grid.Row="1">
+                    <ScrollViewer DockPanel.Dock="Top">
+
+                    </ScrollViewer>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                        <Label Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left" Opacity="0.3"/>
+                    </ScrollViewer>
+                </DockPanel>
 
 
+            </Grid>
         </Grid>
-        
-
     </Grid>
 </Window>
 

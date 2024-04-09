@@ -19,25 +19,26 @@ using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls
 {
-    public partial class TimelineValuesEditorControl : UserControl, ITimelineEditorControl
+    /// <summary>
+    /// Interaction logic for TimelineAllInOnePreviewControl.xaml
+    /// </summary>
+    public partial class TimelineAllInOnePreviewControl : UserControl, ITimelineEditorControl
     {
         private bool _wasPlaying = false;
-     
         private TimelineData? _timelineData;
-
         private IActuatorsService? _actuatorsService;
-        private TimelineCaptions _timelineCaptions;
-        private TimelineViewContext _viewContext;
-        private PlayPosSynchronizer _playPosSynchronizer;
-        private bool _isInitialized;
+        private PlayPosPainter? _playPosPainter;
+        private GridPainter _gridPainter;
+        private TimelineCaptions? _timelineCaptions;
+        private TimelineViewContext? _viewContext;
+        private PlayPosSynchronizer? _playPosSynchronizer;
         private TimelinePlayer? _timelinePlayer;
+        private List<ITimelineEditorControl>? _timelineEditorControls;
+        private List<AbstractValuePainter>? _timelineValuePainters;
 
-        private List<ITimelineEditorControl> _timelineEditorControls;
-        private List<AbstractValuePainter> _timelineValuePainters;
+        private bool _isInitialized;
 
         private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
-        private PlayPosPainter? _playPosPainter;
-        private GridPainter? _gridPainter;
 
         /// <summary>
         /// The timeline player to control the timeline playback
@@ -55,22 +56,9 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public TimelineValuesEditorControl()
+        public TimelineAllInOnePreviewControl()
         {
             InitializeComponent();
-
-            Unloaded += OnUnloaded;
-
-            //MyViewModel vm = new MyViewModel();
-            SizeChanged += TimelineViewer_SizeChanged;
-        }
-
-        private void OnUnloaded(object sender, RoutedEventArgs e)
-        {
-            _playPosPainter?.Dispose();
-            _playPosPainter = null;
-            _gridPainter?.Dispose();
-            _gridPainter = null;
         }
 
         public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
@@ -80,8 +68,10 @@ namespace AwbStudio.TimelineControls
             _playPosSynchronizer = playPosSynchronizer;
             _actuatorsService = actuatorsService;
 
+            _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
+            _gridPainter = new GridPainter(OpticalGrid, _viewContext);
+
             _viewContext.Changed += OnViewContextChanged;
-           // _playPosSynchronizer.OnPlayPosChanged += (sender, e) => MyInvoker.Invoke(new Action(() => { PaintPlayPos(); }));
 
             // set up the actuator value painters and editors
             _timelineEditorControls = [];
@@ -90,35 +80,36 @@ namespace AwbStudio.TimelineControls
             // add servo painter + editors
             foreach (var servoActuator in actuatorsService.Servos)
             {
-                var editorControl = new ServoValueEditorControl();
-                editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
-                AllValueEditorControlsScrollViewer.Children.Add(editorControl);
-                _timelineEditorControls.Add(editorControl);
+                _timelineValuePainters.Add(new ServoValuePainter(
+                    servo: servoActuator,
+                    paintControl: this.AllValuesGrid,
+                    viewContext: _viewContext,
+                    timelineCaptions: _timelineCaptions));
             }
 
             // add sound painter + editors
             foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
             {
-                var editorControl = new SoundValueEditorControl();
-                editorControl.Init(
-                    soundPlayer: soundPlayerActuator, 
-                    viewContext, 
-                    timelineCaptions, 
-                    playPosSynchronizer, 
-                    actuatorsService);
-                AllValueEditorControlsScrollViewer.Children.Add(editorControl);
-                _timelineEditorControls.Add(editorControl);
+                _timelineValuePainters.Add(new SoundValuePainter(
+                    soundPlayer: soundPlayerActuator,
+                    paintControl: this.AllValuesGrid,
+                    viewContext: _viewContext,
+                    timelineCaptions: _timelineCaptions));
             }
-
 
             // todo: add nested timelines painter + editors
 
-            _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
-            _gridPainter = new GridPainter(OpticalGrid, _viewContext);
-
             ZoomChanged();
 
+            Unloaded += OnUnloaded;
+
             _isInitialized = true;
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            _playPosPainter?.Dispose();
+            _gridPainter?.Dispose();
         }
 
         public void TimelineDataLoaded(TimelineData timelineData)
@@ -126,14 +117,13 @@ namespace AwbStudio.TimelineControls
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
             _timelineData = timelineData;
+            _playPosPainter!.TimelineDataLoaded(timelineData);
 
-            foreach (var subTimelineEditorControl in _timelineEditorControls)
+            foreach (var subTimelineEditorControl in _timelineEditorControls!)
                 subTimelineEditorControl.TimelineDataLoaded(timelineData);
 
-            foreach (var valuePainter in _timelineValuePainters)
+            foreach (var valuePainter in _timelineValuePainters!)
                 valuePainter.TimelineDataLoaded(timelineData);
-
-            _playPosPainter.TimelineDataLoaded(timelineData);
         }
 
         private void ZoomChanged()
@@ -142,7 +132,7 @@ namespace AwbStudio.TimelineControls
                 editorControl.Height = _zoomVerticalHeightPerValueEditor;
         }
 
-       
+ 
 
         private void OnViewContextChanged(object? sender, EventArgs e)
         {
@@ -155,12 +145,6 @@ namespace AwbStudio.TimelineControls
             {
                 this.Width = newWidth;
             });
-        }
-
-        private void TimelineViewer_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (!_isInitialized) return;
-            // PaintGrid();
         }
 
 

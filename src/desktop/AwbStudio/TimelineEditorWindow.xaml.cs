@@ -142,6 +142,10 @@ namespace AwbStudio
 
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             ValuesEditorControl.Timelineplayer = _timelinePlayer;
+
+            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
+            AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
+
             SoundPlayer.Sounds = _project.Sounds;
 
             await TimelineDataLoaded();
@@ -584,6 +588,7 @@ namespace AwbStudio
             if (_timelinePlayer != null) _timelinePlayer.TimelineData = data;
             ValuesEditorControl.TimelineDataLoaded(data);
             TimelineCaptionsViewer.TimelineDataLoaded(data);
+            AllInOnePreviewControl.TimelineDataLoaded(data);
             TxtActualTimelineName.Text = _timelineData?.Title ?? string.Empty;
             _unsavedChanges = false;
 

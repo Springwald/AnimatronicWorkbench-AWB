@@ -6,28 +6,12 @@
              xmlns:local="clr-namespace:AwbStudio.TimelineControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="Black" >
-    <Grid>
+    <ScrollViewer>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="40*"  MaxHeight="300" />
-                <RowDefinition Height="60*" MinHeight="200"/>
-            </Grid.RowDefinitions>
-            <Border  BorderBrush="Gray" BorderThickness="1" >
-                <Grid Grid.Row="0">
-                    <Grid x:Name="OpticalGrid"></Grid>
-                    <Grid x:Name="AllValuesGrid"></Grid>
-                </Grid>
-            </Border>
-            <ScrollViewer Grid.Row="1">
-                <StackPanel x:Name="AllValueEditorControlsScrollViewer"  >
-                </StackPanel>
-            </ScrollViewer>
+            <Grid x:Name="OpticalGrid"/>
+            <StackPanel x:Name="AllValueEditorControlsScrollViewer"  >
+            </StackPanel>
+            <Grid x:Name="PlayPosGrid"/>
         </Grid>
-        <Grid>
-            <Grid x:Name="PlayControls">
-                <Line x:Name="PlayPosLine" Stroke="DarkOrange" StrokeThickness="1" X1="10" X2="50" Y1="10" Y2="200" ></Line>
-            </Grid>
-            <Label x:Name="LabelManualPlayPosAbsolute" Content="🔺 02:20" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Background="Black" Foreground="#FF8DA2FA"/>
-        </Grid>
-    </Grid>
+    </ScrollViewer>
 </UserControl>
