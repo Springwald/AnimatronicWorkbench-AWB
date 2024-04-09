@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -17,20 +17,23 @@ using System.Text.Json.Serialization;
 namespace AwbStudio.FileManagement
 {
 
-    public class FileManager
+    public class TimelineFileManager
     {
         private readonly AwbProject _project;
         internal readonly string ProjectTitle;
 
-        public FileManager(AwbProject project)
+        public TimelineFileManager(AwbProject project)
         {
             _project = project;
             ProjectTitle = project.Title;
+
+            ConvertOldFilenamesIfNeeded(deleteOldFiles: false);
         }
 
-        public IEnumerable<string> TimelineFilenames => Directory.GetFiles(_project.ProjectFolder, "*.awbtl");
+        public IEnumerable<string> TimelineFilenamesOld => Directory.GetFiles(_project.ProjectFolder, "*.awbtl");
+        public IEnumerable<string> TimelineFilenames => Directory.GetFiles(_project.ProjectFolder, "*.awbt");
 
-        public string GetTimelineFilename(string timelineName) => Path.Combine(_project.ProjectFolder, $"{timelineName}.awbtl");
+        public string GetTimelineFilenameById(string timelineId) => Path.Combine(_project.ProjectFolder, $"{timelineId}.awbt");
 
         public TimelineData? LoadTimelineData(string filename)
         {
@@ -39,8 +42,6 @@ namespace AwbStudio.FileManagement
             var saveFormat = JsonSerializer.Deserialize<TimelineSaveFormat>(jsonString, _jsonOptions);
             if (saveFormat == null) return null;
             var timelineData = TimelineSaveFormat.ToTimelineData(saveFormat);
-            var timelineTitle = Path.GetFileNameWithoutExtension(filename);
-            timelineData.Title = timelineTitle;
             return timelineData;
         }
 
@@ -55,10 +56,12 @@ namespace AwbStudio.FileManagement
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
             },
         };
- 
 
-        public bool SaveTimelineData(string filename, TimelineData data)
+
+        public bool SaveTimelineData(TimelineData data)
         {
+            if (string.IsNullOrWhiteSpace(data.Id)) data.Id = System.Guid.NewGuid().ToString();
+            var filename = GetTimelineFilenameById(data.Id);
             var saveFormat = TimelineSaveFormat.FromTimelineData(data);
             var jsonString = JsonSerializer.Serialize(saveFormat, _jsonOptions);
             System.IO.File.WriteAllText(filename, jsonString);
@@ -72,7 +75,31 @@ namespace AwbStudio.FileManagement
 
             var state = _project?.TimelinesStates?.SingleOrDefault(s => s.Id == data.TimelineStateId);
             var stateName = state?.Name;
-            return new TimelineMetaData(title: data.Title, stateId: data.TimelineStateId, stateName: stateName ?? $"unknown StateId {data.TimelineStateId}");
+
+            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, stateName: stateName ?? $"unknown StateId {data.TimelineStateId}");
+        }
+
+        /// <summary>
+        ///  if there are no actual timeline files but old timeline files, convert them to the new format
+        /// </summary>
+        private void ConvertOldFilenamesIfNeeded(bool deleteOldFiles)
+        {
+            if (!TimelineFilenames.Any())
+            {
+                var oldFileNames = TimelineFilenamesOld.ToArray();
+                foreach (var oldFileName in oldFileNames)
+                {
+                    var data = LoadTimelineData(oldFileName);
+                    if (data != null && data.Id == null)
+                    {
+                        data.Title = Path.GetFileNameWithoutExtension(oldFileName);
+                        data.Id = System.Guid.NewGuid().ToString();
+                        SaveTimelineData(data);
+                        if (deleteOldFiles)
+                            File.Delete(oldFileName);
+                    }
+                }
+            }
         }
     }
 }

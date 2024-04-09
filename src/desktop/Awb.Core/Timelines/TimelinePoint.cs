@@ -20,14 +20,15 @@ namespace Awb.Core.Timelines
         public abstract string Title { get; set; }
 
         /// <summary>
+        /// A description of this point, e.g. for documentation 
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
         /// A checksum of the content of this point, e.g. for detecting changes
         /// </summary>
         public abstract string PainterCheckSum { get; }
 
-        /// <summary>
-        /// A description of this point, e.g. for documentation 
-        /// </summary>
-        public string? Description { get; set; }
 
         /// <summary>
         /// The id of the servo or display or other actuators

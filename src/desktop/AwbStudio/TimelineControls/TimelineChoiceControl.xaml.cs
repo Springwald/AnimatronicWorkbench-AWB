@@ -17,11 +17,11 @@ namespace AwbStudio.TimelineControls
     /// </summary>
     public partial class TimelineChoiceControl : UserControl
     {
-        private FileManager? _filenameManager;
+        private FileManagement.TimelineFileManager? _filenameManager;
 
         public EventHandler<TimelineNameChosenEventArgs>? OnTimelineChosen;
 
-        public FileManager? FileManager
+        public FileManagement.TimelineFileManager? FileManager
         {
             set
             {

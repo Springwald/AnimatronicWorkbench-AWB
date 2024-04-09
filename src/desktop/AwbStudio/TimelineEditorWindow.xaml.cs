@@ -36,7 +36,7 @@ namespace AwbStudio
         private readonly IProjectManagerService _projectManagerService;
         private readonly IAwbLogger _logger;
         private readonly AwbProject _project;
-        private readonly FileManager _fileManager;
+        private readonly FileManagement.TimelineFileManager _fileManager;
         private readonly ITimelineController[] _timelineControllers;
         private readonly TimelineViewContext _viewContext;
         private TimelinePlayer _timelinePlayer;
@@ -85,7 +85,7 @@ namespace AwbStudio
             _logger = awbLogger;
 
             _project = _projectManagerService.ActualProject;
-            _fileManager = new FileManager(_project);
+            _fileManager = new FileManagement.TimelineFileManager(_project);
             _timelineControllers = timelineControllers;
 
             _viewContext = new TimelineViewContext();
@@ -554,8 +554,10 @@ namespace AwbStudio
         private TimelineData CreateNewTimelineData(string title)
         {
             var timelineData = new TimelineData(
+                id: Guid.NewGuid().ToString(),
                 servoPoints: new List<ServoPoint>(),
                 soundPoints: new List<SoundPoint>(),
+                nestedTimelinePoints: new List<NestedTimelinePoint>(),
                 timelineStateId: _project.TimelinesStates?.FirstOrDefault()?.Id ?? 0)
             {
                 Title = title
@@ -639,15 +641,15 @@ namespace AwbStudio
 
         private bool SaveTimelineData()
         {
-            var name = _timelineData.Title;
-            if (string.IsNullOrWhiteSpace(name))
+            var id = _timelineData.Id;
+            if (string.IsNullOrWhiteSpace(id))
             {
-                MessageBox.Show("Timeline has no title!", "Can't save timeline");
+                MessageBox.Show("Timeline has no id!", "Can't save timeline");
                 return false;
 
             }
-            var filename = _fileManager.GetTimelineFilename(name);
-            if (_fileManager.SaveTimelineData(filename, _timelineData))
+            var filename = _fileManager.GetTimelineFilenameById(id);
+            if (_fileManager.SaveTimelineData(_timelineData))
             {
                 _unsavedChanges = false;
                 MyInvoker.Invoke(new Action(() => { TimelineChooser.Refresh(); }));
@@ -746,7 +748,7 @@ namespace AwbStudio
 
             var timelines = new List<TimelineData>();
 
-            var fileManager = new FileManager(_project);
+            var fileManager = new FileManagement.TimelineFileManager(_project);
             var timelineFilenames = fileManager.TimelineFilenames;
 
             foreach (var timelineFilename in timelineFilenames)

@@ -9,6 +9,8 @@ namespace Awb.Core.Timelines
 {
     public class TimelineData
     {
+        public string Id { get; set; } = Guid.NewGuid().ToString(); 
+
         public int TimelineStateId { get; set; }
 
         public string Title { get; set; } = "no name";
@@ -29,25 +31,34 @@ namespace Awb.Core.Timelines
             {
                 foreach (var point in ServoPoints) yield return point;
                 foreach (var point in SoundPoints) yield return point;
+                foreach (var point in NestedTimelinePoints) yield return point;
             }
         }
 
         /// <summary>
-        /// All servo values changes of the timeline are stores as single points
+        /// All servo values changes of the timeline are stored as single points
         /// </summary>
         public List<ServoPoint> ServoPoints { get; set; }
 
         /// <summary>
-        /// All sound events of the timeline are stores as single points
+        /// All sound events of the timeline are stored as single points
         /// </summary>
         public List<SoundPoint> SoundPoints { get; set; }
+
+        /// <summary>
+        /// All nested timelines are stored as single points
+        /// </summary>
+        public List<NestedTimelinePoint> NestedTimelinePoints { get; set; }
+
         public int LatestPointMs => AllPoints.Max(p => p.TimeMs);
 
-        public TimelineData(List<ServoPoint> servoPoints, List<SoundPoint> soundPoints, int timelineStateId)
+        public TimelineData(string id, List<ServoPoint> servoPoints, List<SoundPoint> soundPoints, List<NestedTimelinePoint> nestedTimelinePoints, int timelineStateId)
         {
+            Id = id;
             TimelineStateId = timelineStateId;
             ServoPoints = servoPoints;
             SoundPoints = soundPoints;
+            NestedTimelinePoints = nestedTimelinePoints;
         }
         public void SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes changeType, string? changedObjectId)
         {
