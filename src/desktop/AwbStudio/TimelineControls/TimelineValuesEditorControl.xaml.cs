@@ -27,13 +27,13 @@ namespace AwbStudio.TimelineControls
 
         private IActuatorsService? _actuatorsService;
         private TimelineCaptions _timelineCaptions;
-        private TimelineViewContext _viewContext;
-        private PlayPosSynchronizer _playPosSynchronizer;
+        private TimelineViewContext? _viewContext;
+        private PlayPosSynchronizer? _playPosSynchronizer;
         private bool _isInitialized;
         private TimelinePlayer? _timelinePlayer;
 
-        private List<ITimelineEditorControl> _timelineEditorControls;
-        private List<AbstractValuePainter> _timelineValuePainters;
+        private List<ITimelineEditorControl>? _timelineEditorControls;
+        private List<AbstractValuePainter>? _timelineValuePainters;
 
         private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
         private PlayPosPainter? _playPosPainter;
@@ -127,13 +127,13 @@ namespace AwbStudio.TimelineControls
 
             _timelineData = timelineData;
 
-            foreach (var subTimelineEditorControl in _timelineEditorControls)
+            foreach (var subTimelineEditorControl in _timelineEditorControls!)
                 subTimelineEditorControl.TimelineDataLoaded(timelineData);
 
-            foreach (var valuePainter in _timelineValuePainters)
+            foreach (var valuePainter in _timelineValuePainters!)
                 valuePainter.TimelineDataLoaded(timelineData);
 
-            _playPosPainter.TimelineDataLoaded(timelineData);
+            _playPosPainter!.TimelineDataLoaded(timelineData);
         }
 
         private void ZoomChanged()
