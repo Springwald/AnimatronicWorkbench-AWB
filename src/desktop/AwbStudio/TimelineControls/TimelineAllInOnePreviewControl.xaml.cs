@@ -154,10 +154,10 @@ namespace AwbStudio.TimelineControls
 
         double _mouseX = 0;
 
-        private async void timelineViewerControl_MouseDown(object sender, MouseButtonEventArgs e) =>
+        private async void AllValuesGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e) =>
             await SetPlayPosByMouse(_mouseX);
 
-        private async void TimelineViewerControl_MouseMove(object sender, MouseEventArgs e)
+        private async void AllValuesGrid_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             _mouseX = e.GetPosition(AllValuesGrid).X;
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -170,7 +170,9 @@ namespace AwbStudio.TimelineControls
             _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
         }
 
+
         #endregion
 
+      
     }
 }

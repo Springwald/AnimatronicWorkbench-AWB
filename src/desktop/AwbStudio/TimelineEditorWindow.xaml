@@ -38,7 +38,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- global timeline viewer-->
-                <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" Grid.Column="0"/>
+                <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" Grid.Column="0" />
 
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Label x:Name="LabelPlayTime" Width="150" Content="Playtime" HorizontalAlignment="Center"  />
