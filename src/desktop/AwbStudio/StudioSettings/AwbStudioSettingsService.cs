@@ -1,14 +1,14 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
 using System;
 using System.IO;
 using System.Text.Json;
-using System.Windows.Shapes;
+using System.Threading.Tasks;
 
 namespace AwbStudio.StudioSettings
 {
@@ -16,7 +16,7 @@ namespace AwbStudio.StudioSettings
     {
         AwbStudioSettings StudioSettings { get; }
 
-        bool SaveSettings();
+        Task<bool> SaveSettingsAsync();
     }
 
     public class AwbStudioSettingsService : IAwbStudioSettingsService
@@ -48,7 +48,7 @@ namespace AwbStudio.StudioSettings
             }
         }
 
-        public bool SaveSettings()
+        public async Task<bool> SaveSettingsAsync()
         {
             var options = new JsonSerializerOptions()
             {
@@ -62,9 +62,10 @@ namespace AwbStudio.StudioSettings
             if (path == null) { return false; }
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
-            File.WriteAllText(SettingsFilename, jsonStr);
+            await File.WriteAllTextAsync(SettingsFilename, jsonStr);
             return true;
         }
+
 
         public AwbStudioSettings StudioSettings => _studioSettings;
     }

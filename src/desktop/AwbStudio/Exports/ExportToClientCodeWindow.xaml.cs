@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -48,7 +48,7 @@ namespace AwbStudio.Exports
             Loaded -= ExportToClientCodeWindow_Loaded;
         }
 
-        private void LabelTargetFolder_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private async void LabelTargetFolder_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
@@ -63,7 +63,7 @@ namespace AwbStudio.Exports
                         return;
                     }
                     _projectManagerService.ActualProject.AutoPlayEsp32ExportFolder = folder;
-                    _projectManagerService.SaveProject(_projectManagerService.ActualProject, _projectManagerService.ActualProject.ProjectFolder);
+                    var saved = await _projectManagerService.SaveProjectAsync(_projectManagerService.ActualProject, _projectManagerService.ActualProject.ProjectFolder);
 
                     ExportFolder = folder;
                 }

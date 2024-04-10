@@ -10,6 +10,7 @@ using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
+using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

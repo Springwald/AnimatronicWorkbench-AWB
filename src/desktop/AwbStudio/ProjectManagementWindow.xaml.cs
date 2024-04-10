@@ -10,6 +10,7 @@ using Awb.Core.Project;
 using Awb.Core.Services;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
+using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace AwbStudio
             _serviceProvider = serviceProvider;
             _awbStudioSettingsService = awbStudioSettingsService;
             _awbLogger = awbLogger;
-            ShowLatestProjects();
+
             this.KeyDown += OnKeyDown;
 
             _awbLogger.OnLog += (s, args) =>
@@ -61,14 +62,28 @@ namespace AwbStudio
                 }));
             };
 
-            Loaded+= (s, args) =>
+            Loaded += OnLoaded;
+        }
+
+        private async void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            ShowLatestProjects();
+
+            if (_awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart)
             {
-                BringIntoView();
-                if (editConfigAvailable == false)
+                ReOpenLastProjectCheckbox.IsChecked = true;
+                var lastProjecFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.FirstOrDefault();
+                if (lastProjecFolder != null)
                 {
-                    ButtonEditExisting.Visibility = Visibility.Collapsed;
+                    var ok = await OpenProject(lastProjecFolder, editConfig: false);
                 }
-            };
+            }
+
+            BringIntoView();
+            if (editConfigAvailable == false)
+            {
+                ButtonEditExisting.Visibility = Visibility.Collapsed;
+            }
         }
 
         private async void OnKeyDown(object sender, KeyEventArgs e)
@@ -106,7 +121,7 @@ namespace AwbStudio
             }
         }
 
-        private void ButtonCreateNew_Click(object sender, RoutedEventArgs e)
+        private async void ButtonCreateNew_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
@@ -122,16 +137,17 @@ namespace AwbStudio
 
                     AwbProject project = CreateNewProject(projectPath);
 
-                    if (_projectManagerService.SaveProject(project, projectFolder: dialog.SelectedPath))
+                    if (await _projectManagerService.SaveProjectAsync(project, projectFolder: dialog.SelectedPath))
                     {
-                        if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
+                        var openResult = await _projectManagerService.OpenProjectAsync(projectPath);
+                        if (openResult.Success)
                         {
                             // ok, project created and opened
                             ShowProjectConfigEditor();
                         }
                         else
                         {
-                            foreach (var error in errorMessages)
+                            foreach (var error in openResult.ErrorMessages)
                                 MessageBox.Show(error, "Error opening project");
                         }
                     }
@@ -178,7 +194,7 @@ namespace AwbStudio
                 Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", name: "Mp3Player") },
                 Inputs = new InputConfig[]
                 {
-                            new InputConfig(id: 1, name:"Sleep") { IoPin = 25 }
+                    new InputConfig(id: 1, name:"Sleep") { IoPin = 25 }
                 },
 
             };
@@ -228,7 +244,8 @@ namespace AwbStudio
                 MessageBox.Show($"No Animatronic WorkBench project found in folder '{projectPath}'");
                 return false;
             }
-            if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
+            var openResult = await _projectManagerService.OpenProjectAsync(projectPath);
+            if (openResult.Success)
             {
                 // ok, project opened
                 if (editConfigAvailable == true && editConfig == true)
@@ -239,7 +256,7 @@ namespace AwbStudio
             }
             else
             {
-                foreach (var error in errorMessages)
+                foreach (var error in openResult.ErrorMessages)
                 {
                     MessageBox.Show(error, "Error opening project");
                 }
@@ -320,6 +337,12 @@ namespace AwbStudio
         {
             GridProjectManagement.Visibility = show ? Visibility.Collapsed : Visibility.Visible;
             GridLoadingProject.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private async void ReOpenLastProjectCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            _awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart = ReOpenLastProjectCheckbox.IsChecked == true;
+            await _awbStudioSettingsService.SaveSettingsAsync();
         }
     }
 }

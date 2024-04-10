@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -11,6 +11,11 @@ namespace AwbStudio.StudioSettings
 {
     public class AwbStudioSettings
     {
+        /// <summary>
+        /// Should the last project be reopened on start
+        /// </summary>
+        public bool ReOpenLastProjectOnStart { get; set; } = false;
+
         /// <summary>
         /// Which projects were opened last
         /// </summary>

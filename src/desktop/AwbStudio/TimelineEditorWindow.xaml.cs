@@ -17,6 +17,7 @@ using AwbStudio.FileManagement;
 using AwbStudio.Projects;
 using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
+using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
