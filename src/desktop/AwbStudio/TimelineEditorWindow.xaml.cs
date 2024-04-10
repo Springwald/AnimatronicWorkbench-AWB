@@ -13,9 +13,7 @@ using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.Exports;
-using AwbStudio.FileManagement;
 using AwbStudio.Projects;
-using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using AwbStudio.Tools;
 using System;
@@ -24,7 +22,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace AwbStudio
 {
@@ -32,7 +29,7 @@ namespace AwbStudio
     {
         const int msPerScreenWidth = 10 * 1000; // todo: zoom in/out
 
-        private readonly PlayPosSynchronizer _playPosSynchronizer ;
+        private readonly PlayPosSynchronizer _playPosSynchronizer;
         private readonly IAwbClientsService _clientsService;
         private readonly IProjectManagerService _projectManagerService;
         private readonly IAwbLogger _logger;
@@ -43,11 +40,8 @@ namespace AwbStudio
         private TimelinePlayer _timelinePlayer;
         protected TimelineData _timelineData;
         private IActuatorsService _actuatorsService;
-        private const int ItemsPerBank = 8;
         private int _lastBankIndex = -1;
-        private int _actualBankIndex = 0;
 
-        private TimelineViewContext _timeLineViewContext;
 
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
 
@@ -90,14 +84,14 @@ namespace AwbStudio
             _timelineControllers = timelineControllers;
 
             _viewContext = new TimelineViewContext();
-            _viewContext.Changed+= ViewContext_Changed; 
+            _viewContext.Changed += ViewContext_Changed;
 
             _playPosSynchronizer = new PlayPosSynchronizer();
 
+            this.LabelPlayTime.Content = "0.0s";
+
             Loaded += TimelineEditorWindow_Loaded;
         }
-
-
 
         private void ViewContext_Changed(object? sender, EventArgs e)
         {
@@ -117,7 +111,7 @@ namespace AwbStudio
             Loaded -= TimelineEditorWindow_Loaded;
 
             this.IsEnabled = false;
-          
+
             _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;
 
             SetupToasts();
@@ -175,7 +169,7 @@ namespace AwbStudio
             _unsavedChanges = false;
             ValuesEditorControl.TimelineDataLoaded(_timelineData);
 
-            Unloaded += TimelineEditorWindow_Unloaded;  
+            Unloaded += TimelineEditorWindow_Unloaded;
         }
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
@@ -492,9 +486,8 @@ namespace AwbStudio
 
         private void PlayPos_Changed(object? sender, int newPlayPosMs)
         {
-            
             MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X"));
-            
+
             if (!_manualUpdatingValues)
                 ShowActuatorValuesOnTimelineInputController();
 

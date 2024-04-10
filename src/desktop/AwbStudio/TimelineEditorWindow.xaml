@@ -8,13 +8,11 @@
         xmlns:local="clr-namespace:AwbStudio"
         xmlns:Timelines="clr-namespace:Awb.Core.Timelines;assembly=Awb.Core"
         mc:Ignorable="d"
-        Title="TimelineEditorWindow" Height="800" Width="1024">
+        Title="TimelineEditorWindow" Height="800" Width="1150">
     <Window.Icon>
         <DrawingImage />
     </Window.Icon>
     <Grid>
-
-
 
         <Grid.RowDefinitions>
             <RowDefinition Height="4*" />
@@ -31,7 +29,7 @@
                 <ColumnDefinition Width="20*" MinWidth="200" MaxWidth="300"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0" Margin="5">
+            <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -40,12 +38,42 @@
                 <!-- global timeline viewer-->
                 <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" Grid.Column="0" />
 
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Label x:Name="LabelPlayTime" Width="150" Content="Playtime" HorizontalAlignment="Center"  />
-                    <Button x:Name="ButtonPlay" Content="▶ Play" Click="ButtonPlay_Click" />
-                    <Button x:Name="ButtonStop"  Content="⏹ Stop" Click="ButtonStop_Click" />
-                    <Button x:Name="ButtonSave" Content="Save"  Click="ButtonSave_Click" />
-                </StackPanel>
+                <Grid Grid.Row="1" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"></ColumnDefinition>
+                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                        <!-- Actual timeline metadata -->
+                       
+                        <Label>Title:</Label>
+                        <TextBox x:Name="TxtActualTimelineName" Width="auto" MinWidth="150" MaxWidth="300" TextChanged="TxtActualTimelineName_TextChanged">Testing</TextBox>
+                        <Label>Type:</Label>
+                        <ComboBox x:Name="ComboTimelineStates" Width="auto" MinWidth="200" MaxHeight="300" SelectionChanged="ComboTimelineStates_SelectionChanged">
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Center">
+                       
+                        <Label Content="Zoom:"/>
+                        <Slider x:Name="ZoomSlider" Width="120" Value="100" Minimum="50" Maximum="200" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"  Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Label x:Name="LabelPlayTime" Width="50" HorizontalAlignment="Center"  Content="0.00s"  />
+                        <Button x:Name="ButtonPlay" Content="▶ Play" Click="ButtonPlay_Click" />
+                        <Button x:Name="ButtonStop"  Content="⏹ Stop" Click="ButtonStop_Click" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3"  Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="ButtonSave" Content="Save"  Click="ButtonSave_Click" />
+                    </StackPanel>
+
+
+                </Grid>
             </Grid>
 
 
@@ -55,13 +83,7 @@
                 <Label>Project:</Label>
                 <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 client" Click="ButtonExportEsp32_Click" />
 
-                <!-- Actual timeline metadata -->
-                <Label >Actual timeline name:</Label>
-                <TextBox x:Name="TxtActualTimelineName" Grid.Row="1" TextChanged="TxtActualTimelineName_TextChanged">Testing</TextBox>
-                <Label>Type:</Label>
-                <ComboBox x:Name="ComboTimelineStates" SelectionChanged="ComboTimelineStates_SelectionChanged">
-                </ComboBox>
-             
+
                 <Button x:Name="ButtonClear" Content="New Timeline" Click="ButtonClear_Click" />
 
                 <Label >Load existing timeline:</Label>
@@ -83,10 +105,9 @@
             </Grid.ColumnDefinitions>
 
             <ScrollViewer x:Name="timelineScrollViewer" Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" 
-                                 />
+                <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" />
             </ScrollViewer>
-            
+
         </Grid>
 
         <Grid Visibility="Collapsed">
@@ -98,8 +119,6 @@
                 <TimelineControls:CaptionsViewerControl  x:Name="TimelineCaptionsViewer" Grid.Column="0"/>
                 <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo"  Grid.Column="1">BANK 1 (1-8)</Label>
             </Grid>
-
-          
 
             <Grid Grid.Column="0" Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -113,7 +132,6 @@
 
                 <DockPanel LastChildFill="true" Grid.Column="2" Grid.Row="1">
                     <ScrollViewer DockPanel.Dock="Top">
-
                     </ScrollViewer>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto">
                         <Label Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left" Opacity="0.3"/>
