@@ -13,8 +13,10 @@ using AwbStudio.TimelineValuePainters;
 using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace AwbStudio.TimelineControls
 {
@@ -54,10 +56,28 @@ namespace AwbStudio.TimelineControls
         {
             InitializeComponent();
 
-            Unloaded += OnUnloaded;
+            Loaded += TimelineValuesEditorControl_Loaded;
 
-            //MyViewModel vm = new MyViewModel();
-            SizeChanged += TimelineViewer_SizeChanged;
+        }
+
+        private void TimelineValuesEditorControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= TimelineValuesEditorControl_Loaded;
+
+            //var scrollBar = MyScrollViewer.Template.FindName("PART_HorizontalScrollBar", MyScrollViewer) as ScrollBar;
+            //if (scrollBar == null)
+            //    MessageBox.Show("HorizontalScrollBar not found");
+            //else
+            //    scrollBar.ValueChanged += ScrollingChanged;
+
+            Unloaded += OnUnloaded;
+        }
+
+        private void ScrollingChanged(object? sender, EventArgs e)
+        {
+            //Debug.WriteLine(MyScrollViewer.HorizontalOffset);
+            //Console.WriteLine(MyScrollViewer.HorizontalOffset);
+
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -135,25 +155,32 @@ namespace AwbStudio.TimelineControls
 
 
 
-        private void OnViewContextChanged(object? sender, EventArgs e)
+        private void OnViewContextChanged(object? sender, ViewContextChangedEventArgs e)
         {
             if (_timelineData == null) return;
+            if (_viewContext == null) return;
 
-            var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
-
-            // update the scrollbar
-            MyInvoker.Invoke(() =>
+            switch (e.ChangeType)
             {
-                this.Width = newWidth;
-            });
+                case ViewContextChangedEventArgs.ChangeTypes.Duration:
+                case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
+                    var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
+                    MyInvoker.Invoke(() =>
+                    {
+                        this.Width = newWidth;
+                    });
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                  
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
+            }
         }
-
-        private void TimelineViewer_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (!_isInitialized) return;
-            // PaintGrid();
-        }
-
-
     }
 }

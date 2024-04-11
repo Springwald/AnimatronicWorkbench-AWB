@@ -6,16 +6,21 @@
              xmlns:local="clr-namespace:AwbStudio.TimelineControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <ScrollViewer x:Name="MyScrollViewer" 
+    <!--<Grid>
+        <ScrollViewer x:Name="MyScrollViewer" 
                     Background="Transparent"   
+                    VerticalScrollBarVisibility="Disabled"
+                    HorizontalScrollBarVisibility="Visible"
                     PreviewMouseDown="AllValuesGrid_PreviewMouseDown" 
-                    PreviewMouseMove="AllValuesGrid_PreviewMouseMove">
-        <Border BorderBrush="Gray" BorderThickness="1" Background="Transparent"  >
-            <Grid Grid.Column="0" >
-                <Grid x:Name="OpticalGrid"></Grid>
-                <Grid x:Name="AllValuesGrid"></Grid>
-                <Grid x:Name="PlayPosGrid" ></Grid>
-            </Grid>
-        </Border>
-    </ScrollViewer>
+                    PreviewMouseMove="AllValuesGrid_PreviewMouseMove"
+                    ScrollChanged="MyScrollViewer_ScrollChanged">
+            <Border BorderBrush="Gray" BorderThickness="1" Background="Transparent"  >-->
+                <Grid>
+                    <Grid x:Name="OpticalGrid"></Grid>
+                    <Grid x:Name="AllValuesGrid"></Grid>
+                    <Grid x:Name="PlayPosGrid" ></Grid>
+                </Grid>
+            <!-- </Border>
+       </ScrollViewer>
+    </Grid>-->
 </UserControl>

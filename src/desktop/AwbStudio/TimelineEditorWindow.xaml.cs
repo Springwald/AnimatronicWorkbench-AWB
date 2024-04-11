@@ -93,16 +93,39 @@ namespace AwbStudio
             Loaded += TimelineEditorWindow_Loaded;
         }
 
-        private void ViewContext_Changed(object? sender, EventArgs e)
+        private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
-            if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
+            switch (e.ChangeType)
             {
-                _lastBankIndex = _viewContext.BankIndex;
-                MyInvoker.Invoke(new Action(() =>
-                {
-                    var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
-                    labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
-                }));
+                case ViewContextChangedEventArgs.ChangeTypes.Duration:
+                case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
+
+                    if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
+                    {
+                        _lastBankIndex = _viewContext.BankIndex;
+                        MyInvoker.Invoke(new Action(() =>
+                        {
+                            var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
+                            labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
+                        }));
+                    }
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                    if (timelineScrollViewer.HorizontalOffset != _viewContext.ScrollPositionPx)
+                    {
+                        MyInvoker.Invoke(() =>
+                        {
+                            timelineScrollViewer.ScrollToHorizontalOffset(_viewContext.ScrollPositionPx);
+                        });
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
         }
 
@@ -784,5 +807,11 @@ namespace AwbStudio
 
         #endregion Button Events
 
+        private void timelineEditorControlsScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (_viewContext == null) return;
+            _viewContext.ScrollPositionPx = (int)timelineScrollViewer.HorizontalOffset;
+            timelineAllValuesScrollViewer.ScrollToHorizontalOffset(timelineScrollViewer.HorizontalOffset);
+        }
     }
 }

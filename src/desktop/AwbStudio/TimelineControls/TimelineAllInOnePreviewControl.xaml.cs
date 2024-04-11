@@ -17,8 +17,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls
 {
@@ -131,23 +129,36 @@ namespace AwbStudio.TimelineControls
 
         private void ZoomChanged()
         {
+            if (_timelineEditorControls == null) return;
             foreach (UserControl editorControl in _timelineEditorControls)
                 editorControl.Height = _zoomVerticalHeightPerValueEditor;
         }
 
- 
-
-        private void OnViewContextChanged(object? sender, EventArgs e)
+        private void OnViewContextChanged(object? sender, ViewContextChangedEventArgs e)
         {
             if (_timelineData == null) return;
+            if (_viewContext == null) return;
 
-            var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
-
-            // update the scrollbar
-            MyInvoker.Invoke(() =>
+            switch (e.ChangeType)
             {
-                this.Width = newWidth;
-            });
+                case ViewContextChangedEventArgs.ChangeTypes.Duration:
+                case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
+                    var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
+                    MyInvoker.Invoke(() =>
+                    {
+                        this.Width = newWidth;
+                    });
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
+            }
         }
 
 
@@ -167,13 +178,22 @@ namespace AwbStudio.TimelineControls
 
         private async Task SetPlayPosByMouse(double mouseX)
         {
-            var newPlayPosMs = (int)(((MyScrollViewer.HorizontalOffset + mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
+            //var newPlayPosMs = (int)(((MyScrollViewer.HorizontalOffset + mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
+            var newPlayPosMs = (int)(((mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
             _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
         }
 
 
+
         #endregion
 
-      
+        #region scroll events
+
+        private void MyScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (_viewContext != null) _viewContext.ScrollPositionPx = (int)e.HorizontalOffset;
+        }
+
+        #endregion
     }
 }
