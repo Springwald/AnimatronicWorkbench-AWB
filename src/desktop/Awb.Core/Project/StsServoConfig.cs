@@ -13,18 +13,19 @@ namespace Awb.Core.Project
 
         public uint ClientId { get; set; }
         public uint Channel { get; set; }
-        public string? Name { get; set; }
+        public string Title { get; set; }
         public int MinValue { get; set; }
         public int MaxValue { get; set; }
         public int? DefaultValue { get; set; }
         public int? Acceleration { get; set; }
         public int? Speed { get; set; }
 
-        public StsServoConfig(string id, uint clientId, uint channel)
+        public StsServoConfig(string id, string title, uint clientId, uint channel)
         {
             this.Id = id;
             this.ClientId = clientId;
             this.Channel = channel;
+            this.Title = title;
         }
     }
 }

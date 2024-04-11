@@ -79,7 +79,7 @@ namespace Awb.Core.DataPackets
                     {
                         Channel = stsServo.Channel,
                         TargetValue = servo.TargetValue,
-                        Name = string.IsNullOrWhiteSpace(stsServo.Name) ? $"STS{stsServo.Channel}" : stsServo.Name,
+                        Name = string.IsNullOrWhiteSpace(stsServo.Title) ? $"STS{stsServo.Channel}" : stsServo.Title,
                     });
                 }
             }
@@ -108,7 +108,7 @@ namespace Awb.Core.DataPackets
                         I2cAddress = pwmServo.I2cAdress,
                         Channel = pwmServo.Channel,
                         TargetValue = servo.TargetValue,
-                        Name = string.IsNullOrWhiteSpace(pwmServo.Name) ? $"STS{pwmServo.Channel}" : pwmServo.Name,
+                        Name = string.IsNullOrWhiteSpace(pwmServo.Title) ? $"STS{pwmServo.Channel}" : pwmServo.Title,
                     });
                 }
             }

@@ -29,7 +29,7 @@ namespace Awb.Core.Actuators
         /// <summary>
         /// The optional visible name of the sound player
         /// </summary>
-        public string? Name { get; }
+        public string? Title { get; }
 
         /// <summary>
         /// The TX pin of the sound player for serial communication
@@ -62,11 +62,9 @@ namespace Awb.Core.Actuators
         /// </summary>
         public bool IsDirty { get; set; }
 
-        
-
         public int ActualSoundId { get; private set; }
 
-        public Mp3PlayerYX5300(Mp3PlayerYX5300Config config, int soundsCount)
+        public Mp3PlayerYX5300(Mp3PlayerYX5300Config config)
         {
             Id = config.SoundPlayerId;
             ClientId = config.ClientId;

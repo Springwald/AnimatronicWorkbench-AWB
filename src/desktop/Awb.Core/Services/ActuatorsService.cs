@@ -42,7 +42,7 @@ namespace Awb.Core.Services
                     if (pca9685PwmServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
                     var client = awbClientsService.GetClient(pca9685PwmServoConfig.ClientId);
                     if (client == null)
-                        logger.LogError($"ActuatorsService: Client with Id '{pca9685PwmServoConfig.ClientId}' for Pca9685PwmServo '{pca9685PwmServoConfig.Name}' not found!");
+                        logger.LogError($"ActuatorsService: Client with Id '{pca9685PwmServoConfig.ClientId}' for Pca9685PwmServo '{pca9685PwmServoConfig.Title}' not found!");
                     var stsServo = new Pca9685PwmServo(pca9685PwmServoConfig);
                     servos.Add(stsServo);
                 }
@@ -56,7 +56,7 @@ namespace Awb.Core.Services
                     if (stsServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
                     var client = awbClientsService.GetClient(stsServoConfig.ClientId);
                     if (client == null)
-                        logger.LogError($"ActuatorsService: Client with Id '{stsServoConfig.ClientId}' for stsServo '{stsServoConfig.Name}' not found!");
+                        logger.LogError($"ActuatorsService: Client with Id '{stsServoConfig.ClientId}' for stsServo '{stsServoConfig.Title}' not found!");
                     var stsServo = new StsScsServo(stsServoConfig, StsScsServo.StsScsTypes.Sts);
                     servos.Add(stsServo);
                 }
@@ -70,7 +70,7 @@ namespace Awb.Core.Services
                     if (scsServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
                     var client = awbClientsService.GetClient(scsServoConfig.ClientId);
                     if (client == null)
-                        logger.LogError($"ActuatorsService: Client with Id '{scsServoConfig.ClientId}' for scsServo '{scsServoConfig.Name}' not found!");
+                        logger.LogError($"ActuatorsService: Client with Id '{scsServoConfig.ClientId}' for scsServo '{scsServoConfig.Title}' not found!");
                     var scsServo = new StsScsServo(scsServoConfig, StsScsServo.StsScsTypes.Scs);
                     servos.Add(scsServo);
                 }
@@ -80,7 +80,7 @@ namespace Awb.Core.Services
             if (projectConfig.Mp3PlayersYX5300 != null)
             {
                 // actual is only one sound player supported
-                SoundPlayers = projectConfig.Mp3PlayersYX5300.Select(p => new Mp3PlayerYX5300(p, soundsCount: projectConfig.Sounds.Length)).ToArray();
+                SoundPlayers = projectConfig.Mp3PlayersYX5300.Select(p => new Mp3PlayerYX5300(p)).ToArray();
             }
             else
             {

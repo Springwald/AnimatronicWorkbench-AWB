@@ -5,19 +5,16 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.ActuatorsAndObjects;
+
 namespace Awb.Core.Actuators
 {
-    public interface IActuator : IDisposable
+    public interface IActuator : IDisposable, IAwbObject
     {
         /// <summary>
         /// The unique ID of the actuator
         /// </summary>
         string Id { get; }
-
-        /// <summary>
-        /// The optional visible name of the actuator
-        /// </summary>
-        string Name { get; }
 
         /// <summary>
         /// When multiple clients are used, this is the ID of the client that is currently controlling the actuator

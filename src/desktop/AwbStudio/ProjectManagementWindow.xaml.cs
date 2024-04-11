@@ -171,9 +171,8 @@ namespace AwbStudio
                 },
                 StsServos = new StsServoConfig[]
                 {
-                    new StsServoConfig(id: "StsServo1", clientId: 1, channel: 1)
+                    new StsServoConfig(id: "StsServo1", title: "Demo serial Servo 1", clientId: 1, channel: 1)
                     {
-                        Name = "Demo serial Servo 1",
                         Acceleration = 20,
                         DefaultValue = 2000,
                         MaxValue = 4095,
@@ -183,9 +182,8 @@ namespace AwbStudio
                 },
                 Pca9685PwmServos = new Pca9685PwmServoConfig[]
                 {
-                    new Pca9685PwmServoConfig(id: "PwmServo1", clientId: 1, i2cAdress: 0x40, channel: 1)
+                    new Pca9685PwmServoConfig(id: "PwmServo1",  title:"Demo PWM Servo 1" , clientId: 1, i2cAdress: 0x40, channel: 1)
                     {
-                        Name = "Demo PWM Servo 1",
                         DefaultValue = 2000,
                         MaxValue = 4095,
                         MinValue = 0,

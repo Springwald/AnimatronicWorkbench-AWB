@@ -73,7 +73,7 @@ namespace AwbStudio.FileManagement
             if (data == null) return null;
 
             var state = _project?.TimelinesStates?.SingleOrDefault(s => s.Id == data.TimelineStateId);
-            var stateName = state?.Name;
+            var stateName = state?.Title;
 
             return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, stateName: stateName ?? $"unknown StateId {data.TimelineStateId}");
         }

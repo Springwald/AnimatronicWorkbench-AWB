@@ -40,7 +40,7 @@ namespace Awb.Core.Actuators
         /// <summary>
         /// The optional visible name of the servo
         /// </summary>
-        public string? Name { get; }
+        public string Title { get; }
 
         /// <summary>
         /// The channel of the servo, mostly starting with 1 instead of 0
@@ -83,7 +83,7 @@ namespace Awb.Core.Actuators
         /// </summary>
         public bool IsDirty { get; set; }
 
-        public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}{StsScsType.ToString().ToUpper()}{Channel} {Name ?? string.Empty}";
+        public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}{StsScsType.ToString().ToUpper()}{Channel} {Title ?? string.Empty}";
 
         public StsScsServo(StsServoConfig config, StsScsTypes type)
         {
@@ -93,7 +93,7 @@ namespace Awb.Core.Actuators
             Id = config.Id;
             ClientId = config.ClientId;
             Channel = config.Channel;
-            Name = config.Name;
+            Title = config.Title;
             MinValue = config.MinValue;
             MaxValue = config.MaxValue;
             DefaultValue = defaultValue;

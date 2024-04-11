@@ -163,7 +163,7 @@ namespace AwbStudio
 
             foreach (var timelineController in _timelineControllers)
             {
-                timelineController.ActualActuatorNames = _actuatorsService.Servos.Select(s => s.Name).ToArray();
+                timelineController.ActualActuatorNames = _actuatorsService.Servos.Select(s => s.Title).ToArray();
                 timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
             }
 
@@ -221,7 +221,7 @@ namespace AwbStudio
         }
 
         private string GetTimelineStateName(TimelineState ts)
-            => ts.Export ? ts.Name : $"{ts.Name} (no export)";
+            => ts.Export ? ts.Title : $"{ts.Title} (no export)";
 
         private async void TimelineChosenToLoad(object? sender, TimelineNameChosenEventArgs e)
         {
@@ -438,7 +438,7 @@ namespace AwbStudio
                             break;
                         default:
 
-                            throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Name} is an unhandled actutuator type.");
+                            throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Title} is an unhandled actutuator type.");
                     }
 
                     _manualUpdatingValues = true;
@@ -558,7 +558,7 @@ namespace AwbStudio
                         }
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException($"{actuators[iActuator].Id}/{actuators[iActuator].Name} is an unhandled actutuator type.");
+                        throw new ArgumentOutOfRangeException($"{actuators[iActuator].Id}/{actuators[iActuator].Title} is an unhandled actutuator type.");
                 }
             }
         }
@@ -608,7 +608,7 @@ namespace AwbStudio
                 var state = _project.TimelinesStates?.FirstOrDefault();
                 if (state != null)
                 {
-                    MessageBox.Show($"Using state {state.Name}[{state.Id}] instead");
+                    MessageBox.Show($"Using state {state.Title}[{state.Id}] instead");
                     data.TimelineStateId = state.Id;
                     changesAfterLoading = true;
                 }

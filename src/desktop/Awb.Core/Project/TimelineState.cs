@@ -10,7 +10,7 @@ namespace Awb.Core.Project
     public class TimelineState
     {
         public int Id { get; internal set; }
-        public string Name { get; internal set; }
+        public string Title { get; internal set; }
 
         public bool Export { get; internal set; } = true;
 
@@ -24,15 +24,15 @@ namespace Awb.Core.Project
         /// </summary>
         public int[] NegativeInputs { get; internal set; }
 
-        public TimelineState(int id, string name, bool export, int[]? positiveInputs = null, int[]? negativeInputs= null)
+        public TimelineState(int id, string title, bool export, int[]? positiveInputs = null, int[]? negativeInputs= null)
         {
             Id = id;
-            Name = name;
+            Title = title;
             PositiveInputs = positiveInputs ?? Array.Empty<int>();
             NegativeInputs = negativeInputs ?? Array.Empty<int>();
             Export = export;
         }
 
-        public override string ToString() => $"[{Id}] {Name}";
+        public override string ToString() => $"[{Id}] {Title}";
     }
 }

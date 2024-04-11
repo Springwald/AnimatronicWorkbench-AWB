@@ -13,7 +13,7 @@ namespace Awb.Core.Actuators
     {
         public string Id { get; }
         public uint ClientId { get; }
-        public string? Name { get; }
+        public string Title { get; }
         public uint Channel { get; }
         public uint I2cAdress { get; }
         public int MinValue { get; }
@@ -22,7 +22,7 @@ namespace Awb.Core.Actuators
         public int TargetValue { get; set; }
         public bool IsDirty { get; set; }
 
-        public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}PWM{Channel} {Name ?? string.Empty}";
+        public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}PWM{Channel} {Title ?? string.Empty}";
 
         public Pca9685PwmServo(Pca9685PwmServoConfig config)
         {
@@ -30,7 +30,7 @@ namespace Awb.Core.Actuators
 
             Id = config.Id;
             ClientId = config.ClientId;
-            Name = config.Name;
+            Title = config.Title;
             MinValue = config.MinValue;
             MaxValue = config.MaxValue;
             DefaultValue = defaultValue;
