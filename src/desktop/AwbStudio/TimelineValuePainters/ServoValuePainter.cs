@@ -20,13 +20,14 @@ namespace AwbStudio.TimelineValuePainters
     class ServoValuePainter : AbstractValuePainter
     {
         private const double _paintMarginTopBottom = 0;
-
+        private readonly double _dotRadius;
         private readonly IServo _servo;
         private readonly TimelineCaptions _timelineCaptions;
 
-        public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions)
+        public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, double dotRadius = 3)
             : base(paintControl, viewContext, timelineCaptions)
         {
+            _dotRadius = dotRadius;
             _servo = servo;
             _timelineCaptions = timelineCaptions;
         }
@@ -57,8 +58,7 @@ namespace AwbStudio.TimelineValuePainters
             var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
 
             // add dots
-            const int dotRadius = 3;
-            const int dotWidth = dotRadius * 2;
+            double dotWidth = _dotRadius * 2;
             foreach (var point in pointsForThisServo)
             {
                 if (point.TimeMs >= 0 && point.TimeMs <= _viewContext!.DurationMs) // is inside view
@@ -71,7 +71,7 @@ namespace AwbStudio.TimelineValuePainters
                         Stroke = caption.ForegroundColor,
                         Height = dotWidth,
                         Width = dotWidth,
-                        Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - dotRadius },
+                        Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius },
                         ToolTip = point.Title
                     };
                     this.PaintControl.Children.Add(ellipse);

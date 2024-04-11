@@ -60,7 +60,7 @@ namespace AwbStudio.TimelineControls
         {
             _viewContext = viewContext;
             _servo = servo;
-            _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions);
+            _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions, dotRadius: 6);
             _caption = timelineCaptions?.GetAktuatorCaption(servo.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
             HeaderControl.TimelineCaption = _caption;
 

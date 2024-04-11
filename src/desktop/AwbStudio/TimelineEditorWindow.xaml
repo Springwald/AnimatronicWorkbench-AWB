@@ -30,13 +30,24 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
+                
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                 </Grid.RowDefinitions>
 
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TimelineControls:CaptionsViewerControl  x:Name="TimelineCaptionsViewer" Grid.Column="0"/>
+                    <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo"  Grid.Column="1">BANK 1 (1-8)</Label>
+                </Grid>
+
                 <!-- global timeline viewer-->
-                <ScrollViewer Grid.Column="0" 
+                <ScrollViewer  Grid.Row="1"
                      x:Name="timelineAllValuesScrollViewer" 
                      HorizontalScrollBarVisibility="Visible" 
                      VerticalScrollBarVisibility="Disabled"
@@ -45,7 +56,7 @@
                     <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" />
                 </ScrollViewer>
 
-                <Grid Grid.Row="1" >
+                <Grid Grid.Row="2" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="5*"></ColumnDefinition>
                         <ColumnDefinition Width="3*"></ColumnDefinition>
@@ -64,7 +75,7 @@
 
                     <StackPanel Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Center">
 
-                        <Label Content="Zoom:"/>
+                        <Label Content="🔎"/>
                         <Slider x:Name="ZoomSlider" Width="120" Value="100" Minimum="50" Maximum="200" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </StackPanel>
 
@@ -75,7 +86,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="3"  Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button x:Name="ButtonSave" Content="Save"  Click="ButtonSave_Click" />
+                        <Button x:Name="ButtonSave" Content="💾 Save"  Click="ButtonSave_Click" />
                     </StackPanel>
 
 
@@ -114,7 +125,7 @@
                 Grid.Column="0" 
                 Grid.Row="1" 
                 HorizontalScrollBarVisibility="Visible" 
-                VerticalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Visible"
                 ScrollChanged="timelineScrollValueChanged"
                
                 >
@@ -124,14 +135,7 @@
         </Grid>
 
         <Grid Visibility="Collapsed">
-            <Grid Grid.Column="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="auto"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <TimelineControls:CaptionsViewerControl  x:Name="TimelineCaptionsViewer" Grid.Column="0"/>
-                <Label Foreground="#FF00DFFF" HorizontalAlignment="Right" FontWeight="Bold" x:Name="labelBankNo"  Grid.Column="1">BANK 1 (1-8)</Label>
-            </Grid>
+           
 
             <Grid Grid.Column="0" Grid.Row="2">
                 <Grid.ColumnDefinitions>
