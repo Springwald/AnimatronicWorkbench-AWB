@@ -16,7 +16,6 @@ using System.Text.Json.Serialization;
 
 namespace AwbStudio.FileManagement
 {
-
     public class TimelineFileManager
     {
         private readonly AwbProject _project;
