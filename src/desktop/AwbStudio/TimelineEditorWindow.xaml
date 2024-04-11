@@ -39,7 +39,9 @@
                 <ScrollViewer Grid.Column="0" 
                      x:Name="timelineAllValuesScrollViewer" 
                      HorizontalScrollBarVisibility="Visible" 
-                     VerticalScrollBarVisibility="Disabled">
+                     VerticalScrollBarVisibility="Disabled"
+                     ScrollChanged="timelineScrollValueChanged"
+                     Background="Transparent">
                     <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" />
                 </ScrollViewer>
 
@@ -108,12 +110,13 @@
             </Grid.ColumnDefinitions>
 
             <ScrollViewer 
-                x:Name="timelineScrollViewer" 
+                x:Name="timelineValuesEditorScrollViewer" 
                 Grid.Column="0" 
                 Grid.Row="1" 
                 HorizontalScrollBarVisibility="Visible" 
                 VerticalScrollBarVisibility="Disabled"
-                ScrollChanged="timelineEditorControlsScrollViewer_ScrollChanged"
+                ScrollChanged="timelineScrollValueChanged"
+               
                 >
                 <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" />
             </ScrollViewer>

@@ -88,8 +88,6 @@ namespace AwbStudio
 
             _playPosSynchronizer = new PlayPosSynchronizer();
 
-            this.LabelPlayTime.Content = "0.0s";
-
             Loaded += TimelineEditorWindow_Loaded;
         }
 
@@ -115,13 +113,6 @@ namespace AwbStudio
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
-                    if (timelineScrollViewer.HorizontalOffset != _viewContext.ScrollPositionPx)
-                    {
-                        MyInvoker.Invoke(() =>
-                        {
-                            timelineScrollViewer.ScrollToHorizontalOffset(_viewContext.ScrollPositionPx);
-                        });
-                    }
                     break;
 
                 default:
@@ -495,10 +486,10 @@ namespace AwbStudio
             int scrollSpeedMs = (howManyMs > 0 ? 1 : -1) * (1000 / fps) * speed;
             for (int i = 0; i < howManyMs / scrollSpeedMs; i++)
             {
-                var newScrollOffset = timelineScrollViewer.HorizontalOffset + _viewContext.DurationMs / scrollSpeedMs;
+                var newScrollOffset = timelineAllValuesScrollViewer.HorizontalOffset + _viewContext.DurationMs / scrollSpeedMs;
                 MyInvoker.Invoke(new Action(() =>
                 {
-                    timelineScrollViewer.ScrollToHorizontalOffset(newScrollOffset);
+                    timelineAllValuesScrollViewer.ScrollToHorizontalOffset(newScrollOffset);
                 }));
                 newPosMs = _playPosSynchronizer.PlayPosMs + scrollSpeedMs;
                 _playPosSynchronizer.SetNewPlayPos(newPosMs);
@@ -807,11 +798,16 @@ namespace AwbStudio
 
         #endregion Button Events
 
-        private void timelineEditorControlsScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        private void timelineScrollValueChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (_viewContext == null) return;
-            _viewContext.ScrollPositionPx = (int)timelineScrollViewer.HorizontalOffset;
-            timelineAllValuesScrollViewer.ScrollToHorizontalOffset(timelineScrollViewer.HorizontalOffset);
+            if (_viewContext != null)
+                _viewContext.ScrollPositionPx = e.HorizontalOffset;
+
+            if (!timelineAllValuesScrollViewer.HorizontalOffset.Equals(e.HorizontalOffset))
+                timelineAllValuesScrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
+
+            if (!timelineValuesEditorScrollViewer.HorizontalOffset.Equals(e.HorizontalOffset))
+                timelineValuesEditorScrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
         }
     }
 }

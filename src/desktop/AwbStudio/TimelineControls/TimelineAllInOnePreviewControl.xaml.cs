@@ -25,7 +25,6 @@ namespace AwbStudio.TimelineControls
     /// </summary>
     public partial class TimelineAllInOnePreviewControl : UserControl, ITimelineEditorControl
     {
-        private bool _wasPlaying = false;
         private TimelineData? _timelineData;
         private IActuatorsService? _actuatorsService;
         private PlayPosPainter? _playPosPainter;
@@ -67,8 +66,6 @@ namespace AwbStudio.TimelineControls
             _viewContext = viewContext;
             _timelineCaptions = timelineCaptions;
             _playPosSynchronizer = playPosSynchronizer;
-            _actuatorsService = actuatorsService;
-
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
             _gridPainter = new GridTimePainter(OpticalGrid, _viewContext);
 
@@ -181,17 +178,6 @@ namespace AwbStudio.TimelineControls
             //var newPlayPosMs = (int)(((MyScrollViewer.HorizontalOffset + mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
             var newPlayPosMs = (int)(((mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
             _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
-        }
-
-
-
-        #endregion
-
-        #region scroll events
-
-        private void MyScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            if (_viewContext != null) _viewContext.ScrollPositionPx = (int)e.HorizontalOffset;
         }
 
         #endregion

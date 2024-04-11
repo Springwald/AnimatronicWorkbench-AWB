@@ -15,12 +15,15 @@
                     PreviewMouseMove="AllValuesGrid_PreviewMouseMove"
                     ScrollChanged="MyScrollViewer_ScrollChanged">
             <Border BorderBrush="Gray" BorderThickness="1" Background="Transparent"  >-->
-                <Grid>
-                    <Grid x:Name="OpticalGrid"></Grid>
-                    <Grid x:Name="AllValuesGrid"></Grid>
-                    <Grid x:Name="PlayPosGrid" ></Grid>
-                </Grid>
-            <!-- </Border>
+    <Grid 
+        PreviewMouseDown="AllValuesGrid_PreviewMouseDown" 
+        PreviewMouseMove="AllValuesGrid_PreviewMouseMove"
+        Background="Black">
+        <Grid x:Name="OpticalGrid" IsHitTestVisible="False"></Grid>
+        <Grid x:Name="AllValuesGrid"></Grid>
+        <Grid x:Name="PlayPosGrid"  IsHitTestVisible="False"></Grid>
+    </Grid>
+    <!-- </Border>
        </ScrollViewer>
     </Grid>-->
 </UserControl>
