@@ -9,17 +9,24 @@ using System.Timers;
 
 namespace Awb.Core.Player
 {
-    public class PlayPosSynchronizer: IDisposable
+    public class PlayPosSynchronizer : IDisposable
     {
         /// <summary>
         /// The distance between two snap positions in milliseconds
         /// </summary>
         public const int SnapMs = 125;
 
+        private const int _timerIntervalMs = 100;
+
         private int _playPosMsRaw;
         private int _lastPlayPosAnnounced;
+
+        /// <summary>
+        /// Is the playpos to snap to the next snap position?
+        /// </summary>
         private bool _inSnapMode = true;
-        private System.Timers.Timer _timer;
+
+        private System.Timers.Timer? _timer;
 
         /// <summary>
         /// The playpos has changed
@@ -35,7 +42,7 @@ namespace Awb.Core.Player
         {
             _timer = new System.Timers.Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent!);
-            _timer.Interval = 100; // ms
+            _timer.Interval = _timerIntervalMs; // ms
             _timer.Enabled = true;
         }
 
@@ -48,16 +55,29 @@ namespace Awb.Core.Player
             }
         }
 
-        /// <summary>
-        /// Is the playpos to snap to the next snap position?
-        /// </summary>
-        public bool InSnapMode
+
+        public TimelinePlayer.PlayStates PlayState
         {
             set
             {
-                if (_inSnapMode != value)
+                bool newInSnapMode;
+                switch (value)
                 {
-                    _inSnapMode = value;
+                    case TimelinePlayer.PlayStates.Nothing:
+                        _timer!.Interval = _timerIntervalMs;
+                        newInSnapMode = true;
+                        break;
+                    case TimelinePlayer.PlayStates.Playing:
+                        _timer!.Interval = _timerIntervalMs / 5; // higher resolution in playing mode
+                        newInSnapMode = false;
+                        break;
+                    default:
+                        throw new NotImplementedException($"{nameof(PlayState)}:{value}");
+                }
+
+                if (_inSnapMode != newInSnapMode)
+                {
+                    _inSnapMode = newInSnapMode;
                     SetNewPlayPos(_playPosMsRaw);
                 }
             }
@@ -76,7 +96,7 @@ namespace Awb.Core.Player
                 _timer.Stop();
                 _timer.Dispose();
                 _timer = null;
-            }   
+            }
         }
     }
 }

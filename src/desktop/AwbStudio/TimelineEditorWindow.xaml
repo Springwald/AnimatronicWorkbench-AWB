@@ -81,8 +81,8 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="2"  Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Label x:Name="LabelPlayTime" Width="50" HorizontalAlignment="Center"  Content="0.00s"  />
                         <Button x:Name="ButtonPlay" Content="▶ Play" Click="ButtonPlay_Click" />
+                        <Label x:Name="LabelPlayTime" Width="50" HorizontalAlignment="Center"  Content="0.00s"  />
                         <Button x:Name="ButtonStop"  Content="⏹ Stop" Click="ButtonStop_Click" />
                     </StackPanel>
 

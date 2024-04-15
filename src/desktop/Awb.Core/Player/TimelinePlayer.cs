@@ -7,6 +7,7 @@
 
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using System.Runtime.CompilerServices;
 
 namespace Awb.Core.Player
 {
@@ -16,13 +17,23 @@ namespace Awb.Core.Player
     //todo: no concept for ramping behaviour yet: Value changes are submittet to the actuatator imidiatelly
     public class TimelinePlayer : IDisposable
     {
+
         public enum PlayStates
         {
             Nothing,
             Playing
         }
 
-        public PlayStates PlayState { get; private set; } = PlayStates.Nothing;
+        private PlayStates _playstateBackingField = PlayStates.Nothing;
+
+        public PlayStates PlayState {
+            get => _playstateBackingField; 
+            set
+            {
+                _playstateBackingField = value;
+                PlayPosSynchronizer.PlayState = value;
+            } 
+        }
 
         private volatile bool _timerFiring;
         private volatile bool _updating;
@@ -79,19 +90,17 @@ namespace Awb.Core.Player
                 _playTimer = new Timer(PlayTimerCallback);
                 _playTimer.Change(dueTime: _updatePlayPeriodMs, period: _updatePlayPeriodMs);
             }
-            PlayPosSynchronizer.InSnapMode = true;
             PlayState = PlayStates.Playing;
+            PlayPosSynchronizer.PlayState = PlayState;
             await Task.CompletedTask;
         }
 
         public async void Stop()
         {
             PlayState = PlayStates.Nothing;
-            PlayPosSynchronizer.InSnapMode = false;
+            PlayPosSynchronizer.PlayState = PlayState;
             await Task.CompletedTask;
         }
-
-
         
 
         /// <summary>

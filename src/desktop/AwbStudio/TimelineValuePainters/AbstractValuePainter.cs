@@ -7,6 +7,7 @@
 
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
+using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -52,7 +53,8 @@ namespace AwbStudio.TimelineValuePainters
 
         private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
-            if (this.IsChangedEventSuitableForThisPainter(e)) PaintValues();
+            if (this.IsChangedEventSuitableForThisPainter(e)) 
+                MyInvoker.Invoke(() => PaintValues());
         }
 
         private void PaintControl_SizeChanged(object sender, SizeChangedEventArgs e)

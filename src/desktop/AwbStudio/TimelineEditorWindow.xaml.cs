@@ -676,7 +676,6 @@ namespace AwbStudio
 
         private void Play()
         {
-            _playPosSynchronizer.InSnapMode = false;
             _timelinePlayer?.Play();
             foreach (var timelineController in _timelineControllers)
                 timelineController?.SetPlayState(ITimelineController.PlayStates.Playing);
@@ -686,7 +685,6 @@ namespace AwbStudio
         {
             // snap scrollpos to snap positions 
             _timelinePlayer?.Stop();
-            _playPosSynchronizer.InSnapMode = true;
             foreach (var timelineController in _timelineControllers)
                 timelineController?.SetPlayState(ITimelineController.PlayStates.Editor);
         }
