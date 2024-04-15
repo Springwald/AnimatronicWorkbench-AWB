@@ -112,8 +112,13 @@ namespace AwbStudio
                     }
                     break;
 
-                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                    var y = ValuesEditorControl.GetScrollPosForEditorControl(_viewContext.ActualFocusObject);
+                    if (y != null)
+                        timelineValuesEditorScrollViewer.ScrollToVerticalOffset(y.Value);
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     break;
 
                 default:
@@ -152,8 +157,7 @@ namespace AwbStudio
 
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             ValuesEditorControl.Timelineplayer = _timelinePlayer;
-            ValuesEditorControl.RequestScrollPosYBySelectingContextObject += RequestScrollPosYBySelectingContextObject;
-
+            
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
 
@@ -188,10 +192,6 @@ namespace AwbStudio
             Unloaded += TimelineEditorWindow_Unloaded;
         }
 
-        private void RequestScrollPosYBySelectingContextObject(object? sender, double verticalOffset)
-        {
-            timelineValuesEditorScrollViewer.ScrollToVerticalOffset(verticalOffset);
-        }
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {

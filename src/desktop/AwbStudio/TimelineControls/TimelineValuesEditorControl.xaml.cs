@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
@@ -16,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml.Linq;
 
 namespace AwbStudio.TimelineControls
 {
@@ -35,8 +35,6 @@ namespace AwbStudio.TimelineControls
         private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
         private PlayPosPainter? _playPosPainter;
         private GridTimePainter? _gridPainter;
-
-        public EventHandler<double>? RequestScrollPosYBySelectingContextObject;
 
         /// <summary>
         /// The timeline player to control the timeline playback
@@ -156,6 +154,26 @@ namespace AwbStudio.TimelineControls
         }
 
 
+        public double? GetScrollPosForEditorControl(IAwbObject? awbObject)
+        {
+            // todo: scroll the view to the focus object
+            if (awbObject is IServo servo)
+                foreach (var child in AllValueEditorControlsStackPanel.Children)
+                {
+                    if (child is ServoValueEditorControl servoControl)
+                    {
+                        if (servoControl.Servo?.Id == servo.Id)
+                        {
+                            var transform = servoControl.TransformToVisual(AllValueEditorControlsStackPanel as FrameworkElement);
+                            Point yPosOfControl = transform.Transform(new Point(0, 0));
+                            return yPosOfControl.Y;
+                        }
+                    }
+                }
+
+            return null;
+        }
+
 
         private void OnViewContextChanged(object? sender, ViewContextChangedEventArgs e)
         {
@@ -180,21 +198,7 @@ namespace AwbStudio.TimelineControls
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
-                    // todo: scroll the view to the focus object
-                    if (_viewContext.ActualFocusObject is IServo servo)
-                        foreach (var child in AllValueEditorControlsStackPanel.Children)
-                        {
-                            if (child is ServoValueEditorControl servoControl)
-                            {
-                                if (servoControl.Servo?.Id == servo.Id)
-                                {
-                                    var transform = servoControl.TransformToVisual(AllValueEditorControlsStackPanel as FrameworkElement);
-                                    Point yPosOfControl = transform.Transform(new Point(0, 0));
-                                    RequestScrollPosYBySelectingContextObject?.Invoke(this, yPosOfControl.Y);
-                                    break;
-                                }
-                            }
-                        }
+
                     break;
 
                 default:
