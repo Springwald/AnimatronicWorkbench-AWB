@@ -29,10 +29,12 @@ namespace AwbStudio.TimelineControls
 
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
-        private IServo? _servo;
+        
         private TimelineCaption? _caption;
         private bool _isInitialized;
         private ServoValuePainter? _servoValuePainter;
+
+        public IServo? Servo { get; private set; }
 
         public ServoValueEditorControl()
         {
@@ -59,7 +61,7 @@ namespace AwbStudio.TimelineControls
         public void Init(IServo servo, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
             _viewContext = viewContext;
-            _servo = servo;
+            Servo = servo;
             _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions, dotRadius: 6);
             _caption = timelineCaptions?.GetAktuatorCaption(servo.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
             HeaderControl.TimelineCaption = _caption;

@@ -153,6 +153,10 @@ namespace AwbStudio.TimelineControls
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     break;
 
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                    // todo: hightlight the selectect object lines
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }

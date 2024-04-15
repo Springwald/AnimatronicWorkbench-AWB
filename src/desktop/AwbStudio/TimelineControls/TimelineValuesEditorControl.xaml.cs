@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
@@ -13,10 +14,9 @@ using AwbStudio.TimelineValuePainters;
 using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
+using System.Xml.Linq;
 
 namespace AwbStudio.TimelineControls
 {
@@ -35,6 +35,8 @@ namespace AwbStudio.TimelineControls
         private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
         private PlayPosPainter? _playPosPainter;
         private GridTimePainter? _gridPainter;
+
+        public EventHandler<double>? RequestScrollPosYBySelectingContextObject;
 
         /// <summary>
         /// The timeline player to control the timeline playback
@@ -104,7 +106,7 @@ namespace AwbStudio.TimelineControls
             {
                 var editorControl = new ServoValueEditorControl();
                 editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
-                AllValueEditorControlsScrollViewer.Children.Add(editorControl);
+                AllValueEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }
 
@@ -118,7 +120,7 @@ namespace AwbStudio.TimelineControls
                     timelineCaptions,
                     playPosSynchronizer,
                     actuatorsService);
-                AllValueEditorControlsScrollViewer.Children.Add(editorControl);
+                AllValueEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }
 
@@ -175,6 +177,24 @@ namespace AwbStudio.TimelineControls
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                    // todo: scroll the view to the focus object
+                    if (_viewContext.ActualFocusObject is IServo servo)
+                        foreach (var child in AllValueEditorControlsStackPanel.Children)
+                        {
+                            if (child is ServoValueEditorControl servoControl)
+                            {
+                                if (servoControl.Servo?.Id == servo.Id)
+                                {
+                                    var transform = servoControl.TransformToVisual(AllValueEditorControlsStackPanel as FrameworkElement);
+                                    Point yPosOfControl = transform.Transform(new Point(0, 0));
+                                    RequestScrollPosYBySelectingContextObject?.Invoke(this, yPosOfControl.Y);
+                                    break;
+                                }
+                            }
+                        }
                     break;
 
                 default:

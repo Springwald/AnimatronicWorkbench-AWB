@@ -84,6 +84,7 @@ namespace AwbStudio.TimelineControls
                     label.Content = no >= _viewContext.FirstBankItemNo && no <= _viewContext.LastBankItemNo ? $"[{no - _viewContext.FirstBankItemNo + 1}] {caption.Label.Trim()}" : caption.Label.Trim();
                     label.Foreground = caption.ForegroundColor;
                     label.Background = caption.BackgroundColor;
+                    label.MouseDown += (sender, e) => _viewContext!.ActualFocusObject = _actuatorsService?.AllActuators.SingleOrDefault(a => a.Id == caption.Id);
                     LineNames.Children.Add(border);
                 }
             }

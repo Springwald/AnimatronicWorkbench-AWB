@@ -13,11 +13,11 @@ namespace AwbStudio.ValueTuning
     /// <summary>
     /// Interaction logic for SingleValueControl.xaml
     /// </summary>
-    public partial class SingleValueControl : UserControl
+    public partial class NumberValueControl : UserControl
     {
         private volatile bool _isSetting = false;
 
-        public SingleValueControl()
+        public NumberValueControl()
         {
             InitializeComponent();
             SliderValue.ValueChanged += SliderValue_ValueChanged;

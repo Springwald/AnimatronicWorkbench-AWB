@@ -113,6 +113,7 @@ namespace AwbStudio
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                     break;
 
                 default:
@@ -151,6 +152,7 @@ namespace AwbStudio
 
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             ValuesEditorControl.Timelineplayer = _timelinePlayer;
+            ValuesEditorControl.RequestScrollPosYBySelectingContextObject += RequestScrollPosYBySelectingContextObject;
 
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
@@ -184,6 +186,11 @@ namespace AwbStudio
             ValuesEditorControl.TimelineDataLoaded(_timelineData);
 
             Unloaded += TimelineEditorWindow_Unloaded;
+        }
+
+        private void RequestScrollPosYBySelectingContextObject(object? sender, double verticalOffset)
+        {
+            timelineValuesEditorScrollViewer.ScrollToVerticalOffset(verticalOffset);
         }
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
