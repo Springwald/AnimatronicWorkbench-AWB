@@ -104,7 +104,7 @@ namespace AwbStudio.TimelineControls
             {
                 var editorControl = new ServoValueEditorControl();
                 editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
-                AllValueEditorControlsStackPanel.Children.Add(editorControl);
+                AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }
 
@@ -118,7 +118,7 @@ namespace AwbStudio.TimelineControls
                     timelineCaptions,
                     playPosSynchronizer,
                     actuatorsService);
-                AllValueEditorControlsStackPanel.Children.Add(editorControl);
+                AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }
 
@@ -158,13 +158,13 @@ namespace AwbStudio.TimelineControls
         {
             // todo: scroll the view to the focus object
             if (awbObject is IServo servo)
-                foreach (var child in AllValueEditorControlsStackPanel.Children)
+                foreach (var child in AllValuesEditorControlsStackPanel.Children)
                 {
                     if (child is ServoValueEditorControl servoControl)
                     {
                         if (servoControl.Servo?.Id == servo.Id)
                         {
-                            var transform = servoControl.TransformToVisual(AllValueEditorControlsStackPanel as FrameworkElement);
+                            var transform = servoControl.TransformToVisual(AllValuesEditorControlsStackPanel as FrameworkElement);
                             Point yPosOfControl = transform.Transform(new Point(0, 0));
                             return yPosOfControl.Y;
                         }

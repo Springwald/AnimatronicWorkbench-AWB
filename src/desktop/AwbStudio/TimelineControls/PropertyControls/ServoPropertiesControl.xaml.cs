@@ -5,31 +5,84 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
+using Awb.Core.ActuatorsAndObjects;
+using AwbStudio.Tools;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls.PropertyControls
 {
     /// <summary>
     /// Interaction logic for ServoPropertiesControl.xaml
     /// </summary>
-    public partial class ServoPropertiesControl : UserControl
+    public partial class ServoPropertiesControl : UserControl, IPropertyEditor
     {
-        public ServoPropertiesControl()
+        private IServo _servo;
+        private bool _isSetting;
+        private double _value;
+
+        public IAwbObject AwbObject => _servo;
+
+        public ServoPropertiesControl(IServo servo)
         {
             InitializeComponent();
+            _servo = servo;
+            LabelName.Content = servo.Title; 
+            SliderValue.Minimum = Math.Min(_servo.MinValue, _servo.MaxValue);
+            SliderValue.Maximum = Math.Max(_servo.MinValue, _servo.MaxValue);
+            Loaded += ServoPropertiesControl_Loaded;
+        }
+
+        private async void ServoPropertiesControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Loaded -= ServoPropertiesControl_Loaded;
+            Unloaded += ServoPropertiesControl_Unloaded;
+
+            SliderValue.ValueChanged += SliderValue_ValueChanged;
+            await UpdateValue();
+        }
+
+        private void ServoPropertiesControl_Unloaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Unloaded -= ServoPropertiesControl_Unloaded;
+            SliderValue.ValueChanged -= SliderValue_ValueChanged;
+        }
+
+        public async Task UpdateValue()
+        {
+            Value = _servo.TargetValue;
+        }
+
+        protected override void OnMouseWheel(System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var newValue = Math.Max(Math.Min(SliderValue.Value + e.Delta / 30d, SliderValue.Maximum), SliderValue.Minimum);
+            if (newValue.Equals(SliderValue.Value)) return;
+            Value = newValue;
+        }
+
+        private void SliderValue_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (e.NewValue.Equals(e.OldValue)) return;
+            if (_isSetting) return;
+        }
+
+        private double Value
+        {
+            get => _value;
+            set
+            {
+                if (value.Equals(Value)) return;
+                _value = value;
+                _isSetting = true;
+                MyInvoker.Invoke(() =>
+                {
+                    LabelValue.Content = $"{value:0.0}";
+                    SliderValue.Value = value;
+                });
+                _isSetting = false;
+            }
         }
     }
 }

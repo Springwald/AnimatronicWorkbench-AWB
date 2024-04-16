@@ -32,6 +32,7 @@ namespace AwbStudio
         {
             services.AddILoggerServices();
             services.TryAddSingleton<IAwbStudioSettingsService, AwbStudioSettingsService>();
+            services.AddPropertyEditorVirtualInputControllerService();
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
             services.TryAddTransient<IAwbClientsService, AwbClientsService>();

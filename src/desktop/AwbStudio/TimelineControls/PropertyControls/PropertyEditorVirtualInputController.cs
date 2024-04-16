@@ -10,29 +10,24 @@ using Awb.Core.Services;
 using System;
 using System.Threading.Tasks;
 
-namespace AwbStudio.TimelineValueTuning
+namespace AwbStudio.TimelineControls.PropertyControls
 {
-    internal class PropertyEditorVirtualInputController : ITimelineController
+
+    internal interface IPropertyEditorVirtualInputController : ITimelineController
     {
-        private IAwbLogger logger;
+    }
+
+    internal class PropertyEditorVirtualInputController : IPropertyEditorVirtualInputController
+    {
+        private IAwbLogger _logger;
 
         public PropertyEditorVirtualInputController(IAwbLogger logger)
         {
-            this.logger = logger;
+            this._logger = logger;
         }
 
-        public string?[] ActualActuatorNames
-        {
-            set
-            {
-            }
-        }
 
-        public event EventHandler<TimelineControllerEventArgs> OnTimelineEvent;
-
-        public void Dispose()
-        {
-        }
+        public event EventHandler<TimelineControllerEventArgs>? OnTimelineEvent;
 
         public async Task SetActuatorValue(int index, double valueInPercent)
         {
@@ -44,6 +39,10 @@ namespace AwbStudio.TimelineValueTuning
         }
 
         public async Task ShowPointButtonState(int index, bool pointExists)
+        {
+        }
+
+        public void Dispose()
         {
         }
     }

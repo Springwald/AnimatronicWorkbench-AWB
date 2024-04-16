@@ -9,25 +9,19 @@ using Awb.Core.Services;
 using AwbStudio.TimelineControls.PropertyControls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 
 namespace AwbStudio.DependencyInjection
 {
-    internal static class AddInputControllerServiceCollectionExtensions
+    internal static class AddPropertyEditorVirtualInputControllerServiceExtensions
     {
-        public static void AddInputControllerServices(this IServiceCollection services)
+        public static void AddPropertyEditorVirtualInputControllerService(this IServiceCollection services)
         {
-            services.TryAddSingleton<IInputControllerService>(sp =>
+            services.TryAddSingleton<IPropertyEditorVirtualInputController>(sp =>
             {
                 var logger = sp.GetRequiredService<IAwbLogger>();
-                var propertyEditorVirtualInputController = sp.GetRequiredService<IPropertyEditorVirtualInputController>();
-
-                return new InputControllerService(
-                    logger: logger,
-                    additionalTimelineControllers: [propertyEditorVirtualInputController]
-                    );
+                return new PropertyEditorVirtualInputController(logger: logger);
             });
         }
-
-
     }
 }

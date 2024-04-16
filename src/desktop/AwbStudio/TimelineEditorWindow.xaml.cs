@@ -14,6 +14,7 @@ using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.Exports;
 using AwbStudio.Projects;
+using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using AwbStudio.Tools;
 using System;
@@ -161,6 +162,8 @@ namespace AwbStudio
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
 
+            FocusObjectPropertyEditorControl.Init(_viewContext, _playPosSynchronizer);
+
             SoundPlayer.Sounds = _project.Sounds;
 
             await TimelineDataLoaded();
@@ -169,7 +172,6 @@ namespace AwbStudio
 
             foreach (var timelineController in _timelineControllers)
             {
-                timelineController.ActualActuatorNames = _actuatorsService.Servos.Select(s => s.Title).ToArray();
                 timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
             }
 

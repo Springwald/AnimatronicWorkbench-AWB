@@ -7,7 +7,6 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
-using Awb.Core.Clients;
 using Awb.Core.Player;
 using AwbStudio.TimelineEditing;
 using System.Windows;
@@ -21,8 +20,10 @@ namespace AwbStudio.TimelineControls.PropertyControls
     public partial class FocusObjectPropertyEditor : UserControl
     {
         private TimelineViewContext? _viewContext;
-        private PlayPosSynchronizer _playPosSynchronizer;
+        private PlayPosSynchronizer? _playPosSynchronizer;
         private IAwbObject? _focusObject;
+        private IPropertyEditor? _actualPropertyEditor;
+
 
         public FocusObjectPropertyEditor()
         {
@@ -47,12 +48,10 @@ namespace AwbStudio.TimelineControls.PropertyControls
             _playPosSynchronizer.OnPlayPosChanged += PlayPosSynchronizer_OnPlayPosChanged;
         }
 
-        private void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
+        private async void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
         {
-            if (_focusObject is IServo servo)
-            {
-
-            };
+            if (_actualPropertyEditor != null)
+                await _actualPropertyEditor.UpdateValue();
         }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
@@ -60,13 +59,14 @@ namespace AwbStudio.TimelineControls.PropertyControls
             switch (e.ChangeType)
             {
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
-                    if (_viewContext != null)
+                    if (_viewContext != null && _viewContext.ActualFocusObject != _actualPropertyEditor?.AwbObject)
                     {
                         _focusObject = _viewContext.ActualFocusObject;
                         if (_focusObject == null)
                         {
                             LabelPropertyEditorTitle.Content = "Properties [nothing selected]";
-                            this.PropertyEditorGrid.Children.Clear();
+                            PropertyEditorGrid.Children.Clear();
+                            _actualPropertyEditor = null;
                             return;
                         }
 
@@ -75,9 +75,9 @@ namespace AwbStudio.TimelineControls.PropertyControls
                         // cast the focus object to a property editor
                         if (_focusObject is IServo servo)
                         {
-                            var propertyEditor = new ServoPropertiesControl();
+                            _actualPropertyEditor = new ServoPropertiesControl(servo);
                             this.PropertyEditorGrid.Children.Clear();
-                            this.PropertyEditorGrid.Children.Add(propertyEditor);
+                            this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }
                     }
                     break;

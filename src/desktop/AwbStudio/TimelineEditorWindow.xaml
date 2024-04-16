@@ -141,7 +141,7 @@
                     <RowDefinition Height="7*"></RowDefinition>
                     <RowDefinition Height="3*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <PropertyControls:FocusObjectPropertyEditor Grid.Row="0" x:Name="MyFocusObjectPropertyEditor"  />
+                <PropertyControls:FocusObjectPropertyEditor Grid.Row="0" x:Name="FocusObjectPropertyEditorControl"  />
                 <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                     <Label Background="Black" x:Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left" Opacity="0.3"/>
                 </ScrollViewer>

@@ -5,31 +5,27 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Awb.Core.ActuatorsAndObjects;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls.PropertyControls
 {
     /// <summary>
     /// Interaction logic for SoundPlayerPropertyControl.xaml
     /// </summary>
-    public partial class SoundPlayerPropertyControl : UserControl
+    public partial class SoundPlayerPropertyControl : UserControl, IPropertyEditor
     {
-        public SoundPlayerPropertyControl()
+        public IAwbObject AwbObject { get; }
+
+        public SoundPlayerPropertyControl(IAwbObject awbObject)
         {
             InitializeComponent();
+            AwbObject = awbObject;
+        }
+
+        public async Task UpdateValue()
+        {
         }
     }
 }
