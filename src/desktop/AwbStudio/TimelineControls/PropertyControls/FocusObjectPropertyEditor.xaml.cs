@@ -9,6 +9,8 @@ using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using AwbStudio.TimelineEditing;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,11 +21,12 @@ namespace AwbStudio.TimelineControls.PropertyControls
     /// </summary>
     public partial class FocusObjectPropertyEditor : UserControl
     {
+        private IServiceProvider _serviceProvider;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private IAwbObject? _focusObject;
         private IPropertyEditor? _actualPropertyEditor;
-
+        private IPropertyEditorVirtualInputController _propertyEditorVirtualInputController;
 
         public FocusObjectPropertyEditor()
         {
@@ -38,10 +41,14 @@ namespace AwbStudio.TimelineControls.PropertyControls
 
             if (_playPosSynchronizer != null)
                 _playPosSynchronizer.OnPlayPosChanged -= PlayPosSynchronizer_OnPlayPosChanged;
+
+            RemoveEditor();
         }
 
-        public void Init(TimelineViewContext timelineViewContext, PlayPosSynchronizer playPosSynchronizer)
+        public void Init(IServiceProvider serviceProvider, TimelineViewContext timelineViewContext, PlayPosSynchronizer playPosSynchronizer)
         {
+            _serviceProvider = serviceProvider;
+            _propertyEditorVirtualInputController = serviceProvider.GetRequiredService<IPropertyEditorVirtualInputController>();
             _viewContext = timelineViewContext;
             _viewContext.Changed += ViewContext_Changed;
             _playPosSynchronizer = playPosSynchronizer;
@@ -61,12 +68,12 @@ namespace AwbStudio.TimelineControls.PropertyControls
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                     if (_viewContext != null && _viewContext.ActualFocusObject != _actualPropertyEditor?.AwbObject)
                     {
+                        RemoveEditor();
                         _focusObject = _viewContext.ActualFocusObject;
+
                         if (_focusObject == null)
                         {
                             LabelPropertyEditorTitle.Content = "Properties [nothing selected]";
-                            PropertyEditorGrid.Children.Clear();
-                            _actualPropertyEditor = null;
                             return;
                         }
 
@@ -76,6 +83,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
                         if (_focusObject is IServo servo)
                         {
                             _actualPropertyEditor = new ServoPropertiesControl(servo);
+                            _actualPropertyEditor.OnValueChanged += OnValueChanged;
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }
@@ -88,9 +96,34 @@ namespace AwbStudio.TimelineControls.PropertyControls
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     break;
 
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
+                    if (_actualPropertyEditor != null && _viewContext?.ActualFocusObject == _actualPropertyEditor.AwbObject)
+                        _actualPropertyEditor.UpdateValue();
+                    break;
+
                 default:
                     throw new System.ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
         }
+
+        private void OnValueChanged(object? sender, EventArgs e)
+        {
+            if (_actualPropertyEditor != null && _actualPropertyEditor.AwbObject == _viewContext?.ActualFocusObject)
+            {
+                _viewContext.FocusObjectValueChanged();
+            }
+        }
+
+        private void RemoveEditor()
+        {
+            PropertyEditorGrid.Children.Clear();
+            if (_actualPropertyEditor != null)
+            {
+                _actualPropertyEditor.OnValueChanged -= OnValueChanged;
+                _actualPropertyEditor = null;
+            }
+        }
+
+
     }
 }

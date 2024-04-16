@@ -14,7 +14,6 @@ using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.Exports;
 using AwbStudio.Projects;
-using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using AwbStudio.Tools;
 using System;
@@ -38,6 +37,7 @@ namespace AwbStudio
         private readonly FileManagement.TimelineFileManager _fileManager;
         private readonly ITimelineController[] _timelineControllers;
         private readonly TimelineViewContext _viewContext;
+        private readonly IServiceProvider _serviceProvider;
         private TimelinePlayer _timelinePlayer;
         protected TimelineData _timelineData;
         private IActuatorsService _actuatorsService;
@@ -53,9 +53,11 @@ namespace AwbStudio
         private int _lastActuatorChanged = 1; // prevent double actuator change events to the midi controller
         private bool _ctrlKeyPressed;
 
-        public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IAwbLogger awbLogger)
+        public TimelineEditorWindow(IServiceProvider serviceProvider, ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IAwbLogger awbLogger)
         {
             InitializeComponent();
+
+            _serviceProvider = serviceProvider;
 
             DebugOutputLabel.Content = string.Empty;
 
@@ -119,6 +121,7 @@ namespace AwbStudio
                         timelineValuesEditorScrollViewer.ScrollToVerticalOffset(y.Value);
                     break;
 
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     break;
 
@@ -158,11 +161,12 @@ namespace AwbStudio
 
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             ValuesEditorControl.Timelineplayer = _timelinePlayer;
-            
+
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
 
-            FocusObjectPropertyEditorControl.Init(_viewContext, _playPosSynchronizer);
+
+            FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, _playPosSynchronizer);
 
             SoundPlayer.Sounds = _project.Sounds;
 

@@ -19,10 +19,13 @@ namespace AwbStudio.TimelineControls.PropertyControls
     /// </summary>
     public partial class ServoPropertiesControl : UserControl, IPropertyEditor
     {
-        private IServo _servo;
+        private readonly IServo _servo;
+
         private bool _isSetting;
         private double _value;
-        private double _inverseValue = 1;
+        private bool _inverseValue;
+
+        public event EventHandler OnValueChanged;
 
         public IAwbObject AwbObject => _servo;
 
@@ -35,14 +38,14 @@ namespace AwbStudio.TimelineControls.PropertyControls
             if (servo.MinValue > servo.MaxValue)
             {
                 // Inverted servo values
-                _inverseValue = -1;
+                _inverseValue = true;
                 SliderValue.Minimum = _servo.MaxValue;
                 SliderValue.Maximum = _servo.MinValue;
             }
             else
             {
                 // Normal servo values
-                _inverseValue = 1;
+                _inverseValue = false;
                 SliderValue.Minimum = _servo.MinValue;
                 SliderValue.Maximum =  _servo.MaxValue;
             }
@@ -69,6 +72,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
             Value = _servo.TargetValue;
         }
 
+
         protected override void OnMouseWheel(System.Windows.Input.MouseWheelEventArgs e)
         {
             var newValue = Math.Max(Math.Min(SliderValue.Value + e.Delta / 30d, SliderValue.Maximum), SliderValue.Minimum);
@@ -80,6 +84,9 @@ namespace AwbStudio.TimelineControls.PropertyControls
         {
             if (e.NewValue.Equals(e.OldValue)) return;
             if (_isSetting) return;
+          //  _servo.TargetValue = (int)(e.NewValue);
+          //  OnValueChanged?.Invoke(this, new EventArgs());
+          //  Value = e.NewValue;
         }
 
         private double Value
@@ -94,14 +101,15 @@ namespace AwbStudio.TimelineControls.PropertyControls
                 MyInvoker.Invoke(() =>
                 {
                     LabelValue.Content = $"{value:0.0}";
-                    if (_inverseValue == -1)
+                    if (_inverseValue)
                     {
-                        SliderValue.Value = SliderValue.Minimum - value  + SliderValue.Maximum;
+                       SliderValue.Value = SliderValue.Minimum - value  + SliderValue.Maximum;
                     } else
                     {
                         SliderValue.Value = value;
                     }
                 });
+
                 _isSetting = false;
             }
         }

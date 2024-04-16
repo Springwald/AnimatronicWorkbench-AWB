@@ -7,9 +7,6 @@
 
 using Awb.Core.ActuatorsAndObjects;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AwbStudio.TimelineControls.PropertyControls
@@ -17,6 +14,8 @@ namespace AwbStudio.TimelineControls.PropertyControls
     internal interface IPropertyEditor
     {
         IAwbObject AwbObject { get; }
+
+        event EventHandler OnValueChanged;
 
         Task UpdateValue();
     }

@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.ActuatorsAndObjects;
+using System;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
@@ -23,6 +24,8 @@ namespace AwbStudio.TimelineControls.PropertyControls
             InitializeComponent();
             AwbObject = awbObject;
         }
+
+        public event EventHandler OnValueChanged;
 
         public async Task UpdateValue()
         {

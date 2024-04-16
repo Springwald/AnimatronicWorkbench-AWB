@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 namespace AwbStudio.TimelineControls.PropertyControls
 {
 
-    internal interface IPropertyEditorVirtualInputController : ITimelineController
+    public interface IPropertyEditorVirtualInputController : ITimelineController
     {
     }
 
-    internal class PropertyEditorVirtualInputController : IPropertyEditorVirtualInputController
+    public class PropertyEditorVirtualInputController : IPropertyEditorVirtualInputController
     {
         private IAwbLogger _logger;
 

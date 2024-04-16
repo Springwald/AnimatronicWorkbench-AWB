@@ -148,8 +148,7 @@ namespace AwbStudio.TimelineControls
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
-                    break;
-
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     break;
 
