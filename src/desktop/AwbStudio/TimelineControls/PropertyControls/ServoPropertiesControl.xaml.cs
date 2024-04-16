@@ -22,6 +22,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
         private IServo _servo;
         private bool _isSetting;
         private double _value;
+        private double _inverseValue = 1;
 
         public IAwbObject AwbObject => _servo;
 
@@ -29,9 +30,22 @@ namespace AwbStudio.TimelineControls.PropertyControls
         {
             InitializeComponent();
             _servo = servo;
-            LabelName.Content = servo.Title; 
-            SliderValue.Minimum = Math.Min(_servo.MinValue, _servo.MaxValue);
-            SliderValue.Maximum = Math.Max(_servo.MinValue, _servo.MaxValue);
+            LabelName.Content = servo.Title;
+
+            if (servo.MinValue > servo.MaxValue)
+            {
+                // Inverted servo values
+                _inverseValue = -1;
+                SliderValue.Minimum = _servo.MaxValue;
+                SliderValue.Maximum = _servo.MinValue;
+            }
+            else
+            {
+                // Normal servo values
+                _inverseValue = 1;
+                SliderValue.Minimum = _servo.MinValue;
+                SliderValue.Maximum =  _servo.MaxValue;
+            }
             Loaded += ServoPropertiesControl_Loaded;
         }
 
@@ -76,10 +90,17 @@ namespace AwbStudio.TimelineControls.PropertyControls
                 if (value.Equals(Value)) return;
                 _value = value;
                 _isSetting = true;
+                
                 MyInvoker.Invoke(() =>
                 {
                     LabelValue.Content = $"{value:0.0}";
-                    SliderValue.Value = value;
+                    if (_inverseValue == -1)
+                    {
+                        SliderValue.Value = SliderValue.Minimum - value  + SliderValue.Maximum;
+                    } else
+                    {
+                        SliderValue.Value = value;
+                    }
                 });
                 _isSetting = false;
             }
