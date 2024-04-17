@@ -7,9 +7,9 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
-using Awb.Core.Tools;
 using AwbStudio.Tools;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
@@ -21,10 +21,10 @@ namespace AwbStudio.TimelineControls.PropertyControls
     public partial class ServoPropertiesControl : UserControl, IPropertyEditor
     {
         private readonly IServo _servo;
-        private bool _isSetting;
+        private volatile bool _isSetting;
         private double _percentValue;
 
-        public event EventHandler OnValueChanged;
+        public event EventHandler? OnValueChanged;
 
         public IAwbObject AwbObject => _servo;
 
@@ -68,9 +68,12 @@ namespace AwbStudio.TimelineControls.PropertyControls
         {
             if (e.NewValue.Equals(e.OldValue)) return;
             if (_isSetting) return;
+
+            Debug.WriteLine("Manual change to " + e.NewValue);
+
             _servo.TargetValue = (int)_servo.PercentCalculator.CalculateValue(e.NewValue);
-         //   OnValueChanged?.Invoke(this, new EventArgs());
-          //  PercentValue = e.NewValue;
+            PercentValue = e.NewValue;
+            OnValueChanged?.Invoke(this, new EventArgs());
         }
 
         private double PercentValue
@@ -79,17 +82,18 @@ namespace AwbStudio.TimelineControls.PropertyControls
             set
             {
                 if (value.Equals(_percentValue)) return;
-                _percentValue = value;
-                _isSetting = true;
-                
                 MyInvoker.Invoke(() =>
                 {
-                    LabelValue.Content = $"{value:0.00}%";
-                    SliderValue.Value = value;
-                });
+                    _percentValue = value;
+                    _isSetting = true;
 
-                _isSetting = false;
+                    LabelValue.Content = $"{_percentValue:0.00}%";
+                    SliderValue.Value = value;
+
+                    _isSetting = false;
+                });
             }
         }
+
     }
 }
