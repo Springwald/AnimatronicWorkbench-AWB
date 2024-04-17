@@ -63,6 +63,8 @@ namespace AwbStudio.TimelineControls.PropertyControls
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
+            if (sender == this) return;
+
             switch (e.ChangeType)
             {
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
@@ -110,7 +112,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
         {
             if (_actualPropertyEditor != null && _actualPropertyEditor.AwbObject == _viewContext?.ActualFocusObject)
             {
-                _viewContext.FocusObjectValueChanged();
+                _viewContext.FocusObjectValueChanged(this);
             }
         }
 

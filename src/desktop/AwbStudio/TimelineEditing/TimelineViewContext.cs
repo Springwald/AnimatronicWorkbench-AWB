@@ -27,9 +27,9 @@ namespace AwbStudio.TimelineEditing
         /// </summary>
         public EventHandler<ViewContextChangedEventArgs>? Changed;
 
-        public void FocusObjectValueChanged()
+        public void FocusObjectValueChanged(object sender)
         {
-            Changed?.Invoke(this, new ViewContextChangedEventArgs(ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue));
+            Changed?.Invoke(sender, new ViewContextChangedEventArgs(ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue));
         }   
 
         public IAwbObject? ActualFocusObject

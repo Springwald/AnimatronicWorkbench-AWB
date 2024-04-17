@@ -20,10 +20,9 @@ namespace AwbStudio.TimelineControls.PropertyControls
     public partial class ServoPropertiesControl : UserControl, IPropertyEditor
     {
         private readonly IServo _servo;
-
+        private readonly PercentCalculator _percentCalculator;
         private bool _isSetting;
-        private double _value;
-        private bool _inverseValue;
+        private double _percentValue;
 
         public event EventHandler OnValueChanged;
 
@@ -33,22 +32,8 @@ namespace AwbStudio.TimelineControls.PropertyControls
         {
             InitializeComponent();
             _servo = servo;
+            _percentCalculator = new PercentCalculator(servo.MinValue, servo.MaxValue);
             LabelName.Content = servo.Title;
-
-            if (servo.MinValue > servo.MaxValue)
-            {
-                // Inverted servo values
-                _inverseValue = true;
-                SliderValue.Minimum = _servo.MaxValue;
-                SliderValue.Maximum = _servo.MinValue;
-            }
-            else
-            {
-                // Normal servo values
-                _inverseValue = false;
-                SliderValue.Minimum = _servo.MinValue;
-                SliderValue.Maximum =  _servo.MaxValue;
-            }
             Loaded += ServoPropertiesControl_Loaded;
         }
 
@@ -69,45 +54,39 @@ namespace AwbStudio.TimelineControls.PropertyControls
 
         public async Task UpdateValue()
         {
-            Value = _servo.TargetValue;
+            PercentValue = _percentCalculator.CalculatePercent(_servo.TargetValue);
         }
 
 
         protected override void OnMouseWheel(System.Windows.Input.MouseWheelEventArgs e)
         {
-            var newValue = Math.Max(Math.Min(SliderValue.Value + e.Delta / 30d, SliderValue.Maximum), SliderValue.Minimum);
-            if (newValue.Equals(SliderValue.Value)) return;
-            Value = newValue;
+            var newPercentValue = Math.Max(Math.Min(SliderValue.Value + e.Delta / 30d, SliderValue.Maximum), SliderValue.Minimum);
+            if (newPercentValue.Equals(SliderValue.Value)) return;
+            PercentValue = newPercentValue;
         }
 
         private void SliderValue_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             if (e.NewValue.Equals(e.OldValue)) return;
             if (_isSetting) return;
-          //  _servo.TargetValue = (int)(e.NewValue);
-          //  OnValueChanged?.Invoke(this, new EventArgs());
-          //  Value = e.NewValue;
+            _servo.TargetValue = (int)_percentCalculator.CalculateValue(e.NewValue);
+            OnValueChanged?.Invoke(this, new EventArgs());
+            PercentValue = e.NewValue;
         }
 
-        private double Value
+        private double PercentValue
         {
-            get => _value;
+            get => _percentValue;
             set
             {
-                if (value.Equals(Value)) return;
-                _value = value;
+                if (value.Equals(_percentValue)) return;
+                _percentValue = value;
                 _isSetting = true;
                 
                 MyInvoker.Invoke(() =>
                 {
-                    LabelValue.Content = $"{value:0.0}";
-                    if (_inverseValue)
-                    {
-                       SliderValue.Value = SliderValue.Minimum - value  + SliderValue.Maximum;
-                    } else
-                    {
-                        SliderValue.Value = value;
-                    }
+                    LabelValue.Content = $"{value:0.00}%";
+                    SliderValue.Value = value;
                 });
 
                 _isSetting = false;
