@@ -9,6 +9,7 @@ using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using AwbStudio.TimelineEditing;
+using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Windows;
@@ -58,7 +59,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
         private async void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
         {
             if (_actualPropertyEditor != null)
-                await _actualPropertyEditor.UpdateValue();
+                MyInvoker.Invoke(async () => { await _actualPropertyEditor.UpdateValue(); });
         }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)

@@ -82,7 +82,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
             set
             {
                 if (value.Equals(_percentValue)) return;
-                MyInvoker.Invoke(() =>
+               // MyInvoker.Invoke(() =>
                 {
                     _percentValue = value;
                     _isSetting = true;
@@ -91,7 +91,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
                     SliderValue.Value = value;
 
                     _isSetting = false;
-                });
+                }//);
             }
         }
 
