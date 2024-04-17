@@ -45,12 +45,11 @@ namespace AwbStudio
 
 
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
-        private TimelineEditingManipulation _timelineEditingManipulation;
+        private TimelineEditingManipulation? _timelineEditingManipulation;
         private bool _unsavedChanges;
 
-        private volatile bool _manualUpdatingValues;
         private bool _switchingPages;
-        private int _lastActuatorChanged = 1; // prevent double actuator change events to the midi controller
+
         private bool _ctrlKeyPressed;
 
         public TimelineEditorWindow(IServiceProvider serviceProvider, ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IAwbLogger awbLogger)
@@ -90,8 +89,6 @@ namespace AwbStudio
             _viewContext.Changed += ViewContext_Changed;
 
             _playPosSynchronizer = new PlayPosSynchronizer();
-
-         
 
             Loaded += TimelineEditorWindow_Loaded;
         }
@@ -145,8 +142,6 @@ namespace AwbStudio
 
             this.IsEnabled = false;
 
-            _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;
-
             SetupToasts();
 
             if (_project.TimelinesStates?.Any() == false)
@@ -173,7 +168,6 @@ namespace AwbStudio
 
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
-
 
             FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, _playPosSynchronizer);
 
@@ -210,6 +204,7 @@ namespace AwbStudio
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (_timelineEditingManipulation != null) _timelineEditingManipulation.Dispose();
             _playPosSynchronizer.Dispose();
         }
 
@@ -285,207 +280,35 @@ namespace AwbStudio
 
             switch (e.EventType)
             {
-                case TimelineControllerEventArgs.EventTypes.PlayPosAbsoluteChanged:
-                    switch (_timelinePlayer.PlayState)
-                    {
-                        case TimelinePlayer.PlayStates.Playing:
-                            break;
-
-                        case TimelinePlayer.PlayStates.Nothing:
-                            _timelineControllerPlayViewPos.SetPositionFromValueInPercent(e.ValueInPercent);
-                            _playPosSynchronizer.SetNewPlayPos(_timelineControllerPlayViewPos.PlayPosAbsoluteMs);
-                            break;
-
-                        default:
-                            throw new ArgumentOutOfRangeException($"{nameof(_timelinePlayer.PlayState)}:{_timelinePlayer.PlayState.ToString()}");
-                    }
-                    _lastActuatorChanged = -1;
-                    break;
-
-                case TimelineControllerEventArgs.EventTypes.NextBank:
-                    SwitchToNextBank();
-                    break;
-
-                case TimelineControllerEventArgs.EventTypes.Play:
-                    Play();
-                    break;
-
-                case TimelineControllerEventArgs.EventTypes.Stop:
-                    Stop();
-                    break;
-
-                case TimelineControllerEventArgs.EventTypes.Forward:
-                    if (_timelinePlayer.PlaybackSpeed < 4) _timelinePlayer.PlaybackSpeed += 0.5;
-                    break;
-
-                case TimelineControllerEventArgs.EventTypes.Backwards:
-                    if (_timelinePlayer.PlaybackSpeed > 0.5) _timelinePlayer.PlaybackSpeed -= 0.5;
-                    break;
-
-
                 case TimelineControllerEventArgs.EventTypes.ActuatorValueChanged:
-                    _unsavedChanges = true;
-
-                    var allActuators = _actuatorsService?.AllActuators;
-                    if (allActuators == null) return;
-
-                    var actuatorIndex = e.ActuatorIndex_ + _viewContext.BankIndex * _viewContext.ItemsPerBank;
-                    if (actuatorIndex >= allActuators.Length) return;
-
-                    var actuator = allActuators[actuatorIndex];
-                    var targetPercent = e.ValueInPercent;
-
-                    switch (actuator)
-                    {
-                        case IServo servo:
-                            _timelineEditingManipulation.UpdateServoValue(servo, targetPercent);
-                            break;
-
-                        case ISoundPlayer soundPlayer:
-                            if (_project.Sounds.Length > 0)
-                            {
-                                var soundIndex = (int)((targetPercent * (_project.Sounds.Length - 1)) / 100);
-                                if (soundIndex > 0 && soundIndex < _project.Sounds.Length)
-                                {
-                                    var sound = _project.Sounds[soundIndex];
-                                    var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-                                    if (soundPoint == null)
-                                    {
-                                        soundPoint = new SoundPoint(timeMs: _playPosSynchronizer.PlayPosMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: sound.Id); ;
-                                        _timelineData!.SoundPoints.Add(soundPoint);
-                                    }
-                                    else
-                                    {
-                                        soundPoint.SoundId = sound.Id;
-                                        soundPoint.Title = sound.Title;
-                                    }
-                                    _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPoint.SoundPlayerId);
-
-                                }
-                            }
-                            break;
-
-                        default:
-                            throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
-                    }
-
-                    if (_lastActuatorChanged != actuatorIndex)
-                    {
-                        ShowActuatorValuesOnTimelineInputController();
-                        _lastActuatorChanged = actuatorIndex;
-                    }
-                    break;
-
                 case TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault:
                 case TimelineControllerEventArgs.EventTypes.ActuatorTogglePoint:
                     _unsavedChanges = true;
-                    _lastActuatorChanged = -1;
-                    var actuators = _actuatorsService?.AllActuators;
-                    if (actuators == null) return;
-
-                    actuatorIndex = e.ActuatorIndex_ + _viewContext.BankIndex * _viewContext.ItemsPerBank;
-                    if (actuatorIndex >= actuators.Length) return;
-
-                    actuator = actuators[actuatorIndex];
-
-                    switch (actuator)
-                    {
-                        case IServo servo:
-                            var servoPoint = _timelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-                            if (servoPoint == null)
-                            {
-                                // Insert a new servo point
-                                var targetValue = e.EventType == TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault ? servo.DefaultValue : servo.TargetValue;
-                                targetPercent = 100.0 * (targetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
-                                servo.TargetValue = targetValue;
-                                servoPoint = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMs);
-                                _timelineData?.ServoPoints.Add(servoPoint);
-                            }
-                            else
-                            {
-
-                                if (e.EventType == TimelineControllerEventArgs.EventTypes.ActuatorSetValueToDefault)
-                                {
-                                    // set target value to default
-                                    var targetValue = servo.DefaultValue;
-                                    targetPercent = 100.0 * (targetValue - servo.MinValue) / (servo.MaxValue - servo.MinValue);
-                                    servoPoint.ValuePercent = targetPercent;
-                                    servo.TargetValue = targetValue;
-                                }
-                                else
-                                {
-                                    // Remove the existing servo point
-                                    _timelineData?.ServoPoints.Remove(servoPoint);
-                                }
-                            }
-                            _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servoPoint.ServoId);
-                            break;
-                        case ISoundPlayer soundPlayer:
-                            if (_project.Sounds?.Any() == true)
-                            {
-
-                                var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-                                if (soundPoint == null)
-                                {
-                                    // Insert a new sound point
-                                    var soundId = soundPlayer.ActualSoundId == 0 ? _project.Sounds.FirstOrDefault()?.Id : soundPlayer.ActualSoundId;
-                                    var sound = _project.Sounds.FirstOrDefault(s => s.Id == soundId);
-                                    if (sound == null)
-                                    {
-                                        MessageBox.Show($"Actual sound id{soundPlayer.ActualSoundId} not found");
-                                    }
-                                    else
-                                    {
-                                        soundPoint = new SoundPoint(timeMs: _playPosSynchronizer.PlayPosMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: soundPlayer.ActualSoundId);
-                                        _timelineData?.SoundPoints.Add(soundPoint);
-                                    }
-                                }
-                                else
-                                {
-                                    // Remove the existing sound point
-                                    _timelineData?.SoundPoints.Remove(soundPoint);
-                                }
-                                _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPlayer.Id);
-                            }
-                            break;
-                        default:
-
-                            throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Title} is an unhandled actutuator type.");
-                    }
-
-                    _manualUpdatingValues = true;
-                    if (_manualUpdatingValues) await _timelinePlayer.UpdateActuators();
-                    _manualUpdatingValues = false;
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.NextPage:
                     await ScrollPaging(_timelineControllerPlayViewPos.PageWidthMs);
-                    _lastActuatorChanged = -1;
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.PreviousPage:
                     await ScrollPaging(_timelineControllerPlayViewPos.PageWidthMs);
-                    _lastActuatorChanged = -1;
                     break;
 
                 case TimelineControllerEventArgs.EventTypes.Save:
                     this.SaveTimelineData();
-                    _lastActuatorChanged = -1;
                     break;
-
-                default:
-                    throw new ArgumentOutOfRangeException($"{nameof(e.EventType)}:{e.EventType.ToString()}");
             }
         }
 
 
-
-        private void SwitchToNextBank()
+        private void PlayPos_Changed(object? sender, int newPlayPosMs)
         {
-            var newBankIndex = _viewContext.BankIndex + 1;
-            var maxBankIndex = _actuatorsService.AllIds.Length / _viewContext.ItemsPerBank;
-            if (newBankIndex > maxBankIndex) newBankIndex = 0;
-            _viewContext.BankIndex = newBankIndex;
+            MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X"));
+
+        }
+
+        private void OnPlayStateChanged(object? sender, PlayStateEventArgs e)
+        {
         }
 
         private async Task ScrollPaging(int howManyMs)
@@ -510,71 +333,6 @@ namespace AwbStudio
                 await Task.Delay(1000 / fps);
             }
             _switchingPages = false;
-        }
-
-        private void PlayPos_Changed(object? sender, int newPlayPosMs)
-        {
-            MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X"));
-
-            if (!_manualUpdatingValues)
-                ShowActuatorValuesOnTimelineInputController();
-
-            _timelineControllerPlayViewPos.SetPlayPosFromTimelineControl(newPlayPosMs);
-        }
-
-        private void OnPlayStateChanged(object? sender, PlayStateEventArgs e)
-        {
-        }
-
-        private void ShowActuatorValuesOnTimelineInputController()
-        {
-            if (_timelineControllers == null) return;
-
-            var playPosMs = _playPosSynchronizer.PlayPosMs;
-
-            var actuators = _actuatorsService?.AllActuators;
-            if (actuators == null) return;
-
-            for (int iActuator = 0; iActuator < actuators.Length; iActuator++)
-            {
-                var timelineControllerIndex = iActuator - _viewContext.BankIndex * _viewContext.ItemsPerBank;
-                if (timelineControllerIndex < 0 || timelineControllerIndex >= _viewContext.ItemsPerBank) continue;
-
-                switch (actuators[iActuator])
-                {
-                    case IServo servo:
-                        foreach (var timelineController in _timelineControllers)
-                        {
-                            timelineController.SetActuatorValue(index: timelineControllerIndex, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * (servo.TargetValue - servo.MinValue * 1.0) / (1.0 * servo.MaxValue - servo.MinValue))));
-                            timelineController.ShowPointButtonState(index: timelineControllerIndex, pointExists: _timelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
-                        }
-                        break;
-                    case ISoundPlayer soundPlayer:
-                        foreach (var timelineController in _timelineControllers)
-                        {
-                            if (_project.Sounds?.Any() == true)
-                            {
-                                var soundIndex = -1;
-                                for (int iSnd = 0; iSnd < _project.Sounds.Length; iSnd++)
-                                {
-                                    if (_project.Sounds[iSnd].Id == soundPlayer.ActualSoundId)
-                                    {
-                                        soundIndex = iSnd;
-                                        break;
-                                    }
-                                }
-                                if (soundIndex != -1)
-                                {
-                                    timelineController.SetActuatorValue(index: timelineControllerIndex, valueInPercent: Math.Max(0, Math.Min(100.0, 100.0 * soundIndex / _project.Sounds.Length)));
-                                    timelineController.ShowPointButtonState(index: timelineControllerIndex, pointExists: _timelineData.SoundPoints.Any(p => p.SoundPlayerId == soundPlayer.Id && p.TimeMs == playPosMs));
-                                }
-                            }
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException($"{actuators[iActuator].Id}/{actuators[iActuator].Title} is an unhandled actutuator type.");
-                }
-            }
         }
 
         private TimelineData CreateNewTimelineData(string title)
@@ -631,12 +389,24 @@ namespace AwbStudio
 
             _playPosSynchronizer.SetNewPlayPos(0);
 
+            if (_timelineEditingManipulation != null)
+            {
+                _timelineEditingManipulation.Dispose();
+                _timelineEditingManipulation = null;
+            }
+
             if (_timelinePlayer != null)
             {
                 await _timelinePlayer.UpdateActuators();
+                _timelineEditingManipulation = new TimelineEditingManipulation(
+                    timelineData: data,
+                    timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
+                    actuatorsService: _actuatorsService,
+                    timelinePlayer: _timelinePlayer,
+                    timelineControllers: _timelineControllers,
+                    viewContext: _viewContext,
+                    playPosSynchronizer: _playPosSynchronizer);
             }
-
-            _timelineEditingManipulation = new TimelineEditingManipulation(data, _viewContext, _playPosSynchronizer);
 
             _unsavedChanges = changesAfterLoading;
         }
@@ -690,21 +460,6 @@ namespace AwbStudio
             }
         }
 
-        private void Play()
-        {
-            _timelinePlayer?.Play();
-            foreach (var timelineController in _timelineControllers)
-                timelineController?.SetPlayState(ITimelineController.PlayStates.Playing);
-        }
-
-        private async void Stop()
-        {
-            // snap scrollpos to snap positions 
-            _timelinePlayer?.Stop();
-            foreach (var timelineController in _timelineControllers)
-                timelineController?.SetPlayState(ITimelineController.PlayStates.Editor);
-        }
-
 
         private void TxtActualTimelineName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
@@ -725,9 +480,9 @@ namespace AwbStudio
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e) => SaveTimelineData();
 
-        private void ButtonPlay_Click(object sender, RoutedEventArgs? e) => Play();
+        private void ButtonPlay_Click(object sender, RoutedEventArgs? e) => _timelineEditingManipulation?.Play();
 
-        private void ButtonStop_Click(object sender, RoutedEventArgs? e) => Stop();
+        private void ButtonStop_Click(object sender, RoutedEventArgs? e) => _timelineEditingManipulation?.Stop();
 
         private async void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
