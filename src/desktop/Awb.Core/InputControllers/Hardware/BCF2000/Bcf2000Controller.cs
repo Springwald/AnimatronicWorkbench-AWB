@@ -1,12 +1,13 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.InputControllers.Midi;
 using Awb.Core.Services;
+using Awb.Core.Tools;
 
 namespace Awb.Core.InputControllers.BCF2000
 {
@@ -16,11 +17,13 @@ namespace Awb.Core.InputControllers.BCF2000
         private LedState?[] _buttonLedStates = new LedState?[16];
 
         public EventHandler<Bcf2000EventArgs>? ActionReceived;
+        private readonly IInvoker? _invoker;
 
-        public Bcf2000Controller(IAwbLogger awbLogger) : base(deviceName: "BCF2000", awbLogger: awbLogger)
+        public Bcf2000Controller(IAwbLogger awbLogger, IInvoker invoker) : base(deviceName: "BCF2000", awbLogger: awbLogger)
         {
             if (_midiPort == null || !Available) return;
             _midiPort.OnInputEvent += _midiPort_OnInputEvent;
+            _invoker = invoker;
         }
 
         private void _midiPort_OnInputEvent(object? sender, MidiInputEventArgs e)
@@ -44,8 +47,9 @@ namespace Awb.Core.InputControllers.BCF2000
                     break;
                 default: throw new ArgumentOutOfRangeException(nameof(args.InputType) + ":" + args.InputType);
             }
-
-            ActionReceived?.Invoke(this, args);
+            // This is important! We must not call the event handler in the timer thread, because the event handler should update the UI.
+            // so we use the invoker using the hosting wpf application thread instead.
+            _invoker.Invoke(() => ActionReceived?.Invoke(this, args));
         }
 
         /// <summary>
