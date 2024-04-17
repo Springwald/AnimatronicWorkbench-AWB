@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Tools;
 using System.Timers;
 
 namespace Awb.Core.Player
@@ -25,7 +26,7 @@ namespace Awb.Core.Player
         /// Is the playpos to snap to the next snap position?
         /// </summary>
         private bool _inSnapMode = true;
-
+        private readonly IInvoker _invoker;
         private System.Timers.Timer? _timer;
 
         /// <summary>
@@ -38,8 +39,9 @@ namespace Awb.Core.Player
         /// </summary>
         public int PlayPosMs { get; private set; }
 
-        public PlayPosSynchronizer()
+        public PlayPosSynchronizer(IInvoker invoker)
         {
+            _invoker = invoker;
             _timer = new System.Timers.Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent!);
             _timer.Interval = _timerIntervalMs; // ms
@@ -51,7 +53,9 @@ namespace Awb.Core.Player
             if (_lastPlayPosAnnounced != PlayPosMs)
             {
                 _lastPlayPosAnnounced = PlayPosMs;
-                this.OnPlayPosChanged?.Invoke(this, PlayPosMs);
+                // this is important! We must not call the event handler in the timer thread, because the event handler should update the UI.
+                // so we use the invoker using the hosting wpf application thread instead.
+                _invoker.Invoke(() => this.OnPlayPosChanged?.Invoke(this, PlayPosMs));
             }
         }
 

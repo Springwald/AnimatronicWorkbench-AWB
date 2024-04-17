@@ -8,6 +8,7 @@
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Project;
 using Awb.Core.Services;
+using Awb.Core.Tools;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
 using AwbStudio.Tools;
@@ -31,35 +32,37 @@ namespace AwbStudio
         private readonly IProjectManagerService _projectManagerService;
         private readonly IServiceProvider _serviceProvider;
         private readonly IAwbStudioSettingsService _awbStudioSettingsService;
+        private readonly IInvokerService _invokerService;
         private readonly IAwbLogger _awbLogger;
 
-        public ProjectManagementWindow(IProjectManagerService projectManagerService, IAwbStudioSettingsService awbStudioSettingsService, IServiceProvider serviceProvider, IAwbLogger awbLogger)
+        public ProjectManagementWindow(IProjectManagerService projectManagerService, IAwbStudioSettingsService awbStudioSettingsService, IServiceProvider serviceProvider, IInvokerService invokerService, IAwbLogger awbLogger)
         {
             InitializeComponent();
             _projectManagerService = projectManagerService;
             _serviceProvider = serviceProvider;
             _awbStudioSettingsService = awbStudioSettingsService;
+            _invokerService = invokerService;
             _awbLogger = awbLogger;
 
             this.KeyDown += OnKeyDown;
 
             _awbLogger.OnLog += (s, args) =>
             {
-                MyInvoker.Invoke(new Action(() =>
+                WpfAppInvoker.Invoke(new Action(() =>
                 {
                     var msg = args;
                     if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
                     TextBoxDebugOutput.Text += msg + "\r\n";
-                }));
+                }), System.Windows.Threading.DispatcherPriority.Background);
             };
             _awbLogger.OnError += (s, args) =>
             {
-                MyInvoker.Invoke(new Action(() =>
+                WpfAppInvoker.Invoke(new Action(() =>
                 {
                     var msg = args;
                     if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
                     TextBoxDebugOutput.Text += msg + "\r\n";
-                }));
+                }), System.Windows.Threading.DispatcherPriority.Background);
             };
 
             Loaded += OnLoaded;
@@ -316,7 +319,7 @@ namespace AwbStudio
 
         private void ShowProjectTimelineEditor(IAwbClientsService clientsService, ITimelineController[] timelineControllers)
         {
-            var timelineEditorWindow = new TimelineEditorWindow(_serviceProvider, timelineControllers, _projectManagerService, clientsService, _awbLogger);
+            var timelineEditorWindow = new TimelineEditorWindow(_serviceProvider, timelineControllers, _projectManagerService, clientsService, _invokerService, _awbLogger);
             if (timelineEditorWindow != null)
             {
                 // hide the loading screen

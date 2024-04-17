@@ -39,7 +39,7 @@ namespace AwbStudio
 
         private async Task ShowMsg(string msg)
         {
-            MyInvoker.Invoke(new Action(() =>
+            WpfAppInvoker.Invoke(new Action(() =>
             {
                 if (_debugWindow?.TextBox != null)
                 {
@@ -47,7 +47,7 @@ namespace AwbStudio
                     while (_output.Count > 80) _output.RemoveAt(_output.Count - 1);
                     _debugWindow.TextBox.Text = string.Join("\r\n", _output);
                 }
-            }));
+            }), System.Windows.Threading.DispatcherPriority.Background);
         }
 
         public void Close()

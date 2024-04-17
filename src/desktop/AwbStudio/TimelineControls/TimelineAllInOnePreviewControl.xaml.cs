@@ -141,10 +141,10 @@ namespace AwbStudio.TimelineControls
                 case ViewContextChangedEventArgs.ChangeTypes.Duration:
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                     var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
-                    MyInvoker.Invoke(() =>
+                    //MyInvoker.Invoke(() =>
                     {
                         this.Width = newWidth;
-                    });
+                    }//);
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:

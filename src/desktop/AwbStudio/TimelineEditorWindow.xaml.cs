@@ -12,6 +12,7 @@ using Awb.Core.Player;
 using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using Awb.Core.Tools;
 using AwbStudio.Exports;
 using AwbStudio.Projects;
 using AwbStudio.TimelineEditing;
@@ -38,6 +39,7 @@ namespace AwbStudio
         private readonly ITimelineController[] _timelineControllers;
         private readonly TimelineViewContext _viewContext;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IInvokerService _invokerService;
         private TimelinePlayer? _timelinePlayer;
         protected TimelineData? _timelineData;
         private IActuatorsService _actuatorsService;
@@ -48,29 +50,30 @@ namespace AwbStudio
         private bool _switchingPages;
         private bool _ctrlKeyPressed;
 
-        public TimelineEditorWindow(IServiceProvider serviceProvider, ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IAwbLogger awbLogger)
+        public TimelineEditorWindow(IServiceProvider serviceProvider, ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
         {
             InitializeComponent();
 
             _serviceProvider = serviceProvider;
+            _invokerService = invokerService;
 
             DebugOutputLabel.Content = string.Empty;
 
             awbLogger.OnLog += (s, args) =>
             {
-                MyInvoker.Invoke(new Action(() =>
+                WpfAppInvoker.Invoke(new Action(() =>
                 {
                     var msg = args;
                     DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: {msg}\r\n{DebugOutputLabel.Content}";
-                }));
+                }), System.Windows.Threading.DispatcherPriority.Background);
             };
             awbLogger.OnError += (s, args) =>
             {
-                MyInvoker.Invoke(new Action(() =>
+                WpfAppInvoker.Invoke(new Action(() =>
                 {
                     var msg = args;
                     DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: ERR: {msg}\r\n{DebugOutputLabel.Content}";
-                }));
+                }), System.Windows.Threading.DispatcherPriority.Background);
             };
 
             _clientsService = clientsService;
@@ -84,7 +87,7 @@ namespace AwbStudio
             _viewContext = new TimelineViewContext();
             _viewContext.Changed += ViewContext_Changed;
 
-            _playPosSynchronizer = new PlayPosSynchronizer();
+            _playPosSynchronizer = new PlayPosSynchronizer(_invokerService.GetInvoker());
 
             Loaded += TimelineEditorWindow_Loaded;
         }
@@ -102,11 +105,11 @@ namespace AwbStudio
                     if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
                     {
                         _lastBankIndex = _viewContext.BankIndex;
-                        MyInvoker.Invoke(new Action(() =>
+                        //MyInvoker.Invoke(new Action(() =>
                         {
                             var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
                             labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
-                        }));
+                        }//));
                     }
                     break;
 
@@ -150,7 +153,7 @@ namespace AwbStudio
 
             this._timelineData = CreateNewTimelineData("");
 
-            _timelinePlayer = new TimelinePlayer(timelineData: this._timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, awbClientsService: _clientsService, logger: _logger);
+            _timelinePlayer = new TimelinePlayer(timelineData: this._timelineData,  playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, awbClientsService: _clientsService, invokerService: _invokerService,  logger: _logger);
             _timelinePlayer.OnPlayStateChanged +=       OnPlayStateChanged;
             _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
@@ -296,7 +299,9 @@ namespace AwbStudio
 
         private void PlayPos_Changed(object? sender, int newPlayPosMs)
         {
-            MyInvoker.Invoke(new Action(() => this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X"));
+            //MyInvoker.Invoke(new Action(() => 
+            this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X";
+            //));
         }
 
         private async Task ScrollPaging(int howManyMs)
@@ -312,10 +317,10 @@ namespace AwbStudio
             for (int i = 0; i < howManyMs / scrollSpeedMs; i++)
             {
                 var newScrollOffset = timelineAllValuesScrollViewer.HorizontalOffset + _viewContext.DurationMs / scrollSpeedMs;
-                MyInvoker.Invoke(new Action(() =>
+                //MyInvoker.Invoke(new Action(() =>
                 {
                     timelineAllValuesScrollViewer.ScrollToHorizontalOffset(newScrollOffset);
-                }));
+                }//));
                 newPosMs = _playPosSynchronizer.PlayPosMs + scrollSpeedMs;
                 _playPosSynchronizer.SetNewPlayPos(newPosMs);
                 await Task.Delay(1000 / fps);
@@ -432,7 +437,9 @@ namespace AwbStudio
             if (_fileManager.SaveTimelineData(_timelineData))
             {
                 _unsavedChanges = false;
-                MyInvoker.Invoke(new Action(() => { TimelineChooser.Refresh(); }));
+                //MyInvoker.Invoke(new Action(() => { 
+                    TimelineChooser.Refresh(); 
+                //}));
                 return true;
             }
             else

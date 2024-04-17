@@ -6,9 +6,11 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Services;
+using Awb.Core.Tools;
 using AwbStudio.DependencyInjection;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
+using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Windows;
@@ -31,6 +33,7 @@ namespace AwbStudio
         private void ConfigureServices(ServiceCollection services)
         {
             services.AddILoggerServices();
+            services.TryAddSingleton<IInvokerService, WpfAppInvokerService>();
             services.TryAddSingleton<IAwbStudioSettingsService, AwbStudioSettingsService>();
             services.AddPropertyEditorVirtualInputControllerService();
             services.AddInputControllerServices();

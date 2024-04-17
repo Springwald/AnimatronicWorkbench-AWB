@@ -71,12 +71,12 @@ namespace AwbStudio.TimelineControls
                 {
                     _lastPlayedSoundId = sound.Id;
                     _lastPlayedSoundUtcTime = DateTime.UtcNow;
-                    MyInvoker.Invoke(new Action(() =>
+                    //MyInvoker.Invoke(new Action(() =>
                     {
                         _mediaPlayer.Stop();
                         _mediaPlayer.Open(new Uri(sound.Mp3Filename));
                         _mediaPlayer.Play();
-                    }));
+                    }//));
                 }
             }
         }

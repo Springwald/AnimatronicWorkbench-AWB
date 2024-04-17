@@ -1,13 +1,14 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.InputControllers.BCF2000;
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.InputControllers.XTouchMini;
+using Awb.Core.Tools;
 
 namespace Awb.Core.Services
 {
@@ -21,6 +22,7 @@ namespace Awb.Core.Services
         private ITimelineController[]? _timelineControllers;
         private readonly IAwbLogger _logger;
         private readonly ITimelineController[] _additionalTimelineControllers;
+        private readonly IInvoker _invoker;
 
         public ITimelineController[] TimelineControllers
         {
@@ -31,7 +33,7 @@ namespace Awb.Core.Services
                     var list = new List<ITimelineController>();
 
                     // check behringer x-touch mini
-                    var xtouchMidiController = new XTouchMiniController(_logger);
+                    var xtouchMidiController = new XTouchMiniController(_logger, _invoker);
                     if (xtouchMidiController.Available)
                         list.Add(new XTouchMiniTimelineController(xtouchMidiController));
 
@@ -49,10 +51,11 @@ namespace Awb.Core.Services
             }
         }
 
-        public InputControllerService(IAwbLogger logger, ITimelineController[] additionalTimelineControllers)
+        public InputControllerService(IAwbLogger logger, IInvokerService invokerService, ITimelineController[] additionalTimelineControllers)
         {
             _logger = logger;
             _additionalTimelineControllers = additionalTimelineControllers;
+            _invoker = invokerService.GetInvoker();
         }
 
         public void Dispose()

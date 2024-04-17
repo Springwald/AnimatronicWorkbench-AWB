@@ -59,7 +59,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
         private async void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
         {
             if (_actualPropertyEditor != null)
-                MyInvoker.Invoke(async () => { await _actualPropertyEditor.UpdateValue(); });
+               await _actualPropertyEditor.UpdateValue(); 
         }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)

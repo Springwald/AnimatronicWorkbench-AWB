@@ -7,7 +7,7 @@
 
 using Awb.Core.Services;
 using Awb.Core.Timelines;
-using System.Runtime.CompilerServices;
+using Awb.Core.Tools;
 
 namespace Awb.Core.Player
 {
@@ -26,13 +26,14 @@ namespace Awb.Core.Player
 
         private PlayStates _playstateBackingField = PlayStates.Nothing;
 
-        public PlayStates PlayState {
-            get => _playstateBackingField; 
+        public PlayStates PlayState
+        {
+            get => _playstateBackingField;
             set
             {
                 _playstateBackingField = value;
                 PlayPosSynchronizer.PlayState = value;
-            } 
+            }
         }
 
         private volatile bool _timerFiring;
@@ -45,9 +46,9 @@ namespace Awb.Core.Player
 
         private readonly IActuatorsService _actuatorsService;
         private readonly IAwbLogger _logger;
-        
-        private readonly ChangesToClientSender _sender;
 
+        private readonly ChangesToClientSender _sender;
+        private readonly IInvoker _myInvoker;
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
         public EventHandler<SoundPlayEventArgs>? OnPlaySound;
 
@@ -69,14 +70,15 @@ namespace Awb.Core.Player
         /// to set the actuators to the initial position. Because of the async character of Play 
         /// this is not dont automatically.
         /// </remarks>
-        public TimelinePlayer(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, IAwbClientsService awbClientsService, IAwbLogger logger)
+        public TimelinePlayer(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, IAwbClientsService awbClientsService, IInvokerService invokerService, IAwbLogger logger)
         {
             if (timelineData == null) throw new ArgumentNullException(nameof(timelineData));
 
             _logger = logger;
-            
             _actuatorsService = actuatorsService;
             _sender = new ChangesToClientSender(actuatorsService, awbClientsService, _logger);
+            _myInvoker = invokerService.GetInvoker();
+
             TimelineData = timelineData;
 
             PlayPosSynchronizer = playPosSynchronizer;
@@ -101,7 +103,7 @@ namespace Awb.Core.Player
             PlayPosSynchronizer.PlayState = PlayState;
             await Task.CompletedTask;
         }
-        
+
 
         /// <summary>
         /// Move the actual play position to the given new position.
@@ -115,7 +117,7 @@ namespace Awb.Core.Player
             }
 
             var playPos = PlayPosSynchronizer.PlayPosMs;
-    
+
             _updating = true;
 
             var start = DateTime.UtcNow;
@@ -168,17 +170,17 @@ namespace Awb.Core.Player
                 var pointsWithMatchingMs = TimelineData.SoundPoints.Where(p => p.TargetObjectId == soundTargetObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
                 var targetPoint = pointsWithMatchingMs.OrderBy(p => Math.Abs(p.TimeMs - playPos)).FirstOrDefault();
                 if (targetPoint == null) continue; // no points found for this at the actual position
-                if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs (targetPoint.SoundId));
+                if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs(targetPoint.SoundId));
             }
 
             _playPosMsOnLastUpdate = playPos;
 
             var ok = await _sender.SendChangesToClients();
             _updating = false;
-           
+
         }
 
-        private async void PlayTimerCallback(object? state)
+        private void PlayTimerCallback(object? state)
         {
             if (_timerFiring) return;
 
@@ -188,27 +190,31 @@ namespace Awb.Core.Player
                 return;
             }
 
-            _timerFiring = true;
-
-            TimeSpan diff = (DateTime.UtcNow - _lastPlayUpdate.Value);
-            _lastPlayUpdate = DateTime.UtcNow;
-
-            if (PlayState == PlayStates.Playing)
+            _myInvoker.Invoke(() =>
             {
-                if (PlayPosSynchronizer.PlayPosMs >= TimelineData.DurationMs)
-                {
-                    PlayPosSynchronizer.SetNewPlayPos(0);
-                }
-                else
-                {
+                _timerFiring = true;
 
-                    var newPos = PlayPosSynchronizer.PlayPosMs + (int)(diff.TotalMilliseconds * PlaybackSpeed);
-                    if (newPos > TimelineData.DurationMs) newPos = TimelineData.DurationMs;
+                TimeSpan diff = (DateTime.UtcNow - _lastPlayUpdate.Value);
+                _lastPlayUpdate = DateTime.UtcNow;
+
+                if (PlayState == PlayStates.Playing)
+                {
+                    var newPos = 0;
+                    if (PlayPosSynchronizer.PlayPosMs >= TimelineData.DurationMs)
+                    {
+                        newPos = 0;
+                    }
+                    else
+                    {
+                        newPos = PlayPosSynchronizer.PlayPosMs + (int)(diff.TotalMilliseconds * PlaybackSpeed);
+                        if (newPos > TimelineData.DurationMs) newPos = TimelineData.DurationMs;
+
+                    }
                     PlayPosSynchronizer.SetNewPlayPos(newPos);
                 }
-            }
 
-            _timerFiring = false;
+                _timerFiring = false;
+            });
         }
 
         public async void Dispose()

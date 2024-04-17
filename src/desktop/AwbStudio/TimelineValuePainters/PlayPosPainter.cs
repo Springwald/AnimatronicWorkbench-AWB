@@ -55,8 +55,12 @@ namespace AwbStudio.TimelineValuePainters
             PaintPlayPos();
         }
 
-        private void OnPlayPosChanged(object? sender, int e) =>
-            MyInvoker.Invoke(new Action(() => PaintPlayPos()));
+        private void OnPlayPosChanged(object? sender, int e)
+        {
+            //MyInvoker.Invoke(new Action(() =>
+            PaintPlayPos();
+            //));
+        }
 
         public void TimelineDataLoaded(TimelineData timelineData)
         {
