@@ -26,7 +26,7 @@ namespace MidiControllerLiveControl
 
         public async Task Run()
         {
-            var midiController = new XTouchMiniController(_logger);
+            var midiController = new XTouchMiniController(_logger, new MockInvoker());
             midiController.ActionReceived += ActionReceived;
 
             for (int i = 0; i <= 8; i++)

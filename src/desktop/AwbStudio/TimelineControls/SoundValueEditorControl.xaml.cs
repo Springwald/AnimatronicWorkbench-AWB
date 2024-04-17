@@ -6,12 +6,14 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
+using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -22,7 +24,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for SoundValueViewerControl.xaml
     /// </summary>
-    public partial class SoundValueEditorControl : UserControl, ITimelineEditorControl
+    public partial class SoundValueEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
         private const double _paintMarginTopBottom = 30;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
@@ -34,6 +36,8 @@ namespace AwbStudio.TimelineControls
         private SoundValuePainter? _soundValuePainter;
         private TimelineCaption? _caption;
         private bool _isInitialized;
+
+        public IAwbObject? AwbObject => _soundPlayer;
 
         public SoundValueEditorControl()
         {
@@ -98,5 +102,10 @@ namespace AwbStudio.TimelineControls
             }
         }
 
+        private void Grid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_viewContext != null && _soundPlayer != null)
+                _viewContext.ActualFocusObject = _soundPlayer;
+        }
     }
 }

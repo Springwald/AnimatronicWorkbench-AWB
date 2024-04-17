@@ -6,15 +6,11 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.ActuatorsAndObjects;
-using System;
-using System.Threading.Tasks;
 
-namespace AwbStudio.TimelineControls.PropertyControls
+namespace AwbStudio.TimelineControls
 {
-    internal interface IPropertyEditor: IAwbObjectControl
+    public interface IAwbObjectControl
     {
-        event EventHandler OnValueChanged;
-
-        Task UpdateValue();
+        IAwbObject? AwbObject { get; }
     }
 }

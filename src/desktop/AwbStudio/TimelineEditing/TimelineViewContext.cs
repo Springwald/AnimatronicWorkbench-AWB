@@ -27,6 +27,11 @@ namespace AwbStudio.TimelineEditing
         /// </summary>
         public EventHandler<ViewContextChangedEventArgs>? Changed;
 
+        /// <summary>
+        /// If true, no actuator scrolling into view when ActualFocusObject changes is wanted at the moment
+        /// </summary>
+        public volatile bool PreventAllActuatorScrolling;
+
         public void FocusObjectValueChanged(object sender)
         {
             Changed?.Invoke(sender, new ViewContextChangedEventArgs(ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue));

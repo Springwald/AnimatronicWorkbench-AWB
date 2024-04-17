@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
@@ -22,7 +23,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for ServoValueViewerControl.xaml
     /// </summary>
-    public partial class ServoValueEditorControl : UserControl, ITimelineEditorControl
+    public partial class ServoValueEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private const double _paintMarginTopBottom = 30;
@@ -35,6 +36,8 @@ namespace AwbStudio.TimelineControls
         private ServoValuePainter? _servoValuePainter;
 
         public IServo? Servo { get; private set; }
+
+        public IAwbObject? AwbObject => Servo;
 
         public ServoValueEditorControl()
         {
@@ -98,5 +101,12 @@ namespace AwbStudio.TimelineControls
                 OpticalGrid.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = _gridLineBrush });
             }
         }
+
+        private void Grid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_viewContext != null && this.Servo != null)
+                _viewContext.ActualFocusObject = this.Servo;
+        }
+
     }
 }

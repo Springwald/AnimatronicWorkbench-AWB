@@ -10,13 +10,14 @@ using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
-using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {
@@ -32,9 +33,12 @@ namespace AwbStudio.TimelineControls
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
 
-        private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
+
         private PlayPosPainter? _playPosPainter;
         private GridTimePainter? _gridPainter;
+        private SolidColorBrush _highlightBackground;
+
+        public double ZoomVerticalHeightPerValueEditor { get; private set; } = 180; // pixel per value editor
 
         /// <summary>
         /// The timeline player to control the timeline playback
@@ -55,29 +59,14 @@ namespace AwbStudio.TimelineControls
         public TimelineValuesEditorControl()
         {
             InitializeComponent();
-
             Loaded += TimelineValuesEditorControl_Loaded;
-
         }
 
         private void TimelineValuesEditorControl_Loaded(object sender, RoutedEventArgs e)
         {
+            _highlightBackground = new SolidColorBrush(Color.FromRgb(50,50,60));
             Loaded -= TimelineValuesEditorControl_Loaded;
-
-            //var scrollBar = MyScrollViewer.Template.FindName("PART_HorizontalScrollBar", MyScrollViewer) as ScrollBar;
-            //if (scrollBar == null)
-            //    MessageBox.Show("HorizontalScrollBar not found");
-            //else
-            //    scrollBar.ValueChanged += ScrollingChanged;
-
             Unloaded += OnUnloaded;
-        }
-
-        private void ScrollingChanged(object? sender, EventArgs e)
-        {
-            //Debug.WriteLine(MyScrollViewer.HorizontalOffset);
-            //Console.WriteLine(MyScrollViewer.HorizontalOffset);
-
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -149,14 +138,13 @@ namespace AwbStudio.TimelineControls
 
         private void ZoomChanged()
         {
-            foreach (UserControl editorControl in _timelineEditorControls)
-                editorControl.Height = _zoomVerticalHeightPerValueEditor;
+            if (_timelineEditorControls != null)
+                foreach (UserControl editorControl in _timelineEditorControls)
+                    editorControl.Height = ZoomVerticalHeightPerValueEditor;
         }
-
 
         public double? GetScrollPosForEditorControl(IAwbObject? awbObject)
         {
-            // todo: scroll the view to the focus object
             if (awbObject is IServo servo)
                 foreach (var child in AllValuesEditorControlsStackPanel.Children)
                 {
@@ -170,8 +158,26 @@ namespace AwbStudio.TimelineControls
                         }
                     }
                 }
-
             return null;
+        }
+
+        private void HighlightActualObject()
+        {
+            if (_timelineData == null) return;
+            if (_viewContext == null) return;
+            if (_timelineEditorControls == null) return;
+
+            foreach (UserControl editorControl in _timelineEditorControls)
+            {
+                if ((editorControl as IAwbObjectControl)?.AwbObject == _viewContext.ActualFocusObject)
+                {
+                    editorControl.BorderBrush = Brushes.LightSlateGray;
+                    editorControl.BorderThickness = new Thickness(4); 
+                } else
+                {
+                    editorControl.BorderBrush =null;
+                }
+            }
         }
 
 
@@ -193,8 +199,11 @@ namespace AwbStudio.TimelineControls
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
-                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                    HighlightActualObject();
                     break;
 
                 default:

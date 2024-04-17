@@ -69,12 +69,11 @@ namespace AwbStudio.TimelineControls.PropertyControls
             if (e.NewValue.Equals(e.OldValue)) return;
             if (_isSetting) return;
 
-            Debug.WriteLine("Manual change to " + e.NewValue);
-
             _servo.TargetValue = (int)_servo.PercentCalculator.CalculateValue(e.NewValue);
             PercentValue = e.NewValue;
             OnValueChanged?.Invoke(this, new EventArgs());
         }
+
 
         private double PercentValue
         {
@@ -95,5 +94,6 @@ namespace AwbStudio.TimelineControls.PropertyControls
             }
         }
 
+      
     }
 }

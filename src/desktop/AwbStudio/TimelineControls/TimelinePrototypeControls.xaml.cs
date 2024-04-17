@@ -7,6 +7,7 @@
 
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using AwbStudio.Tools;
 
 namespace AwbStudio.TimelineControls
 {

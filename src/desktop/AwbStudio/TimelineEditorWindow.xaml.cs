@@ -116,7 +116,10 @@ namespace AwbStudio
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                     var y = ValuesEditorControl.GetScrollPosForEditorControl(_viewContext.ActualFocusObject);
                     if (y != null)
-                        timelineValuesEditorScrollViewer.ScrollToVerticalOffset(y.Value);
+                    {
+                        if (y < timelineValuesEditorScrollViewer.VerticalOffset || y + ValuesEditorControl.ZoomVerticalHeightPerValueEditor > timelineValuesEditorScrollViewer.ActualHeight - timelineValuesEditorScrollViewer.VerticalOffset )
+                            timelineValuesEditorScrollViewer.ScrollToVerticalOffset(y.Value); // scroll the view to the focus object
+                    }
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
@@ -125,6 +128,7 @@ namespace AwbStudio
                     {
                         _timelineEditingManipulation?.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     }
+                    _unsavedChanges = true;
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:

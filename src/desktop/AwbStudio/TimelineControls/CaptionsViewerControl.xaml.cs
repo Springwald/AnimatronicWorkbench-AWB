@@ -5,10 +5,12 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
+using AwbStudio.Tools;
 using System;
 using System.Linq;
 using System.Windows.Controls;
@@ -28,6 +30,8 @@ namespace AwbStudio.TimelineControls
         private TimelineCaptions? _timelineCaptions;
 
         private bool _isInitialized;
+
+        public IAwbObject AwbObject => null;
 
         public CaptionsViewerControl()
         {

@@ -5,16 +5,15 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.ActuatorsAndObjects;
-using System;
-using System.Threading.Tasks;
+using Awb.Core.Tools;
 
-namespace AwbStudio.TimelineControls.PropertyControls
+namespace MidiControllerLiveControl
 {
-    internal interface IPropertyEditor: IAwbObjectControl
+    internal class MockInvoker : IInvoker
     {
-        event EventHandler OnValueChanged;
-
-        Task UpdateValue();
+        public void Invoke(Action action, bool useBackgroundPriority = true)
+        {
+            action();
+        }
     }
 }
