@@ -5,9 +5,9 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-namespace AwbStudio.Tools
+namespace Awb.Core.Tools
 {
-    internal class PercentCalculator
+    public class PercentCalculator
     {
         public PercentCalculator(double min, double max)
         {

@@ -45,7 +45,7 @@ namespace AwbStudio
 
 
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
-
+        private TimelineEditingManipulation _timelineEditingManipulation;
         private bool _unsavedChanges;
 
         private volatile bool _manualUpdatingValues;
@@ -91,6 +91,8 @@ namespace AwbStudio
 
             _playPosSynchronizer = new PlayPosSynchronizer();
 
+         
+
             Loaded += TimelineEditorWindow_Loaded;
         }
 
@@ -125,8 +127,7 @@ namespace AwbStudio
                     var servo = _viewContext.ActualFocusObject as IServo;
                     if (servo != null)
                     {
-                        var percentCalculator = new PercentCalculator(servo.MinValue, servo.MaxValue);
-                        SetNewActuatorValue(servo, percentCalculator.CalculatePercent(servo.TargetValue));
+                        _timelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     }
                     break;
 
@@ -334,7 +335,39 @@ namespace AwbStudio
                     var actuator = allActuators[actuatorIndex];
                     var targetPercent = e.ValueInPercent;
 
-                    SetNewActuatorValue(actuator, targetPercent);
+                    switch (actuator)
+                    {
+                        case IServo servo:
+                            _timelineEditingManipulation.UpdateServoValue(servo, targetPercent);
+                            break;
+
+                        case ISoundPlayer soundPlayer:
+                            if (_project.Sounds.Length > 0)
+                            {
+                                var soundIndex = (int)((targetPercent * (_project.Sounds.Length - 1)) / 100);
+                                if (soundIndex > 0 && soundIndex < _project.Sounds.Length)
+                                {
+                                    var sound = _project.Sounds[soundIndex];
+                                    var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
+                                    if (soundPoint == null)
+                                    {
+                                        soundPoint = new SoundPoint(timeMs: _playPosSynchronizer.PlayPosMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: sound.Id); ;
+                                        _timelineData!.SoundPoints.Add(soundPoint);
+                                    }
+                                    else
+                                    {
+                                        soundPoint.SoundId = sound.Id;
+                                        soundPoint.Title = sound.Title;
+                                    }
+                                    _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPoint.SoundPlayerId);
+
+                                }
+                            }
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
+                    }
 
                     if (_lastActuatorChanged != actuatorIndex)
                     {
@@ -445,52 +478,7 @@ namespace AwbStudio
             }
         }
 
-        private void SetNewActuatorValue(IActuator actuator, double targetPercent)
-        {
-            switch (actuator)
-            {
-                case IServo servo:
-                    var servoPoint = _timelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-                    if (servoPoint == null)
-                    {
-                        servoPoint = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMs);
-                        _timelineData?.ServoPoints.Add(servoPoint);
-                    }
-                    else
-                    {
-                        servoPoint.ValuePercent = targetPercent;
-                    }
-                    _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servoPoint.ServoId);
-                    break;
 
-                case ISoundPlayer soundPlayer:
-                    if (_project.Sounds.Length > 0)
-                    {
-                        var soundIndex = (int)((targetPercent * (_project.Sounds.Length - 1)) / 100);
-                        if (soundIndex > 0 && soundIndex < _project.Sounds.Length)
-                        {
-                            var sound = _project.Sounds[soundIndex];
-                            var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-                            if (soundPoint == null)
-                            {
-                                soundPoint = new SoundPoint(timeMs: _playPosSynchronizer.PlayPosMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: sound.Id); ;
-                                _timelineData!.SoundPoints.Add(soundPoint);
-                            }
-                            else
-                            {
-                                soundPoint.SoundId = sound.Id;
-                                soundPoint.Title = sound.Title;
-                            }
-                            _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPoint.SoundPlayerId);
-
-                        }
-                    }
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
-            }
-        }
 
         private void SwitchToNextBank()
         {
@@ -647,6 +635,8 @@ namespace AwbStudio
             {
                 await _timelinePlayer.UpdateActuators();
             }
+
+            _timelineEditingManipulation = new TimelineEditingManipulation(data, _viewContext, _playPosSynchronizer);
 
             _unsavedChanges = changesAfterLoading;
         }

@@ -7,6 +7,7 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
+using Awb.Core.Tools;
 using AwbStudio.Tools;
 using System;
 using System.Threading.Tasks;
@@ -20,7 +21,6 @@ namespace AwbStudio.TimelineControls.PropertyControls
     public partial class ServoPropertiesControl : UserControl, IPropertyEditor
     {
         private readonly IServo _servo;
-        private readonly PercentCalculator _percentCalculator;
         private bool _isSetting;
         private double _percentValue;
 
@@ -32,7 +32,6 @@ namespace AwbStudio.TimelineControls.PropertyControls
         {
             InitializeComponent();
             _servo = servo;
-            _percentCalculator = new PercentCalculator(servo.MinValue, servo.MaxValue);
             LabelName.Content = servo.Title;
             Loaded += ServoPropertiesControl_Loaded;
         }
@@ -54,7 +53,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
 
         public async Task UpdateValue()
         {
-            PercentValue = _percentCalculator.CalculatePercent(_servo.TargetValue);
+            PercentValue = _servo.PercentCalculator.CalculatePercent(_servo.TargetValue);
         }
 
 
@@ -69,7 +68,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
         {
             if (e.NewValue.Equals(e.OldValue)) return;
             if (_isSetting) return;
-            _servo.TargetValue = (int)_percentCalculator.CalculateValue(e.NewValue);
+            _servo.TargetValue = (int)_servo.PercentCalculator.CalculateValue(e.NewValue);
             OnValueChanged?.Invoke(this, new EventArgs());
             PercentValue = e.NewValue;
         }

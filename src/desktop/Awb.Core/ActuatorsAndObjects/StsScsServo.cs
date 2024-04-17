@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Tools;
 
 namespace Awb.Core.Actuators
 {
@@ -85,6 +86,8 @@ namespace Awb.Core.Actuators
 
         public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}{StsScsType.ToString().ToUpper()}{Channel} {Title ?? string.Empty}";
 
+        public PercentCalculator PercentCalculator { get; }
+
         public StsScsServo(StsServoConfig config, StsScsTypes type)
         {
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
@@ -99,6 +102,8 @@ namespace Awb.Core.Actuators
             DefaultValue = defaultValue;
             TargetValue = defaultValue;
             IsDirty = true;
+
+            PercentCalculator = new PercentCalculator(MinValue, MaxValue);
         }
 
         public bool TurnOff()

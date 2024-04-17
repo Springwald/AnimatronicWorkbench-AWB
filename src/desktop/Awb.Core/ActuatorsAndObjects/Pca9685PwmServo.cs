@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Tools;
 
 namespace Awb.Core.Actuators
 {
@@ -24,6 +25,8 @@ namespace Awb.Core.Actuators
 
         public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}PWM{Channel} {Title ?? string.Empty}";
 
+        public PercentCalculator PercentCalculator { get; }
+
         public Pca9685PwmServo(Pca9685PwmServoConfig config)
         {
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
@@ -39,6 +42,8 @@ namespace Awb.Core.Actuators
 
             Channel = config.Channel;
             I2cAdress = config.I2cAdress;
+
+            PercentCalculator = new PercentCalculator(MinValue, MaxValue);
         }
 
         public bool TurnOff()

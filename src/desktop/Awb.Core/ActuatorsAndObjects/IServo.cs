@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Tools;
+
 namespace Awb.Core.Actuators
 {
     /// <summary>
@@ -41,5 +43,7 @@ namespace Awb.Core.Actuators
         /// </returns>
 
         bool TurnOff();
+
+        PercentCalculator PercentCalculator { get; }
     }
 }
