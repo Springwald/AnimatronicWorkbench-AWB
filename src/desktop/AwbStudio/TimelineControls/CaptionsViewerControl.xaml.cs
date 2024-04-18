@@ -13,6 +13,7 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.Tools;
 using System;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace AwbStudio.TimelineControls
@@ -46,10 +47,31 @@ namespace AwbStudio.TimelineControls
             _actuatorsService = actuatorsService;
             _timelineCaptions = timelineCaptions;
 
+            _viewContext.Changed += ViewContext_Changed;
+
             foreach (var actuator in _actuatorsService!.AllActuators)
                 _timelineCaptions.AddAktuator(actuator);
 
+            Unloaded += On_Unloaded;
+
             _isInitialized = true;
+        }
+
+        private void On_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (_viewContext != null)
+                _viewContext.Changed -= ViewContext_Changed;
+            Unloaded -= On_Unloaded;
+        }
+
+        private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
+        {
+            switch (e.ChangeType)
+            {
+                case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
+                    UpdateCaptionView();
+                    break;
+            }
         }
 
         public void TimelineDataLoaded(TimelineData timelineData)
@@ -62,30 +84,48 @@ namespace AwbStudio.TimelineControls
         private void UpdateCaptionView()
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-
             if (_timelineCaptions == null) return;
+            if (_viewContext == null) return;
 
             LineNames.Children.Clear();
+
             if (_timelineCaptions?.Captions?.Any() == true)
             {
                 int no = 0;
                 Border? border = null;
                 foreach (var caption in _timelineCaptions.Captions)
                 {
-                    no++;
-                    if (no >= _viewContext!.FirstBankItemNo && no <= _viewContext.LastBankItemNo)
+                    if (caption.ObjectIsControllerTuneable)
                     {
-                        // actuator is inside the actual bank
-                        border = WpfToolbox.XamlClone(_prototypeLabelBorderInActualBank);
+                        no++;
+                        if (no >= _viewContext!.FirstBankItemNo && no <= _viewContext.LastBankItemNo)
+                        {
+                            // actuator is inside the actual bank
+                            border = WpfToolbox.XamlClone(_prototypeLabelBorderInActualBank);
+                        }
+                        else
+                        {
+                            // actuatator is not inside the actual bank
+                            border = WpfToolbox.XamlClone(_prototypeLabelBorder);
+                        }
                     }
                     else
                     {
-                        // actuatator is not inside the actual bank
+                        // actuator is not tuneable
                         border = WpfToolbox.XamlClone(_prototypeLabelBorder);
                     }
 
                     var label = border.Child as Label ?? throw new ApplicationException("label border contains no label control?");
-                    label.Content = no >= _viewContext.FirstBankItemNo && no <= _viewContext.LastBankItemNo ? $"[{no - _viewContext.FirstBankItemNo + 1}] {caption.Label.Trim()}" : caption.Label.Trim();
+
+                    if (caption.ObjectIsControllerTuneable)
+                    {
+                        label.Content = no >= _viewContext.FirstBankItemNo && no <= _viewContext.LastBankItemNo ? $"[{no - _viewContext.FirstBankItemNo + 1}] {caption.Label.Trim()}" : caption.Label.Trim();
+                    } else
+                    {
+                        label.Content =  caption.Label.Trim();
+                    }
+
+                    
                     label.Foreground = caption.ForegroundColor;
                     label.Background = caption.BackgroundColor;
                     label.MouseDown += (sender, e) => _viewContext!.ActualFocusObject = _actuatorsService?.AllActuators.SingleOrDefault(a => a.Id == caption.Id);

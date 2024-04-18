@@ -25,5 +25,10 @@ namespace Awb.Core.Actuators
         /// Has the target value to be send as update to the client?
         /// </summary>
         bool IsDirty { get; set; }
+
+        /// <summary>
+        /// Is the actuator an number value based actor and can it also be tuned by the controller by spinning a knob or pushjing a slider?
+        /// </summary>
+        bool IsControllerTuneable { get; }
     }
 }

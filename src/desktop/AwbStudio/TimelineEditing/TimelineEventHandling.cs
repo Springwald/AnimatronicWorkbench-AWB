@@ -26,6 +26,7 @@ namespace AwbStudio.TimelineEditing
         private readonly TimelineViewContext _viewContext;
         private readonly TimelineEditingManipulation _timelineEditingManipulation;
         private readonly IActuator[] _allActuators;
+        private readonly IActuator[] _controllerTuneableActuators;
         private volatile bool _manualUpdatingValuesViaController;
         private int _lastActuatorChanged = 1; // prevent double actuator change events to the midi controller
 
@@ -36,6 +37,7 @@ namespace AwbStudio.TimelineEditing
 
             _actuatorsService = actuatorsService;
             _allActuators = _actuatorsService.AllActuators;
+            _controllerTuneableActuators = _allActuators.Where(a => a.IsControllerTuneable).ToArray();
 
             _timelineControllers = timelineControllers;
             _timelineControllerPlayViewPos = timelineControllerPlayViewPos;
@@ -66,8 +68,8 @@ namespace AwbStudio.TimelineEditing
             if (e.ActuatorIndex_ != -1)
             {
                 actuatorIndexAbsolute = e.ActuatorIndex_ + _viewContext.BankIndex * _viewContext.ItemsPerBank;
-                if (actuatorIndexAbsolute < _allActuators.Length)
-                    actuator = _allActuators[actuatorIndexAbsolute];
+                if (actuatorIndexAbsolute < _controllerTuneableActuators.Length)
+                    actuator = _controllerTuneableActuators[actuatorIndexAbsolute];
             }
 
             switch (e.EventType)
@@ -315,15 +317,14 @@ namespace AwbStudio.TimelineEditing
 
             var playPosMs = _playPosSynchronizer.PlayPosMs;
 
-            var actuators = _actuatorsService?.AllActuators;
-            if (actuators == null) return;
+            if (_controllerTuneableActuators == null) return;
 
-            for (int iActuator = 0; iActuator < actuators.Length; iActuator++)
+            for (int iActuator = 0; iActuator < _controllerTuneableActuators.Length; iActuator++)
             {
                 var timelineControllerIndex = iActuator - _viewContext.BankIndex * _viewContext.ItemsPerBank;
                 if (timelineControllerIndex < 0 || timelineControllerIndex >= _viewContext.ItemsPerBank) continue;
 
-                switch (actuators[iActuator])
+                switch (_controllerTuneableActuators[iActuator])
                 {
                     case IServo servo:
                         foreach (var timelineController in _timelineControllers)
@@ -355,7 +356,7 @@ namespace AwbStudio.TimelineEditing
                              }
                          }*/
                     default:
-                        throw new ArgumentOutOfRangeException($"{actuators[iActuator].Id}/{actuators[iActuator].Title} is an unhandled actutuator type.");
+                        throw new ArgumentOutOfRangeException($"{_controllerTuneableActuators[iActuator].Id}/{_controllerTuneableActuators[iActuator].Title} is an unhandled actutuator type.");
                 }
             }
         }

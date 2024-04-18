@@ -28,6 +28,7 @@ namespace Awb.Core.Services
 
         public IActuator[] AllActuators { get; }
 
+
         public ISoundPlayer[] SoundPlayers { get; }
 
         public ActuatorsService(AwbProject projectConfig, IAwbClientsService awbClientsService, IAwbLogger logger)

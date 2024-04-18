@@ -64,6 +64,8 @@ namespace Awb.Core.Actuators
 
         public int ActualSoundId { get; private set; }
 
+        public bool IsControllerTuneable => false;
+
         public Mp3PlayerYX5300(Mp3PlayerYX5300Config config)
         {
             Id = config.SoundPlayerId;

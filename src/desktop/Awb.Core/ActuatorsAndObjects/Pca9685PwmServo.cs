@@ -27,6 +27,8 @@ namespace Awb.Core.Actuators
 
         public PercentCalculator PercentCalculator { get; }
 
+        public bool IsControllerTuneable => true;
+
         public Pca9685PwmServo(Pca9685PwmServoConfig config)
         {
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;

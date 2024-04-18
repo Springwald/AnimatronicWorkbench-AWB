@@ -15,5 +15,6 @@ namespace AwbStudio.TimelineEditing
         public Brush ForegroundColor { get; set; }
         public Brush? BackgroundColor { get; set; }
         public string Id { get; set; }
+        public bool ObjectIsControllerTuneable { get; set; }    
     }
 }

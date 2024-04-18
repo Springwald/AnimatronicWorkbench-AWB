@@ -88,6 +88,8 @@ namespace Awb.Core.Actuators
 
         public PercentCalculator PercentCalculator { get; }
 
+        public bool IsControllerTuneable => true;
+
         public StsScsServo(StsServoConfig config, StsScsTypes type)
         {
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;

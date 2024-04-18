@@ -64,7 +64,8 @@ namespace AwbStudio.TimelineEditing
             AddCaption(new TimelineCaption
             {
                 Id = actuator.Id,
-                Label = label
+                Label = label,
+                ObjectIsControllerTuneable = actuator.IsControllerTuneable
             },
             inverse: actuator switch
             {
