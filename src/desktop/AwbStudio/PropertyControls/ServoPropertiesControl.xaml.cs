@@ -31,6 +31,8 @@ namespace AwbStudio.PropertyControls
             InitializeComponent();
             _servo = servo;
             LabelName.Content = "Servo " + servo.Title;
+            BtnSetToDefault.Content = $"{servo.PercentCalculator.CalculatePercent(servo.DefaultValue).ToString("0.00")}%";
+            SliderValueDefault.Value = servo.PercentCalculator.CalculatePercent(servo.DefaultValue);
             Loaded += ServoPropertiesControl_Loaded;
         }
 
@@ -72,6 +74,12 @@ namespace AwbStudio.PropertyControls
             OnValueChanged?.Invoke(this, new EventArgs());
         }
 
+        private void BtnSetToDefault_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            PercentValue = _servo.PercentCalculator.CalculatePercent(_servo.DefaultValue);
+            _servo.TargetValue = _servo.DefaultValue;
+            OnValueChanged?.Invoke(this, new EventArgs());
+        }
 
         private double PercentValue
         {
@@ -92,6 +100,6 @@ namespace AwbStudio.PropertyControls
             }
         }
 
-
+       
     }
 }

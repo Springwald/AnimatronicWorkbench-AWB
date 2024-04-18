@@ -10,20 +10,54 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
             <RowDefinition Height="*"/>
-            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
+
         <Label x:Name="LabelName"  Content="Ch 1"  Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="White"/>
-        <Slider x:Name="SliderValue" Orientation="Vertical" Grid.Row="1"  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Minimum="0" Maximum="100" Foreground="White" SmallChange="5" LargeChange="10" TickFrequency="-1"  >
-            <Slider.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform ScaleX="-1"/>
-                    <SkewTransform/>
-                    <RotateTransform/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </Slider.RenderTransform>
-        </Slider>
-        <Label x:Name="LabelValue" Content="100"  Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" />
+
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Slider x:Name="SliderValueDefault" IsEnabled="False" Orientation="Vertical" Grid.Row="0"  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Minimum="0" Maximum="100" Foreground="White" SmallChange="5" LargeChange="10" TickFrequency="-1"  >
+                    <Slider.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="-1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Slider.RenderTransform>
+                </Slider>
+                <Slider x:Name="SliderValue" Orientation="Vertical" Grid.Row="0"  RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Minimum="0" Maximum="100" Foreground="White" SmallChange="5" LargeChange="10" TickFrequency="-1"  >
+                    <Slider.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="-1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Slider.RenderTransform>
+                </Slider>
+               
+                <Label x:Name="LabelValue" Content="100,00%"  Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" />
+            </Grid>
+
+            <StackPanel Grid.Column="1">
+                <Label>Set to default:</Label>
+                <Button x:Name="BtnSetToDefault" Click="BtnSetToDefault_Click">100%</Button>
+                <Label>Toggle point:</Label>
+                <Button x:Name="BtnTooglePoint" Click="BtnSetToDefault_Click">Toggle</Button>
+            </StackPanel>
+
+        </Grid>
+
         <Rectangle Margin="2,2,2,2" Grid.RowSpan="3" Stroke="DarkGray"  />
     </Grid>
 </UserControl>
