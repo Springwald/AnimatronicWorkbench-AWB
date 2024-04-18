@@ -7,13 +7,11 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
-using AwbStudio.Tools;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace AwbStudio.TimelineControls.PropertyControls
+namespace AwbStudio.PropertyControls
 {
     /// <summary>
     /// Interaction logic for ServoPropertiesControl.xaml
@@ -32,7 +30,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
         {
             InitializeComponent();
             _servo = servo;
-            LabelName.Content = servo.Title;
+            LabelName.Content = "Servo " + servo.Title;
             Loaded += ServoPropertiesControl_Loaded;
         }
 
@@ -81,7 +79,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
             set
             {
                 if (value.Equals(_percentValue)) return;
-               // MyInvoker.Invoke(() =>
+                // MyInvoker.Invoke(() =>
                 {
                     _percentValue = value;
                     _isSetting = true;
@@ -94,6 +92,6 @@ namespace AwbStudio.TimelineControls.PropertyControls
             }
         }
 
-      
+
     }
 }

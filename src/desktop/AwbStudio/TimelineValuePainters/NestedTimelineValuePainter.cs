@@ -7,6 +7,7 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.Timelines;
+using AwbStudio.PropertyControls;
 using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;

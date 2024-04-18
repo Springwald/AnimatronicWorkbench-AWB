@@ -5,13 +5,13 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.ActuatorsAndObjects;
+using AwbStudio.TimelineControls;
 using System;
 using System.Threading.Tasks;
 
-namespace AwbStudio.TimelineControls.PropertyControls
+namespace AwbStudio.PropertyControls
 {
-    internal interface IPropertyEditor: IAwbObjectControl
+    internal interface IPropertyEditor : IAwbObjectControl
     {
         event EventHandler OnValueChanged;
 

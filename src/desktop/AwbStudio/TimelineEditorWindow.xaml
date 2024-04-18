@@ -7,7 +7,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:AwbStudio"
         xmlns:Timelines="clr-namespace:Awb.Core.Timelines;assembly=Awb.Core"
-        xmlns:PropertyControls="clr-namespace:AwbStudio.TimelineControls.PropertyControls" x:Class="AwbStudio.TimelineEditorWindow"
+        xmlns:PropertyControls="clr-namespace:AwbStudio.PropertyControls" x:Class="AwbStudio.TimelineEditorWindow"
         mc:Ignorable="d"
         Title="TimelineEditorWindow" Height="800" Width="1150">
     <Window.Icon>

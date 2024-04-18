@@ -7,7 +7,7 @@
 
 using System.Windows.Controls;
 
-namespace AwbStudio.TimelineControls.PropertyControls
+namespace AwbStudio.PropertyControls
 {
     /// <summary>
     /// Interaction logic for SoundPlayerPointLabel.xaml

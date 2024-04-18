@@ -8,14 +8,14 @@
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
+using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
-using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AwbStudio.TimelineControls.PropertyControls
+namespace AwbStudio.PropertyControls
 {
     /// <summary>
     /// Interaction logic for FocusObjectPropertyEditor.xaml
@@ -59,7 +59,7 @@ namespace AwbStudio.TimelineControls.PropertyControls
         private async void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
         {
             if (_actualPropertyEditor != null)
-               await _actualPropertyEditor.UpdateValue(); 
+                await _actualPropertyEditor.UpdateValue();
         }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)

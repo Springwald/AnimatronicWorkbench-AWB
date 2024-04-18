@@ -6,11 +6,12 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.ActuatorsAndObjects;
+using AwbStudio.PropertyControls;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace AwbStudio.TimelineControls.PropertyControls
+namespace AwbStudio.PropertyControls
 {
     /// <summary>
     /// Interaction logic for SoundPlayerPropertyControl.xaml
