@@ -45,7 +45,7 @@ namespace AwbStudio
         private IActuatorsService _actuatorsService;
         private int _lastBankIndex = -1;
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
-        private TimelineEditingManipulation? _timelineEditingManipulation;
+        private TimelineEventHandling? _timelineEventHandling;
         private bool _unsavedChanges;
         private bool _switchingPages;
         private bool _ctrlKeyPressed;
@@ -88,6 +88,7 @@ namespace AwbStudio
             _viewContext.Changed += ViewContext_Changed;
 
             _playPosSynchronizer = new PlayPosSynchronizer(_invokerService.GetInvoker());
+            _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;
 
             Loaded += TimelineEditorWindow_Loaded;
         }
@@ -98,6 +99,7 @@ namespace AwbStudio
             {
                 case ViewContextChangedEventArgs.ChangeTypes.Duration:
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
+                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
@@ -123,15 +125,7 @@ namespace AwbStudio
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
-                    var servo = _viewContext.ActualFocusObject as IServo;
-                    if (servo != null)
-                    {
-                        _timelineEditingManipulation?.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
-                    }
                     _unsavedChanges = true;
-                    break;
-
-                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     break;
 
                 default:
@@ -206,7 +200,7 @@ namespace AwbStudio
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (_timelineEditingManipulation != null) _timelineEditingManipulation.Dispose();
+            if (_timelineEventHandling != null) _timelineEventHandling.Dispose();
             _playPosSynchronizer.Dispose();
         }
 
@@ -303,9 +297,7 @@ namespace AwbStudio
 
         private void PlayPos_Changed(object? sender, int newPlayPosMs)
         {
-            //MyInvoker.Invoke(new Action(() => 
-            this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X";
-            //));
+            this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer?.PlaybackSpeed:0.0}X";
         }
 
         private async Task ScrollPaging(int howManyMs)
@@ -377,10 +369,10 @@ namespace AwbStudio
             }
             ComboTimelineStates.SelectedIndex = _project.TimelinesStates?.TakeWhile(t => t.Id != data.TimelineStateId).Count() ?? 0;
 
-            if (_timelineEditingManipulation != null)
+            if (_timelineEventHandling != null)
             {
-                _timelineEditingManipulation.Dispose();
-                _timelineEditingManipulation = null;
+                _timelineEventHandling.Dispose();
+                _timelineEventHandling = null;
             }
 
             _playPosSynchronizer.SetNewPlayPos(0);
@@ -388,7 +380,7 @@ namespace AwbStudio
             if (_timelinePlayer != null)
             {
                 await _timelinePlayer.UpdateActuators();
-                _timelineEditingManipulation = new TimelineEditingManipulation(
+                _timelineEventHandling = new TimelineEventHandling(
                     timelineData: data,
                     timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
                     actuatorsService: _actuatorsService,
@@ -472,9 +464,9 @@ namespace AwbStudio
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e) => SaveTimelineData();
 
-        private void ButtonPlay_Click(object sender, RoutedEventArgs? e) => _timelineEditingManipulation?.Play();
+        private void ButtonPlay_Click(object sender, RoutedEventArgs? e) => _timelineEventHandling?.Play();
 
-        private void ButtonStop_Click(object sender, RoutedEventArgs? e) => _timelineEditingManipulation?.Stop();
+        private void ButtonStop_Click(object sender, RoutedEventArgs? e) => _timelineEventHandling?.Stop();
 
         private async void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
