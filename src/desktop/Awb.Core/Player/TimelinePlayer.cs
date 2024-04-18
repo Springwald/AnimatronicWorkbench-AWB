@@ -148,7 +148,7 @@ namespace Awb.Core.Player
                 var targetServo = _actuatorsService.Servos.SingleOrDefault(o => o.Id.Equals(servoTargetObjectId));
                 if (targetServo == null)
                 {
-                    await _logger.LogError($"{nameof(UpdateActuators)}: Target object with id {servoTargetObjectId} not found.");
+                    await _logger.LogError($"{nameof(UpdateActuators)}: Targets servo object with id {servoTargetObjectId} not found.");
                 }
                 else
                 {
@@ -170,6 +170,21 @@ namespace Awb.Core.Player
                 var pointsWithMatchingMs = TimelineData.SoundPoints.Where(p => p.TargetObjectId == soundTargetObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
                 var targetPoint = pointsWithMatchingMs.OrderBy(p => Math.Abs(p.TimeMs - playPos)).FirstOrDefault();
                 if (targetPoint == null) continue; // no points found for this at the actual position
+
+                var targetSoundPlayerId = targetPoint.SoundPlayerId;
+                var targetSoundPlayer = _actuatorsService.SoundPlayers.SingleOrDefault(o => o.Id.Equals(targetSoundPlayerId));
+                if (targetSoundPlayer == null)
+                {
+                    await _logger.LogError($"{nameof(UpdateActuators)}: Target soundplayer object with id {targetSoundPlayerId} not found.");
+                }
+                else
+                {
+                    if (targetPoint.SoundId != targetSoundPlayer.ActualSoundId)
+                    {
+                        targetSoundPlayer.PlaySound(targetPoint.SoundId);
+                        targetSoundPlayer.IsDirty = true;
+                    }
+                }
                 if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs(targetPoint.SoundId));
             }
 
