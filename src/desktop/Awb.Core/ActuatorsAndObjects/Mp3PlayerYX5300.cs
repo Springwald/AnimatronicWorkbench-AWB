@@ -74,6 +74,7 @@ namespace Awb.Core.Actuators
             RxPin = config.RxPin;
             ActualSoundId = 0;
             IsDirty = true;
+            Title = string.IsNullOrWhiteSpace(config.Name) ? $"MP3-{config.SoundPlayerId}" : config.Name;
         }
 
         public void PlaySound(int soundId)

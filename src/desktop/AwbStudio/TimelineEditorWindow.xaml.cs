@@ -164,8 +164,7 @@ namespace AwbStudio
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
 
-            FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, _playPosSynchronizer);
-
+         
             SoundPlayer.Sounds = _project.Sounds;
 
             await TimelineDataLoaded();
@@ -388,6 +387,9 @@ namespace AwbStudio
                     timelineControllers: _timelineControllers,
                     viewContext: _viewContext,
                     playPosSynchronizer: _playPosSynchronizer);
+
+                FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, new TimelineEditingManipulation(data, _playPosSynchronizer), _playPosSynchronizer, _project.Sounds);
+
             }
 
             _unsavedChanges = changesAfterLoading;

@@ -53,11 +53,10 @@
                 <Label>Set to default:</Label>
                 <Button x:Name="BtnSetToDefault" Click="BtnSetToDefault_Click">100%</Button>
                 <Label>Toggle point:</Label>
-                <Button x:Name="BtnTooglePoint" Click="BtnSetToDefault_Click">Toggle</Button>
+                <Button x:Name="BtnTooglePoint" Click="BtnTooglePoint_Click" >Toggle</Button>
             </StackPanel>
 
         </Grid>
-
         <Rectangle Margin="2,2,2,2" Grid.RowSpan="3" Stroke="DarkGray"  />
     </Grid>
 </UserControl>

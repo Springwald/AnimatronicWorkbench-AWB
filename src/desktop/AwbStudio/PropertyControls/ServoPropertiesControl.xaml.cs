@@ -7,6 +7,7 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
+using AwbStudio.TimelineEditing;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -19,6 +20,7 @@ namespace AwbStudio.PropertyControls
     public partial class ServoPropertiesControl : UserControl, IPropertyEditor
     {
         private readonly IServo _servo;
+        private readonly TimelineEditingManipulation _timelineEditingManipulation;
         private volatile bool _isSetting;
         private double _percentValue;
 
@@ -26,10 +28,11 @@ namespace AwbStudio.PropertyControls
 
         public IAwbObject AwbObject => _servo;
 
-        public ServoPropertiesControl(IServo servo)
+        public ServoPropertiesControl(IServo servo, TimelineEditingManipulation timelineEditingManipulation)
         {
             InitializeComponent();
             _servo = servo;
+            _timelineEditingManipulation = timelineEditingManipulation;
             LabelName.Content = "Servo " + servo.Title;
             BtnSetToDefault.Content = $"{servo.PercentCalculator.CalculatePercent(servo.DefaultValue).ToString("0.00")}%";
             SliderValueDefault.Value = servo.PercentCalculator.CalculatePercent(servo.DefaultValue);
@@ -55,7 +58,6 @@ namespace AwbStudio.PropertyControls
         {
             PercentValue = _servo.PercentCalculator.CalculatePercent(_servo.TargetValue);
         }
-
 
         protected override void OnMouseWheel(System.Windows.Input.MouseWheelEventArgs e)
         {
@@ -87,19 +89,21 @@ namespace AwbStudio.PropertyControls
             set
             {
                 if (value.Equals(_percentValue)) return;
-                // MyInvoker.Invoke(() =>
-                {
-                    _percentValue = value;
-                    _isSetting = true;
+                _percentValue = value;
+                _isSetting = true;
 
-                    LabelValue.Content = $"{_percentValue:0.00}%";
-                    SliderValue.Value = value;
+                LabelValue.Content = $"{_percentValue:0.00}%";
+                SliderValue.Value = value;
 
-                    _isSetting = false;
-                }//);
+                _isSetting = false;
             }
         }
 
-       
+        private void BtnTooglePoint_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            _timelineEditingManipulation.ToggleServoPoint(_servo, _percentValue);
+        }
+
+
     }
 }

@@ -5,9 +5,11 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Accessibility;
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
+using Awb.Core.Sounds;
 using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,11 +25,14 @@ namespace AwbStudio.PropertyControls
     public partial class FocusObjectPropertyEditor : UserControl
     {
         private IServiceProvider _serviceProvider;
+        private Sound[]? _projectSounds;
+        private TimelineEditingManipulation? _timelineEditingManipulation;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private IAwbObject? _focusObject;
         private IPropertyEditor? _actualPropertyEditor;
         private IPropertyEditorVirtualInputController _propertyEditorVirtualInputController;
+        private bool _initialized;
 
         public FocusObjectPropertyEditor()
         {
@@ -46,14 +51,17 @@ namespace AwbStudio.PropertyControls
             RemoveEditor();
         }
 
-        public void Init(IServiceProvider serviceProvider, TimelineViewContext timelineViewContext, PlayPosSynchronizer playPosSynchronizer)
+        public void Init(IServiceProvider serviceProvider, TimelineViewContext timelineViewContext, TimelineEditingManipulation timelineEditingManipulation, PlayPosSynchronizer playPosSynchronizer, Sound[] projectSounds )
         {
             _serviceProvider = serviceProvider;
+            _projectSounds = projectSounds;
+            _timelineEditingManipulation = timelineEditingManipulation;
             _propertyEditorVirtualInputController = serviceProvider.GetRequiredService<IPropertyEditorVirtualInputController>();
             _viewContext = timelineViewContext;
             _viewContext.Changed += ViewContext_Changed;
             _playPosSynchronizer = playPosSynchronizer;
             _playPosSynchronizer.OnPlayPosChanged += PlayPosSynchronizer_OnPlayPosChanged;
+            _initialized = true;
         }
 
         private async void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
@@ -64,6 +72,7 @@ namespace AwbStudio.PropertyControls
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
+            if (_initialized == false) return;
             if (sender == this) return;
 
             switch (e.ChangeType)
@@ -85,7 +94,15 @@ namespace AwbStudio.PropertyControls
                         // cast the focus object to a property editor
                         if (_focusObject is IServo servo)
                         {
-                            _actualPropertyEditor = new ServoPropertiesControl(servo);
+                            _actualPropertyEditor = new ServoPropertiesControl(servo,_timelineEditingManipulation);
+                            _actualPropertyEditor.OnValueChanged += OnValueChanged;
+                            this.PropertyEditorGrid.Children.Clear();
+                            this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
+                        }
+
+                        if (_focusObject is ISoundPlayer soundPlayer)
+                        {
+                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer, _projectSounds);
                             _actualPropertyEditor.OnValueChanged += OnValueChanged;
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
@@ -111,7 +128,7 @@ namespace AwbStudio.PropertyControls
 
         private void OnValueChanged(object? sender, EventArgs e)
         {
-            if (_actualPropertyEditor != null && _actualPropertyEditor.AwbObject == _viewContext?.ActualFocusObject)
+            if (_viewContext != null && _actualPropertyEditor != null && _actualPropertyEditor.AwbObject == _viewContext?.ActualFocusObject)
             {
                 _viewContext.FocusObjectValueChanged(this);
             }
