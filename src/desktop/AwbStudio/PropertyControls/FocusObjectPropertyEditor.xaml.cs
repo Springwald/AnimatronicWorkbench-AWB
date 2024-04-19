@@ -10,6 +10,7 @@ using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Sounds;
+using AwbStudio.FileManagement;
 using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ namespace AwbStudio.PropertyControls
     {
         private IServiceProvider _serviceProvider;
         private Sound[]? _projectSounds;
+        private TimelineFileManager _timelineFileManager;
         private TimelineEditingManipulation? _timelineEditingManipulation;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
@@ -51,10 +53,11 @@ namespace AwbStudio.PropertyControls
             RemoveEditor();
         }
 
-        public void Init(IServiceProvider serviceProvider, TimelineViewContext timelineViewContext, TimelineEditingManipulation timelineEditingManipulation, PlayPosSynchronizer playPosSynchronizer, Sound[] projectSounds )
+        public void Init(IServiceProvider serviceProvider, TimelineViewContext timelineViewContext, TimelineEditingManipulation timelineEditingManipulation, PlayPosSynchronizer playPosSynchronizer, TimelineFileManager timelineFileManager, Sound[] projectSounds )
         {
             _serviceProvider = serviceProvider;
             _projectSounds = projectSounds;
+            _timelineFileManager = timelineFileManager;
             _timelineEditingManipulation = timelineEditingManipulation;
             _propertyEditorVirtualInputController = serviceProvider.GetRequiredService<IPropertyEditorVirtualInputController>();
             _viewContext = timelineViewContext;
@@ -106,6 +109,13 @@ namespace AwbStudio.PropertyControls
                             _actualPropertyEditor.OnValueChanged += OnValueChanged;
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
+                        }
+
+                        if (_focusObject == NestedTimelinesFakeObject.Singleton)
+                        {
+                            var editor = new NestedTimelinePropertyControl();
+                            _actualPropertyEditor = editor;
+                            editor.FileManager = _timelineFileManager;
                         }
                     }
                     break;

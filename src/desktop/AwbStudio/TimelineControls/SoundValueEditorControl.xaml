@@ -12,7 +12,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <local:ValueEditorHeaderControl x:Name="HeaderControl" Grid.Row="0"/>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Background="Transparent">
             <Grid x:Name="AllValuesGrid" >
             </Grid>
         </Grid>

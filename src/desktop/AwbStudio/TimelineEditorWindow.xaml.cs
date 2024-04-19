@@ -93,42 +93,7 @@ namespace AwbStudio
             Loaded += TimelineEditorWindow_Loaded;
         }
 
-        private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
-        {
-            switch (e.ChangeType)
-            {
-                case ViewContextChangedEventArgs.ChangeTypes.Duration:
-                case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
-                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
-                    break;
 
-                case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
-
-                    if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
-                    {
-                        _lastBankIndex = _viewContext.BankIndex;
-                        var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
-                        labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
-                    }
-                    break;
-
-                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
-                    var y = ValuesEditorControl.GetScrollPosForEditorControl(_viewContext.ActualFocusObject);
-                    if (y != null)
-                    {
-                        if (y < timelineValuesEditorScrollViewer.VerticalOffset || y + ValuesEditorControl.ZoomVerticalHeightPerValueEditor > timelineValuesEditorScrollViewer.ActualHeight - timelineValuesEditorScrollViewer.VerticalOffset)
-                            timelineValuesEditorScrollViewer.ScrollToVerticalOffset(y.Value); // scroll the view to the focus object
-                    }
-                    break;
-
-                case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
-                    _unsavedChanges = true;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
-            }
-        }
 
         private async void TimelineEditorWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -196,7 +161,45 @@ namespace AwbStudio
             _playPosSynchronizer.Dispose();
         }
 
-        private void CalculateSizeAndPixelPerMs() =>  this._viewContext.PixelPerMs = this.ActualWidth / msPerScreenWidth;
+
+        private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
+        {
+            switch (e.ChangeType)
+            {
+                case ViewContextChangedEventArgs.ChangeTypes.Duration:
+                case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
+                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
+
+                    if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
+                    {
+                        _lastBankIndex = _viewContext.BankIndex;
+                        var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
+                        labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
+                    }
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                    var y = ValuesEditorControl.GetScrollPosForEditorControl(_viewContext.ActualFocusObject);
+                    if (y != null)
+                    {
+                        if (y < timelineValuesEditorScrollViewer.VerticalOffset || y + ValuesEditorControl.ZoomVerticalHeightPerValueEditor > timelineValuesEditorScrollViewer.ActualHeight - timelineValuesEditorScrollViewer.VerticalOffset)
+                            timelineValuesEditorScrollViewer.ScrollToVerticalOffset(y.Value); // scroll the view to the focus object
+                    }
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
+                    _unsavedChanges = true;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
+            }
+        }
+
+        private void CalculateSizeAndPixelPerMs() => this._viewContext.PixelPerMs = this.ActualWidth / msPerScreenWidth;
 
         private void TimelineEditorWindow_SizeChanged(object sender, SizeChangedEventArgs e) => CalculateSizeAndPixelPerMs();
 
@@ -369,7 +372,7 @@ namespace AwbStudio
                     viewContext: _viewContext,
                     playPosSynchronizer: _playPosSynchronizer);
 
-                FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, new TimelineEditingManipulation(data, _playPosSynchronizer), _playPosSynchronizer, _project.Sounds);
+                FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, new TimelineEditingManipulation(data, _playPosSynchronizer), _playPosSynchronizer, _fileManager, _project.Sounds);
             }
             _unsavedChanges = changesAfterLoading;
         }

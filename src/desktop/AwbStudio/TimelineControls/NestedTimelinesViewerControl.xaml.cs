@@ -81,7 +81,7 @@ namespace AwbStudio.TimelineControls
 
         private void Grid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            _viewContext.ActualFocusObject = NestedTimelinesFakeObject.Singleton;
+            _viewContext.ActualFocusObject = AwbObject;
         }
     }
 }
