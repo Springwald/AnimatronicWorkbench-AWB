@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.LoadNSave.Export;
 using Awb.Core.Player;
@@ -40,12 +39,13 @@ namespace AwbStudio
         private readonly TimelineViewContext _viewContext;
         private readonly IServiceProvider _serviceProvider;
         private readonly IInvokerService _invokerService;
-        private TimelinePlayer? _timelinePlayer;
-        protected TimelineData? _timelineData;
         private IActuatorsService _actuatorsService;
-        private int _lastBankIndex = -1;
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
         private TimelineEventHandling? _timelineEventHandling;
+        private TimelinePlayer? _timelinePlayer;
+        protected TimelineData? _timelineData;
+
+        private int _lastBankIndex = -1;
         private bool _unsavedChanges;
         private bool _switchingPages;
         private bool _ctrlKeyPressed;
@@ -107,11 +107,8 @@ namespace AwbStudio
                     if (_lastBankIndex != _viewContext.BankIndex && _actuatorsService != null)
                     {
                         _lastBankIndex = _viewContext.BankIndex;
-                        //MyInvoker.Invoke(new Action(() =>
-                        {
-                            var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
-                            labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
-                        }//));
+                        var bankStartItemNo = _viewContext.BankIndex * _viewContext.ItemsPerBank + 1; // base 1
+                        labelBankNo.Content = $"Bank {_viewContext.BankIndex + 1} [{bankStartItemNo}-{Math.Min(_actuatorsService.AllIds.Length, bankStartItemNo + _viewContext.ItemsPerBank - 1)}]";
                     }
                     break;
 
@@ -119,7 +116,7 @@ namespace AwbStudio
                     var y = ValuesEditorControl.GetScrollPosForEditorControl(_viewContext.ActualFocusObject);
                     if (y != null)
                     {
-                        if (y < timelineValuesEditorScrollViewer.VerticalOffset || y + ValuesEditorControl.ZoomVerticalHeightPerValueEditor > timelineValuesEditorScrollViewer.ActualHeight - timelineValuesEditorScrollViewer.VerticalOffset )
+                        if (y < timelineValuesEditorScrollViewer.VerticalOffset || y + ValuesEditorControl.ZoomVerticalHeightPerValueEditor > timelineValuesEditorScrollViewer.ActualHeight - timelineValuesEditorScrollViewer.VerticalOffset)
                             timelineValuesEditorScrollViewer.ScrollToVerticalOffset(y.Value); // scroll the view to the focus object
                     }
                     break;
@@ -151,20 +148,17 @@ namespace AwbStudio
 
             this._timelineData = CreateNewTimelineData("");
 
-            _timelinePlayer = new TimelinePlayer(timelineData: this._timelineData,  playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, awbClientsService: _clientsService, invokerService: _invokerService,  logger: _logger);
-            _timelinePlayer.OnPlayStateChanged +=       OnPlayStateChanged;
+            _timelinePlayer = new TimelinePlayer(timelineData: this._timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
             _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
             var timelineCaptions = new TimelineCaptions();
             TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
 
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
-            ValuesEditorControl.Timelineplayer = _timelinePlayer;
 
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
 
-         
             SoundPlayer.Sounds = _project.Sounds;
 
             await TimelineDataLoaded();
@@ -195,7 +189,6 @@ namespace AwbStudio
             Unloaded += TimelineEditorWindow_Unloaded;
         }
 
-       
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -203,12 +196,11 @@ namespace AwbStudio
             _playPosSynchronizer.Dispose();
         }
 
-        private void CalculateSizeAndPixelPerMs()
-        {
-            this._viewContext.PixelPerMs = this.ActualWidth / msPerScreenWidth;
-        }
+        private void CalculateSizeAndPixelPerMs() =>  this._viewContext.PixelPerMs = this.ActualWidth / msPerScreenWidth;
 
         private void TimelineEditorWindow_SizeChanged(object sender, SizeChangedEventArgs e) => CalculateSizeAndPixelPerMs();
+
+        private async void TimelineChosenToLoad(object? sender, TimelineNameChosenEventArgs e) => await this.LoadTimelineData(filename: e.FileName);
 
         private void TimelineEditorWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -228,10 +220,7 @@ namespace AwbStudio
             }
         }
 
-        private string GetTimelineStateName(TimelineState ts)
-            => ts.Export ? ts.Title : $"{ts.Title} (no export)";
-
-        private async void TimelineChosenToLoad(object? sender, TimelineNameChosenEventArgs e) =>   await this.LoadTimelineData(filename: e.FileName);
+        private string GetTimelineStateName(TimelineState ts) => ts.Export ? ts.Title : $"{ts.Title} (no export)";
 
         private void TimelineEditorWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -260,8 +249,7 @@ namespace AwbStudio
                 timelineController.OnTimelineEvent -= TimelineController_OnTimelineEvent;
             }
 
-            _timelinePlayer.OnPlayStateChanged -= OnPlayStateChanged;
-            _timelinePlayer.Dispose();
+            _timelinePlayer!.Dispose();
         }
 
         private async void TimelineController_OnTimelineEvent(object? sender, TimelineControllerEventArgs e)
@@ -290,19 +278,12 @@ namespace AwbStudio
             }
         }
 
-        private void OnPlayStateChanged(object? sender, PlayStateEventArgs e)
-        {
-        }
-
-        private void PlayPos_Changed(object? sender, int newPlayPosMs)
-        {
+        private void PlayPos_Changed(object? sender, int newPlayPosMs) =>
             this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer?.PlaybackSpeed:0.0}X";
-        }
 
         private async Task ScrollPaging(int howManyMs)
         {
             if (ValuesEditorControl == null) return;
-            if (ValuesEditorControl.Timelineplayer == null) return;
             if (_switchingPages) return;
             int fps = 20;
             int speed = 4; // speed (x seconds per second)
@@ -389,9 +370,7 @@ namespace AwbStudio
                     playPosSynchronizer: _playPosSynchronizer);
 
                 FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, new TimelineEditingManipulation(data, _playPosSynchronizer), _playPosSynchronizer, _project.Sounds);
-
             }
-
             _unsavedChanges = changesAfterLoading;
         }
 
@@ -436,7 +415,7 @@ namespace AwbStudio
             {
                 _unsavedChanges = false;
                 //MyInvoker.Invoke(new Action(() => { 
-                    TimelineChooser.Refresh(); 
+                TimelineChooser.Refresh();
                 //}));
                 return true;
             }
@@ -445,7 +424,6 @@ namespace AwbStudio
                 return false;
             }
         }
-
 
         private void TxtActualTimelineName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
@@ -547,9 +525,6 @@ namespace AwbStudio
             exportWindow.Show();
             exportWindow.ShowResult(result);
         }
-
-
-
 
         #endregion Button Events
 

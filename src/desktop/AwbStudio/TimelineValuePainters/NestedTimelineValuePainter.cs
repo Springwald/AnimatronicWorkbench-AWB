@@ -21,13 +21,11 @@ namespace AwbStudio.TimelineValuePainters
     internal class NestedTimelineValuePainter : AbstractValuePainter
     {
         private const int _paintMarginTopBottom = 0;
-        private readonly ISoundPlayer _soundPlayer;
         private readonly TimelineCaptions _timelineCaptions;
 
-        public NestedTimelineValuePainter(ISoundPlayer soundPlayer, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions) :
+        public NestedTimelineValuePainter(Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions) :
             base(paintControl, viewContext, timelineCaptions)
         {
-            _soundPlayer = soundPlayer;
             _timelineCaptions = timelineCaptions;
         }
 
@@ -55,7 +53,7 @@ namespace AwbStudio.TimelineValuePainters
 
             double y = 0;
 
-            var caption = _timelineCaptions?.GetAktuatorCaption(_soundPlayer.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
+        /*    var caption = _timelineCaptions?.GetAktuatorCaption(_soundPlayer.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
 
             // Add polylines with points
             var pointsForThisSoundplayer = _timelineData?.SoundPoints.OfType<SoundPoint>().Where(p => p.SoundPlayerId == _soundPlayer.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<SoundPoint>();
@@ -76,7 +74,7 @@ namespace AwbStudio.TimelineValuePainters
                     };
                     PaintControl.Children.Add(label);
                 }
-            }
+            }*/
         }
 
         public new void Dispose()
@@ -87,7 +85,7 @@ namespace AwbStudio.TimelineValuePainters
         protected override bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs)
         {
             if (changedEventArgs.ChangeType != TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged) return false;
-            return this._soundPlayer.Id == changedEventArgs.ChangedObjectId;
+            return false; // this._soundPlayer.Id == changedEventArgs.ChangedObjectId;
         }
     }
 }

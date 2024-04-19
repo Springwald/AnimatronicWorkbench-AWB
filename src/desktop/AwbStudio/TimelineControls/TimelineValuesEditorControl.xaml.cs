@@ -10,7 +10,6 @@ using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
-using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
@@ -23,38 +22,18 @@ namespace AwbStudio.TimelineControls
 {
     public partial class TimelineValuesEditorControl : UserControl, ITimelineEditorControl
     {
-        private TimelineData? _timelineData;
+        private bool _isInitialized;
 
+        private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
-        private bool _isInitialized;
-        private TimelinePlayer? _timelinePlayer;
+        private PlayPosPainter? _playPosPainter;
+        private GridTimePainter? _gridPainter;
 
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
 
-
-        private PlayPosPainter? _playPosPainter;
-        private GridTimePainter? _gridPainter;
-        private SolidColorBrush _highlightBackground;
-
         public double ZoomVerticalHeightPerValueEditor { get; private set; } = 180; // pixel per value editor
-
-        /// <summary>
-        /// The timeline player to control the timeline playback
-        /// </summary>
-        public TimelinePlayer? Timelineplayer
-        {
-            get => _timelinePlayer;
-            set
-            {
-                _timelinePlayer = value;
-                if (_timelinePlayer != null)
-                {
-
-                }
-            }
-        }
 
         public TimelineValuesEditorControl()
         {
@@ -64,7 +43,6 @@ namespace AwbStudio.TimelineControls
 
         private void TimelineValuesEditorControl_Loaded(object sender, RoutedEventArgs e)
         {
-            _highlightBackground = new SolidColorBrush(Color.FromRgb(50,50,60));
             Loaded -= TimelineValuesEditorControl_Loaded;
             Unloaded += OnUnloaded;
         }
@@ -77,16 +55,21 @@ namespace AwbStudio.TimelineControls
             _gridPainter = null;
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(TimelineViewContext viewContext,TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
         {
             _viewContext = viewContext;
             _playPosSynchronizer = playPosSynchronizer;
             _viewContext.Changed += OnViewContextChanged;
-            // _playPosSynchronizer.OnPlayPosChanged += (sender, e) => MyInvoker.Invoke(new Action(() => { PaintPlayPos(); }));
 
             // set up the actuator value painters and editors
             _timelineEditorControls = [];
             _timelineValuePainters = [];
+
+            // add nested timelines painter + editors
+            var nestedTimelineEditorControl = new NestedTimelinesViewerControl();
+            nestedTimelineEditorControl.Init(viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
+            AllValuesEditorControlsStackPanel.Children.Add(nestedTimelineEditorControl);
+            _timelineEditorControls.Add(nestedTimelineEditorControl);
 
             // add servo painter + editors
             foreach (var servoActuator in actuatorsService.Servos)
@@ -111,8 +94,6 @@ namespace AwbStudio.TimelineControls
                 _timelineEditorControls.Add(editorControl);
             }
 
-
-            // todo: add nested timelines painter + editors
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
             _gridPainter = new GridTimePainter(OpticalTimeGrid, _viewContext);
 
@@ -140,7 +121,17 @@ namespace AwbStudio.TimelineControls
         {
             if (_timelineEditorControls != null)
                 foreach (UserControl editorControl in _timelineEditorControls)
-                    editorControl.Height = ZoomVerticalHeightPerValueEditor;
+                {
+                    if (editorControl is NestedTimelinesViewerControl || editorControl is SoundValueEditorControl)
+                    {
+                        editorControl.Height = Math.Max(80, ZoomVerticalHeightPerValueEditor / 4);
+                    }
+                    else
+                    {
+                        editorControl.Height = ZoomVerticalHeightPerValueEditor;
+                    }
+                }
+                    
         }
 
         public double? GetScrollPosForEditorControl(IAwbObject? awbObject)
@@ -172,14 +163,14 @@ namespace AwbStudio.TimelineControls
                 if ((editorControl as IAwbObjectControl)?.AwbObject == _viewContext.ActualFocusObject)
                 {
                     editorControl.BorderBrush = Brushes.LightSlateGray;
-                    editorControl.BorderThickness = new Thickness(4); 
-                } else
+                    editorControl.BorderThickness = new Thickness(4);
+                }
+                else
                 {
-                    editorControl.BorderBrush =null;
+                    editorControl.BorderBrush = null;
                 }
             }
         }
-
 
         private void OnViewContextChanged(object? sender, ViewContextChangedEventArgs e)
         {

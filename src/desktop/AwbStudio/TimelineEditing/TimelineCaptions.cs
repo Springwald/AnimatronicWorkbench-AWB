@@ -6,7 +6,6 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
@@ -77,6 +76,13 @@ namespace AwbStudio.TimelineEditing
 
         public TimelineCaption? GetAktuatorCaption(string aktuatorId)
         {
+            if (aktuatorId == NestedTimelinesFakeObject.Singleton.Id)
+                return new TimelineCaption
+                {
+                    Id = NestedTimelinesFakeObject.Singleton.Id,
+                    Label = NestedTimelinesFakeObject.Singleton.Title,
+                    ForegroundColor = new SolidColorBrush(Colors.White)
+                }; // special case for nested timelines (no real actuator
             return _captions.FirstOrDefault(c => c.Id == aktuatorId);
         }
 
