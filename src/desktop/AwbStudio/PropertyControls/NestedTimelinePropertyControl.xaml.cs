@@ -76,7 +76,7 @@ namespace AwbStudio.PropertyControls
         }
 
 
-        public async Task UpdateValue()
+        public async Task UpdateValue(int timeMs)
         {
             SoundId = _soundPlayer.ActualSoundId;
             //if (_projectSounds?.Any() == true)

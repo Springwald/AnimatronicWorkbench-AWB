@@ -372,7 +372,7 @@ namespace AwbStudio
                     viewContext: _viewContext,
                     playPosSynchronizer: _playPosSynchronizer);
 
-                FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, new TimelineEditingManipulation(data, _playPosSynchronizer), _playPosSynchronizer, _fileManager, _project.Sounds);
+                FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, data, new TimelineEditingManipulation(data, _playPosSynchronizer),  _playPosSynchronizer, _fileManager,  _project.Sounds);
             }
             _unsavedChanges = changesAfterLoading;
         }

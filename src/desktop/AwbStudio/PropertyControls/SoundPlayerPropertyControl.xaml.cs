@@ -8,6 +8,7 @@
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Sounds;
+using Awb.Core.Timelines;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,16 +22,18 @@ namespace AwbStudio.PropertyControls
     public partial class SoundPlayerPropertyControl : UserControl, IPropertyEditor
     {
         private readonly ISoundPlayer _soundPlayer;
+        private readonly TimelineData _timelineData;
         private readonly Sound[] _projectSounds;
         private bool _isSetting;
         private int _soundId;
 
         public IAwbObject AwbObject => _soundPlayer;
 
-        public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, Sound[] projectSounds)
+        public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, TimelineData timelineData, Sound[] projectSounds)
         {
             InitializeComponent();
             _soundPlayer = soundPlayer;
+            _timelineData = timelineData;
             _projectSounds = projectSounds;
 
             Loaded += SoundPlayerPropertyControl_Loaded;
@@ -43,16 +46,21 @@ namespace AwbStudio.PropertyControls
             {
                 ComboBoxSoundToPlay.Items.Add(sound.Title);
             }
-
-
         }
 
         public event EventHandler OnValueChanged;
 
 
-        public async Task UpdateValue()
+        public async Task UpdateValue(int timeMs)
         {
-            SoundId = _soundPlayer.ActualSoundId;
+            var point = _timelineData?.GetPoint<SoundPoint>(timeMs, _soundPlayer.Id);
+            if (point == null)
+            {
+                SoundId = -1;
+            } else 
+            {
+                SoundId = point.SoundId;
+            }
             //if (_projectSounds?.Any() == true)
             //{
 

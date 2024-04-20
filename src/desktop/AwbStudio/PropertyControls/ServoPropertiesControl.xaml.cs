@@ -7,6 +7,8 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
+using Awb.Core.Player;
+using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using System;
 using System.Threading.Tasks;
@@ -21,6 +23,8 @@ namespace AwbStudio.PropertyControls
     {
         private readonly IServo _servo;
         private readonly TimelineEditingManipulation _timelineEditingManipulation;
+        private readonly TimelineData _timelineData;
+        private readonly PlayPosSynchronizer _playPosSynchronizer;
         private volatile bool _isSetting;
         private double _percentValue;
 
@@ -28,11 +32,13 @@ namespace AwbStudio.PropertyControls
 
         public IAwbObject AwbObject => _servo;
 
-        public ServoPropertiesControl(IServo servo, TimelineEditingManipulation timelineEditingManipulation)
+        public ServoPropertiesControl(IServo servo, TimelineEditingManipulation timelineEditingManipulation, TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer)
         {
             InitializeComponent();
             _servo = servo;
             _timelineEditingManipulation = timelineEditingManipulation;
+            _timelineData = timelineData;
+            _playPosSynchronizer = playPosSynchronizer;
             LabelName.Content = "Servo " + servo.Title;
             BtnSetToDefault.Content = $"{servo.PercentCalculator.CalculatePercent(servo.DefaultValue).ToString("0.00")}%";
             SliderValueDefault.Value = servo.PercentCalculator.CalculatePercent(servo.DefaultValue);
@@ -45,7 +51,7 @@ namespace AwbStudio.PropertyControls
             Unloaded += ServoPropertiesControl_Unloaded;
 
             SliderValue.ValueChanged += SliderValue_ValueChanged;
-            await UpdateValue();
+            await UpdateValue(_playPosSynchronizer.PlayPosMs);
         }
 
         private void ServoPropertiesControl_Unloaded(object sender, System.Windows.RoutedEventArgs e)
@@ -54,7 +60,7 @@ namespace AwbStudio.PropertyControls
             SliderValue.ValueChanged -= SliderValue_ValueChanged;
         }
 
-        public async Task UpdateValue()
+        public async Task UpdateValue(int timeMs)
         {
             PercentValue = _servo.PercentCalculator.CalculatePercent(_servo.TargetValue);
         }

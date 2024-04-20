@@ -10,6 +10,7 @@ using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Sounds;
+using Awb.Core.Timelines;
 using AwbStudio.FileManagement;
 using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
@@ -29,6 +30,7 @@ namespace AwbStudio.PropertyControls
         private Sound[]? _projectSounds;
         private TimelineFileManager _timelineFileManager;
         private TimelineEditingManipulation? _timelineEditingManipulation;
+        private TimelineData _timelineData;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private IAwbObject? _focusObject;
@@ -53,12 +55,13 @@ namespace AwbStudio.PropertyControls
             RemoveEditor();
         }
 
-        public void Init(IServiceProvider serviceProvider, TimelineViewContext timelineViewContext, TimelineEditingManipulation timelineEditingManipulation, PlayPosSynchronizer playPosSynchronizer, TimelineFileManager timelineFileManager, Sound[] projectSounds )
+        public void Init(IServiceProvider serviceProvider, TimelineViewContext timelineViewContext, TimelineData timelineData, TimelineEditingManipulation timelineEditingManipulation, PlayPosSynchronizer playPosSynchronizer, TimelineFileManager timelineFileManager, Sound[] projectSounds )
         {
             _serviceProvider = serviceProvider;
             _projectSounds = projectSounds;
             _timelineFileManager = timelineFileManager;
             _timelineEditingManipulation = timelineEditingManipulation;
+            _timelineData = timelineData;
             _propertyEditorVirtualInputController = serviceProvider.GetRequiredService<IPropertyEditorVirtualInputController>();
             _viewContext = timelineViewContext;
             _viewContext.Changed += ViewContext_Changed;
@@ -67,10 +70,10 @@ namespace AwbStudio.PropertyControls
             _initialized = true;
         }
 
-        private async void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
+        private async void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int timeMs)
         {
             if (_actualPropertyEditor != null)
-                await _actualPropertyEditor.UpdateValue();
+                await _actualPropertyEditor.UpdateValue(timeMs);
         }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
@@ -97,7 +100,7 @@ namespace AwbStudio.PropertyControls
                         // cast the focus object to a property editor
                         if (_focusObject is IServo servo)
                         {
-                            _actualPropertyEditor = new ServoPropertiesControl(servo,_timelineEditingManipulation);
+                            _actualPropertyEditor = new ServoPropertiesControl(servo,_timelineEditingManipulation,_timelineData, _playPosSynchronizer);
                             _actualPropertyEditor.OnValueChanged += OnValueChanged;
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
@@ -105,7 +108,7 @@ namespace AwbStudio.PropertyControls
 
                         if (_focusObject is ISoundPlayer soundPlayer)
                         {
-                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer, _projectSounds);
+                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer,_timelineData,  _projectSounds);
                             _actualPropertyEditor.OnValueChanged += OnValueChanged;
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
@@ -128,7 +131,7 @@ namespace AwbStudio.PropertyControls
 
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                     if (_actualPropertyEditor != null && _viewContext?.ActualFocusObject == _actualPropertyEditor.AwbObject)
-                        _actualPropertyEditor.UpdateValue();
+                        _actualPropertyEditor.UpdateValue(_playPosSynchronizer!.PlayPosMs);
                     break;
 
                 default:

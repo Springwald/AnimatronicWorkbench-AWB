@@ -15,6 +15,6 @@ namespace AwbStudio.PropertyControls
     {
         event EventHandler OnValueChanged;
 
-        Task UpdateValue();
+        Task UpdateValue(int timeMs);
     }
 }
