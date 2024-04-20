@@ -30,12 +30,12 @@ namespace AwbStudio.PropertyControls
 
         public IAwbObject AwbObject => _servo;
 
-        public ServoPropertiesControl(IServo servo, TimelineEditingManipulation timelineEditingManipulation, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
+        public ServoPropertiesControl(IServo servo, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
         {
             InitializeComponent();
             _servo = servo;
-            _timelineEditingManipulation = timelineEditingManipulation;
             _timelineData = timelineData;
+            _timelineData.OnContentChanged+= TimelineData_OnContentChanged; 
             _viewContext = viewContext;
 
             _playPosSynchronizer = playPosSynchronizer;
@@ -45,6 +45,8 @@ namespace AwbStudio.PropertyControls
             SliderValueDefault.Value = servo.PercentCalculator.CalculatePercent(servo.DefaultValue);
             Loaded += ServoPropertiesControl_Loaded;
         }
+
+       
 
         private async void ServoPropertiesControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
@@ -77,6 +79,11 @@ namespace AwbStudio.PropertyControls
             }
         }
 
+        private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
+        {
+            if (e.ChangedObjectId == _servo.Id) ShowActualValue();
+        }
+
         private void OnPlayPosChanged(object? sender, int e)
         {
             if (_viewContext.ActualFocusObject == _servo)
@@ -105,7 +112,7 @@ namespace AwbStudio.PropertyControls
 
         private void BtnTooglePoint_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            _timelineEditingManipulation.ToggleServoPoint(_servo, _percentValue);
+            new TimelineEditingManipulation(_timelineData, _playPosSynchronizer).ToggleServoPoint(_servo, _percentValue);
             ShowActualValue();
         }
 

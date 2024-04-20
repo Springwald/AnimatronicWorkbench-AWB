@@ -91,7 +91,7 @@ namespace AwbStudio.PropertyControls
                         // cast the focus object to a property editor
                         if (_focusObject is IServo servo)
                         {
-                            _actualPropertyEditor = new ServoPropertiesControl(servo,_timelineEditingManipulation,_timelineData, _viewContext, _playPosSynchronizer);
+                            _actualPropertyEditor = new ServoPropertiesControl(servo,_timelineData, _viewContext, _playPosSynchronizer);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }

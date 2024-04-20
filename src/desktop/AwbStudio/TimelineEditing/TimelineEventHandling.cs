@@ -33,6 +33,7 @@ namespace AwbStudio.TimelineEditing
         public TimelineEventHandling(TimelineData timelineData, TimelineControllerPlayViewPos timelineControllerPlayViewPos, IActuatorsService actuatorsService, TimelinePlayer timelinePlayer, ITimelineController[] timelineControllers, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
         {
             _timelineData = timelineData;
+            _timelineData.OnContentChanged += TimelineData_ContentChanged;
             _timelinePlayer = timelinePlayer;
 
             _actuatorsService = actuatorsService;
@@ -54,6 +55,25 @@ namespace AwbStudio.TimelineEditing
             {
                 timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
             }
+        }
+
+        private async void TimelineData_ContentChanged(object? sender, TimelineDataChangedEventArgs e)
+        {
+            switch (e.ChangeType)
+            {
+                case TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged:
+                case TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged:
+                case TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged:
+                    if (!_manualUpdatingValuesViaController)
+                    {
+                        await _timelinePlayer.UpdateActuators();
+                        ShowActuatorValuesOnTimelineInputController();
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");    
+
+            }   
         }
 
         private void PlayPos_Changed(object? sender, int newPlayPosMs)
@@ -179,25 +199,7 @@ namespace AwbStudio.TimelineEditing
                         switch (actuator)
                         {
                             case IServo servo:
-                                var servoPoint = _timelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-                                if (servoPoint == null)
-                                {
-                                    // Insert a new servo point
-                                    var targetValue = servo.DefaultValue;
-                                    var targetPercent = servo.PercentCalculator.CalculatePercent(targetValue);
-                                    servo.TargetValue = targetValue;
-                                    servoPoint = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMs);
-                                    _timelineData?.ServoPoints.Add(servoPoint);
-                                }
-                                else
-                                {
-                                    // set target value to default
-                                    var targetValue = servo.DefaultValue;
-                                    var targetPercent = servo.PercentCalculator.CalculatePercent(targetValue);
-                                    servoPoint.ValuePercent = targetPercent;
-                                    servo.TargetValue = targetValue;
-                                }
-                                _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servoPoint.ServoId);
+                                _timelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.DefaultValue));
                                 break;
 
                             default:
@@ -311,6 +313,7 @@ namespace AwbStudio.TimelineEditing
         {
 
             _playPosSynchronizer.OnPlayPosChanged -= PlayPos_Changed;
+            _timelineData.OnContentChanged -= TimelineData_ContentChanged;
 
             foreach (var timelineController in _timelineControllers)
             {
