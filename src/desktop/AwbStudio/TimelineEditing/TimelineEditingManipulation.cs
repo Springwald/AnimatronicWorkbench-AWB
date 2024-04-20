@@ -28,17 +28,17 @@ namespace AwbStudio.TimelineEditing
 
         public void UpdateServoValue(IServo servo, double targetPercent)
         {
-            var servoPoint = _timelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-            if (servoPoint == null)
+            var point = _timelineData.GetPoint<ServoPoint>(_playPosSynchronizer.PlayPosMs, servo.Id);
+            if (point == null)
             {
-                servoPoint = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMs);
-                _timelineData?.ServoPoints.Add(servoPoint);
+                point = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMs);
+                _timelineData?.ServoPoints.Add(point);
             }
             else
             {
-                servoPoint.ValuePercent = targetPercent;
-            }
-            _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servoPoint.ServoId);
+                point.ValuePercent = targetPercent;
+                _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servo.Id);
+            }   
         }
 
         public void ToggleServoPoint(IServo servo, double percentValue)
@@ -78,7 +78,6 @@ namespace AwbStudio.TimelineEditing
             _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPlayer.Id);
         }
 
-      
 
         #endregion
     }

@@ -40,17 +40,17 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// All servo values changes of the timeline are stored as single points
         /// </summary>
-        public List<ServoPoint> ServoPoints { get; set; }
+        public List<ServoPoint> ServoPoints { get;  }
 
         /// <summary>
         /// All sound events of the timeline are stored as single points
         /// </summary>
-        public List<SoundPoint> SoundPoints { get; set; }
+        public List<SoundPoint> SoundPoints { get;  }
 
         /// <summary>
         /// All nested timelines are stored as single points
         /// </summary>
-        public List<NestedTimelinePoint> NestedTimelinePoints { get; set; }
+        public List<NestedTimelinePoint> NestedTimelinePoints { get;  }
 
         public int LatestPointMs => AllPoints.Max(p => p.TimeMs);
 
@@ -65,6 +65,29 @@ namespace Awb.Core.Timelines
 
         public TimelinePointType? GetPoint<TimelinePointType>(int timeMs, string awbObjectId) where TimelinePointType : TimelinePoint
             => AllPoints.OfType<TimelinePointType>().SingleOrDefault(p => p.AbwObjectId == awbObjectId && (int)p.TimeMs == timeMs); // check existing point
+
+        public TimelinePoint InsertPoint(TimelinePoint point)
+        {
+            if (point == null) throw new ArgumentNullException(nameof(point));
+
+            if (point is ServoPoint servoPoint)
+            {
+                ServoPoints.Add(servoPoint);
+                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, point.AbwObjectId);
+            }
+            else if (point is SoundPoint soundPoint)
+            {
+                SoundPoints.Add(soundPoint);
+                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, point.AbwObjectId);
+            }
+            else if (point is NestedTimelinePoint nestedTimelinePoint)
+            {
+                NestedTimelinePoints.Add(nestedTimelinePoint);
+                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged, point.AbwObjectId);
+            }
+
+            throw new ArgumentOutOfRangeException($"Point type {typeof(Point)} not supported for RemovePoint method.");
+        }
 
         public bool RemovePoint<TimelinePointType>(int timeMs, string awbObjectId) where TimelinePointType : TimelinePoint
         {
