@@ -54,7 +54,7 @@ namespace AwbStudio.PropertyControls
             SliderValue.ValueChanged += SliderValue_ValueChanged;
             _playPosSynchronizer.OnPlayPosChanged += OnPlayPosChanged;
             _viewContext.Changed += ViewContext_Changed;
-            SetNewValue(_servo.PercentCalculator.CalculatePercent(_servo.TargetValue), fireChangedEvent: false);
+            ShowActualValue();
         }
 
         private void ServoPropertiesControl_Unloaded(object sender, System.Windows.RoutedEventArgs e)
@@ -72,7 +72,7 @@ namespace AwbStudio.PropertyControls
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                     if (_viewContext.ActualFocusObject == _servo)
-                        SetNewValue(_servo.PercentCalculator.CalculatePercent(_servo.TargetValue), fireChangedEvent: false);
+                        ShowActualValue();
                     break;
             }
         }
@@ -80,49 +80,57 @@ namespace AwbStudio.PropertyControls
         private void OnPlayPosChanged(object? sender, int e)
         {
             if (_viewContext.ActualFocusObject == _servo)
-                SetNewValue(_servo.PercentCalculator.CalculatePercent(_servo.TargetValue), fireChangedEvent: false);
+                ShowActualValue();
         }
 
         protected override void OnMouseWheel(System.Windows.Input.MouseWheelEventArgs e)
         {
             var newPercentValue = Math.Max(Math.Min(SliderValue.Value + e.Delta / 30d, SliderValue.Maximum), SliderValue.Minimum);
             if (newPercentValue.Equals(SliderValue.Value)) return;
-            SetNewValue(newPercentValue, fireChangedEvent: true);
+            SetNewValue(newPercentValue);
         }
 
         private void SliderValue_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             if (e.NewValue.Equals(e.OldValue)) return;
             if (_isSetting) return;
-            SetNewValue(e.NewValue, fireChangedEvent: true);
+            SetNewValue(e.NewValue);
         }
 
         private void BtnSetToDefault_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             var percentValue = _servo.PercentCalculator.CalculatePercent(_servo.DefaultValue);
-            SetNewValue(percentValue, fireChangedEvent: true);
+            SetNewValue(percentValue);
         }
 
         private void BtnTooglePoint_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             _timelineEditingManipulation.ToggleServoPoint(_servo, _percentValue);
+            ShowActualValue();
         }
 
-        private void SetNewValue(double percentValue, bool fireChangedEvent)
+        private void SetNewValue(double percentValue)
         {
             if (percentValue.Equals(_percentValue)) return;
             _percentValue = percentValue;
             _isSetting = true;
 
-            LabelValue.Content = $"{_percentValue:0.00}%";
-            SliderValue.Value = percentValue;
-
-            if (_servo.TargetValue != (int)_servo.PercentCalculator.CalculateValue(percentValue) && fireChangedEvent)
+            if (_servo.TargetValue != (int)_servo.PercentCalculator.CalculateValue(percentValue))
             {
                 _servo.TargetValue = (int)_servo.PercentCalculator.CalculateValue(percentValue);
                 _viewContext.FocusObjectValueChanged(this);
             }
+
+            ShowActualValue();
+
             _isSetting = false;
+        }
+
+        private void ShowActualValue()
+        {
+            _percentValue = (int)_servo.PercentCalculator.CalculatePercent(_servo.TargetValue);
+            LabelValue.Content = $"{_percentValue:0.00}%";
+            SliderValue.Value = _percentValue;
         }
 
 

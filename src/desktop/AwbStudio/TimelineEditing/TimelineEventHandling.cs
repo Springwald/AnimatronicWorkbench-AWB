@@ -212,9 +212,7 @@ namespace AwbStudio.TimelineEditing
 
 
                 case TimelineControllerEventArgs.EventTypes.ActuatorTogglePoint:
-
                     _lastActuatorChanged = -1;
-
                     if (actuator != null)
                     {
                         switch (actuator)
