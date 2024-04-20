@@ -49,9 +49,6 @@ namespace AwbStudio.PropertyControls
             if (_viewContext != null)
                 _viewContext.Changed -= ViewContext_Changed;
 
-            if (_playPosSynchronizer != null)
-                _playPosSynchronizer.OnPlayPosChanged -= PlayPosSynchronizer_OnPlayPosChanged;
-
             RemoveEditor();
         }
 
@@ -66,15 +63,9 @@ namespace AwbStudio.PropertyControls
             _viewContext = timelineViewContext;
             _viewContext.Changed += ViewContext_Changed;
             _playPosSynchronizer = playPosSynchronizer;
-            _playPosSynchronizer.OnPlayPosChanged += PlayPosSynchronizer_OnPlayPosChanged;
             _initialized = true;
         }
 
-        private async void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int timeMs)
-        {
-            if (_actualPropertyEditor != null)
-                await _actualPropertyEditor.UpdateValue(timeMs);
-        }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
@@ -100,8 +91,7 @@ namespace AwbStudio.PropertyControls
                         // cast the focus object to a property editor
                         if (_focusObject is IServo servo)
                         {
-                            _actualPropertyEditor = new ServoPropertiesControl(servo,_timelineEditingManipulation,_timelineData, _playPosSynchronizer);
-                            _actualPropertyEditor.OnValueChanged += OnValueChanged;
+                            _actualPropertyEditor = new ServoPropertiesControl(servo,_timelineEditingManipulation,_timelineData, _viewContext, _playPosSynchronizer);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }
@@ -109,7 +99,6 @@ namespace AwbStudio.PropertyControls
                         if (_focusObject is ISoundPlayer soundPlayer)
                         {
                             _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer,_timelineData,  _projectSounds);
-                            _actualPropertyEditor.OnValueChanged += OnValueChanged;
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }
@@ -127,11 +116,7 @@ namespace AwbStudio.PropertyControls
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
-                    break;
-
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
-                    if (_actualPropertyEditor != null && _viewContext?.ActualFocusObject == _actualPropertyEditor.AwbObject)
-                        _actualPropertyEditor.UpdateValue(_playPosSynchronizer!.PlayPosMs);
                     break;
 
                 default:
@@ -152,7 +137,6 @@ namespace AwbStudio.PropertyControls
             PropertyEditorGrid.Children.Clear();
             if (_actualPropertyEditor != null)
             {
-                _actualPropertyEditor.OnValueChanged -= OnValueChanged;
                 _actualPropertyEditor = null;
             }
         }

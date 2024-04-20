@@ -13,8 +13,5 @@ namespace AwbStudio.PropertyControls
 {
     internal interface IPropertyEditor : IAwbObjectControl
     {
-        event EventHandler OnValueChanged;
-
-        Task UpdateValue(int timeMs);
     }
 }
