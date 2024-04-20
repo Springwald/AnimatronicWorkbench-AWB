@@ -23,6 +23,7 @@ namespace AwbStudio.TimelineEditing
             _playPosSynchronizer = playPosSynchronizer;
         }
 
+
         #region SERVOS
 
         public void UpdateServoValue(IServo servo, double targetPercent)
@@ -77,15 +78,7 @@ namespace AwbStudio.TimelineEditing
             _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPlayer.Id);
         }
 
-        public void RemoveSoundPoint(ISoundPlayer soundPlayer)
-        {
-            var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-            if (soundPoint == null) return;
-
-            // Remove the existing sound point
-            _timelineData?.SoundPoints.Remove(soundPoint);
-            _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPoint.SoundPlayerId);
-        }
+      
 
         #endregion
     }

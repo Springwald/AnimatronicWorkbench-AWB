@@ -17,6 +17,7 @@ namespace Awb.Core.Timelines
         {
             ServoPointChanged,
             SoundPointChanged,
+            NestedTimelinePointChanged
         }
 
         public TimelineDataChangedEventArgs(ChangeTypes changeType, string? changedObjectId)

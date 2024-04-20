@@ -123,11 +123,11 @@ namespace Awb.Core.Player
             var start = DateTime.UtcNow;
 
             // Play Servos
-            var servoTargetObjectIds = TimelineData.ServoPoints.Select(p => p.TargetObjectId).Distinct().ToArray();
+            var servoTargetObjectIds = TimelineData.ServoPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
             foreach (var servoTargetObjectId in servoTargetObjectIds)
             {
-                var point1 = TimelineData.ServoPoints.Where(p => p.TargetObjectId == servoTargetObjectId && p.TimeMs <= playPos).OrderByDescending(p => p.TimeMs).FirstOrDefault();
-                var point2 = TimelineData.ServoPoints.Where(p => p.TargetObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
+                var point1 = TimelineData.ServoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs <= playPos).OrderByDescending(p => p.TimeMs).FirstOrDefault();
+                var point2 = TimelineData.ServoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
 
                 if (point1 == null && point2 == null) continue; // no points found for this object before or after the actual position
                 point1 ??= point2;
@@ -162,12 +162,12 @@ namespace Awb.Core.Player
             }
 
             // Play Sounds
-            var soundTargetObjectIds = TimelineData.SoundPoints.Select(p => p.TargetObjectId).Distinct().ToArray();
+            var soundTargetObjectIds = TimelineData.SoundPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
             foreach (var soundTargetObjectId in soundTargetObjectIds)
             {
                 var lower = Math.Min(_playPosMsOnLastUpdate, playPos);
                 var higher = Math.Max(_playPosMsOnLastUpdate, playPos);
-                var pointsWithMatchingMs = TimelineData.SoundPoints.Where(p => p.TargetObjectId == soundTargetObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
+                var pointsWithMatchingMs = TimelineData.SoundPoints.Where(p => p.AbwObjectId == soundTargetObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
                 var targetPoint = pointsWithMatchingMs.OrderBy(p => Math.Abs(p.TimeMs - playPos)).FirstOrDefault();
                 if (targetPoint == null) continue; // no points found for this at the actual position
 

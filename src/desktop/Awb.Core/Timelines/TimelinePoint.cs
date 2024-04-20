@@ -33,11 +33,11 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// The id of the servo or display or other actuators
         /// </summary>
-        public string TargetObjectId { get; set; }
+        public string AbwObjectId { get; set; }
 
         public TimelinePoint(string targetObjectId, int timeMs)
         {
-            TargetObjectId = targetObjectId;
+            AbwObjectId = targetObjectId;
             TimeMs = timeMs;
         }
     }
