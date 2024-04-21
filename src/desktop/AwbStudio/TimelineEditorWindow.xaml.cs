@@ -300,7 +300,7 @@ namespace AwbStudio
                 {
                     timelineAllValuesScrollViewer.ScrollToHorizontalOffset(newScrollOffset);
                 }//));
-                newPosMs = _playPosSynchronizer.PlayPosMs + scrollSpeedMs;
+                newPosMs = _playPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped + scrollSpeedMs;
                 _playPosSynchronizer.SetNewPlayPos(newPosMs);
                 await Task.Delay(1000 / fps);
             }

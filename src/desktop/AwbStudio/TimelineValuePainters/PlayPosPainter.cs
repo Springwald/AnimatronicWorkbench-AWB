@@ -72,12 +72,12 @@ namespace AwbStudio.TimelineValuePainters
         {
 
             // draw the manual midi controller play position as triangle at the bottom
-            var x = _viewContext.GetXPos(_playPosSynchronizer.PlayPosMs);
+            var x = _viewContext.GetXPos(_playPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped);
             _labelPlayPosAbsoluteControl.Margin = new Thickness(x - _labelPlayPosAbsoluteControl.FontSize, 0, 0, 0);
-            _labelPlayPosAbsoluteControl.Content = $"🔺 {_playPosSynchronizer.PlayPosMs}ms";
+            _labelPlayPosAbsoluteControl.Content = $"🔺 {_playPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped}ms";
 
             // draw the play position as a vertical line
-            var playPosMs = _playPosSynchronizer.PlayPosMs;
+            var playPosMs = _playPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped;
             if (_timelineData == null || playPosMs < 0 || playPosMs > _viewContext.DurationMs)
             {
                 _linePlayPosControl.Visibility = Visibility.Hidden;
