@@ -75,7 +75,7 @@ namespace AwbStudio.TimelineControls
             // add servo painter + editors
             foreach (var servoActuator in actuatorsService.Servos)
             {
-                var editorControl = new ServoValueEditorControl();
+                var editorControl = new ServoTimelineEditorControl();
                 editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
@@ -84,7 +84,7 @@ namespace AwbStudio.TimelineControls
             // add sound painter + editors
             foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
             {
-                var editorControl = new SoundValueEditorControl();
+                var editorControl = new SoundTimelineEditorControl();
                 editorControl.Init(
                     soundPlayer: soundPlayerActuator,
                     viewContext,
@@ -122,7 +122,7 @@ namespace AwbStudio.TimelineControls
             if (_timelineEditorControls != null)
                 foreach (UserControl editorControl in _timelineEditorControls)
                 {
-                    if (editorControl is NestedTimelinesViewerControl || editorControl is SoundValueEditorControl)
+                    if (editorControl is NestedTimelinesViewerControl || editorControl is SoundTimelineEditorControl)
                     {
                         editorControl.Height = Math.Max(80, ZoomVerticalHeightPerValueEditor / 4);
                     }
@@ -139,7 +139,7 @@ namespace AwbStudio.TimelineControls
             if (awbObject is IServo servo)
                 foreach (var child in AllValuesEditorControlsStackPanel.Children)
                 {
-                    if (child is ServoValueEditorControl servoControl)
+                    if (child is ServoTimelineEditorControl servoControl)
                     {
                         if (servoControl.Servo?.Id == servo.Id)
                         {

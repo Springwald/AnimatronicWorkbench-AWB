@@ -23,7 +23,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for ServoValueViewerControl.xaml
     /// </summary>
-    public partial class ServoValueEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
+    public partial class ServoTimelineEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
         private const double _paintMarginTopBottom = 30;
@@ -39,7 +39,7 @@ namespace AwbStudio.TimelineControls
 
         public IAwbObject? AwbObject => Servo;
 
-        public ServoValueEditorControl()
+        public ServoTimelineEditorControl()
         {
             InitializeComponent();
             Loaded += ServoValueViewerControl_Loaded;

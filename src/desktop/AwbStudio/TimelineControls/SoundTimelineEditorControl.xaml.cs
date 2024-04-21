@@ -24,7 +24,7 @@ namespace AwbStudio.TimelineControls
     /// <summary>
     /// Interaction logic for SoundValueViewerControl.xaml
     /// </summary>
-    public partial class SoundValueEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
+    public partial class SoundTimelineEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
         private const double _paintMarginTopBottom = 30;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
@@ -37,7 +37,7 @@ namespace AwbStudio.TimelineControls
 
         public IAwbObject? AwbObject => _soundPlayer;
 
-        public SoundValueEditorControl()
+        public SoundTimelineEditorControl()
         {
             InitializeComponent();
             Loaded += ServoValueViewerControl_Loaded;
