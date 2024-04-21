@@ -1,19 +1,13 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.InputControllers.BCF2000;
-using Awb.Core.InputControllers.XTouchMini;
 using Awb.Core.Player;
 using Awb.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MidiControllerLiveControl
 {
@@ -32,7 +26,7 @@ namespace MidiControllerLiveControl
 
         public async Task Run()
         {
-            var midiController = new Bcf2000Controller(_logger);
+            var midiController = new Bcf2000Controller(_logger, new MockInvoker());
             midiController.ActionReceived += ActionReceived;
 
             //for (int i = 1; i <= 8; i++)
