@@ -52,7 +52,7 @@ namespace AwbStudio.TimelineValuePainters
             // Update the content points and lines
             // ToDo: cache and only update on changes; or: use model binding and auto update
 
-            var caption = _timelineCaptions?.GetAktuatorCaption(_servo.Id) ?? new TimelineCaption (foregroundColor: new SolidColorBrush(Colors.White) );
+            var caption = _timelineCaptions?.GetAktuatorCaption(_servo.Id);
 
             // Add polylines with points
             var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();

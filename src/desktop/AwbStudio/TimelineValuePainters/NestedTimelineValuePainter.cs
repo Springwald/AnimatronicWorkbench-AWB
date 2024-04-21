@@ -10,11 +10,9 @@ using Awb.Core.Timelines;
 using AwbStudio.FileManagement;
 using AwbStudio.PropertyControls;
 using AwbStudio.TimelineEditing;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace AwbStudio.TimelineValuePainters
 {
@@ -46,8 +44,6 @@ namespace AwbStudio.TimelineValuePainters
 
             if (height < _paintMarginTopBottom * 2 || width < 100) return;
 
-            //var soundPlayerIds = _timelineData?.SoundPoints?.OfType<SoundPoint>().Select(p => p.SoundPlayerId).Where(id => id != null).Distinct().ToArray() ?? Array.Empty<string>();
-
             double diagramHeight = height - _paintMarginTopBottom * 2;
 
             // Update the content points and lines
@@ -55,10 +51,10 @@ namespace AwbStudio.TimelineValuePainters
 
             double y = 0;
 
-            var caption = _timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id) ?? new TimelineCaption(foregroundColor: new SolidColorBrush(Colors.LightSkyBlue) );
+            var caption = _timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id);
 
             // Add polylines with points
-            var points = _timelineData?.NestedTimelinePoints.OfType<NestedTimelinePoint>().OrderBy(p => p.TimeMs).ToList() ?? new List<NestedTimelinePoint>();
+            var points = _timelineData?.NestedTimelinePoints.OfType<NestedTimelinePoint>().OrderBy(p => p.TimeMs).ToList() ?? [];
 
             // add dots
             foreach (var point in points)
@@ -108,15 +104,16 @@ namespace AwbStudio.TimelineValuePainters
             }
         }
 
-        public new void Dispose()
-        {
-            base.Dispose();
-        }
 
         protected override bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs)
         {
             if (changedEventArgs.ChangeType != TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged) return false;
             return NestedTimelinesFakeObject.Singleton.Id == changedEventArgs.ChangedObjectId;
+        }
+
+        public new void Dispose()
+        {
+            base.Dispose();
         }
     }
 }

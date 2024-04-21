@@ -16,7 +16,7 @@ namespace Awb.Core.Project
 
         public string? _projectFolder;
 
-        public string Info { get; set; }
+        public string? Info { get; set; }
 
         public string Title { get; set; }
 
