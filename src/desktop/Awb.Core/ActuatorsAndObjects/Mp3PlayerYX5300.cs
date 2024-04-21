@@ -14,7 +14,7 @@ namespace Awb.Core.Actuators
         /// <summary>
         /// The requested target sound id to play for this sound player
         /// </summary>
-        private int _targetValue;
+        private int? _targetValue;
 
         /// <summary>
         /// The unique id of this sound player
@@ -44,7 +44,7 @@ namespace Awb.Core.Actuators
         /// <summary>
         /// The requested target value of this soundplayer
         /// </summary>
-        public int TargetValue
+        public int? TargetValue
         {
             get => _targetValue;
             set
@@ -62,7 +62,7 @@ namespace Awb.Core.Actuators
         /// </summary>
         public bool IsDirty { get; set; }
 
-        public int ActualSoundId { get; private set; }
+        public int? ActualSoundId { get; private set; }
 
         public bool IsControllerTuneable => false;
 
@@ -82,9 +82,14 @@ namespace Awb.Core.Actuators
             ActualSoundId = soundId;
         }
 
+        public void SetNoSound()
+        {
+            ActualSoundId = null;
+        }
+
         public bool TurnOff()
         {
-            TargetValue = -1;
+            TargetValue = null;
             return true;
         }
 
@@ -92,5 +97,7 @@ namespace Awb.Core.Actuators
         {
             TurnOff();
         }
+
+
     }
 }

@@ -12,7 +12,9 @@ namespace Awb.Core.Actuators
     /// </summary>
     public interface ISoundPlayer : IActuator
     {
-        int ActualSoundId { get;}
+        int? ActualSoundId { get;}
         void PlaySound(int soundId);
+
+        void SetNoSound();
     }
 }

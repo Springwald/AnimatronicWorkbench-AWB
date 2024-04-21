@@ -66,6 +66,15 @@ namespace Awb.Core.Timelines
         public TimelinePointType? GetPoint<TimelinePointType>(int timeMs, string awbObjectId) where TimelinePointType : TimelinePoint
             => AllPoints.OfType<TimelinePointType>().SingleOrDefault(p => p.AbwObjectId == awbObjectId && (int)p.TimeMs == timeMs); // check existing point
 
+        public IEnumerable<TimelinePointType> GetPointsBetween<TimelinePointType>(int timeMs1, int timeMs2, string awbObjectId) where TimelinePointType : TimelinePoint
+        {
+            var lower = Math.Min(timeMs1, timeMs2);
+            var higher = Math.Max(timeMs1, timeMs2);
+            var pointsWithMatchingMs = AllPoints.OfType<TimelinePointType>().Where(p => p.AbwObjectId == awbObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
+            foreach (var point in pointsWithMatchingMs)
+                yield return point;
+        }
+
         public TimelinePoint InsertPoint(TimelinePoint point)
         {
             if (point == null) throw new ArgumentNullException(nameof(point));

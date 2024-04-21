@@ -90,7 +90,8 @@ namespace AwbStudio.TimelineEditing
                     if (_viewContext?.ActualFocusObject is IServo servo)
                         _timelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     if (_viewContext?.ActualFocusObject is ISoundPlayer soundPlayer)
-                        _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId);
+                        if (soundPlayer.ActualSoundId != null)
+                            _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId.Value);
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
@@ -111,10 +112,9 @@ namespace AwbStudio.TimelineEditing
 
             // get the actuator referenced by the event
             IActuator? actuator = null;
-            int actuatorIndexAbsolute = -1;
             if (e.ActuatorIndex_ != -1)
             {
-                actuatorIndexAbsolute = e.ActuatorIndex_ + _viewContext.BankIndex * _viewContext.ItemsPerBank;
+                int actuatorIndexAbsolute = e.ActuatorIndex_ + _viewContext.BankIndex * _viewContext.ItemsPerBank;
                 if (actuatorIndexAbsolute < _controllerTuneableActuators.Length)
                     actuator = _controllerTuneableActuators[actuatorIndexAbsolute];
             }

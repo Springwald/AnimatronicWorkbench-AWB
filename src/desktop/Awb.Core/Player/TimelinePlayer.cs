@@ -163,29 +163,45 @@ namespace Awb.Core.Player
 
             // Play Sounds
             var soundTargetObjectIds = TimelineData.SoundPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
+
+
             foreach (var soundTargetObjectId in soundTargetObjectIds)
             {
-                var lower = Math.Min(_playPosMsOnLastUpdate, playPos);
-                var higher = Math.Max(_playPosMsOnLastUpdate, playPos);
-                var pointsWithMatchingMs = TimelineData.SoundPoints.Where(p => p.AbwObjectId == soundTargetObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
-                var targetPoint = pointsWithMatchingMs.OrderBy(p => Math.Abs(p.TimeMs - playPos)).FirstOrDefault();
-                if (targetPoint == null) continue; // no points found for this at the actual position
+                SoundPoint? soundPoint = null;
 
-                var targetSoundPlayerId = targetPoint.SoundPlayerId;
-                var targetSoundPlayer = _actuatorsService.SoundPlayers.SingleOrDefault(o => o.Id.Equals(targetSoundPlayerId));
+                switch (PlayState)
+                {
+                    case PlayStates.Nothing:
+                        // take exactly the point at the actual position
+                        soundPoint = TimelineData.GetPoint<SoundPoint>(playPos, soundTargetObjectId);
+                        break;
+                    case PlayStates.Playing:
+                        // take a point between the last and the actual position
+                        soundPoint = TimelineData.GetPointsBetween<SoundPoint>(_playPosMsOnLastUpdate, playPos, soundTargetObjectId).FirstOrDefault();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");
+                }
+
+                var targetSoundPlayer = _actuatorsService.SoundPlayers.SingleOrDefault(o => o.Id.Equals(soundTargetObjectId));
                 if (targetSoundPlayer == null)
                 {
-                    await _logger.LogError($"{nameof(UpdateActuators)}: Target soundplayer object with id {targetSoundPlayerId} not found.");
+                    await _logger.LogError($"{nameof(UpdateActuators)}: Target soundplayer object with id {soundTargetObjectId} not found.");
                 }
                 else
                 {
-                    if (targetPoint.SoundId != targetSoundPlayer.ActualSoundId)
+                    if (soundPoint == null)
                     {
-                        targetSoundPlayer.PlaySound(targetPoint.SoundId);
+                        targetSoundPlayer.SetNoSound();
                         targetSoundPlayer.IsDirty = true;
                     }
+                    else if (soundPoint.SoundId != targetSoundPlayer.ActualSoundId)
+                    {
+                        targetSoundPlayer.PlaySound(soundPoint.SoundId);
+                        targetSoundPlayer.IsDirty = true;
+                        if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs(soundPoint.SoundId));
+                    }
                 }
-                if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs(targetPoint.SoundId));
             }
 
             _playPosMsOnLastUpdate = playPos;

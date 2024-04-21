@@ -7,10 +7,10 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
+using Awb.Core.Player;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
-using System;
-using System.Threading.Tasks;
+using AwbStudio.TimelineEditing;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -24,17 +24,28 @@ namespace AwbStudio.PropertyControls
         private readonly ISoundPlayer _soundPlayer;
         private readonly TimelineData _timelineData;
         private readonly Sound[] _projectSounds;
-        private bool _isSetting;
-        private int _soundId;
+        private readonly TimelineViewContext _viewContext;
+        private readonly PlayPosSynchronizer _playPosSynchronizer;
+        private bool _isUpdatingView;
 
         public IAwbObject AwbObject => _soundPlayer;
 
-        public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, TimelineData timelineData, Sound[] projectSounds)
+        public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, Sound[] projectSounds, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
         {
             InitializeComponent();
             _soundPlayer = soundPlayer;
-            _timelineData = timelineData;
             _projectSounds = projectSounds;
+
+            _timelineData = timelineData;
+            _timelineData.OnContentChanged += TimelineData_OnContentChanged;
+
+            _viewContext = viewContext;
+            _viewContext.Changed += ViewContext_Changed;
+
+            _playPosSynchronizer = playPosSynchronizer;
+            _playPosSynchronizer.OnPlayPosChanged += OnPlayPosChanged;
+
+            //LabelName.Content = "MP3 " + soundPlayer.Title;
 
             Loaded += SoundPlayerPropertyControl_Loaded;
         }
@@ -42,53 +53,48 @@ namespace AwbStudio.PropertyControls
         private void SoundPlayerPropertyControl_Loaded(object sender, RoutedEventArgs e)
         {
             Loaded -= SoundPlayerPropertyControl_Loaded;
+            Unloaded += SoundPlayerPropertiesControl_Unloaded;
+
+            ComboBoxSoundToPlay.Items.Add("-- NO SOUND --");
             foreach (var sound in _projectSounds)
             {
+
                 ComboBoxSoundToPlay.Items.Add(sound.Title);
             }
+
+            ShowActualValue();
+
         }
 
-        public event EventHandler OnValueChanged;
-
-
-        public async Task UpdateValue(int timeMs)
+        private void SoundPlayerPropertiesControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            var point = _timelineData?.GetPoint<SoundPoint>(timeMs, _soundPlayer.Id);
-            if (point == null)
-            {
-                SoundId = -1;
-            } else 
-            {
-                SoundId = point.SoundId;
-            }
-            //if (_projectSounds?.Any() == true)
-            //{
-
-            //var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
-            //if (soundPoint == null)
-            //{
-            //    // Insert a new sound point
-            //    var soundId = soundPlayer.ActualSoundId == 0 ? _projectSounds.FirstOrDefault()?.Id : soundPlayer.ActualSoundId;
-            //    var sound = _projectSounds.FirstOrDefault(s => s.Id == soundId);
-            //    if (sound == null)
-            //    {
-            //        MessageBox.Show($"Actual sound id{soundPlayer.ActualSoundId} not found");
-            //    }
-            //    else
-            //    {
-            //        soundPoint = new SoundPoint(timeMs: _playPosSynchronizer.PlayPosMs, soundPlayerId: soundPlayer.Id, title: sound.Title, soundId: soundPlayer.ActualSoundId);
-            //        _timelineData?.SoundPoints.Add(soundPoint);
-            //    }
-            //}
-            //else
-            //{
-            //    // Remove the existing sound point
-            //    _timelineData?.SoundPoints.Remove(soundPoint);
-            //}
-            //_timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPlayer.Id);
-            // }
+            Unloaded -= SoundPlayerPropertiesControl_Unloaded;
+            _playPosSynchronizer.OnPlayPosChanged -= OnPlayPosChanged;
+            _viewContext.Changed -= ViewContext_Changed;
         }
 
+        private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
+        {
+            switch (e.ChangeType)
+            {
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
+                    if (_viewContext.ActualFocusObject == _soundPlayer)
+                        ShowActualValue();
+                    break;
+            }
+        }
+
+        private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
+        {
+            if (e.ChangedObjectId == _soundPlayer.Id) ShowActualValue();
+        }
+
+        private void OnPlayPosChanged(object? sender, int e)
+        {
+            if (_viewContext.ActualFocusObject == _soundPlayer)
+                ShowActualValue();
+        }
 
         private void ComboBoxSoundToPlay_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -100,25 +106,58 @@ namespace AwbStudio.PropertyControls
                 return;
             }
 
-            if (_isSetting) return;
-            if (_soundPlayer.ActualSoundId == _projectSounds[index].Id) return;
-
-            SoundId = _projectSounds[index].Id;
-            _soundPlayer.PlaySound(_projectSounds[index].Id);
-            OnValueChanged?.Invoke(this, new EventArgs());
+            if (_isUpdatingView) return;
+            if (index == 0)
+            {
+                SetNewValue(null);
+            }
+            else
+            {
+                var newSoundId = _projectSounds[index];
+                SetNewValue(newSoundId);
+            }
         }
 
-        private int SoundId
+        private void SetNewValue(Sound? sound)
         {
-            get => _soundId;
-            set
+            if (_soundPlayer.ActualSoundId != sound?.Id)
             {
-                if (value.Equals(_soundId)) return;
-                _soundId = value;
-                _isSetting = true;
-                ComboBoxSoundToPlay.SelectedIndex = Array.FindIndex(_projectSounds, s => s.Id == value);
-                _isSetting = false;
+                if (sound == null)
+                {
+                    _soundPlayer.SetNoSound();
+                }
+                else
+                {
+                    _soundPlayer.PlaySound(sound!.Id);
+                }
+                _viewContext.FocusObjectValueChanged(this);
             }
+            ShowActualValue();
+        }
+
+        private void ShowActualValue()
+        {
+            var soundId = _soundPlayer.ActualSoundId;
+
+            _isUpdatingView = true;
+
+            if (soundId == null)
+            {
+                ComboBoxSoundToPlay.SelectedIndex = 0;
+            }
+            else
+            {
+                for (int index = 0; index < _projectSounds.Length; index++)
+                {
+                    if (_projectSounds[index].Id == soundId)
+                    {
+                        ComboBoxSoundToPlay.SelectedIndex = index+1;
+                        break; ;
+                    }
+                }
+            }
+
+            _isUpdatingView = false;
         }
     }
 }

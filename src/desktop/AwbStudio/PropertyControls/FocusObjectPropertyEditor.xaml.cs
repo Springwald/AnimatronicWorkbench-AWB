@@ -98,7 +98,7 @@ namespace AwbStudio.PropertyControls
 
                         if (_focusObject is ISoundPlayer soundPlayer)
                         {
-                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer,_timelineData,  _projectSounds);
+                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer,  _projectSounds, _timelineData, _viewContext, _playPosSynchronizer);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }
