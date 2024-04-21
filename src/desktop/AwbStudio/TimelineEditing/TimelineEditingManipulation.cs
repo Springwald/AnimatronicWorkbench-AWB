@@ -7,8 +7,11 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.Player;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
+using System;
 using System.Linq;
+using System.Media;
 
 namespace AwbStudio.TimelineEditing
 {
@@ -43,7 +46,7 @@ namespace AwbStudio.TimelineEditing
 
         public void ToggleServoPoint(IServo servo)
         {
-            var servoPoint = _timelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
+            var servoPoint = _timelineData?.ServoPoints.SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
             if (servoPoint == null)
             {
                 // Insert a new servo point
@@ -65,7 +68,7 @@ namespace AwbStudio.TimelineEditing
 
         public void UpdateSoundPlayerValue(ISoundPlayer soundPlayer, int? soundId, string? soundTitle)
         {
-            var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
+            var soundPoint = _timelineData?.SoundPoints.SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
             if (soundId == null)
             {
                 // sound should be removed from timeline at this position
@@ -90,5 +93,31 @@ namespace AwbStudio.TimelineEditing
 
 
         #endregion
+
+        public void UpdateNestedTimelinesValue()
+        {
+            var timelineId = NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId;    
+            var nestedTimelinePoint = _timelineData?.NestedTimelinePoints.SingleOrDefault( p => (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
+            if (timelineId == null)
+            {
+                // nested timeline value should be removed from timeline at this position
+                if (nestedTimelinePoint == null) return; // nothing to do
+                _timelineData?.NestedTimelinePoints.Remove(nestedTimelinePoint);
+            }
+            else
+            {
+                // nested timeline value should be added or updated at this position
+                if (nestedTimelinePoint == null)
+                {
+                    nestedTimelinePoint = new NestedTimelinePoint(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, timelineId);
+                    _timelineData?.NestedTimelinePoints.Add(nestedTimelinePoint);
+                }
+                else
+                {
+                    nestedTimelinePoint.TimelineId = timelineId;
+                }
+            }
+            _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged, NestedTimelinesFakeObject.Singleton.Id);
+        }
     }
 }

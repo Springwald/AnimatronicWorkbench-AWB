@@ -106,7 +106,7 @@ namespace AwbStudio.PropertyControls
 
                         if (_focusObject == NestedTimelinesFakeObject.Singleton)
                         {
-                            _actualPropertyEditor = new NestedTimelinePropertyControl(_timelineFileManager.TimelineMetaDataService);
+                            _actualPropertyEditor = new NestedTimelinePropertyControl(_timelineFileManager.TimelineMetaDataService, _viewContext);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }

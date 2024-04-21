@@ -57,7 +57,7 @@ namespace AwbStudio.TimelineValuePainters
             var caption = _timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightSkyBlue) };
 
             // Add polylines with points
-            var points = _timelineData?.SoundPoints.OfType<NestedTimelinePoint>().OrderBy(p => p.TimeMs).ToList() ?? new List<NestedTimelinePoint>();
+            var points = _timelineData?.NestedTimelinePoints.OfType<NestedTimelinePoint>().OrderBy(p => p.TimeMs).ToList() ?? new List<NestedTimelinePoint>();
 
             // add dots
             foreach (var point in points)

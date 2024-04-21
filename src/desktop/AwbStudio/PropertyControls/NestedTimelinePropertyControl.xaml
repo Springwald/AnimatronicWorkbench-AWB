@@ -9,7 +9,7 @@
     <Grid>
         <StackPanel>
             <Label>Timline to insert:</Label>
-            <ComboBox x:Name="ComboBoxTimeline">
+            <ComboBox x:Name="ComboBoxTimeline" SelectionChanged="ComboBoxTimeline_SelectionChanged">
             </ComboBox>
         </StackPanel>
     </Grid>

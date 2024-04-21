@@ -125,7 +125,7 @@ namespace AwbStudio.TimelineControls
                 {
                     if (editorControl is NestedTimelinesViewerControl || editorControl is SoundTimelineEditorControl)
                     {
-                        editorControl.Height = Math.Max(80, ZoomVerticalHeightPerValueEditor / 4);
+                        editorControl.Height = Math.Max(120, ZoomVerticalHeightPerValueEditor / 4);
                     }
                     else
                     {

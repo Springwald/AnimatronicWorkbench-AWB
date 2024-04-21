@@ -23,6 +23,8 @@ namespace AwbStudio.TimelineEditing
 
         public bool IsControllerTuneable => false;
 
+        public string? ActualNestedTimelineId { get; set; }
+
         public void Dispose()
         {
         }

@@ -91,6 +91,8 @@ namespace AwbStudio.TimelineEditing
                         _timelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     if (_viewContext?.ActualFocusObject is ISoundPlayer soundPlayer)
                             _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null);
+                    if (_viewContext?.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
+                        _timelineEditingManipulation.UpdateNestedTimelinesValue();
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
