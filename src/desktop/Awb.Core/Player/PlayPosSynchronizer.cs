@@ -37,7 +37,13 @@ namespace Awb.Core.Player
         /// <summary>
         /// the actual play position in  millseconds; snapped or no snapped - depending on "InSnapMode"
         /// </summary>
-        public int PlayPosMs { get; private set; }
+        public int PlayPosMsAutoSnappedOrUnSnapped { get; private set; }
+
+        /// <summary>
+        /// the actual play position in  millseconds; snapped - independing on "InSnapMode"
+        /// </summary>
+        public int PlayPosMsGuaranteedSnapped => (PlayPosMsAutoSnappedOrUnSnapped / SnapMs) * SnapMs;
+
 
         public PlayPosSynchronizer(IInvoker invoker)
         {
@@ -50,12 +56,12 @@ namespace Awb.Core.Player
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            if (_lastPlayPosAnnounced != PlayPosMs)
+            if (_lastPlayPosAnnounced != PlayPosMsAutoSnappedOrUnSnapped)
             {
-                _lastPlayPosAnnounced = PlayPosMs;
+                _lastPlayPosAnnounced = PlayPosMsAutoSnappedOrUnSnapped;
                 // this is important! We must not call the event handler in the timer thread, because the event handler should update the UI.
                 // so we use the invoker using the hosting wpf application thread instead.
-                _invoker.Invoke(() => this.OnPlayPosChanged?.Invoke(this, PlayPosMs));
+                _invoker.Invoke(() => this.OnPlayPosChanged?.Invoke(this, PlayPosMsAutoSnappedOrUnSnapped));
             }
         }
 
@@ -90,7 +96,7 @@ namespace Awb.Core.Player
         public void SetNewPlayPos(int playPosMs)
         {
             _playPosMsRaw = playPosMs;
-            PlayPosMs = _inSnapMode ? (playPosMs / SnapMs) * SnapMs : playPosMs;
+            PlayPosMsAutoSnappedOrUnSnapped = _inSnapMode ? (playPosMs / SnapMs) * SnapMs : playPosMs;
         }
 
         public void Dispose()

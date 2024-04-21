@@ -21,12 +21,10 @@ namespace AwbStudio.PropertyControls
     public partial class ServoPropertiesControl : UserControl, IPropertyEditor
     {
         private readonly IServo _servo;
-        private readonly TimelineEditingManipulation _timelineEditingManipulation;
         private readonly TimelineData _timelineData;
         private readonly TimelineViewContext _viewContext;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
-        private volatile bool _isSetting;
-        private double _percentValue;
+        private volatile bool _isUpdatingView;
 
         public IAwbObject AwbObject => _servo;
 
@@ -100,7 +98,7 @@ namespace AwbStudio.PropertyControls
         private void SliderValue_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             if (e.NewValue.Equals(e.OldValue)) return;
-            if (_isSetting) return;
+            if (_isUpdatingView) return;
             SetNewValue(e.NewValue);
         }
 
@@ -112,32 +110,27 @@ namespace AwbStudio.PropertyControls
 
         private void BtnTooglePoint_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            new TimelineEditingManipulation(_timelineData, _playPosSynchronizer).ToggleServoPoint(_servo, _percentValue);
+            new TimelineEditingManipulation(_timelineData, _playPosSynchronizer).ToggleServoPoint(_servo);
             ShowActualValue();
         }
 
         private void SetNewValue(double percentValue)
         {
-            if (percentValue.Equals(_percentValue)) return;
-            _percentValue = percentValue;
-            _isSetting = true;
-
             if (_servo.TargetValue != (int)_servo.PercentCalculator.CalculateValue(percentValue))
             {
                 _servo.TargetValue = (int)_servo.PercentCalculator.CalculateValue(percentValue);
                 _viewContext.FocusObjectValueChanged(this);
             }
-
             ShowActualValue();
-
-            _isSetting = false;
         }
 
         private void ShowActualValue()
         {
-            _percentValue = (int)_servo.PercentCalculator.CalculatePercent(_servo.TargetValue);
-            LabelValue.Content = $"{_percentValue:0.00}%";
-            SliderValue.Value = _percentValue;
+            var percentValue = (int)_servo.PercentCalculator.CalculatePercent(_servo.TargetValue);
+            _isUpdatingView = true;
+            LabelValue.Content = $"{percentValue:0.00}%";
+            SliderValue.Value = percentValue;
+            _isUpdatingView = false;
         }
 
 

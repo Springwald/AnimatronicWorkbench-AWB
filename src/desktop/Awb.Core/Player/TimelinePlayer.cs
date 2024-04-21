@@ -116,7 +116,7 @@ namespace Awb.Core.Player
                 return;
             }
 
-            var playPos = PlayPosSynchronizer.PlayPosMs;
+            var playPos = PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped;
 
             _updating = true;
 
@@ -215,13 +215,13 @@ namespace Awb.Core.Player
                 if (PlayState == PlayStates.Playing)
                 {
                     var newPos = 0;
-                    if (PlayPosSynchronizer.PlayPosMs >= TimelineData.DurationMs)
+                    if (PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped >= TimelineData.DurationMs)
                     {
                         newPos = 0;
                     }
                     else
                     {
-                        newPos = PlayPosSynchronizer.PlayPosMs + (int)(diff.TotalMilliseconds * PlaybackSpeed);
+                        newPos = PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped + (int)(diff.TotalMilliseconds * PlaybackSpeed);
                         if (newPos > TimelineData.DurationMs) newPos = TimelineData.DurationMs;
 
                     }

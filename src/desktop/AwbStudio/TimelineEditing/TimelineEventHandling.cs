@@ -175,10 +175,6 @@ namespace AwbStudio.TimelineEditing
                             case IServo servo:
                                 _timelineEditingManipulation.UpdateServoValue(servo, targetPercent);
                                 break;
-
-                            case ISoundPlayer soundPlayer:
-                                throw new NotImplementedException("todo: remove soundplayer from actuator bank counting!"); // todo: remove soundplayer from actuator bank counting!
-
                             default:
                                 throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                         }
@@ -220,7 +216,7 @@ namespace AwbStudio.TimelineEditing
                         switch (actuator)
                         {
                             case IServo servo:
-                                _timelineEditingManipulation.ToggleServoPoint(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
+                                _timelineEditingManipulation.ToggleServoPoint(servo);
                                 break;
 
                             default:
@@ -249,8 +245,6 @@ namespace AwbStudio.TimelineEditing
                     throw new ArgumentOutOfRangeException($"{nameof(e.EventType)}:{e.EventType.ToString()}");
             }
         }
-
-
 
         public void Play()
         {

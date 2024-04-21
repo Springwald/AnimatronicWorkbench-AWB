@@ -28,10 +28,10 @@ namespace AwbStudio.TimelineEditing
 
         public void UpdateServoValue(IServo servo, double targetPercent)
         {
-            var point = _timelineData.GetPoint<ServoPoint>(_playPosSynchronizer.PlayPosMs, servo.Id);
+            var point = _timelineData.GetPoint<ServoPoint>(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, servo.Id);
             if (point == null)
             {
-                point = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMs);
+                point = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMsGuaranteedSnapped);
                 _timelineData?.ServoPoints.Add(point);
             }
             else
@@ -41,14 +41,14 @@ namespace AwbStudio.TimelineEditing
             }   
         }
 
-        public void ToggleServoPoint(IServo servo, double percentValue)
+        public void ToggleServoPoint(IServo servo)
         {
-            var servoPoint = _timelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
+            var servoPoint = _timelineData?.ServoPoints.OfType<ServoPoint>().SingleOrDefault(p => p.ServoId == servo.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
             if (servoPoint == null)
             {
                 // Insert a new servo point
-                servo.TargetValue = (int)servo.PercentCalculator.CalculateValue(percentValue);
-                servoPoint = new ServoPoint(servo.Id, percentValue, _playPosSynchronizer.PlayPosMs);
+                var percentValue = servo.PercentCalculator.CalculatePercent(servo.TargetValue);
+                servoPoint = new ServoPoint(servo.Id, percentValue, _playPosSynchronizer.PlayPosMsGuaranteedSnapped);
                 _timelineData?.ServoPoints.Add(servoPoint);
             }
             else
@@ -65,10 +65,10 @@ namespace AwbStudio.TimelineEditing
 
         public void UpdateSoundPlayerValue(ISoundPlayer soundPlayer, int soundId)
         {
-            var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMs); // check existing point
+            var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
             if (soundPoint == null)
             {
-                soundPoint = new SoundPoint(_playPosSynchronizer.PlayPosMs, soundPlayer.Id, "Sound " + soundId, soundId);
+                soundPoint = new SoundPoint(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, soundPlayer.Id, "Sound " + soundId, soundId);
                 _timelineData?.SoundPoints.Add(soundPoint);
             }
             else
