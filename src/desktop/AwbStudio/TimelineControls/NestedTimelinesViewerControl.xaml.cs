@@ -7,6 +7,7 @@
 
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
+using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.FileManagement;
@@ -16,7 +17,6 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls
 {

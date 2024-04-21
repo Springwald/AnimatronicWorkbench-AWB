@@ -107,7 +107,7 @@ namespace AwbStudio.PropertyControls
             }
             else
             {
-                if (_projectSounds.Length <= index)
+                if (_projectSounds.Length < index)
                 {
                     MessageBox.Show("Sound index " + index + " not found!");
                     return;

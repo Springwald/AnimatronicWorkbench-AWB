@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using Awb.Core.Tools;
@@ -161,10 +162,36 @@ namespace Awb.Core.Player
                 }
             }
 
+            // Update Nested timelines 
+            NestedTimelinePoint? nestedTimelinePoint = null;
+
+            switch (PlayState)
+            {
+                case PlayStates.Nothing:
+                    // take exactly the point at the actual position
+                    nestedTimelinePoint = TimelineData.GetPoint<NestedTimelinePoint>(playPos, NestedTimelinesFakeObject.Singleton.Id);
+                    break;
+                case PlayStates.Playing:
+                    // take a point between the last and the actual position
+                    nestedTimelinePoint = TimelineData.GetPointsBetween<NestedTimelinePoint>(_playPosMsOnLastUpdate, playPos, NestedTimelinesFakeObject.Singleton.Id).FirstOrDefault();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");
+            }
+
+            if (nestedTimelinePoint == null)
+            {
+                NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = null;
+                NestedTimelinesFakeObject.Singleton.IsDirty = true;
+            }
+            else if (nestedTimelinePoint.TimelineId != NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId)
+            {
+                NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = nestedTimelinePoint.TimelineId;
+                NestedTimelinesFakeObject.Singleton.IsDirty = true;
+            }
+
             // Play Sounds
             var soundTargetObjectIds = TimelineData.SoundPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
-
-
             foreach (var soundTargetObjectId in soundTargetObjectIds)
             {
                 SoundPoint? soundPoint = null;

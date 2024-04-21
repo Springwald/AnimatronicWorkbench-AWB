@@ -9,6 +9,7 @@ using Accessibility;
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
+using Awb.Core.Project;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.FileManagement;
@@ -106,7 +107,7 @@ namespace AwbStudio.PropertyControls
 
                         if (_focusObject == NestedTimelinesFakeObject.Singleton)
                         {
-                            _actualPropertyEditor = new NestedTimelinePropertyControl(_timelineFileManager.TimelineMetaDataService, _viewContext);
+                            _actualPropertyEditor = new NestedTimelinePropertyControl(_timelineFileManager.TimelineMetaDataService, _timelineData,   _viewContext, _playPosSynchronizer);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }

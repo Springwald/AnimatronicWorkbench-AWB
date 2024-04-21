@@ -7,6 +7,7 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.Player;
+using Awb.Core.Project;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System;

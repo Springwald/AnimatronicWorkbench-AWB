@@ -6,8 +6,12 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.ActuatorsAndObjects;
+using Awb.Core.Player;
+using Awb.Core.Project;
+using Awb.Core.Timelines;
 using AwbStudio.FileManagement;
 using AwbStudio.TimelineEditing;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,26 +23,65 @@ namespace AwbStudio.PropertyControls
     public partial class NestedTimelinePropertyControl : UserControl, IPropertyEditor
     {
         private readonly ITimelineMetaDataService _timelineMetaDataService;
+        private readonly TimelineData _timelineData;
         private readonly TimelineViewContext _viewContext;
+        private readonly PlayPosSynchronizer _playPosSynchronizer;
         private bool _isUpdatingView;
 
         public IAwbObject AwbObject => NestedTimelinesFakeObject.Singleton;
 
 
-        public NestedTimelinePropertyControl(ITimelineMetaDataService timelineMetaDataService, TimelineViewContext viewContext)
+        public NestedTimelinePropertyControl(ITimelineMetaDataService timelineMetaDataService, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
         {
             InitializeComponent();
             Loaded += NestedTimelinePropertyControl_Loaded;
             _timelineMetaDataService = timelineMetaDataService;
+            _timelineData = timelineData;
             _viewContext = viewContext;
+            _playPosSynchronizer = playPosSynchronizer;
+            
         }
 
         private void NestedTimelinePropertyControl_Loaded(object sender, RoutedEventArgs e)
         {
             Loaded -= NestedTimelinePropertyControl_Loaded;
+            Unloaded += NestedTimelinePropertyControl_Unloaded;
+            _timelineData.OnContentChanged += TimelineData_OnContentChanged;
+            _viewContext.Changed += ViewContext_Changed;
+            _playPosSynchronizer.OnPlayPosChanged += PlayPosSynchronizer_OnPlayPosChanged;
             RefreshList();
         }
-      
+
+        private void NestedTimelinePropertyControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Unloaded -= NestedTimelinePropertyControl_Unloaded;
+            _viewContext.Changed -= ViewContext_Changed;
+            _playPosSynchronizer.OnPlayPosChanged -= PlayPosSynchronizer_OnPlayPosChanged;
+            _timelineData.OnContentChanged -= TimelineData_OnContentChanged;
+        }
+
+        private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
+        {
+            if (e.ChangedObjectId == NestedTimelinesFakeObject.Singleton.Id) ShowActualValue();
+        }
+
+        private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
+        {
+            switch (e.ChangeType)
+            {
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
+                    if (_viewContext.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
+                        ShowActualValue();
+                    break;
+            }
+        }
+
+        private void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
+        {
+            if (_viewContext.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
+                ShowActualValue();
+        }
 
         private void ComboBoxTimeline_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -52,7 +95,7 @@ namespace AwbStudio.PropertyControls
             else
             {
                 var timeslines = _timelineMetaDataService.GetAllMetaData();
-                if (timeslines.Length <= index)
+                if (timeslines.Length < index)
                 {
                     MessageBox.Show("Timelines index " + index + " not found!");
                     return;

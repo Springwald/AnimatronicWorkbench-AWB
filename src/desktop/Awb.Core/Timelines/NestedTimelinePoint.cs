@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Project;
+
 namespace Awb.Core.Timelines
 {
     public class NestedTimelinePoint : TimelinePoint
@@ -19,10 +21,11 @@ namespace Awb.Core.Timelines
         public override string PainterCheckSum => TimelineId.ToString() + base.TimeMs.ToString() ;
 
         /// <param name="soundId">The resource id of the sound to be played. What kind of resource this is depends on the implementation of the sound player.</param>
-        public NestedTimelinePoint(int timeMs, string timelineId) : base(targetObjectId: string.Empty, timeMs: timeMs)
+        public NestedTimelinePoint(int timeMs, string timelineId) : base(targetObjectId: NestedTimelinesFakeObject.Singleton.Id, timeMs: timeMs)
         {
             this.TimeMs = timeMs;
             this.TimelineId = timelineId;
+            this.Title = "Nested Timelines";
         }
     }
 }

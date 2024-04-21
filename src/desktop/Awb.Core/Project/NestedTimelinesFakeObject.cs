@@ -7,9 +7,9 @@
 
 using Awb.Core.Actuators;
 
-namespace AwbStudio.TimelineEditing
+namespace Awb.Core.Project
 {
-    internal class NestedTimelinesFakeObject : IActuator
+    public class NestedTimelinesFakeObject : IActuator
     {
         public static NestedTimelinesFakeObject Singleton { get; } = new NestedTimelinesFakeObject();
 

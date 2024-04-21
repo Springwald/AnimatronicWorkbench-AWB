@@ -8,6 +8,7 @@
 using Awb.Core.Actuators;
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Player;
+using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using System;
