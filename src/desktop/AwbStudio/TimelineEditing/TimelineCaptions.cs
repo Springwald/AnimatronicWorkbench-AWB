@@ -59,48 +59,52 @@ namespace AwbStudio.TimelineEditing
                 _ => $"{clientIdPraefix}{actuator.Id} {actuator.Title ?? string.Empty}"
             };
 
-
-            //var id = GetIdForAktuator(aktuator);
-            AddCaption(new TimelineCaption
-            {
-                Id = actuator.Id,
-                Label = label,
-                ObjectIsControllerTuneable = actuator.IsControllerTuneable
-            },
-            inverse: actuator switch
-            {
-                ISoundPlayer soundPlayer => true,
-                IServo servo => false,
-                _ => false
-            });
+            AddCaption(
+                id: actuator.Id,
+                label: label,
+                objectIsControllerTuneable: actuator.IsControllerTuneable,
+                inverse: actuator switch
+                    {
+                        ISoundPlayer soundPlayer => true,
+                        IServo servo => false,
+                        _ => false
+                    });
         }
 
         public TimelineCaption? GetAktuatorCaption(string aktuatorId)
         {
             if (aktuatorId == NestedTimelinesFakeObject.Singleton.Id)
-                return new TimelineCaption
+                return new TimelineCaption(foregroundColor: new SolidColorBrush(Colors.White))
                 {
                     Id = NestedTimelinesFakeObject.Singleton.Id,
                     Label = NestedTimelinesFakeObject.Singleton.Title,
-                    ForegroundColor = new SolidColorBrush(Colors.White)
                 }; // special case for nested timelines (no real actuator
             return _captions.FirstOrDefault(c => c.Id == aktuatorId);
         }
 
-        public void AddCaption(TimelineCaption caption, bool inverse)
+        public void AddCaption(string id, string label, bool objectIsControllerTuneable, bool inverse)
         {
             if (inverse)
             {
-                caption.BackgroundColor = _brushes[_brushIndex++];
-                caption.ForegroundColor = _brushBlack;
+                _captions.Add(new TimelineCaption(foregroundColor: _brushBlack)
+                {
+                    Id = id,
+                    Label = label,
+                    ObjectIsControllerTuneable = objectIsControllerTuneable,
+                    BackgroundColor = _brushes[_brushIndex++],
+                });
             }
             else
             {
-                caption.BackgroundColor = null;
-                caption.ForegroundColor = _brushes[_brushIndex++];
+                _captions.Add(new TimelineCaption(foregroundColor: _brushes[_brushIndex++])
+                {
+                    Id = id,
+                    Label = label,
+                    ObjectIsControllerTuneable = objectIsControllerTuneable,
+                    BackgroundColor = null,
+                });
             }
             if (_brushIndex >= _brushes.Length) _brushIndex = 0; // start with first color again
-            _captions.Add(caption);
         }
 
     }

@@ -57,7 +57,7 @@ namespace AwbStudio.TimelineValuePainters
 
             double y = 0;
 
-            var caption = _timelineCaptions?.GetAktuatorCaption(_soundPlayer.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
+            var caption = _timelineCaptions?.GetAktuatorCaption(_soundPlayer.Id) ?? new TimelineCaption (foregroundColor: new SolidColorBrush(Colors.LightYellow) );
 
             // Add polylines with points
             var pointsForThisSoundplayer = _timelineData?.SoundPoints.OfType<SoundPoint>().Where(p => p.SoundPlayerId == _soundPlayer.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<SoundPoint>();

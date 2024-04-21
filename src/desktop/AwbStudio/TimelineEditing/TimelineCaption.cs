@@ -12,9 +12,14 @@ namespace AwbStudio.TimelineEditing
     public class TimelineCaption
     {
         public string Label { get; set; }
-        public Brush ForegroundColor { get; set; }
+        public Brush ForegroundColor { get; }
         public Brush? BackgroundColor { get; set; }
         public string Id { get; set; }
-        public bool ObjectIsControllerTuneable { get; set; }    
+        public bool ObjectIsControllerTuneable { get; set; }
+
+        public TimelineCaption(Brush foregroundColor)
+        {
+            ForegroundColor = foregroundColor;
+        }
     }
 }
