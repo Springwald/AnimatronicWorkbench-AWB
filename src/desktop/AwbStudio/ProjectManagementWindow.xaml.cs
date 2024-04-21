@@ -319,7 +319,7 @@ namespace AwbStudio
 
         private void ShowProjectTimelineEditor(IAwbClientsService clientsService, ITimelineController[] timelineControllers)
         {
-            var timelineEditorWindow = new TimelineEditorWindow(_serviceProvider, timelineControllers, _projectManagerService, clientsService, _invokerService, _awbLogger);
+            var timelineEditorWindow = new TimelineEditorWindow(timelineControllers, _projectManagerService, clientsService, _invokerService, _awbLogger);
             if (timelineEditorWindow != null)
             {
                 // hide the loading screen

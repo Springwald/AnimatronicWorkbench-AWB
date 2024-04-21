@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -16,6 +16,8 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
 
         public string?[] ActualActuatorNames { set { } }
 
+        public event EventHandler<TimelineControllerEventArgs>? OnTimelineEvent;
+
         public XTouchMiniTimelineController(XTouchMiniController xTouchMiniController)
         {
             _xTouchMiniController = xTouchMiniController;
@@ -25,7 +27,6 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             }
         }
 
-        public event EventHandler<TimelineControllerEventArgs>? OnTimelineEvent;
 
         public void Dispose()
         {
@@ -35,7 +36,7 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             }
         }
 
-        public async Task SetPlayState(ITimelineController.PlayStates playState)
+        public async Task SetPlayStateAsync(ITimelineController.PlayStates playState)
         {
             _playState = playState;
             switch (_playState)
@@ -52,7 +53,7 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             await Task.CompletedTask;
         }
 
-        public async Task SetActuatorValue(int index, double valueInPercent)
+        public async Task SetActuatorValueAsync(int index, double valueInPercent)
         {
             var ok = _xTouchMiniController.SetKnobPosition((byte)(index + 1), (byte)(Math.Max(0, Math.Min(127, valueInPercent * 127 / 100.0))));
             await Task.CompletedTask;
@@ -60,7 +61,7 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
 
 
 
-        public async Task ShowPointButtonState(int index, bool pointExists)
+        public async Task ShowPointButtonStateAsync(int index, bool pointExists)
         {
             var ok = _xTouchMiniController.SetButtonLedState(topLine: true, (byte)(index + 1), pointExists ? LedState.On : LedState.Off);
             await Task.CompletedTask;

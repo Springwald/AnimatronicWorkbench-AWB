@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -21,7 +21,7 @@ namespace Awb.Core.InputControllers.Midi
         private readonly NativeMethods.MidiOutProc _midiOutProc;
         private IntPtr _handle, _handleOut;
         private bool _isOpenOut, _isOpenIn, _isStarted;
-        public EventHandler<MidiInputEventArgs> OnInputEvent;
+        public EventHandler<MidiInputEventArgs>? OnInputEvent;
 
         public int _p;
         public string _pS = "";

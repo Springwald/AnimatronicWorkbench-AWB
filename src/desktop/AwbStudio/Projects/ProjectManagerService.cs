@@ -28,7 +28,7 @@ namespace AwbStudio.Projects
             private OpenProjectResult() { }
         }
 
-        AwbProject ActualProject { get; }
+        AwbProject? ActualProject { get; }
         bool ExistProject(string projectPath);
         Task<OpenProjectResult> OpenProjectAsync(string projectFolder);
         Task<bool> SaveProjectAsync(AwbProject project, string projectFolder);

@@ -26,11 +26,6 @@ namespace AwbStudio.TimelineControls
     public partial class NestedTimelinesViewerControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
 
-        private const double _paintMarginTopBottom = 30;
-        private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
-
-        private TimelineData? _timelineData;
-        private TimelineCaptions? _timelineCaptions;
         private TimelineViewContext? _viewContext;
         private NestedTimelineValuePainter? _nestedTimelineValuePainter;
         private TimelineCaption? _caption;
@@ -73,7 +68,6 @@ namespace AwbStudio.TimelineControls
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
             _nestedTimelineValuePainter!.TimelineDataLoaded(timelineData);
-            _timelineData = timelineData;
         }
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -82,7 +76,7 @@ namespace AwbStudio.TimelineControls
 
         private void Grid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            _viewContext.ActualFocusObject = AwbObject;
+            if (_viewContext != null) _viewContext.ActualFocusObject = AwbObject;
         }
     }
 }

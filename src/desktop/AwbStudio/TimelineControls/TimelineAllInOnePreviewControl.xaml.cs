@@ -11,7 +11,6 @@ using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
-using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,10 +26,9 @@ namespace AwbStudio.TimelineControls
     public partial class TimelineAllInOnePreviewControl : UserControl, ITimelineEditorControl
     {
         private TimelineData? _timelineData;
-        private IActuatorsService? _actuatorsService;
         private PlayPosPainter? _playPosPainter;
-        private GridTimePainter _gridPainter;
-        private Sound[] _projectSounds;
+        private GridTimePainter? _gridPainter;
+        private Sound[]? _projectSounds;
         private TimelineCaptions? _timelineCaptions;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
@@ -165,7 +163,6 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-
         #region mouse events
 
         double _mouseX = 0;
@@ -182,9 +179,13 @@ namespace AwbStudio.TimelineControls
 
         private async Task SetPlayPosByMouse(double mouseX)
         {
-            //var newPlayPosMs = (int)(((MyScrollViewer.HorizontalOffset + mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
+            if (_viewContext == null) return;
+            if (_playPosSynchronizer == null) return;
+
             var newPlayPosMs = (int)(((mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
             _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
+
+            await Task.CompletedTask;
         }
 
         #endregion

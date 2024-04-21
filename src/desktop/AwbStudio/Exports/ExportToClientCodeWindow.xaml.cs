@@ -50,6 +50,12 @@ namespace AwbStudio.Exports
 
         private async void LabelTargetFolder_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            if (_projectManagerService.ActualProject == null)
+            {
+                MessageBox.Show("No project loaded");
+                return;
+            }
+
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
@@ -64,7 +70,11 @@ namespace AwbStudio.Exports
                     }
                     _projectManagerService.ActualProject.AutoPlayEsp32ExportFolder = folder;
                     var saved = await _projectManagerService.SaveProjectAsync(_projectManagerService.ActualProject, _projectManagerService.ActualProject.ProjectFolder);
-
+                    if (!saved)
+                    {
+                        MessageBox.Show("Error saving project");
+                        return;
+                    }   
                     ExportFolder = folder;
                 }
             }

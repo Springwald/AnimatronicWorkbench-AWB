@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -19,11 +19,11 @@ namespace Awb.Core.InputControllers.XTouchMini
         public EventHandler<XTouchMiniEventArgs>? ActionReceived;
         private readonly IInvoker _invoker;
 
-        public XTouchMiniController(IAwbLogger awbLogger, IInvoker  invoker) : base(deviceName: "X-TOUCH MINI", awbLogger: awbLogger)
+        public XTouchMiniController(IAwbLogger awbLogger, IInvoker invoker) : base(deviceName: "X-TOUCH MINI", awbLogger: awbLogger)
         {
+            _invoker = invoker;
             if (_midiPort == null || !Available) return;
             _midiPort.OnInputEvent += _midiPort_OnInputEvent;
-            _invoker = invoker;
         }
 
         private void _midiPort_OnInputEvent(object? sender, MidiInputEventArgs e)

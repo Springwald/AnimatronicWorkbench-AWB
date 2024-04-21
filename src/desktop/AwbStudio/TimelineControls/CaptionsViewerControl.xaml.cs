@@ -6,7 +6,6 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.ActuatorsAndObjects;
-using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
@@ -32,8 +31,6 @@ namespace AwbStudio.TimelineControls
 
         private bool _isInitialized;
 
-        public IAwbObject AwbObject => null;
-
         public CaptionsViewerControl()
         {
             InitializeComponent();
@@ -41,7 +38,7 @@ namespace AwbStudio.TimelineControls
             this._prototypeLabelBorderInActualBank = WpfToolbox.XamlClone(PrototypeLabelBorderInActualBank);
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, IActuatorsService actuatorsService)
         {
             _viewContext = viewContext;
             _actuatorsService = actuatorsService;
@@ -120,12 +117,13 @@ namespace AwbStudio.TimelineControls
                     if (caption.ObjectIsControllerTuneable)
                     {
                         label.Content = no >= _viewContext.FirstBankItemNo && no <= _viewContext.LastBankItemNo ? $"[{no - _viewContext.FirstBankItemNo + 1}] {caption.Label.Trim()}" : caption.Label.Trim();
-                    } else
+                    }
+                    else
                     {
-                        label.Content =  caption.Label.Trim();
+                        label.Content = caption.Label.Trim();
                     }
 
-                    
+
                     label.Foreground = caption.ForegroundColor;
                     label.Background = caption.BackgroundColor;
                     label.MouseDown += (sender, e) => _viewContext!.ActualFocusObject = _actuatorsService?.AllActuators.SingleOrDefault(a => a.Id == caption.Id);

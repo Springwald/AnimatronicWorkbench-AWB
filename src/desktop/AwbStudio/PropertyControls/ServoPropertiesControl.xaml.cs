@@ -11,6 +11,7 @@ using Awb.Core.Player;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace AwbStudio.PropertyControls
@@ -55,6 +56,8 @@ namespace AwbStudio.PropertyControls
             _playPosSynchronizer.OnPlayPosChanged += OnPlayPosChanged;
             _viewContext.Changed += ViewContext_Changed;
             ShowActualValue();
+
+            await Task.CompletedTask;   
         }
 
         private void ServoPropertiesControl_Unloaded(object sender, System.Windows.RoutedEventArgs e)

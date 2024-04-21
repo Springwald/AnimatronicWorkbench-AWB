@@ -26,20 +26,21 @@ namespace AwbStudio.TimelineControls.PropertyControls
             this._logger = logger;
         }
 
-
         public event EventHandler<TimelineControllerEventArgs>? OnTimelineEvent;
 
-        public async Task SetActuatorValue(int index, double valueInPercent)
+        public async Task SetActuatorValueAsync(int index, double valueInPercent)
         {
-
+            await Task.CompletedTask;
         }
 
-        public async Task SetPlayState(ITimelineController.PlayStates playStates)
+        public async Task SetPlayStateAsync(ITimelineController.PlayStates playStates)
         {
+            await Task.CompletedTask;
         }
 
-        public async Task ShowPointButtonState(int index, bool pointExists)
+        public async Task ShowPointButtonStateAsync(int index, bool pointExists)
         {
+            await Task.CompletedTask;
         }
 
         public void Dispose()

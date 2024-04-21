@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -17,11 +17,13 @@ namespace Awb.Core.Clients
 
         public async Task<bool> InitAsync()
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
         public async Task<IAwbClient.SendResult> Send(byte[] payload)
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
     }

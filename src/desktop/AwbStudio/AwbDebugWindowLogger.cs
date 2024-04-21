@@ -15,14 +15,15 @@ namespace AwbStudio
 {
     internal class AwbDebugWindowLogger : IAwbLogger, IDisposable
     {
-        private DebugWindow? _debugWindow;
-        private List<string> _output = new List<string>();
+        private DebugWindow _debugWindow;
+        private List<string> _output;
         public event EventHandler<string>? OnError;
         public event EventHandler<string>? OnLog;
 
         public AwbDebugWindowLogger(DebugWindow debugWindow)
         {
             _debugWindow = debugWindow;
+            _output = new List<string>();
         }
 
         public async Task LogError(string message)
@@ -48,6 +49,7 @@ namespace AwbStudio
                     _debugWindow.TextBox.Text = string.Join("\r\n", _output);
                 }
             }), System.Windows.Threading.DispatcherPriority.Background);
+            await Task.CompletedTask;
         }
 
         public void Close()

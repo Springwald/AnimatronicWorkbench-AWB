@@ -8,6 +8,7 @@
 // Licensed under MIT License
 
 using PacketLogistics.ComPorts.ComportPackets;
+using System.Management;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("PacketLogisticsTests")]
@@ -63,7 +64,7 @@ namespace PacketLogistics.ComPorts.Serialization
 
             // checksum
             var checksumRawBytes = ByteArrayConverter.GetNextBytes(value, 2, ref pos);
-            var checksum = ByteArrayConverter.UnSplitBytes(checksumRawBytes)?.FirstOrDefault();
+            var checksum = ByteArrayConverter.UnSplitBytes(checksumRawBytes ?? [])?.FirstOrDefault();
             if (checksum == null)
             {
                 errorMsg = "Checksum not found";

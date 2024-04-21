@@ -17,11 +17,13 @@ namespace Awb.Core.Clients
 
         public async Task<bool> InitAsync()
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
         public async Task<IAwbClient.SendResult> Send(byte[] payload)
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
     }

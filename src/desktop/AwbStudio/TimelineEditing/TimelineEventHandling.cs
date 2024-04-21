@@ -224,7 +224,7 @@ namespace AwbStudio.TimelineEditing
         {
             _timelinePlayer?.Play();
             foreach (var timelineController in _timelineControllers)
-                timelineController?.SetPlayState(ITimelineController.PlayStates.Playing);
+                timelineController?.SetPlayStateAsync(ITimelineController.PlayStates.Playing);
         }
 
         public async void Stop()
@@ -232,7 +232,7 @@ namespace AwbStudio.TimelineEditing
             // snap scrollpos to snap positions 
             _timelinePlayer?.Stop();
             foreach (var timelineController in _timelineControllers)
-                timelineController?.SetPlayState(ITimelineController.PlayStates.Editor);
+                timelineController?.SetPlayStateAsync(ITimelineController.PlayStates.Editor);
         }
 
         private void SwitchToNextBank()
@@ -261,8 +261,8 @@ namespace AwbStudio.TimelineEditing
                     case IServo servo:
                         foreach (var timelineController in _timelineControllers)
                         {
-                            timelineController.SetActuatorValue(index: timelineControllerIndex, valueInPercent: servo.PercentCalculator.CalculatePercent(servo.TargetValue));
-                            timelineController.ShowPointButtonState(index: timelineControllerIndex, pointExists: _timelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
+                            timelineController.SetActuatorValueAsync(index: timelineControllerIndex, valueInPercent: servo.PercentCalculator.CalculatePercent(servo.TargetValue));
+                            timelineController.ShowPointButtonStateAsync(index: timelineControllerIndex, pointExists: _timelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
                         }
                         break;
                     default:

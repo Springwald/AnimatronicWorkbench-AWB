@@ -49,7 +49,7 @@ namespace Awb.Core.InputControllers.BCF2000
             }
             // This is important! We must not call the event handler in the timer thread, because the event handler should update the UI.
             // so we use the invoker using the hosting wpf application thread instead.
-            _invoker.Invoke(() => ActionReceived?.Invoke(this, args));
+            _invoker?.Invoke(() => ActionReceived?.Invoke(this, args));
         }
 
         /// <summary>
@@ -58,11 +58,12 @@ namespace Awb.Core.InputControllers.BCF2000
         /// <param name="fader">1-8</param>
         /// <param name="pos">0-127</param>
         /// <returns></returns>
-        public async Task<bool> SetFaderPosition(byte fader, byte pos)
+        public async Task<bool> SetFaderPositionAsync(byte fader, byte pos)
         {
             if (fader == 0) throw new ArgumentOutOfRangeException("fader must be 1-8; is not 0 based!");
             if (pos == _valuesKnobRotation[fader - 1]) return true;
             if (fader > 3) fader++; // fader 4 is missing, so shift all fader after 3 by one
+            await Task.CompletedTask;
             return _midiPort?.SendMidiMessage((byte)176, (byte)(fader + 7), pos) == true;
         }
 

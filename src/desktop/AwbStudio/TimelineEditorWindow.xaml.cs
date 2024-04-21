@@ -37,9 +37,8 @@ namespace AwbStudio
         private readonly FileManagement.TimelineFileManager _fileManager;
         private readonly ITimelineController[] _timelineControllers;
         private readonly TimelineViewContext _viewContext;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IInvokerService _invokerService;
-        private IActuatorsService _actuatorsService;
+        private IActuatorsService? _actuatorsService;
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
         private TimelineEventHandling? _timelineEventHandling;
         private TimelinePlayer? _timelinePlayer;
@@ -50,11 +49,10 @@ namespace AwbStudio
         private bool _switchingPages;
         private bool _ctrlKeyPressed;
 
-        public TimelineEditorWindow(IServiceProvider serviceProvider, ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
+        public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
         {
             InitializeComponent();
 
-            _serviceProvider = serviceProvider;
             _invokerService = invokerService;
 
             DebugOutputLabel.Content = string.Empty;
@@ -80,7 +78,7 @@ namespace AwbStudio
             _projectManagerService = projectManagerService;
             _logger = awbLogger;
 
-            _project = _projectManagerService.ActualProject;
+            _project = _projectManagerService.ActualProject ?? throw new Exception("Actual project is null?!?");
             _fileManager = new FileManagement.TimelineFileManager(_project);
             _timelineControllers = timelineControllers;
 
@@ -117,7 +115,7 @@ namespace AwbStudio
             _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
             var timelineCaptions = new TimelineCaptions();
-            TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
+            TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _actuatorsService);
 
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _fileManager.TimelineMetaDataService, _project.Sounds);
 
@@ -248,7 +246,7 @@ namespace AwbStudio
 
             foreach (var timelineController in _timelineControllers)
             {
-                timelineController.SetPlayState(ITimelineController.PlayStates.Editor);
+                timelineController.SetPlayStateAsync(ITimelineController.PlayStates.Editor);
                 timelineController.OnTimelineEvent -= TimelineController_OnTimelineEvent;
             }
 
@@ -372,7 +370,7 @@ namespace AwbStudio
                     viewContext: _viewContext,
                     playPosSynchronizer: _playPosSynchronizer);
 
-                FocusObjectPropertyEditorControl.Init(_serviceProvider, _viewContext, data, new TimelineEditingManipulation(data, _playPosSynchronizer),  _playPosSynchronizer, _fileManager,  _project.Sounds);
+                FocusObjectPropertyEditorControl.Init(_viewContext, data, _playPosSynchronizer, _fileManager, _project.Sounds);
             }
             _unsavedChanges = changesAfterLoading;
         }
@@ -406,13 +404,19 @@ namespace AwbStudio
 
         private bool SaveTimelineData()
         {
+            if (_timelineData == null)
+            {
+                MessageBox.Show("No timeline data to save!");
+                return false;
+            }
+
             var id = _timelineData.Id;
             if (string.IsNullOrWhiteSpace(id))
             {
                 MessageBox.Show("Timeline has no id!", "Can't save timeline");
                 return false;
-
             }
+
             var filename = _fileManager.GetTimelineFilenameById(id);
             if (_fileManager.SaveTimelineData(_timelineData))
             {

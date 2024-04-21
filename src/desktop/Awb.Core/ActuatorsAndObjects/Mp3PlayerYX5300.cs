@@ -29,7 +29,7 @@ namespace Awb.Core.Actuators
         /// <summary>
         /// The optional visible name of the sound player
         /// </summary>
-        public string? Title { get; }
+        public string Title { get; }
 
         /// <summary>
         /// The TX pin of the sound player for serial communication

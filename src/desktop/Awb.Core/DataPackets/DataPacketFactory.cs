@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -27,17 +27,15 @@ namespace Awb.Core.DataPackets
 
                 if (stsServos != null || pwmServos != null || scsServos != null)
                 {
-                    yield return new ClientDataPacket
-                    {
-                        ClientId = servosByClient.ClientId,
-                        Content = new DataPacketContent
+                    yield return new ClientDataPacket(
+                        clientId: servosByClient.ClientId,
+                        dataPacketContent: new DataPacketContent
                         {
                             DisplayMessage = null,
                             StsServos = stsServos,
                             ScsServos = scsServos,
                             Pca9685PwmServos = pwmServos
-                        }
-                    };
+                        });
                 }
             }
         }

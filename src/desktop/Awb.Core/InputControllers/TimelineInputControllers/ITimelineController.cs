@@ -17,10 +17,10 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
 
         event EventHandler<TimelineControllerEventArgs> OnTimelineEvent;
 
-        Task SetPlayState(PlayStates playStates);
+        Task SetPlayStateAsync(PlayStates playStates);
 
-        Task SetActuatorValue(int index, double valueInPercent);
+        Task SetActuatorValueAsync(int index, double valueInPercent);
 
-        Task ShowPointButtonState(int index, bool pointExists);
+        Task ShowPointButtonStateAsync(int index, bool pointExists);
     }
 }
