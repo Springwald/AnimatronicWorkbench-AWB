@@ -119,7 +119,7 @@ namespace AwbStudio
             var timelineCaptions = new TimelineCaptions();
             TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
 
-            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.Sounds);
+            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _fileManager.TimelineMetaDataService, _project.Sounds);
 
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.Sounds);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
@@ -496,9 +496,7 @@ namespace AwbStudio
             var exportWindow = new ExportToClientCodeWindow(_projectManagerService);
 
             var timelines = new List<TimelineData>();
-
-            var fileManager = new FileManagement.TimelineFileManager(_project);
-            var timelineFilenames = fileManager.TimelineFilenames;
+            var timelineFilenames = _fileManager.TimelineFilenames;
 
             foreach (var timelineFilename in timelineFilenames)
             {

@@ -11,6 +11,7 @@ using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
+using AwbStudio.FileManagement;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
@@ -56,7 +57,7 @@ namespace AwbStudio.TimelineControls
             _gridPainter = null;
         }
 
-        public void Init(TimelineViewContext viewContext,TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, Sound[] projectSounds)
+        public void Init(TimelineViewContext viewContext,TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, Sound[] projectSounds)
         {
             _viewContext = viewContext;
             _playPosSynchronizer = playPosSynchronizer;
@@ -68,7 +69,7 @@ namespace AwbStudio.TimelineControls
 
             // add nested timelines painter + editors
             var nestedTimelineEditorControl = new NestedTimelinesViewerControl();
-            nestedTimelineEditorControl.Init(viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
+            nestedTimelineEditorControl.Init(viewContext, timelineCaptions, playPosSynchronizer, actuatorsService, timelineMetaDataService);
             AllValuesEditorControlsStackPanel.Children.Add(nestedTimelineEditorControl);
             _timelineEditorControls.Add(nestedTimelineEditorControl);
 

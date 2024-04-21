@@ -13,13 +13,15 @@ namespace AwbStudio.FileManagement
         public string Title { get; }
         public int StateId { get; }
         public string StateName { get; }
+        public int DurationMs { get;  }
 
-        public TimelineMetaData(string id, string title, int stateId, string stateName)
+        public TimelineMetaData(string id, string title, int stateId, string stateName, int durationMs)
         {
             Id = id;
             Title = title;
             StateId = stateId;
             StateName = stateName;
+            DurationMs = durationMs;
         }
     }
 }

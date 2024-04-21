@@ -9,6 +9,7 @@ using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using AwbStudio.FileManagement;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
@@ -58,10 +59,10 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService)
         {
             _viewContext = viewContext;
-            _nestedTimelineValuePainter = new NestedTimelineValuePainter(AllValuesGrid, _viewContext, timelineCaptions);
+            _nestedTimelineValuePainter = new NestedTimelineValuePainter(AllValuesGrid, _viewContext, timelineCaptions, timelineMetaDataService);
             _caption = timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
             HeaderControl.TimelineCaption = _caption;
 

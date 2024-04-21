@@ -5,10 +5,9 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.Timelines;
+using AwbStudio.FileManagement;
 using AwbStudio.PropertyControls;
-using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +21,13 @@ namespace AwbStudio.TimelineValuePainters
     {
         private const int _paintMarginTopBottom = 0;
         private readonly TimelineCaptions _timelineCaptions;
+        private readonly ITimelineMetaDataService _timelineMetaDataService;
 
-        public NestedTimelineValuePainter(Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions) :
+        public NestedTimelineValuePainter(Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineMetaDataService timelineMetaDataService) :
             base(paintControl, viewContext, timelineCaptions)
         {
             _timelineCaptions = timelineCaptions;
+            _timelineMetaDataService = timelineMetaDataService;
         }
 
         protected override void TimelineDataLoadedInternal()
@@ -53,28 +54,57 @@ namespace AwbStudio.TimelineValuePainters
 
             double y = 0;
 
-        /*    var caption = _timelineCaptions?.GetAktuatorCaption(_soundPlayer.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightYellow) };
+            var caption = _timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.LightSkyBlue) };
 
             // Add polylines with points
-            var pointsForThisSoundplayer = _timelineData?.SoundPoints.OfType<SoundPoint>().Where(p => p.SoundPlayerId == _soundPlayer.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<SoundPoint>();
+            var points = _timelineData?.SoundPoints.OfType<NestedTimelinePoint>().OrderBy(p => p.TimeMs).ToList() ?? new List<NestedTimelinePoint>();
 
             // add dots
-            foreach (var point in pointsForThisSoundplayer)
+            foreach (var point in points)
             {
+                y += 20;
+                if (y > 60) y = 0;
                 if (point.TimeMs >= 0 && point.TimeMs <= _viewContext.DurationMs) // is inside view
                 {
-                    var label = new SoundPlayerPointLabel()
+                    var timeMs = (int)point.TimeMs;
+
+                    if (_timelineMetaDataService.ExistsTimeline(point.TimelineId) == false)
                     {
-                        LabelText = "Sound" + point.Title,
-                        Margin = new Thickness
+                        var label = new NestedTimelinePointLabel()
                         {
-                            Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData),
-                            Bottom = 0
-                        }
-                    };
-                    PaintControl.Children.Add(label);
+                            LabelText = $"TIMELINE + " + point.TimelineId + " NOT FOUND!",
+                            Margin = new Thickness
+                            {
+                                Left = _viewContext.GetXPos(timeMs: timeMs, timelineData: _timelineData),
+                                Top = y,
+                                Bottom = 0
+                            },
+                        };
+                        _valueControls.Add(label);
+                        PaintControl.Children.Add(label);
+                    }
+                    else
+                    {
+                        var timeline = _timelineMetaDataService.GetMetaData(point.TimelineId);
+                        var label = new NestedTimelinePointLabel()
+                        {
+                            LabelText = $"Timeline: {timeline.Title ?? point.Title}",
+                            Margin = new Thickness
+                            {
+                                Left = _viewContext.GetXPos(timeMs: timeMs, timelineData: _timelineData),
+                                Top = y,
+                                Bottom = 0
+                            },
+                        };
+                        _valueControls.Add(label);
+                        PaintControl.Children.Add(label);
+                        var durationMs = _timelineMetaDataService.GetDurationMs(point.TimelineId);
+                        if (durationMs < 1000) durationMs = 1000;
+                        label.SetWidthByDuration(_viewContext.PixelPerMs * durationMs);
+                    }
+
                 }
-            }*/
+            }
         }
 
         public new void Dispose()
@@ -84,8 +114,8 @@ namespace AwbStudio.TimelineValuePainters
 
         protected override bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs)
         {
-            if (changedEventArgs.ChangeType != TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged) return false;
-            return false; // this._soundPlayer.Id == changedEventArgs.ChangedObjectId;
+            if (changedEventArgs.ChangeType != TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged) return false;
+            return NestedTimelinesFakeObject.Singleton.Id == changedEventArgs.ChangedObjectId;
         }
     }
 }

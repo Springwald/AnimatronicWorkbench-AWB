@@ -48,6 +48,7 @@ namespace AwbStudio.PropertyControls
         {
             if (_viewContext != null)
                 _viewContext.Changed -= ViewContext_Changed;
+                _viewContext.Changed -= ViewContext_Changed;
 
             RemoveEditor();
         }
@@ -105,9 +106,9 @@ namespace AwbStudio.PropertyControls
 
                         if (_focusObject == NestedTimelinesFakeObject.Singleton)
                         {
-                            var editor = new NestedTimelinePropertyControl();
-                            _actualPropertyEditor = editor;
-                            editor.FileManager = _timelineFileManager;
+                            _actualPropertyEditor = new NestedTimelinePropertyControl(_timelineFileManager.TimelineMetaDataService);
+                            this.PropertyEditorGrid.Children.Clear();
+                            this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }
                     }
                     break;

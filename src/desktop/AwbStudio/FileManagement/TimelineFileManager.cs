@@ -19,8 +19,18 @@ namespace AwbStudio.FileManagement
 {
     public class TimelineFileManager
     {
+        private ITimelineMetaDataService? _timelineMetaDataService;
         private readonly AwbProject _project;
         internal readonly string ProjectTitle;
+
+        public ITimelineMetaDataService TimelineMetaDataService
+        {
+            get
+            {
+                _timelineMetaDataService ??= new TimelineMetaDataService(this);
+                return _timelineMetaDataService;
+            }
+        }
 
         public TimelineFileManager(AwbProject project)
         {
@@ -55,7 +65,7 @@ namespace AwbStudio.FileManagement
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
             },
         };
-
+      
 
         public bool SaveTimelineData(TimelineData data)
         {
@@ -64,6 +74,7 @@ namespace AwbStudio.FileManagement
             var saveFormat = TimelineSaveFormat.FromTimelineData(data);
             var jsonString = JsonSerializer.Serialize(saveFormat, _jsonOptions);
             System.IO.File.WriteAllText(filename, jsonString);
+            _timelineMetaDataService?.ClearCache(data.Id);
             return true;
         }
 
@@ -75,7 +86,7 @@ namespace AwbStudio.FileManagement
             var state = _project?.TimelinesStates?.SingleOrDefault(s => s.Id == data.TimelineStateId);
             var stateName = state?.Title;
 
-            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, stateName: stateName ?? $"unknown StateId {data.TimelineStateId}");
+            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, stateName: stateName ?? $"unknown StateId {data.TimelineStateId}", data.DurationMs);
         }
 
         /// <summary>

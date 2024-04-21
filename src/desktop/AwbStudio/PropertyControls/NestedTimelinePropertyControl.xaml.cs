@@ -5,13 +5,10 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
-using Awb.Core.Sounds;
 using AwbStudio.FileManagement;
 using AwbStudio.TimelineEditing;
 using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -22,48 +19,38 @@ namespace AwbStudio.PropertyControls
     /// </summary>
     public partial class NestedTimelinePropertyControl : UserControl, IPropertyEditor
     {
-        private TimelineFileManager? _filenameManager;
-        private IEnumerable<string> _filenames;
+        private readonly ITimelineMetaDataService _timelineMetaDataService;
 
         public IAwbObject AwbObject => NestedTimelinesFakeObject.Singleton;
 
-        public FileManagement.TimelineFileManager? FileManager
-        {
-            set
-            {
-                _filenameManager = value;
-                Refresh();
-            }
-        }
 
-
-        public NestedTimelinePropertyControl()
+        public NestedTimelinePropertyControl(ITimelineMetaDataService timelineMetaDataService)
         {
             InitializeComponent();
-            Loaded += SoundPlayerPropertyControl_Loaded;
+            Loaded += NestedTimelinePropertyControl_Loaded;
+            _timelineMetaDataService = timelineMetaDataService;
         }
 
-        private void SoundPlayerPropertyControl_Loaded(object sender, RoutedEventArgs e)
+        private void NestedTimelinePropertyControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Loaded -= SoundPlayerPropertyControl_Loaded;
+            Loaded -= NestedTimelinePropertyControl_Loaded;
+            RefreshList();
         }
 
         public event EventHandler OnValueChanged;
 
-        private void Refresh()
+        private void RefreshList()
         {
             this.ComboBoxTimeline.Items.Clear();
-            if (_filenameManager != null)
+            var timelineMetaDatas = _timelineMetaDataService.GetAllMetaData();
+            foreach (var timelineMetaData in timelineMetaDatas)
             {
-                _filenames = _filenameManager.TimelineFilenames;
-                foreach (var timelineFilename in _filenames)
-                {
-                    var timelineMetaData = _filenameManager.GetTimelineMetaData(timelineFilename);
-                    if (timelineMetaData == null) continue;
-                    this.ComboBoxTimeline.Items.Add($"[{timelineMetaData.StateName}] {timelineMetaData.Title}");
-                }
+                if (timelineMetaData == null) continue;
+                this.ComboBoxTimeline.Items.Add($"[{timelineMetaData.StateName}] {timelineMetaData.Title}");
             }
         }
+
+      
     }
 }
 

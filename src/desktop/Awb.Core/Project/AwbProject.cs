@@ -5,9 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Project;
 using Awb.Core.Sounds;
-using System.IO;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
@@ -18,7 +16,7 @@ namespace Awb.Core.Project
 
         public string? _projectFolder;
 
-        public string Info { get; set; } 
+        public string Info { get; set; }
 
         public string Title { get; set; }
 
@@ -27,9 +25,9 @@ namespace Awb.Core.Project
         public StsServoConfig[]? ScsServos { get; set; }
         public Mp3PlayerYX5300Config[]? Mp3PlayersYX5300 { get; set; }
         public TimelineState[]? TimelinesStates { get; set; }
-        public InputConfig[]? Inputs { get; set; }  
+        public InputConfig[]? Inputs { get; set; }
 
-        public int ItemsPerBank { get; set; } = 8;  
+        public int ItemsPerBank { get; set; } = 8;
 
         public string? AutoPlayEsp32ExportFolder { get; set; }
 
