@@ -98,22 +98,21 @@ namespace AwbStudio.PropertyControls
 
         private void ComboBoxSoundToPlay_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var index = ComboBoxSoundToPlay.SelectedIndex;
-            if (index < 0) return;
-            if (_projectSounds.Length <= index)
-            {
-                MessageBox.Show("Sound index " + index + " not found!");
-                return;
-            }
-
             if (_isUpdatingView) return;
+
+            var index = ComboBoxSoundToPlay.SelectedIndex;
             if (index == 0)
             {
                 SetNewValue(null);
             }
             else
             {
-                var newSoundId = _projectSounds[index];
+                if (_projectSounds.Length <= index)
+                {
+                    MessageBox.Show("Sound index " + index + " not found!");
+                    return;
+                }
+                var newSoundId = _projectSounds[index-1];
                 SetNewValue(newSoundId);
             }
         }

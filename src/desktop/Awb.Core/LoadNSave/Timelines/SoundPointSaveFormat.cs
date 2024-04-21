@@ -5,13 +5,14 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 
 namespace Awb.Core.LoadNSave.Timelines
 {
     public class SoundPointSaveFormat
     {
-        public int TimeMs { get; set;  }
+        public int TimeMs { get; set; }
         public string TargetObjectId { get; set; }
         public string SoundPlayerId => TargetObjectId;
         public string Title { get; set; }
@@ -36,13 +37,17 @@ namespace Awb.Core.LoadNSave.Timelines
         };
 
         public static SoundPoint ToSoundPoint(SoundPointSaveFormat soundPointSaveFormat)
-        => new SoundPoint(
+        {
+            var result = new SoundPoint(
             timeMs: soundPointSaveFormat.TimeMs,
             soundPlayerId: soundPointSaveFormat.TargetObjectId,
             title: soundPointSaveFormat.Title,
             soundId: soundPointSaveFormat.SoundId)
-        {
-            Description = soundPointSaveFormat.Description,
-        };
+            {
+                Description = soundPointSaveFormat.Description,
+            };
+
+            return result;
+        }
     }
 }

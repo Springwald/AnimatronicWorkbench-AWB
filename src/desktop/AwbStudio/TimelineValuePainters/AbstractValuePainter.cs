@@ -54,9 +54,7 @@ namespace AwbStudio.TimelineValuePainters
         private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
             if (this.IsChangedEventSuitableForThisPainter(e))
-                //MyInvoker.Invoke(() => 
                 PaintValues();
-                //);
         }
 
         private void PaintControl_SizeChanged(object sender, SizeChangedEventArgs e)

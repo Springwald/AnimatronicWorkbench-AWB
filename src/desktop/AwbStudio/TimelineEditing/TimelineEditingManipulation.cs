@@ -63,17 +63,27 @@ namespace AwbStudio.TimelineEditing
 
         #region SOUNDPLAYER
 
-        public void UpdateSoundPlayerValue(ISoundPlayer soundPlayer, int soundId)
+        public void UpdateSoundPlayerValue(ISoundPlayer soundPlayer, int? soundId, string? soundTitle)
         {
             var soundPoint = _timelineData?.SoundPoints.OfType<SoundPoint>().SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
-            if (soundPoint == null)
+            if (soundId == null)
             {
-                soundPoint = new SoundPoint(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, soundPlayer.Id, "Sound " + soundId, soundId);
-                _timelineData?.SoundPoints.Add(soundPoint);
+                // sound should be removed from timeline at this position
+                if (soundPoint == null) return; // nothing to do
+                _timelineData?.SoundPoints.Remove(soundPoint);
             }
             else
             {
-                soundPoint.SoundId = soundId;
+                // sound should be added or updated at this position
+                if (soundPoint == null)
+                {
+                    soundPoint = new SoundPoint(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, soundPlayer.Id, soundTitle ?? $"Sound {soundId}", soundId.Value);
+                    _timelineData?.SoundPoints.Add(soundPoint);
+                }
+                else
+                {
+                    soundPoint.SoundId = soundId.Value;
+                }
             }
             _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPlayer.Id);
         }

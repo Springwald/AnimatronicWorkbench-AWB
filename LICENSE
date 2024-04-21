@@ -37,3 +37,5 @@ These are:
 - Musique de Mario (Arduino Leonardo) - original code from https://gist.github.com/davidperrenoud/7718862
 
 - Arduino YX5300/YX6300 Serial MP3 Player Library - https://github.com/MajicDesigns/MD_YX5300 (LGPL-3.0 license)
+
+- taglib-sharp - https://github.com/mono/taglib-sharp (LGPL-2.1 license)

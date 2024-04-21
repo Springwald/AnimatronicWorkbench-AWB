@@ -7,6 +7,7 @@
 
 using Awb.Core.LoadNSave.TimelineLoadNSave;
 using Awb.Core.Project;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +26,7 @@ namespace AwbStudio.FileManagement
         {
             _project = project;
             ProjectTitle = project.Title;
-            ConvertOldFilenamesIfNeeded(deleteOldFiles: false);
+            ConvertOldFilenamesIfNeeded(deleteOldFiles: false, projectSounds: project.Sounds);
         }
 
         public IEnumerable<string> TimelineFilenamesOld => Directory.GetFiles(_project.ProjectFolder, "*.awbtl");
@@ -80,7 +81,7 @@ namespace AwbStudio.FileManagement
         /// <summary>
         ///  if there are no actual timeline files but old timeline files, convert them to the new format
         /// </summary>
-        private void ConvertOldFilenamesIfNeeded(bool deleteOldFiles)
+        private void ConvertOldFilenamesIfNeeded(bool deleteOldFiles, Sound[] projectSounds)
         {
             if (!TimelineFilenames.Any())
             {

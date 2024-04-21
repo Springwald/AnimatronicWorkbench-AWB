@@ -7,6 +7,7 @@
 
 using Awb.Core.Player;
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
@@ -29,6 +30,7 @@ namespace AwbStudio.TimelineControls
         private IActuatorsService? _actuatorsService;
         private PlayPosPainter? _playPosPainter;
         private GridTimePainter _gridPainter;
+        private Sound[] _projectSounds;
         private TimelineCaptions? _timelineCaptions;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
@@ -61,19 +63,32 @@ namespace AwbStudio.TimelineControls
             InitializeComponent();
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, Sound[] projectSounds)
         {
             _viewContext = viewContext;
             _timelineCaptions = timelineCaptions;
             _playPosSynchronizer = playPosSynchronizer;
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
             _gridPainter = new GridTimePainter(OpticalGrid, _viewContext);
-
+            _projectSounds = projectSounds;
             _viewContext.Changed += OnViewContextChanged;
 
             // set up the actuator value painters and editors
             _timelineEditorControls = [];
             _timelineValuePainters = [];
+
+            // add sound painter + editors
+            foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
+            {
+                _timelineValuePainters.Add(new SoundValuePainter(
+                    soundPlayer: soundPlayerActuator,
+                    paintControl: this.AllValuesGrid,
+                    viewContext: _viewContext,
+                    timelineCaptions: _timelineCaptions,
+                    projectSounds: _projectSounds));
+            }
+
+            // todo: add nested timelines painter + editors
 
             // add servo painter + editors
             foreach (var servoActuator in actuatorsService.Servos)
@@ -85,17 +100,6 @@ namespace AwbStudio.TimelineControls
                     timelineCaptions: _timelineCaptions));
             }
 
-            // add sound painter + editors
-            foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
-            {
-                _timelineValuePainters.Add(new SoundValuePainter(
-                    soundPlayer: soundPlayerActuator,
-                    paintControl: this.AllValuesGrid,
-                    viewContext: _viewContext,
-                    timelineCaptions: _timelineCaptions));
-            }
-
-            // todo: add nested timelines painter + editors
 
             ZoomChanged();
 

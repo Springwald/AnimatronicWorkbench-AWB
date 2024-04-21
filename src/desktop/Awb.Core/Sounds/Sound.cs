@@ -14,6 +14,7 @@ namespace Awb.Core.Sounds
         public int Id { get; }
 
         public string Title { get; }
+        public int DurationMs { get; set; }
 
         public Sound(string mp3Filename)
         {
@@ -35,6 +36,10 @@ namespace Awb.Core.Sounds
             var title = pureFilename.Substring(3);
             if (string.IsNullOrWhiteSpace(title)) title = pureFilename;
             Title = title;
+
+            // get the duration
+            TagLib.File file = TagLib.File.Create(mp3Filename);
+            DurationMs = (int)file.Properties.Duration.TotalMilliseconds;
         }
 
     }

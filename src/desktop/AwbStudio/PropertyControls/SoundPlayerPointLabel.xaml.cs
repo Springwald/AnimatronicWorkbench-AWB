@@ -15,7 +15,6 @@ namespace AwbStudio.PropertyControls
     public partial class SoundPlayerPointLabel : UserControl
     {
 
-
         public string? LabelText
         {
             get => SoundPlayerLabel.Content?.ToString();
@@ -24,6 +23,11 @@ namespace AwbStudio.PropertyControls
                 SoundPlayerLabel.Content = value;
             }
         }
+
+        public void SetWidthByDuration(double widthInPixel)
+        {
+            SoundPlayerLabel.Width = widthInPixel;
+        }   
 
         public SoundPlayerPointLabel()
         {

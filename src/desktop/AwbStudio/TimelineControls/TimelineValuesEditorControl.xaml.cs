@@ -9,6 +9,7 @@ using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
@@ -55,7 +56,7 @@ namespace AwbStudio.TimelineControls
             _gridPainter = null;
         }
 
-        public void Init(TimelineViewContext viewContext,TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(TimelineViewContext viewContext,TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, Sound[] projectSounds)
         {
             _viewContext = viewContext;
             _playPosSynchronizer = playPosSynchronizer;
@@ -88,8 +89,7 @@ namespace AwbStudio.TimelineControls
                     soundPlayer: soundPlayerActuator,
                     viewContext,
                     timelineCaptions,
-                    playPosSynchronizer,
-                    actuatorsService);
+                    projectSounds: projectSounds);
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }

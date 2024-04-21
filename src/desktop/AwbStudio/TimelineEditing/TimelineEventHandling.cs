@@ -90,8 +90,7 @@ namespace AwbStudio.TimelineEditing
                     if (_viewContext?.ActualFocusObject is IServo servo)
                         _timelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     if (_viewContext?.ActualFocusObject is ISoundPlayer soundPlayer)
-                        if (soundPlayer.ActualSoundId != null)
-                            _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId.Value);
+                            _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null);
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:

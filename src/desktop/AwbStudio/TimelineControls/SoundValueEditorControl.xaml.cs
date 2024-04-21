@@ -9,6 +9,7 @@ using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
@@ -28,8 +29,6 @@ namespace AwbStudio.TimelineControls
         private const double _paintMarginTopBottom = 30;
         private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
 
-        private TimelineData? _timelineData;
-        private TimelineCaptions? _timelineCaptions;
         private TimelineViewContext? _viewContext;
         private ISoundPlayer? _soundPlayer;
         private SoundValuePainter? _soundValuePainter;
@@ -59,11 +58,11 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public void Init(ISoundPlayer soundPlayer, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService)
+        public void Init(ISoundPlayer soundPlayer, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, Sound[] projectSounds)
         {
             _viewContext = viewContext;
             _soundPlayer = soundPlayer;
-            _soundValuePainter = new SoundValuePainter(soundPlayer, AllValuesGrid, _viewContext, timelineCaptions);
+            _soundValuePainter = new SoundValuePainter(soundPlayer, AllValuesGrid, _viewContext, timelineCaptions, projectSounds);
             _caption = timelineCaptions?.GetAktuatorCaption(soundPlayer.Id) ?? new TimelineCaption { ForegroundColor = new SolidColorBrush(Colors.White) };
             HeaderControl.TimelineCaption = _caption;
 
@@ -74,7 +73,6 @@ namespace AwbStudio.TimelineControls
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
             _soundValuePainter!.TimelineDataLoaded(timelineData);
-            _timelineData = timelineData;
         }
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)

@@ -6,9 +6,9 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.PropertyControls;
-using AwbStudio.TimelineControls.PropertyControls;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,12 +23,14 @@ namespace AwbStudio.TimelineValuePainters
         private const int _paintMarginTopBottom = 0;
         private readonly ISoundPlayer _soundPlayer;
         private readonly TimelineCaptions _timelineCaptions;
+        private readonly Sound[] _projectSounds;
 
-        public SoundValuePainter(ISoundPlayer soundPlayer, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions) :
+        public SoundValuePainter(ISoundPlayer soundPlayer, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, Sound[] projectSounds) :
             base(paintControl, viewContext, timelineCaptions)
         {
             _soundPlayer = soundPlayer;
             _timelineCaptions = timelineCaptions;
+            _projectSounds = projectSounds;
         }
 
         protected override void TimelineDataLoadedInternal()
@@ -63,18 +65,32 @@ namespace AwbStudio.TimelineValuePainters
             // add dots
             foreach (var point in pointsForThisSoundplayer)
             {
+                y += 20;
+                if (y > 60) y = 0;
                 if (point.TimeMs >= 0 && point.TimeMs <= _viewContext.DurationMs) // is inside view
                 {
+                    var timeMs = (int)point.TimeMs;
+
+                    var sound = _projectSounds.FirstOrDefault(s => s.Id == point.SoundId);
+
                     var label = new SoundPlayerPointLabel()
                     {
-                        LabelText = "Sound" + point.Title,
+                        LabelText = $"Sound: {sound?.Title ?? point.Title}",
                         Margin = new Thickness
                         {
-                            Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData),
+                            Left = _viewContext.GetXPos(timeMs: timeMs, timelineData: _timelineData),
+                            Top = y,
                             Bottom = 0
-                        }
+                        },
                     };
+
+                    _valueControls.Add(label);  
                     PaintControl.Children.Add(label);
+
+                    // set the with to the duration of the sound if available
+                   
+                    var durationMs = sound?.DurationMs ?? 1000;
+                    label.SetWidthByDuration(_viewContext.PixelPerMs * durationMs);
                 }
             }
         }

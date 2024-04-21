@@ -119,9 +119,9 @@ namespace AwbStudio
             var timelineCaptions = new TimelineCaptions();
             TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
 
-            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
+            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.Sounds);
 
-            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService);
+            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.Sounds);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
 
             SoundPlayer.Sounds = _project.Sounds;
