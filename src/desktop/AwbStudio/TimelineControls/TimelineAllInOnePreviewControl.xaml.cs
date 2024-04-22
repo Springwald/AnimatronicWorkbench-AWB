@@ -61,7 +61,7 @@ namespace AwbStudio.TimelineControls
             InitializeComponent();
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, Sound[] projectSounds)
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineDataService timelineDataService,  IAwbLogger awbLogger, Sound[] projectSounds)
         {
             _viewContext = viewContext;
             _timelineCaptions = timelineCaptions;
@@ -95,7 +95,10 @@ namespace AwbStudio.TimelineControls
                     servo: servoActuator,
                     paintControl: this.AllValuesGrid,
                     viewContext: _viewContext,
-                    timelineCaptions: _timelineCaptions));
+                    timelineCaptions: _timelineCaptions,
+                    timelineDataService: timelineDataService,
+                    awbLogger: awbLogger
+                    ));
             }
 
 

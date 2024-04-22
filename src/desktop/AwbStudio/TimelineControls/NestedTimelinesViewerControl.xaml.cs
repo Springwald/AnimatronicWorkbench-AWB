@@ -10,13 +10,11 @@ using Awb.Core.Player;
 using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
-using AwbStudio.FileManagement;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {

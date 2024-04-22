@@ -5,22 +5,20 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-namespace AwbStudio.FileManagement
+namespace Awb.Core.Timelines
 {
     public class TimelineMetaData
     {
         public string Id { get; set; }
         public string Title { get; }
         public int StateId { get; }
-        public string StateName { get; }
         public int DurationMs { get;  }
 
-        public TimelineMetaData(string id, string title, int stateId, string stateName, int durationMs)
+        public TimelineMetaData(string id, string title, int stateId, int durationMs)
         {
             Id = id;
             Title = title;
             StateId = stateId;
-            StateName = stateName;
             DurationMs = durationMs;
         }
     }

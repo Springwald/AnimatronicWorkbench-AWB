@@ -8,7 +8,6 @@
 using Awb.Core.Project;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
-using AwbStudio.FileManagement;
 using AwbStudio.PropertyControls;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;

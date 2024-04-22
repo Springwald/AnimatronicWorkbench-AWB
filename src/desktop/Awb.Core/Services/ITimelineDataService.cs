@@ -11,6 +11,14 @@ namespace Awb.Core.Services
 {
     public interface ITimelineDataService
     {
-        TimelineData GetTimelineData(string timelineId);
+        ITimelineMetaDataService TimelineMetaDataService { get; }
+
+        IEnumerable<string> TimelineIds { get; }
+
+        bool Exists(string timelineId);
+
+        TimelineData? GetTimelineData(string timelineId);
+
+        bool SaveTimelineData(TimelineData data);
     }
 }

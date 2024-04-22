@@ -35,10 +35,11 @@ namespace AwbStudio
         private readonly IProjectManagerService _projectManagerService;
         private readonly IAwbLogger _logger;
         private readonly AwbProject _project;
-        private readonly FileManagement.TimelineFileManager _fileManager;
+        private readonly ITimelineDataService _timelineDataService;
         private readonly ITimelineController[] _timelineControllers;
         private readonly TimelineViewContext _viewContext;
         private readonly IInvokerService _invokerService;
+        private readonly IAwbLogger _awbLogger;
         private IActuatorsService? _actuatorsService;
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
         private TimelineEventHandling? _timelineEventHandling;
@@ -58,6 +59,7 @@ namespace AwbStudio
 
             DebugOutputLabel.Content = string.Empty;
 
+            _awbLogger = awbLogger; 
             awbLogger.OnLog += (s, args) =>
             {
                 WpfAppInvoker.Invoke(new Action(() =>
@@ -80,7 +82,7 @@ namespace AwbStudio
             _logger = awbLogger;
 
             _project = _projectManagerService.ActualProject ?? throw new Exception("Actual project is null?!?");
-            _fileManager = new FileManagement.TimelineFileManager(_project);
+            _timelineDataService = _project.TimelineDataService;
             _timelineControllers = timelineControllers;
 
             _viewContext = new TimelineViewContext();
@@ -118,9 +120,9 @@ namespace AwbStudio
             var timelineCaptions = new TimelineCaptions();
             TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _actuatorsService);
 
-            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _fileManager.TimelineMetaDataService, _project.Sounds);
+            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds);
 
-            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.Sounds);
+            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _awbLogger, _project.Sounds);
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
 
             SoundPlayer.Sounds = _project.Sounds;
@@ -136,7 +138,8 @@ namespace AwbStudio
 
             // fill timeline state chooser
             ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
-            TimelineChooser.FileManager = _fileManager;
+            TimelineChooser.ProjectTitle = _project.Title;  
+            TimelineChooser.FileManager = _timelineDataService;
 
             Closing += TimelineEditorWindow_Closing;
             KeyDown += TimelineEditorWindow_KeyDown;
@@ -371,14 +374,14 @@ namespace AwbStudio
                     viewContext: _viewContext,
                     playPosSynchronizer: _playPosSynchronizer);
 
-                FocusObjectPropertyEditorControl.Init(_viewContext, data, _playPosSynchronizer, _fileManager, _project.Sounds);
+                FocusObjectPropertyEditorControl.Init(_viewContext, data, _playPosSynchronizer, _timelineDataService, _project.Sounds);
             }
             _unsavedChanges = changesAfterLoading;
         }
 
         private async Task LoadTimelineData(string timelineId)
         {
-            if (_fileManager == null)
+            if (_timelineDataService == null)
             {
                 MessageBox.Show("No filemanager is set!");
                 return;
@@ -399,7 +402,7 @@ namespace AwbStudio
                         throw new ArgumentOutOfRangeException($"{nameof(choice)}:{choice}");
                 }
             }
-            _timelineData = _fileManager.LoadTimelineDataById(timelineId);
+            _timelineData = _timelineDataService.GetTimelineData(timelineId);
             await TimelineDataLoaded();
         }
 
@@ -418,8 +421,7 @@ namespace AwbStudio
                 return false;
             }
 
-            var filename = _fileManager.GetTimelineFilenameById(id);
-            if (_fileManager.SaveTimelineData(_timelineData))
+            if (_timelineDataService.SaveTimelineData(_timelineData))
             {
                 _unsavedChanges = false;
                 //MyInvoker.Invoke(new Action(() => { 
@@ -501,11 +503,11 @@ namespace AwbStudio
             var exportWindow = new ExportToClientCodeWindow(_projectManagerService);
 
             var timelines = new List<TimelineData>();
-            var timelineIds = _fileManager.TimelineIds;
+            var timelineIds = _timelineDataService.TimelineIds;
 
             foreach (var timelineId in timelineIds)
             {
-                var timelineData = _fileManager.LoadTimelineDataById(timelineId);
+                var timelineData = _timelineDataService.GetTimelineData(timelineId);
                 if (timelineData == null)
                 {
                     MessageBox.Show($"Can't load timeline '{timelineId}'. Export canceled.");

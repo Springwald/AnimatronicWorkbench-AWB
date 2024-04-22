@@ -9,9 +9,7 @@ using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Project;
 using Awb.Core.Timelines;
-using AwbStudio.FileManagement;
 using AwbStudio.TimelineEditing;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -152,7 +150,8 @@ namespace AwbStudio.PropertyControls
                 }
                 else
                 {
-                    this.ComboBoxTimeline.Items.Add($"[{timelineMetaData.StateName}] {timelineMetaData.Title}");
+                    var stateName = timelineMetaData.StateId; // todo: get state name from the project config
+                    this.ComboBoxTimeline.Items.Add($"[{stateName}] {timelineMetaData.Title}");
                 }
             }
         }

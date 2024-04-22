@@ -35,7 +35,7 @@ namespace Awb.Core.Project
         public string? AutoPlayEsp32ExportFolder { get; set; }
 
         [JsonIgnore]
-        public ITimelineDataService? TimelineDataService => _timelineDataService ?? throw new Exception("TimelineDataService not set! Have you set the project folder?");
+        public ITimelineDataService TimelineDataService => _timelineDataService ?? throw new Exception("TimelineDataService not set! Have you set the project folder?");
 
         [JsonIgnore]
         public Sound[] Sounds => _sounds ?? throw new Exception("Sounds not set! Have you set the project folder?");

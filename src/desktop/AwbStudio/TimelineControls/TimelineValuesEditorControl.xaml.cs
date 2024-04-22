@@ -11,7 +11,6 @@ using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
-using AwbStudio.FileManagement;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
@@ -57,7 +56,7 @@ namespace AwbStudio.TimelineControls
             _gridPainter = null;
         }
 
-        public void Init(TimelineViewContext viewContext,TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, Sound[] projectSounds)
+        public void Init(TimelineViewContext viewContext,TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, ITimelineDataService timelineDataService,  IAwbLogger awbLogger,  Sound[] projectSounds)
         {
             _viewContext = viewContext;
             _playPosSynchronizer = playPosSynchronizer;
@@ -77,7 +76,7 @@ namespace AwbStudio.TimelineControls
             foreach (var servoActuator in actuatorsService.Servos)
             {
                 var editorControl = new ServoTimelineEditorControl();
-                editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, playPosSynchronizer, actuatorsService);
+                editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, timelineDataService, awbLogger);
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }

@@ -1,15 +1,13 @@
-﻿// Animatronic WorkBench
+﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
 // (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using Awb.Core.Services;
 
-namespace AwbStudio.FileManagement
+namespace Awb.Core.Timelines
 {
     public interface ITimelineMetaDataService
     {
@@ -22,14 +20,14 @@ namespace AwbStudio.FileManagement
 
     public class TimelineMetaDataService : ITimelineMetaDataService
     {
-        private readonly TimelineFileManager _timelineFileManager;
+        private readonly ITimelineDataService _timelineDataService;
 
         private Dictionary<string, int> _durationCache = new Dictionary<string, int>();
         private TimelineMetaData[]? _allMetaDataCache = null;
 
-        public TimelineMetaDataService(TimelineFileManager timelineFileManager)
+        public TimelineMetaDataService(ITimelineDataService timelineDataService)
         {
-            _timelineFileManager = timelineFileManager;
+            _timelineDataService = timelineDataService;
         }
 
         public void ClearCache(string timelineId)
@@ -38,24 +36,20 @@ namespace AwbStudio.FileManagement
             _allMetaDataCache = null;
         }
 
-        public bool ExistsTimeline(string timelineId)
-        {
-            var filename = _timelineFileManager.GetTimelineFilenameById(timelineId);
-            return File.Exists(filename);
-        }
+        public bool ExistsTimeline(string timelineId) => _timelineDataService.Exists(timelineId);
 
         public TimelineMetaData[] GetAllMetaData()
         {
             if (_allMetaDataCache != null) return _allMetaDataCache;
 
-            var timelineIds = _timelineFileManager.TimelineIds;
+            var timelineIds = _timelineDataService.TimelineIds;
             var result = new List<TimelineMetaData>();
             foreach (var timelineId in timelineIds)
             {
-                var metaData = _timelineFileManager.GetTimelineMetaDataById(timelineId);
+                var metaData = GetMetaData(timelineId);
                 if (metaData != null) result.Add(metaData);
             }
-            _allMetaDataCache = result.OrderBy(t => t.StateName).ThenBy(t => t.Title).ToArray();
+            _allMetaDataCache = result.OrderBy(t => t.Title).ToArray();
             return _allMetaDataCache;
         }
 
@@ -69,7 +63,10 @@ namespace AwbStudio.FileManagement
 
         public TimelineMetaData GetMetaData(string timelineId)
         {
-            return _timelineFileManager.GetTimelineMetaDataById(timelineId) ?? throw new FileNotFoundException($"Timeline '{timelineId}' not found!");
+            var data = _timelineDataService.GetTimelineData(timelineId);
+            if (data == null) throw new Exception($"Timeline with id {timelineId} not found");
+            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, data.DurationMs);
         }
     }
+
 }

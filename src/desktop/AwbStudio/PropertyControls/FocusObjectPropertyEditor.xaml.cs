@@ -9,9 +9,9 @@ using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
 using Awb.Core.Project;
+using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
-using AwbStudio.FileManagement;
 using AwbStudio.TimelineEditing;
 using System;
 using System.Windows;
@@ -25,7 +25,7 @@ namespace AwbStudio.PropertyControls
     public partial class FocusObjectPropertyEditor : UserControl
     {
         private Sound[]? _projectSounds;
-        private TimelineFileManager? _timelineFileManager;
+        private ITimelineDataService? _timelineDataService;
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
@@ -47,10 +47,10 @@ namespace AwbStudio.PropertyControls
             RemoveEditor();
         }
 
-        public void Init(TimelineViewContext timelineViewContext, TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, TimelineFileManager timelineFileManager, Sound[] projectSounds)
+        public void Init(TimelineViewContext timelineViewContext, TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, ITimelineDataService timelineDataService, Sound[] projectSounds)
         {
             _projectSounds = projectSounds;
-            _timelineFileManager = timelineFileManager;
+            _timelineDataService = timelineDataService;
             _timelineData = timelineData;
             _viewContext = timelineViewContext;
             _viewContext.Changed += ViewContext_Changed;
@@ -96,7 +96,7 @@ namespace AwbStudio.PropertyControls
 
                         if (_focusObject == NestedTimelinesFakeObject.Singleton)
                         {
-                            _actualPropertyEditor = new NestedTimelinePropertyControl(_timelineFileManager!.TimelineMetaDataService, _timelineData!, _viewContext, _playPosSynchronizer!);
+                            _actualPropertyEditor = new NestedTimelinePropertyControl(_timelineDataService!.TimelineMetaDataService, _timelineData!, _viewContext, _playPosSynchronizer!);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }

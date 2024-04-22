@@ -6,7 +6,9 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using Awb.Core.Services;
 using Awb.Core.Timelines;
+using Awb.Core.Timelines.NestedTimelines;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,13 +25,17 @@ namespace AwbStudio.TimelineValuePainters
         private readonly double _dotRadius;
         private readonly IServo _servo;
         private readonly TimelineCaptions _timelineCaptions;
+        private readonly ITimelineDataService _timelineDataService;
+        private readonly IAwbLogger _awbLogger;
 
-        public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, double dotRadius = 3)
+        public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineDataService timelineDataService, IAwbLogger awbLogger, double dotRadius = 3)
             : base(paintControl, viewContext, timelineCaptions)
         {
             _dotRadius = dotRadius;
             _servo = servo;
             _timelineCaptions = timelineCaptions;
+            _timelineDataService = timelineDataService;
+            _awbLogger = awbLogger;
         }
 
         protected override void TimelineDataLoadedInternal()
@@ -38,9 +44,9 @@ namespace AwbStudio.TimelineValuePainters
 
         protected override void PaintValues(IEnumerable<TimelinePoint>? timelinePoints)
         {
-            if (_timelineData == null) return;
-
             base.CleanUpValueControls(); // todo: only remove changed or not confirmed controls
+
+            if (timelinePoints == null || timelinePoints.Any() == false) return;
 
             double height = PaintControl.ActualHeight;
             double width = PaintControl.ActualWidth;
@@ -54,9 +60,10 @@ namespace AwbStudio.TimelineValuePainters
 
             var caption = _timelineCaptions?.GetAktuatorCaption(_servo.Id);
 
+            var pointMerger = new NestedTimelinesPointMerger(timelinePoints, timelineDataService: _timelineDataService, _awbLogger, recursionDepth: 0);
 
             // Add polylines with points
-            var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
+            var pointsForThisServo = pointMerger.MergedPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
 
             // add dots
             double dotWidth = _dotRadius * 2;
