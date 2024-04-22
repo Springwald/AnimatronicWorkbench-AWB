@@ -13,6 +13,8 @@ namespace Awb.Core.Project
 {
     public class AwbProject
     {
+        private ITimelineDataService? _timelineDataService;
+
         private Sound[]? _sounds;
 
         public string? _projectFolder;
@@ -32,7 +34,8 @@ namespace Awb.Core.Project
 
         public string? AutoPlayEsp32ExportFolder { get; set; }
 
-        public ITimelineDataService TimelineDataService { get; }
+        [JsonIgnore]
+        public ITimelineDataService? TimelineDataService => _timelineDataService ?? throw new Exception("TimelineDataService not set! Have you set the project folder?");
 
         [JsonIgnore]
         public Sound[] Sounds => _sounds ?? throw new Exception("Sounds not set! Have you set the project folder?");
@@ -50,6 +53,7 @@ namespace Awb.Core.Project
             if (!Path.Exists(folder)) throw new DirectoryNotFoundException(folder);
             _projectFolder = folder;
             _sounds = new SoundManager(Path.Combine(_projectFolder, "audio")).Sounds;
+            _timelineDataService = new TimelineDataServiceByJsonFiles(_projectFolder);
         }
 
 

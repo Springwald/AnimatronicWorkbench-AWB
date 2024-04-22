@@ -11,8 +11,8 @@ namespace Awb.Core.LoadNSave.Timelines
 {
     public class NestedTimelinePointSaveFormat
     {
-        public int TimeMs { get;  }
-        public string TimelineId { get;  }
+        public int TimeMs { get; set; }
+        public string TimelineId { get; set; }
         public string Title { get; set; }
         public string? Description { get; set; }
 
@@ -23,11 +23,11 @@ namespace Awb.Core.LoadNSave.Timelines
             Title = title;
         }
 
-        public static NestedTimelinePointSaveFormat FromNestedTimelinePoint(NestedTimelinePoint nestedTimelinePoint) => new NestedTimelinePointSaveFormat(
+        public static NestedTimelinePointSaveFormat FromNestedTimelinePoint(NestedTimelinePoint nestedTimelinePoint) => 
+            new NestedTimelinePointSaveFormat(
                 timeMs: nestedTimelinePoint.TimeMs,
                 timelineId: nestedTimelinePoint.TimelineId,
-                title: nestedTimelinePoint.Title
-                )
+                title: nestedTimelinePoint.Title)
         {
             Title = nestedTimelinePoint.Title,
             Description = nestedTimelinePoint.Description,
