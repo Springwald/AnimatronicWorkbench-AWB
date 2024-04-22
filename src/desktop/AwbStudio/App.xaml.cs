@@ -13,6 +13,7 @@ using AwbStudio.StudioSettings;
 using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 using System.Windows;
 
 namespace AwbStudio

@@ -7,7 +7,6 @@
 
 using Awb.Core.LoadNSave.TimelineLoadNSave;
 using Awb.Core.Project;
-using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System.Collections.Generic;
 using System.IO;
@@ -36,15 +35,23 @@ namespace AwbStudio.FileManagement
         {
             _project = project;
             ProjectTitle = project.Title;
-            ConvertOldFilenamesIfNeeded(deleteOldFiles: false, projectSounds: project.Sounds);
+            ConvertOldFilenamesIfNeeded(deleteOldFiles: true);
         }
 
         public IEnumerable<string> TimelineFilenamesOld => Directory.GetFiles(_project.ProjectFolder, "*.awbtl");
-        public IEnumerable<string> TimelineFilenames => Directory.GetFiles(_project.ProjectFolder, "*.awbt");
+        public IEnumerable<string> TimelineRawFilenames => Directory.GetFiles(_project.ProjectFolder, "*.awbt");
+
+        public IEnumerable<string> TimelineIds => Directory.GetFiles(_project.ProjectFolder, "*.awbt").Select(f => Path.GetFileNameWithoutExtension(f));
 
         public string GetTimelineFilenameById(string timelineId) => Path.Combine(_project.ProjectFolder, $"{timelineId}.awbt");
 
-        public TimelineData? LoadTimelineData(string filename)
+        public TimelineData? LoadTimelineDataById(string timelineId)
+        {
+            var filename = GetTimelineFilenameById(timelineId);
+            return LoadTimelineDataByFilename(filename);
+        }
+
+        private TimelineData? LoadTimelineDataByFilename(string filename)
         {
             if (!File.Exists(filename)) return null;
             var jsonString = System.IO.File.ReadAllText(filename);
@@ -65,7 +72,7 @@ namespace AwbStudio.FileManagement
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
             },
         };
-      
+
 
         public bool SaveTimelineData(TimelineData data)
         {
@@ -78,9 +85,9 @@ namespace AwbStudio.FileManagement
             return true;
         }
 
-        public TimelineMetaData? GetTimelineMetaData(string filename)
+        public TimelineMetaData? GetTimelineMetaDataById(string timelineId)
         {
-            var data = LoadTimelineData(filename);
+            var data = LoadTimelineDataById(timelineId);
             if (data == null) return null;
 
             var state = _project?.TimelinesStates?.SingleOrDefault(s => s.Id == data.TimelineStateId);
@@ -92,14 +99,14 @@ namespace AwbStudio.FileManagement
         /// <summary>
         ///  if there are no actual timeline files but old timeline files, convert them to the new format
         /// </summary>
-        private void ConvertOldFilenamesIfNeeded(bool deleteOldFiles, Sound[] projectSounds)
+        private void ConvertOldFilenamesIfNeeded(bool deleteOldFiles)
         {
-            if (!TimelineFilenames.Any())
+            if (!TimelineRawFilenames.Any())
             {
                 var oldFileNames = TimelineFilenamesOld.ToArray();
                 foreach (var oldFileName in oldFileNames)
                 {
-                    var data = LoadTimelineData(oldFileName);
+                    var data = LoadTimelineDataByFilename(oldFileName);
                     if (data != null && data.Id == null)
                     {
                         data.Title = Path.GetFileNameWithoutExtension(oldFileName);

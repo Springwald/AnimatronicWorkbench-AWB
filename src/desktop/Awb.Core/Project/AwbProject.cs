@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Services;
 using Awb.Core.Sounds;
 using System.Text.Json.Serialization;
 
@@ -30,6 +31,8 @@ namespace Awb.Core.Project
         public int ItemsPerBank { get; set; } = 8;
 
         public string? AutoPlayEsp32ExportFolder { get; set; }
+
+        public ITimelineDataService TimelineDataService { get; }
 
         [JsonIgnore]
         public Sound[] Sounds => _sounds ?? throw new Exception("Sounds not set! Have you set the project folder?");

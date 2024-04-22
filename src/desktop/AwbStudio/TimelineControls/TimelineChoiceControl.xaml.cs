@@ -45,12 +45,12 @@ namespace AwbStudio.TimelineControls
             else
             {
                 this.LabelTitle.Content = $"{_filenameManager.ProjectTitle} Timelines";
-                foreach (var timelineFilename in _filenameManager.TimelineFilenames)
+                foreach (var timelineId in _filenameManager.TimelineIds)
                 {
-                    var timelineMetaData = _filenameManager.GetTimelineMetaData(timelineFilename);
+                    var timelineMetaData = _filenameManager.GetTimelineMetaDataById(timelineId);
                     if (timelineMetaData == null) continue;
-                    var button = new Button { Content = $"[{timelineMetaData.StateName}] {timelineMetaData.Title}", Tag = timelineFilename };
-                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs(timelineFilename)); };
+                    var button = new Button { Content = $"[{timelineMetaData.StateName}] {timelineMetaData.Title}", Tag = timelineId };
+                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs( timelineId: timelineId)); };
                     this.PanelNames.Children.Add(button);
                 }
             }

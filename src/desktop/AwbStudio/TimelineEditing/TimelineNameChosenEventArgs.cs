@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -9,11 +9,11 @@ namespace AwbStudio.TimelineEditing
 {
     public class TimelineNameChosenEventArgs
     {
-        public string FileName { get; }
+        public string TimelineId { get; }
 
-        public TimelineNameChosenEventArgs(string filename)
+        public TimelineNameChosenEventArgs(string timelineId)
         {
-            FileName = filename;
+            TimelineId = timelineId;
         }
     }
 }

@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,7 +35,7 @@ namespace AwbStudio.FileManagement
         public void ClearCache(string timelineId)
         {
             if (_durationCache.ContainsKey(timelineId)) _durationCache.Remove(timelineId);
-            _allMetaDataCache = null;   
+            _allMetaDataCache = null;
         }
 
         public bool ExistsTimeline(string timelineId)
@@ -47,13 +46,13 @@ namespace AwbStudio.FileManagement
 
         public TimelineMetaData[] GetAllMetaData()
         {
-            if (_allMetaDataCache != null) return _allMetaDataCache;    
+            if (_allMetaDataCache != null) return _allMetaDataCache;
 
-            var timelineFilenames = _timelineFileManager.TimelineFilenames;
-            var result = new List<TimelineMetaData>();  
-            foreach (var timelineFilename in timelineFilenames)
+            var timelineIds = _timelineFileManager.TimelineIds;
+            var result = new List<TimelineMetaData>();
+            foreach (var timelineId in timelineIds)
             {
-                var metaData = _timelineFileManager.GetTimelineMetaData(timelineFilename);
+                var metaData = _timelineFileManager.GetTimelineMetaDataById(timelineId);
                 if (metaData != null) result.Add(metaData);
             }
             _allMetaDataCache = result.OrderBy(t => t.StateName).ThenBy(t => t.Title).ToArray();
@@ -63,15 +62,14 @@ namespace AwbStudio.FileManagement
         public int GetDurationMs(string timelineId)
         {
             if (_durationCache.ContainsKey(timelineId)) return _durationCache[timelineId];
-            var metaData  = GetMetaData(timelineId);
+            var metaData = GetMetaData(timelineId);
             _durationCache[timelineId] = metaData.DurationMs;
             return metaData.DurationMs;
         }
 
         public TimelineMetaData GetMetaData(string timelineId)
         {
-            var filename = _timelineFileManager.GetTimelineFilenameById(timelineId);
-            return _timelineFileManager.GetTimelineMetaData(filename) ?? throw new  FileNotFoundException($"Timeline '{filename}' not found!");
+            return _timelineFileManager.GetTimelineMetaDataById(timelineId) ?? throw new FileNotFoundException($"Timeline '{timelineId}' not found!");
         }
     }
 }

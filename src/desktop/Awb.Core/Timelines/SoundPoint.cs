@@ -32,5 +32,10 @@ namespace Awb.Core.Timelines
             Title = title;
             SoundPlayerId = soundPlayerId;
         }
+
+        public override SoundPoint Clone()
+        {
+            return new SoundPoint(timeMs:TimeMs, soundPlayerId: SoundPlayerId, title: Title, soundId: SoundId);
+        }
     }
 }

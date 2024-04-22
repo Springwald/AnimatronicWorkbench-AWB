@@ -7,6 +7,7 @@
 
 using Awb.Core.LoadNSave.Timelines;
 using Awb.Core.Timelines;
+using Awb.Core.Timelines.NestedTimelines;
 
 namespace Awb.Core.LoadNSave.TimelineLoadNSave
 {

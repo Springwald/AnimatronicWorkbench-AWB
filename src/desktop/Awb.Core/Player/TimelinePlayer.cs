@@ -8,6 +8,7 @@
 using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using Awb.Core.Timelines.NestedTimelines;
 using Awb.Core.Tools;
 
 namespace Awb.Core.Player

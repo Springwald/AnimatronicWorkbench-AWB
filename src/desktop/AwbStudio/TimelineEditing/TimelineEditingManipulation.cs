@@ -10,6 +10,7 @@ using Awb.Core.Player;
 using Awb.Core.Project;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
+using Awb.Core.Timelines.NestedTimelines;
 using System;
 using System.Linq;
 using System.Media;

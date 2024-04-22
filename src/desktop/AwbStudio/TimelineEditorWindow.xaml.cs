@@ -11,6 +11,7 @@ using Awb.Core.Player;
 using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using Awb.Core.Timelines.NestedTimelines;
 using Awb.Core.Tools;
 using AwbStudio.Exports;
 using AwbStudio.Projects;
@@ -201,7 +202,7 @@ namespace AwbStudio
 
         private void TimelineEditorWindow_SizeChanged(object sender, SizeChangedEventArgs e) => CalculateSizeAndPixelPerMs();
 
-        private async void TimelineChosenToLoad(object? sender, TimelineNameChosenEventArgs e) => await this.LoadTimelineData(filename: e.FileName);
+        private async void TimelineChosenToLoad(object? sender, TimelineNameChosenEventArgs e) => await this.LoadTimelineData(timelineId: e.TimelineId);
 
         private void TimelineEditorWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -375,7 +376,7 @@ namespace AwbStudio
             _unsavedChanges = changesAfterLoading;
         }
 
-        private async Task LoadTimelineData(string filename)
+        private async Task LoadTimelineData(string timelineId)
         {
             if (_fileManager == null)
             {
@@ -398,7 +399,7 @@ namespace AwbStudio
                         throw new ArgumentOutOfRangeException($"{nameof(choice)}:{choice}");
                 }
             }
-            _timelineData = _fileManager.LoadTimelineData(filename);
+            _timelineData = _fileManager.LoadTimelineDataById(timelineId);
             await TimelineDataLoaded();
         }
 
@@ -500,14 +501,14 @@ namespace AwbStudio
             var exportWindow = new ExportToClientCodeWindow(_projectManagerService);
 
             var timelines = new List<TimelineData>();
-            var timelineFilenames = _fileManager.TimelineFilenames;
+            var timelineIds = _fileManager.TimelineIds;
 
-            foreach (var timelineFilename in timelineFilenames)
+            foreach (var timelineId in timelineIds)
             {
-                var timelineData = _fileManager.LoadTimelineData(timelineFilename);
+                var timelineData = _fileManager.LoadTimelineDataById(timelineId);
                 if (timelineData == null)
                 {
-                    MessageBox.Show($"Can't load timeline '{timelineFilename}'. Export canceled.");
+                    MessageBox.Show($"Can't load timeline '{timelineId}'. Export canceled.");
                     return;
                 }
                 timelines.Add(timelineData);

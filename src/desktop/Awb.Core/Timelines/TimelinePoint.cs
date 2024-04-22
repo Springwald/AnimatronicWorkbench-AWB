@@ -29,6 +29,8 @@ namespace Awb.Core.Timelines
         /// </summary>
         public abstract string PainterCheckSum { get; }
 
+        public abstract TimelinePoint Clone();
+
 
         /// <summary>
         /// The id of the servo or display or other actuators

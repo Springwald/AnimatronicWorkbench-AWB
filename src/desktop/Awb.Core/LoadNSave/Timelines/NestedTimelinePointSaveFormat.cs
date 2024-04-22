@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Timelines;
+using Awb.Core.Timelines.NestedTimelines;
 
 namespace Awb.Core.LoadNSave.Timelines
 {

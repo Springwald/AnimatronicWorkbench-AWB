@@ -30,5 +30,10 @@ namespace Awb.Core.Timelines
             ValuePercent = valuePercent;
             Title = $"{ServoId}: {ValuePercent:0.0}% {TimeMs}ms";
         }
+
+        public override ServoPoint Clone()
+        {
+            return new ServoPoint(servoId: ServoId, valuePercent: ValuePercent, timeMs: TimeMs) { Title = Title };
+        }
     }
 }
