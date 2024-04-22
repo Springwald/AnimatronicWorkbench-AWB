@@ -7,7 +7,6 @@
 
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
-using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Windows;

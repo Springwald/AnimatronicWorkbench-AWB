@@ -31,7 +31,12 @@ namespace Awb.Core.Timelines.NestedTimelines
                             var nestedTimelinePoints = _timelineDataService.GetTimelineData(nestedTimelinePoint.TimelineId).AllPoints;
                             var merger = new NestedTimelinesPointMerger(nestedTimelinePoints, _timelineDataService, _awbLogger, _recursionDepth + 1);
                             foreach (var nestedPoint in merger.MergedPoints)
-                                yield return nestedPoint;
+                            {
+                                var clone = nestedPoint.Clone();
+                                clone.TimeMs += nestedTimelinePoint.TimeMs;
+                                clone.IsNestedTimelinePoint = true;
+                                yield return clone;
+                            }
                         } else
                         {
                             _awbLogger.LogError($"Nested timeline recursion depth exceeded " + MaxRecursionDepth + $" for timeline {nestedTimelinePoint.TimelineId}!");

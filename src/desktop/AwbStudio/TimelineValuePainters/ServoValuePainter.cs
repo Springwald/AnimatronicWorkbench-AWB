@@ -58,8 +58,7 @@ namespace AwbStudio.TimelineValuePainters
             // Update the content points and lines
             // ToDo: cache and only update on changes; or: use model binding and auto update
 
-            var caption = _timelineCaptions?.GetAktuatorCaption(_servo.Id);
-
+            var caption = _timelineCaptions?.GetAktuatorCaption(_servo.Id) ?? new TimelineCaption(Brushes.LightSalmon, _servo.Id, label: _servo.Title);
             var pointMerger = new NestedTimelinesPointMerger(timelinePoints, timelineDataService: _timelineDataService, _awbLogger, recursionDepth: 0);
 
             // Add polylines with points
@@ -71,19 +70,36 @@ namespace AwbStudio.TimelineValuePainters
             {
                 if (point.TimeMs >= 0 && point.TimeMs <= _viewContext!.DurationMs) // is inside view
                 {
-                    var ellipse = new Ellipse
+                    Shape shape;
+
+                    if (point.IsNestedTimelinePoint)
                     {
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Top,
-                        Fill = caption.ForegroundColor,
-                        Stroke = caption.ForegroundColor,
-                        Height = dotWidth,
-                        Width = dotWidth,
-                        Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius },
-                        ToolTip = point.Title
-                    };
-                    this.PaintControl.Children.Add(ellipse);
-                    _valueControls.Add(ellipse);
+                        shape = new Rectangle
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Fill = Brushes.Transparent,
+                            Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius },
+                        };
+
+                    }
+                    else
+                    {
+                        shape = new Ellipse
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            Fill = caption.ForegroundColor,
+                            Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius },
+                        };
+                    }
+
+                    shape.Height = dotWidth;
+                    shape.Width = dotWidth;
+                    shape.ToolTip = point.Title;
+                    shape.Stroke = caption.ForegroundColor;
+                    this.PaintControl.Children.Add(shape);
+                    _valueControls.Add(shape);
                 }
             }
 

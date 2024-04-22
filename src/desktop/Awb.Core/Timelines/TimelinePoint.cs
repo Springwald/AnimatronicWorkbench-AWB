@@ -14,6 +14,8 @@ namespace Awb.Core.Timelines
         /// </summary>
         public int TimeMs { get; set; }
 
+        public bool IsNestedTimelinePoint { get; set; }
+
         /// <summary>
         /// The title of this point
         /// </summary>
