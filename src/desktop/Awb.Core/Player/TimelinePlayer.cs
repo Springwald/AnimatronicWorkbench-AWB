@@ -46,6 +46,7 @@ namespace Awb.Core.Player
         private DateTime? _lastPlayUpdate;
 
         private readonly IActuatorsService _actuatorsService;
+        private readonly ITimelineDataService _timelineDataService;
         private readonly IAwbLogger _logger;
 
         private readonly ChangesToClientSender _sender;
@@ -53,6 +54,7 @@ namespace Awb.Core.Player
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
         public EventHandler<SoundPlayEventArgs>? OnPlaySound;
         private TimelineData _timelineData;
+        private volatile TimelinePoint[]? _allPointsMerged;
         public readonly PlayPosSynchronizer PlayPosSynchronizer;
 
         /// <summary>
@@ -70,12 +72,13 @@ namespace Awb.Core.Player
         /// to set the actuators to the initial position. Because of the async character of Play 
         /// this is not dont automatically.
         /// </remarks>
-        public TimelinePlayer(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, IAwbClientsService awbClientsService, IInvokerService invokerService, IAwbLogger logger)
+        public TimelinePlayer(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineDataService timelineDataService, IAwbClientsService awbClientsService, IInvokerService invokerService, IAwbLogger logger)
         {
             if (timelineData == null) throw new ArgumentNullException(nameof(timelineData));
 
             _logger = logger;
             _actuatorsService = actuatorsService;
+            _timelineDataService = timelineDataService;
             _sender = new ChangesToClientSender(actuatorsService, awbClientsService, _logger);
             _myInvoker = invokerService.GetInvoker();
 
@@ -97,7 +100,7 @@ namespace Awb.Core.Player
 
         private void TimelineContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
-
+            _allPointsMerged = null;
         }
 
         public async void Play()
@@ -133,18 +136,23 @@ namespace Awb.Core.Player
 
             var playPos = PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped;
 
-            var allPoints = TimelineData.AllPoints.ToArray();
+            if (_allPointsMerged == null) 
+            {
+                var allPoints = TimelineData.AllPoints.ToArray();
+                _allPointsMerged = new NestedTimelinesPointMerger(allPoints, _timelineDataService, _logger, recursionDepth: 0).MergedPoints.ToArray();
+            }
 
             _updating = true;
 
             var start = DateTime.UtcNow;
 
             // Play Servos
-            var servoTargetObjectIds = TimelineData.ServoPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
+            var servoPoints = _allPointsMerged.OfType<ServoPoint>().ToArray();
+            var servoTargetObjectIds = servoPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
             foreach (var servoTargetObjectId in servoTargetObjectIds)
             {
-                var point1 = TimelineData.ServoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs <= playPos).OrderByDescending(p => p.TimeMs).FirstOrDefault();
-                var point2 = TimelineData.ServoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
+                var point1 = servoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs <= playPos).OrderByDescending(p => p.TimeMs).FirstOrDefault();
+                var point2 = servoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
 
                 if (point1 == null && point2 == null) continue; // no points found for this object before or after the actual position
                 point1 ??= point2;
