@@ -19,7 +19,6 @@ namespace Awb.Core.Player
     //todo: no concept for ramping behaviour yet: Value changes are submittet to the actuatator imidiatelly
     public class TimelinePlayer : IDisposable
     {
-
         public enum PlayStates
         {
             Nothing,
@@ -53,14 +52,13 @@ namespace Awb.Core.Player
         private readonly IInvoker _myInvoker;
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
         public EventHandler<SoundPlayEventArgs>? OnPlaySound;
-
-
+        private TimelineData _timelineData;
         public readonly PlayPosSynchronizer PlayPosSynchronizer;
 
         /// <summary>
         /// The timeline to play
         /// </summary>
-        public TimelineData TimelineData { get; set; }
+        public TimelineData TimelineData => _timelineData;
 
         /// <summary>
         /// 1 = normal Speed
@@ -81,10 +79,25 @@ namespace Awb.Core.Player
             _sender = new ChangesToClientSender(actuatorsService, awbClientsService, _logger);
             _myInvoker = invokerService.GetInvoker();
 
-            TimelineData = timelineData;
-
             PlayPosSynchronizer = playPosSynchronizer;
             PlayPosSynchronizer.OnPlayPosChanged += async (sender, playPosMs) => await this.UpdateActuators();
+
+            this.SetTimelineData(timelineData);
+        }
+
+        public void SetTimelineData(TimelineData timelineData)
+        {
+            if (_timelineData != null)
+            {
+                _timelineData.OnContentChanged -= TimelineContentChanged;
+            }
+            _timelineData = timelineData;
+            _timelineData.OnContentChanged += TimelineContentChanged;
+        }
+
+        private void TimelineContentChanged(object? sender, TimelineDataChangedEventArgs e)
+        {
+
         }
 
         public async void Play()
@@ -119,6 +132,8 @@ namespace Awb.Core.Player
             }
 
             var playPos = PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped;
+
+            var allPoints = TimelineData.AllPoints.ToArray();
 
             _updating = true;
 
@@ -289,6 +304,10 @@ namespace Awb.Core.Player
                 await Task.Delay(100);
                 if (ok) break;
                 await Task.Delay(500);
+            }
+            if (_timelineData != null)
+            {
+                _timelineData.OnContentChanged -= TimelineContentChanged;
             }
 
         }

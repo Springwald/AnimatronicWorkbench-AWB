@@ -113,8 +113,7 @@ namespace AwbStudio
             _actuatorsService = new ActuatorsService(_project, _clientsService, _logger);
 
             this._timelineData = CreateNewTimelineData("");
-
-            _timelinePlayer = new TimelinePlayer(timelineData: this._timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
+            _timelinePlayer = new TimelinePlayer(timelineData: _timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
             _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
             var timelineCaptions = new TimelineCaptions();
@@ -332,7 +331,7 @@ namespace AwbStudio
             var changesAfterLoading = false;
 
             this.Title = _timelineData == null ? "No Timeline" : $"Timeline '{_timelineData.Title}'";
-            if (_timelinePlayer != null) _timelinePlayer.TimelineData = data;
+            if (_timelinePlayer != null) _timelinePlayer.SetTimelineData(data);
             ValuesEditorControl.TimelineDataLoaded(data);
             TimelineCaptionsViewer.TimelineDataLoaded(data);
             AllInOnePreviewControl.TimelineDataLoaded(data);
