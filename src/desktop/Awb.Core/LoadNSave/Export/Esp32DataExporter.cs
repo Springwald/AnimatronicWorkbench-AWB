@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Timelines;
 using System.Text;
 
 namespace Awb.Core.LoadNSave.Export
@@ -133,7 +134,7 @@ namespace Awb.Core.LoadNSave.Export
                 result.AppendLine($"\t\tauto *mp3PlayerYX5300Points{timelineNo} = new std::vector<Mp3PlayerYX5300Point>();");
 
                 // Export Servo-Points
-                foreach (var servoPoint in timeline.ServoPoints.OrderBy(p => p.TimeMs))
+                foreach (var servoPoint in timeline.Points.OfType<ServoPoint>().OrderBy(p => p.TimeMs))
                 {
                     // find STS servo
                     var stsServo = exportData.StsServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
@@ -173,7 +174,7 @@ namespace Awb.Core.LoadNSave.Export
                 }
 
                 // Export Sound-Points
-                foreach (var soundPoint in timeline.SoundPoints.OrderBy(p => p.TimeMs))
+                foreach (var soundPoint in timeline.Points.OfType<SoundPoint>().OrderBy(p => p.TimeMs))
                 {
                     if (exportData.Mp3PlayerYX5300Configs != null)
                     {

@@ -502,7 +502,7 @@ namespace AwbStudio
 
             var exportWindow = new ExportToClientCodeWindow(_projectManagerService);
 
-            var timelines = new List<TimelineData>();
+            var timelines = new List<TimelineExportData>();
             var timelineIds = _timelineDataService.TimelineIds;
 
             foreach (var timelineId in timelineIds)
@@ -513,7 +513,16 @@ namespace AwbStudio
                     MessageBox.Show($"Can't load timeline '{timelineId}'. Export canceled.");
                     return;
                 }
-                timelines.Add(timelineData);
+
+                // convert timelineData to TimelineExportData
+                var exportData = TimelineExportData.FromTimeline(
+                    timelineStateId: timelineData.TimelineStateId, 
+                    title: timelineData.Title, 
+                    points: timelineData.AllPoints, 
+                    timelineDataService: _timelineDataService,
+                    awbLogger: _awbLogger);
+
+                timelines.Add(exportData);
             }
 
             var data = new Esp32ClientExportData()

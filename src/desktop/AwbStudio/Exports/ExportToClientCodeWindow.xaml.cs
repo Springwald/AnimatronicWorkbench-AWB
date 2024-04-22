@@ -36,6 +36,12 @@ namespace AwbStudio.Exports
             _rememberBackground = this.Background;
 
             _projectManagerService = projectManagerService;
+            if (projectManagerService.ActualProject == null)
+            {
+                MessageBox.Show("No project loaded");
+                return;
+            }   
+
             ExportFolder = projectManagerService.ActualProject.AutoPlayEsp32ExportFolder;
 
             ButtonCopyToFile.Content = $"Write to '{targetFilenameOnly}' file";
