@@ -37,7 +37,7 @@ namespace AwbStudio.TimelineValuePainters
         {
         }
 
-        protected override void PaintValues()
+        protected override void PaintValues(IEnumerable<TimelinePoint>? timelinePoints)
         {
             if (_timelineData == null) return;
 

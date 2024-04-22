@@ -36,7 +36,7 @@ namespace AwbStudio.TimelineValuePainters
         {
         }
 
-        protected override void PaintValues()
+        protected override void PaintValues(IEnumerable<TimelinePoint>? timelinePoints)
         {
             if (_timelineData == null) return;
 
@@ -53,6 +53,7 @@ namespace AwbStudio.TimelineValuePainters
             // ToDo: cache and only update on changes; or: use model binding and auto update
 
             var caption = _timelineCaptions?.GetAktuatorCaption(_servo.Id);
+
 
             // Add polylines with points
             var pointsForThisServo = _timelineData?.ServoPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();

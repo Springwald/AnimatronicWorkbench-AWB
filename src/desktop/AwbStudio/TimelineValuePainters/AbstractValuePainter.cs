@@ -42,29 +42,29 @@ namespace AwbStudio.TimelineValuePainters
             _timelineData = timelineData ?? throw new ArgumentNullException(nameof(timelineData));
             _timelineData.OnContentChanged += TimelineData_OnContentChanged;
             TimelineDataLoadedInternal();
-            PaintValues();
+            PaintValues(_timelineData?.AllPoints);
         }
 
         protected abstract void TimelineDataLoadedInternal();
 
-        protected abstract void PaintValues();
+        protected abstract void PaintValues(IEnumerable<TimelinePoint>? timelinePoints);
 
         protected abstract bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs);
 
         private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
             if (this.IsChangedEventSuitableForThisPainter(e))
-                PaintValues();
+                PaintValues(_timelineData?.AllPoints);
         }
 
         private void PaintControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            PaintValues();
+            PaintValues(_timelineData?.AllPoints);
         }
 
         private void OnViewContextChanged(object? sender, EventArgs e)
         {
-            PaintValues();
+            PaintValues(_timelineData?.AllPoints);
         }
 
         public void CleanUpValueControls()

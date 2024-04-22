@@ -11,6 +11,7 @@ using Awb.Core.Timelines.NestedTimelines;
 using AwbStudio.FileManagement;
 using AwbStudio.PropertyControls;
 using AwbStudio.TimelineEditing;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,7 +35,7 @@ namespace AwbStudio.TimelineValuePainters
         {
         }
 
-        protected override void PaintValues()
+        protected override void PaintValues(IEnumerable<TimelinePoint>? timelinePoints)
         {
             if (_timelineData == null) return;
 
