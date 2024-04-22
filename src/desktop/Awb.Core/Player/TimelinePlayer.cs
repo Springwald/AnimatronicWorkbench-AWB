@@ -186,36 +186,10 @@ namespace Awb.Core.Player
                 }
             }
 
-            // Update Nested timelines 
-            NestedTimelinePoint? nestedTimelinePoint = null;
-
-            switch (PlayState)
-            {
-                case PlayStates.Nothing:
-                    // take exactly the point at the actual position
-                    nestedTimelinePoint = TimelineData.GetPoint<NestedTimelinePoint>(playPos, NestedTimelinesFakeObject.Singleton.Id);
-                    break;
-                case PlayStates.Playing:
-                    // take a point between the last and the actual position
-                    nestedTimelinePoint = TimelineData.GetPointsBetween<NestedTimelinePoint>(_playPosMsOnLastUpdate, playPos, NestedTimelinesFakeObject.Singleton.Id).FirstOrDefault();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");
-            }
-
-            if (nestedTimelinePoint == null)
-            {
-                NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = null;
-                NestedTimelinesFakeObject.Singleton.IsDirty = true;
-            }
-            else if (nestedTimelinePoint.TimelineId != NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId)
-            {
-                NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = nestedTimelinePoint.TimelineId;
-                NestedTimelinesFakeObject.Singleton.IsDirty = true;
-            }
 
             // Play Sounds
-            var soundTargetObjectIds = TimelineData.SoundPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
+            var soundPoints = _allPointsMerged.OfType<SoundPoint>().ToArray();
+            var soundTargetObjectIds = soundPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
             foreach (var soundTargetObjectId in soundTargetObjectIds)
             {
                 SoundPoint? soundPoint = null;
@@ -224,11 +198,11 @@ namespace Awb.Core.Player
                 {
                     case PlayStates.Nothing:
                         // take exactly the point at the actual position
-                        soundPoint = TimelineData.GetPoint<SoundPoint>(playPos, soundTargetObjectId);
+                        soundPoint = soundPoints.GetPoint<SoundPoint>(playPos, soundTargetObjectId);
                         break;
                     case PlayStates.Playing:
                         // take a point between the last and the actual position
-                        soundPoint = TimelineData.GetPointsBetween<SoundPoint>(_playPosMsOnLastUpdate, playPos, soundTargetObjectId).FirstOrDefault();
+                        soundPoint = soundPoints.GetPointsBetween<SoundPoint>(_playPosMsOnLastUpdate, playPos, soundTargetObjectId).FirstOrDefault();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");
@@ -254,6 +228,36 @@ namespace Awb.Core.Player
                     }
                 }
             }
+
+
+            // Update Nested timelines 
+            NestedTimelinePoint? nestedTimelinePoint = null;
+
+            switch (PlayState)
+            {
+                case PlayStates.Nothing:
+                    // take exactly the point at the actual position
+                    nestedTimelinePoint = TimelineData.NestedTimelinePoints.GetPoint<NestedTimelinePoint>(playPos, NestedTimelinesFakeObject.Singleton.Id);
+                    break;
+                case PlayStates.Playing:
+                    // take a point between the last and the actual position
+                    nestedTimelinePoint = TimelineData.NestedTimelinePoints.GetPointsBetween<NestedTimelinePoint>(_playPosMsOnLastUpdate, playPos, NestedTimelinesFakeObject.Singleton.Id).FirstOrDefault();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");
+            }
+
+            if (nestedTimelinePoint == null)
+            {
+                NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = null;
+                NestedTimelinesFakeObject.Singleton.IsDirty = true;
+            }
+            else if (nestedTimelinePoint.TimelineId != NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId)
+            {
+                NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = nestedTimelinePoint.TimelineId;
+                NestedTimelinesFakeObject.Singleton.IsDirty = true;
+            }
+
 
             _playPosMsOnLastUpdate = playPos;
 

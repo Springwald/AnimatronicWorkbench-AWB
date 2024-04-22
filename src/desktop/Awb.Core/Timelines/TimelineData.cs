@@ -64,17 +64,7 @@ namespace Awb.Core.Timelines
             NestedTimelinePoints = nestedTimelinePoints;
         }
 
-        public TimelinePointType? GetPoint<TimelinePointType>(int timeMs, string awbObjectId) where TimelinePointType : TimelinePoint
-            => AllPoints.OfType<TimelinePointType>().SingleOrDefault(p => p.AbwObjectId == awbObjectId && (int)p.TimeMs == timeMs); // check existing point
-
-        public IEnumerable<TimelinePointType> GetPointsBetween<TimelinePointType>(int timeMs1, int timeMs2, string awbObjectId) where TimelinePointType : TimelinePoint
-        {
-            var lower = Math.Min(timeMs1, timeMs2);
-            var higher = Math.Max(timeMs1, timeMs2);
-            var pointsWithMatchingMs = AllPoints.OfType<TimelinePointType>().Where(p => p.AbwObjectId == awbObjectId && p.TimeMs >= lower && p.TimeMs <= higher);
-            foreach (var point in pointsWithMatchingMs)
-                yield return point;
-        }
+       
 
         public TimelinePoint InsertPoint(TimelinePoint point)
         {
@@ -101,7 +91,7 @@ namespace Awb.Core.Timelines
 
         public bool RemovePoint<TimelinePointType>(int timeMs, string awbObjectId) where TimelinePointType : TimelinePoint
         {
-            var point = GetPoint<TimelinePointType>(timeMs, awbObjectId);
+            var point = AllPoints.GetPoint<TimelinePointType>(timeMs, awbObjectId);
             if (point == null) return false;
 
             if (point is ServoPoint servoPoint)

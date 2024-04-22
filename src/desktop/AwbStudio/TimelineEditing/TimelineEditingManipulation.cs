@@ -33,7 +33,7 @@ namespace AwbStudio.TimelineEditing
 
         public void UpdateServoValue(IServo servo, double targetPercent)
         {
-            var point = _timelineData.GetPoint<ServoPoint>(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, servo.Id);
+            var point = _timelineData.ServoPoints.GetPoint<ServoPoint>(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, servo.Id);
             if (point == null)
             {
                 point = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMsGuaranteedSnapped);
