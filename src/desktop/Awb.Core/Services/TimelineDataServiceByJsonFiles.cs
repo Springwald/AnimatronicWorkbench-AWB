@@ -15,6 +15,19 @@ namespace Awb.Core.Services
     public class TimelineDataServiceByJsonFiles : ITimelineDataService
     {
         private readonly string _jsonFilesPath;
+        private TimelineMetaDataService? _timelineMetaDataService;
+
+        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+        {
+            IgnoreReadOnlyFields = true,
+            IgnoreReadOnlyProperties = true,
+            PropertyNameCaseInsensitive = false,
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+            WriteIndented = true,
+            Converters = {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+            },
+        };
 
         public ITimelineMetaDataService TimelineMetaDataService
         {
@@ -51,13 +64,13 @@ namespace Awb.Core.Services
             return true;
         }
 
-
-        public IEnumerable<string> TimelineFilenamesOld => Directory.GetFiles(_jsonFilesPath, "*.awbtl");
-        public IEnumerable<string> TimelineRawFilenames => Directory.GetFiles(_jsonFilesPath, "*.awbt");
-
-        public string GetTimelineFilenameById(string timelineId) => Path.Combine(_jsonFilesPath, $"{timelineId}.awbt");
-
         public bool Exists(string timelineId) => File.Exists(GetTimelineFilenameById(timelineId));
+
+
+        private IEnumerable<string> TimelineFilenamesOld => Directory.GetFiles(_jsonFilesPath, "*.awbtl");
+        private IEnumerable<string> TimelineRawFilenames => Directory.GetFiles(_jsonFilesPath, "*.awbt");
+
+        private string GetTimelineFilenameById(string timelineId) => Path.Combine(_jsonFilesPath, $"{timelineId}.awbt");
 
         private TimelineData? LoadTimelineDataByFilename(string filename)
         {
@@ -68,22 +81,6 @@ namespace Awb.Core.Services
             var timelineData = TimelineSaveFormat.ToTimelineData(saveFormat);
             return timelineData;
         }
-
-        private JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
-        {
-            IgnoreReadOnlyFields = true,
-            IgnoreReadOnlyProperties = true,
-            PropertyNameCaseInsensitive = false,
-            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-            WriteIndented = true,
-            Converters = {
-                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
-            },
-        };
-        private TimelineMetaDataService _timelineMetaDataService;
-
-     
-
 
         /// <summary>
         ///  if there are no actual timeline files but old timeline files, convert them to the new format
@@ -107,7 +104,5 @@ namespace Awb.Core.Services
                 }
             }
         }
-
-
     }
 }
