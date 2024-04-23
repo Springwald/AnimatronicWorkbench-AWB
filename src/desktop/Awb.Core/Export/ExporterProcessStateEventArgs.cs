@@ -5,16 +5,10 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-
 namespace Awb.Core.Export
 {
-    public class Esp32ClientExporter : IExporter
+    public class ExporterProcessStateEventArgs
     {
-        public event EventHandler<ExporterProcessStateEventArgs>? Processing;
-
-        public Task<IExporter.ExportResult> Export(string targetPath)
-        {
-            throw new NotImplementedException();
-        }
+        public string? ErrorMessage { get; internal set; }
     }
 }

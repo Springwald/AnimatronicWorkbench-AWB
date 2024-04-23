@@ -499,6 +499,29 @@ namespace AwbStudio
                 }
             }
 
+            var exportWindow = new ExportToClientsWindow(_projectManagerService);
+            exportWindow.Show();
+        }
+
+        private void ButtonExportEsp32Old_Click(object sender, RoutedEventArgs e)
+        {
+            if (_unsavedChanges == true)
+            {
+                var choice = MessageBox.Show("Save changes to the current timeline?", "Unsaved changes!", MessageBoxButton.YesNoCancel);
+                switch (choice)
+                {
+                    case MessageBoxResult.Yes:
+                        if (SaveTimelineData() == false) return;
+                        break;
+                    case MessageBoxResult.No:
+                        break;
+                    case MessageBoxResult.Cancel:
+                        return;
+                    default:
+                        throw new ArgumentOutOfRangeException($"{nameof(choice)}:{choice}");
+                }
+            }
+
             var exportWindow = new ExportToClientCodeWindow(_projectManagerService);
 
             var timelines = new List<TimelineExportData>();

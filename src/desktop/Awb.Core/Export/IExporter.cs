@@ -5,15 +5,22 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Awb.Core.Export
 {
     public interface IExporter
     {
+        public class ExportResult
+        {
+            public bool Success => string.IsNullOrEmpty(ErrorMessage);
+            public string? ErrorMessage { get; set; }
+
+            public static ExportResult SuccessResult => new ExportResult();
+        }
+
+        // reports the current state as event
+        event EventHandler<ExporterProcessStateEventArgs>? Processing;
+
+        // exports the data to the targetPath
+        Task<ExportResult> Export(string targetPath);
     }
 }

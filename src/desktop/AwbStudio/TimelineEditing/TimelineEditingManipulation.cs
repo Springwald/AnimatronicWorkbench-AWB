@@ -8,12 +8,9 @@
 using Awb.Core.Actuators;
 using Awb.Core.Player;
 using Awb.Core.Project;
-using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
-using System;
 using System.Linq;
-using System.Media;
 
 namespace AwbStudio.TimelineEditing
 {
@@ -43,7 +40,7 @@ namespace AwbStudio.TimelineEditing
             {
                 point.ValuePercent = targetPercent;
                 _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servo.Id);
-            }   
+            }
         }
 
         public void ToggleServoPoint(IServo servo)
@@ -98,8 +95,8 @@ namespace AwbStudio.TimelineEditing
 
         public void UpdateNestedTimelinesValue()
         {
-            var timelineId = NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId;    
-            var nestedTimelinePoint = _timelineData?.NestedTimelinePoints.SingleOrDefault( p => (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
+            var timelineId = NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId;
+            var nestedTimelinePoint = _timelineData?.NestedTimelinePoints.SingleOrDefault(p => (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
             if (timelineId == null)
             {
                 // nested timeline value should be removed from timeline at this position
