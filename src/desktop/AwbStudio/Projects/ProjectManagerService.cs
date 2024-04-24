@@ -23,7 +23,7 @@ namespace AwbStudio.Projects
             public string[] ErrorMessages { get; init; }
 
             public static OpenProjectResult SuccessResult => new() { Success = true, ErrorMessages = [] };
-            public static OpenProjectResult ErrorResult(string[] errorMessages) => new() { Success = true, ErrorMessages = errorMessages };
+            public static OpenProjectResult ErrorResult(string[] errorMessages) => new() { Success = false, ErrorMessages = errorMessages };
 
             private OpenProjectResult() { }
         }

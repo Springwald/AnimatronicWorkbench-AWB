@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -33,13 +33,14 @@ namespace Awb.Core.Project
         /// </summary>
         public int[] NegativeInputs { get; internal set; }
 
-        public TimelineState(int id, string title, bool export, int[]? positiveInputs = null, int[]? negativeInputs= null)
+        public TimelineState(int id, string title, bool export, bool autoPlay, int[]? positiveInputs = null, int[]? negativeInputs = null)
         {
             Id = id;
             Title = title;
             PositiveInputs = positiveInputs ?? Array.Empty<int>();
             NegativeInputs = negativeInputs ?? Array.Empty<int>();
             Export = export;
+            AutoPlay = autoPlay;
         }
 
         public override string ToString() => $"[{Id}] {Title}";
