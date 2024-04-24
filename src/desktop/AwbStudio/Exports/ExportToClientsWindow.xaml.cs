@@ -10,6 +10,7 @@ using Awb.Core.Services;
 using AwbStudio.Projects;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
@@ -83,7 +84,20 @@ namespace AwbStudio.Exports
 
         private async void ButtonWriteToEsp32RemoteClient_Click(object sender, RoutedEventArgs e)
         {
-            var targetFolder = Path.Combine(ExportFolderGlobal, "Esp32RemoteClient");
+            // get the folder where the wpf project is located and running:
+            var appFolder = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            var esp32ClientsSourceFolderRelative = @"..\..\..\..\..\clients";
+
+            var esp32ClientsSourceFolder =  Path.Combine(appFolder, esp32ClientsSourceFolderRelative);
+
+            await Export(new Esp32ClientRemoteExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder), targetSubFolder: "Esp32RemoteClient");   
+        }
+
+        private async Task Export(IExporter exporter,  string targetSubFolder)
+        {
+
+            var targetFolder = Path.Combine(ExportFolderGlobal, targetSubFolder);
             if (!Directory.Exists(targetFolder))
             {
                 var msgBoxResult = MessageBox.Show("Target folder \r\n\r\n'" + targetFolder + "'\r\n\r\n does not exist.\r\n\r\nCreate?", "Create target folder?", MessageBoxButton.YesNoCancel);
@@ -99,9 +113,7 @@ namespace AwbStudio.Exports
             }
 
             await _awbLogger.LogAsync("Exporting to " + targetFolder);
-
-            var sourceFolder = "";
-            var exporter = new Esp32ClientRemoteExporter(sourceFolder);
+           
             exporter.Processing += ExporerProcessing;
 
             var result = await exporter.ExportAsync(targetPath: targetFolder);

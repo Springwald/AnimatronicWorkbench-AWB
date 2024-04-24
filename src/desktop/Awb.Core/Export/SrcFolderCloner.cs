@@ -31,7 +31,7 @@ namespace Awb.Core.Export
         public async Task<CloneResult> Clone()
         {
             if (!Directory.Exists(_sourceFolder)) return new CloneResult { ErrorMessage = $"Source folder '{_sourceFolder}' does not exist" };
-            if (!Directory.Exists(_targetFolder)) return new CloneResult { ErrorMessage = $"Target folder '{_targetFolder}' already exists" };
+            if (!Directory.Exists(_targetFolder)) return new CloneResult { ErrorMessage = $"Target folder '{_targetFolder}' does not exist" };
 
             // clone the source folder to the target folder stepping through all files and subfolders
             foreach (var sourceFile in Directory.GetFiles(_sourceFolder, "*", SearchOption.AllDirectories))
