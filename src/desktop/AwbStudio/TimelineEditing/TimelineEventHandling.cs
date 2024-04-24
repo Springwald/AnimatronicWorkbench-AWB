@@ -18,6 +18,7 @@ namespace AwbStudio.TimelineEditing
 {
     internal class TimelineEventHandling : IDisposable
     {
+        private readonly IAwbLogger _awbLogger;
         private readonly TimelineData _timelineData;
         private readonly TimelinePlayer _timelinePlayer;
         private readonly IActuatorsService _actuatorsService;
@@ -29,8 +30,18 @@ namespace AwbStudio.TimelineEditing
         private readonly IActuator[] _allActuators;
         private readonly IActuator[] _controllerTuneableActuators;
 
-        public TimelineEventHandling(TimelineData timelineData, TimelineControllerPlayViewPos timelineControllerPlayViewPos, IActuatorsService actuatorsService, TimelinePlayer timelinePlayer, ITimelineController[] timelineControllers, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
+        public TimelineEventHandling(
+            TimelineData timelineData,
+            TimelineControllerPlayViewPos timelineControllerPlayViewPos,
+            IActuatorsService actuatorsService,
+            TimelinePlayer timelinePlayer,
+            ITimelineController[] timelineControllers,
+            TimelineViewContext viewContext,
+            PlayPosSynchronizer playPosSynchronizer,
+            IAwbLogger awbLogger)
         {
+            _awbLogger = awbLogger;
+
             _timelineData = timelineData;
             _timelineData.OnContentChanged += TimelineData_ContentChanged;
             _timelinePlayer = timelinePlayer;
@@ -50,6 +61,8 @@ namespace AwbStudio.TimelineEditing
             _viewContext = viewContext;
             _viewContext.Changed += ViewContext_Changed;
 
+
+
             foreach (var timelineController in _timelineControllers)
             {
                 timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
@@ -64,7 +77,10 @@ namespace AwbStudio.TimelineEditing
                 case TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged:
                 case TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged:
                     await _timelinePlayer.UpdateActuators();
-                    ShowActuatorValuesOnTimelineInputController();
+                    if (sender is ITimelineController timelineController)
+                        ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: timelineController);
+                    else
+                        ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: null);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
@@ -73,7 +89,11 @@ namespace AwbStudio.TimelineEditing
 
         private void PlayPos_Changed(object? sender, int newPlayPosMs)
         {
-            ShowActuatorValuesOnTimelineInputController();
+            if (sender is ITimelineController timelineController)
+                ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: timelineController);
+            else
+                ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: null);
+
             _timelineControllerPlayViewPos.SetPlayPosFromTimelineControl(newPlayPosMs);
         }
 
@@ -91,7 +111,7 @@ namespace AwbStudio.TimelineEditing
                     if (_viewContext?.ActualFocusObject is IServo servo)
                         _timelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     if (_viewContext?.ActualFocusObject is ISoundPlayer soundPlayer)
-                            _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null);
+                        _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null);
                     if (_viewContext?.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
                         _timelineEditingManipulation.UpdateNestedTimelinesValue();
                     break;
@@ -108,9 +128,16 @@ namespace AwbStudio.TimelineEditing
         /// <summary>
         /// Handle the events from the hardware timeline controllers like behringer x-touch mini or other midi controllers
         /// </summary>
-        private async void TimelineController_OnTimelineEvent(object? sender, TimelineControllerEventArgs e)
+        private async void TimelineController_OnTimelineEvent(object? senderController, TimelineControllerEventArgs e)
         {
             if (_timelineData == null) return;
+
+            ITimelineController? timelineController = (ITimelineController?)senderController;
+            if (senderController != null && timelineController == null)
+            {
+                await _awbLogger.LogErrorAsync($"TimelineController_OnTimelineEvent: senderController is not null but cannot be casted to ITimelineController");
+                return;
+            }
 
             // get the actuator referenced by the event
             IActuator? actuator = null;
@@ -171,7 +198,7 @@ namespace AwbStudio.TimelineEditing
                             default:
                                 throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                         }
-                        ShowActuatorValuesOnTimelineInputController();
+                        ShowActuatorValuesOnTimelineInputController(timelineController);
                     }
                     break;
 
@@ -244,7 +271,7 @@ namespace AwbStudio.TimelineEditing
             _viewContext.BankIndex = newBankIndex;
         }
 
-        private void ShowActuatorValuesOnTimelineInputController()
+        private void ShowActuatorValuesOnTimelineInputController(ITimelineController? dontUpdateThisController)
         {
             if (_timelineControllers == null) return;
             if (_controllerTuneableActuators == null) return;
@@ -261,6 +288,10 @@ namespace AwbStudio.TimelineEditing
                     case IServo servo:
                         foreach (var timelineController in _timelineControllers)
                         {
+                            if (dontUpdateThisController == timelineController)
+                            {
+                                continue;
+                            }
                             timelineController.SetActuatorValueAsync(index: timelineControllerIndex, valueInPercent: servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                             timelineController.ShowPointButtonStateAsync(index: timelineControllerIndex, pointExists: _timelineData.ServoPoints.Any(p => p.ServoId == servo.Id && p.TimeMs == playPosMs));
                         }

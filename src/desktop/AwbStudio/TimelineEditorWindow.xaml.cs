@@ -371,7 +371,8 @@ namespace AwbStudio
                     timelinePlayer: _timelinePlayer,
                     timelineControllers: _timelineControllers,
                     viewContext: _viewContext,
-                    playPosSynchronizer: _playPosSynchronizer);
+                    playPosSynchronizer: _playPosSynchronizer,
+                    awbLogger: _awbLogger );
 
                 FocusObjectPropertyEditorControl.Init(_viewContext, data, _playPosSynchronizer, _timelineDataService, _project.Sounds);
             }
