@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Export;
+using Awb.Core.Services;
 using AwbStudio.Projects;
 using System;
 using System.IO;
@@ -16,10 +17,11 @@ namespace AwbStudio.Exports
 {
     public partial class ExportToClientsWindow : Window
     {
-        private readonly Brush _rememberBackground;
         private readonly IProjectManagerService _projectManagerService;
+        private readonly Brush _rememberBackground;
+        private readonly IAwbLogger _awbLogger;
 
-        protected string? ExportFolder
+        protected string? ExportFolderGlobal
         {
             get => LabelTargetFolder?.Content?.ToString();
             set
@@ -29,10 +31,11 @@ namespace AwbStudio.Exports
             }
         }
 
-        public ExportToClientsWindow(IProjectManagerService projectManagerService)
+        public ExportToClientsWindow(IProjectManagerService projectManagerService, IAwbLogger awbLogger)
         {
             InitializeComponent();
             _rememberBackground = this.Background;
+            _awbLogger = awbLogger;
 
             _projectManagerService = projectManagerService;
             if (projectManagerService.ActualProject == null)
@@ -41,7 +44,7 @@ namespace AwbStudio.Exports
                 return;
             }
 
-            ExportFolder = System.IO.Path.Combine(projectManagerService.ActualProject.ProjectFolder, "Esp32Clients");
+            ExportFolderGlobal = System.IO.Path.Combine(projectManagerService.ActualProject.ProjectFolder, "Esp32Clients");
 
             Loaded += ExportToClientCodeWindow_Loaded;
         }
@@ -78,10 +81,53 @@ namespace AwbStudio.Exports
         //}
 
 
-        private void ButtonWriteToEsp32RemoteClient_Click(object sender, RoutedEventArgs e)
+        private async void ButtonWriteToEsp32RemoteClient_Click(object sender, RoutedEventArgs e)
         {
+            var targetFolder = Path.Combine(ExportFolderGlobal, "Esp32RemoteClient");
+            if (!Directory.Exists(targetFolder))
+            {
+                var msgBoxResult = MessageBox.Show("Target folder \r\n\r\n'" + targetFolder + "'\r\n\r\n does not exist.\r\n\r\nCreate?", "Create target folder?", MessageBoxButton.YesNoCancel);
+                if (msgBoxResult == MessageBoxResult.Yes)
+                {
+                    Directory.CreateDirectory(targetFolder);
+                }
+                else
+                {
+                    MessageBox.Show("Export canceled");
+                    return;
+                }
+            }
+
+            await _awbLogger.LogAsync("Exporting to " + targetFolder);
+
             var sourceFolder = "";
             var exporter = new Esp32ClientRemoteExporter(sourceFolder);
+            exporter.Processing += ExporerProcessing;
+
+            var result = await exporter.ExportAsync(targetPath: targetFolder);
+
+            exporter.Processing -= ExporerProcessing;
+
+            if (result.Success)
+            {
+                MessageBox.Show("Export done.");
+            }
+            else
+            {
+                MessageBox.Show("Export failed: " + result.ErrorMessage);
+            }
+        }
+
+        private async void ExporerProcessing(object? sender, ExporterProcessStateEventArgs e)
+        {
+            if (e.ErrorMessage == null)
+            {
+                // todo: show progress
+            }
+            else
+            {
+                await _awbLogger.LogErrorAsync(e.ErrorMessage);
+            }
         }
     }
 }

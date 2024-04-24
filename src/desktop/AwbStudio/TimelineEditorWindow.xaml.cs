@@ -499,7 +499,7 @@ namespace AwbStudio
                 }
             }
 
-            var exportWindow = new ExportToClientsWindow(_projectManagerService);
+            var exportWindow = new ExportToClientsWindow(_projectManagerService, _awbLogger);
             exportWindow.Show();
         }
 

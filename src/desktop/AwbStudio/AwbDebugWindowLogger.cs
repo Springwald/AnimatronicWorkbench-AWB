@@ -26,13 +26,13 @@ namespace AwbStudio
             _output = new List<string>();
         }
 
-        public async Task LogError(string message)
+        public async Task LogErrorAsync(string message)
         {
             OnError?.Invoke(this, message);
             await ShowMsg($"## Error ## {message}");
         }
 
-        public async Task Log(string message)
+        public async Task LogAsync(string message)
         {
             OnLog?.Invoke(this, message);
             await ShowMsg(message);

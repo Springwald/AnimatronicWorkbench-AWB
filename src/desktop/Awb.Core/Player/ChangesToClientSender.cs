@@ -56,7 +56,7 @@ namespace Awb.Core.Player
                         }
                     }
                     _notFoundClients[clientID] = DateTime.Now;
-                    await _logger.LogError($"ClientId '{clientID}' not found!");
+                    await _logger.LogErrorAsync($"ClientId '{clientID}' not found!");
 
                     continue;
                 }
@@ -77,7 +77,7 @@ namespace Awb.Core.Player
                 }
                 else
                 {
-                    await _logger.LogError($"Error sending data to client Id '{clientID}': {result.ErrorMessage}");
+                    await _logger.LogErrorAsync($"Error sending data to client Id '{clientID}': {result.ErrorMessage}");
                     success = false;
                 }
 

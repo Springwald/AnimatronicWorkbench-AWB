@@ -173,7 +173,7 @@ namespace Awb.Core.Player
                 var targetServo = _actuatorsService.Servos.SingleOrDefault(o => o.Id.Equals(servoTargetObjectId));
                 if (targetServo == null)
                 {
-                    await _logger.LogError($"{nameof(UpdateActuators)}: Targets servo object with id {servoTargetObjectId} not found.");
+                    await _logger.LogErrorAsync($"{nameof(UpdateActuators)}: Targets servo object with id {servoTargetObjectId} not found.");
                 }
                 else
                 {
@@ -211,7 +211,7 @@ namespace Awb.Core.Player
                 var targetSoundPlayer = _actuatorsService.SoundPlayers.SingleOrDefault(o => o.Id.Equals(soundTargetObjectId));
                 if (targetSoundPlayer == null)
                 {
-                    await _logger.LogError($"{nameof(UpdateActuators)}: Target soundplayer object with id {soundTargetObjectId} not found.");
+                    await _logger.LogErrorAsync($"{nameof(UpdateActuators)}: Target soundplayer object with id {soundTargetObjectId} not found.");
                 }
                 else
                 {

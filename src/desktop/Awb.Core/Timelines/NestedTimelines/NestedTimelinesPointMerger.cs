@@ -39,7 +39,7 @@ namespace Awb.Core.Timelines.NestedTimelines
                             }
                         } else
                         {
-                            _awbLogger.LogError($"Nested timeline recursion depth exceeded " + MaxRecursionDepth + $" for timeline {nestedTimelinePoint.TimelineId}!");
+                            _awbLogger.LogErrorAsync($"Nested timeline recursion depth exceeded " + MaxRecursionDepth + $" for timeline {nestedTimelinePoint.TimelineId}!");
                         }
                     }
                     else

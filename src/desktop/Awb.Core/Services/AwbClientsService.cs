@@ -39,7 +39,7 @@ namespace Awb.Core.Services
             {
                 if (_clients == null)
                 {
-                    _logger?.Log($"Access to clients not available because still searching clients...");
+                    _logger?.LogAsync($"Access to clients not available because still searching clients...");
                     return Array.Empty<Esp32ComPortClient>();
                 }
                 return _clients;
@@ -48,11 +48,11 @@ namespace Awb.Core.Services
 
         public async Task InitAsync()
         {
-            _logger?.Log($"\r\nSearching clients...");
+            _logger?.LogAsync($"\r\nSearching clients...");
 
             var config = new AwbEsp32ComportClientConfig();
             var clientIdScanner = new ClientIdScanner(config);
-            clientIdScanner.OnLog += (s, e) => _logger?.Log(e);
+            clientIdScanner.OnLog += (s, e) => _logger?.LogAsync(e);
             var foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
             if (foundComPortClients.Any() == false)
             {
@@ -62,20 +62,20 @@ namespace Awb.Core.Services
             var clients = foundComPortClients.Select(c => new Esp32ComPortClient(c.ComPortName, c.ClientId)).ToArray();
             var clientTasks = clients.Select(async c =>
             {
-                _logger?.Log("Init client " + c.ClientId + "/" + c.FriendlyName);
+                _logger?.LogAsync("Init client " + c.ClientId + "/" + c.FriendlyName);
                 var ok = await c.InitAsync();
-                if (ok == false) _logger?.LogError($"Can't init client {c.ClientId}/{c.FriendlyName}");
+                if (ok == false) _logger?.LogErrorAsync($"Can't init client {c.ClientId}/{c.FriendlyName}");
             }).ToArray();
 
             await Task.WhenAll(clientTasks);
 
             foreach (var client in clients)
             {
-                client.OnError += (s, e) => _logger?.LogError($"Client {client.ClientId}/{client.FriendlyName}: {e}");
+                client.OnError += (s, e) => _logger?.LogErrorAsync($"Client {client.ClientId}/{client.FriendlyName}: {e}");
             }
 
             _clients = clients;
-            _logger?.Log($"Found {_clients.Length} clients. ({string.Join(", ", _clients.Select(c => c.ClientId))})");
+            _logger?.LogAsync($"Found {_clients.Length} clients. ({string.Join(", ", _clients.Select(c => c.ClientId))})");
 
             if (ClientsLoaded != null)
                 ClientsLoaded(this, EventArgs.Empty);

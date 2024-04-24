@@ -12,7 +12,7 @@ namespace Awb.Core.Export
     {
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
-        public Task<IExporter.ExportResult> Export(string targetPath)
+        public Task<IExporter.ExportResult> ExportAsync(string targetPath)
         {
             throw new NotImplementedException();
         }

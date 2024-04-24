@@ -11,8 +11,8 @@ namespace Awb.Core.Services
 {
     public interface IAwbLogger
     {
-        Task Log(string message);
-        Task LogError(string message);
+        Task LogAsync(string message);
+        Task LogErrorAsync(string message);
         event EventHandler<string>? OnError;
         event EventHandler<string>? OnLog;
     }
@@ -29,7 +29,7 @@ namespace Awb.Core.Services
             _throwWhenInDebugMode = throwWhenInDebugMode;
         }
 
-        public async Task LogError(string message)
+        public async Task LogErrorAsync(string message)
         {
             OnError?.Invoke(this, message);
             if (_throwWhenInDebugMode && Debugger.IsAttached) throw new Exception(message);
@@ -41,7 +41,7 @@ namespace Awb.Core.Services
             await Task.CompletedTask;
         }
 
-        public async Task Log(string message)
+        public async Task LogAsync(string message)
         {
             OnLog?.Invoke(this, message);
             SetStandardColor();

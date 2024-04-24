@@ -19,10 +19,15 @@ namespace Awb.Core.Export
             _esp32ClientsSourceFolder = esp32ClientsSourceFolder;
         }
 
-        public async Task<IExporter.ExportResult> Export(string targetPath)
+        public async Task<IExporter.ExportResult> ExportAsync(string targetPath)
         {
             var remoteSrcFolder = Path.Combine(_esp32ClientsSourceFolder, "awb_esp32_remote-controller");
             var targetSrcFolder = Path.Combine(targetPath, "awb_esp32_remote-controller");
+
+            if (!Directory.Exists(remoteSrcFolder))
+            {
+                return new IExporter.ExportResult { ErrorMessage = $"Source folder '{remoteSrcFolder}' not found" };
+            }
 
             var cloneResult = await new SrcFolderCloner(remoteSrcFolder, targetSrcFolder, removeExtraFilesInTarget: false).Clone();
             if (!cloneResult.Success)
@@ -33,5 +38,6 @@ namespace Awb.Core.Export
 
             return IExporter.ExportResult.SuccessResult;
         }
+
     }
 }
