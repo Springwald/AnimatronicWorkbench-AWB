@@ -35,7 +35,7 @@ namespace Awb.Core.Services
                     // check behringer x-touch mini
                     var xtouchMidiController = new XTouchMiniController(_logger, _invoker);
                     if (xtouchMidiController.Available)
-                        list.Add(new XTouchMiniTimelineController(xtouchMidiController));
+                        list.Add(new XTouchMiniTimelineController(xtouchMidiController, _logger));
 
                     // check behringer BCF2000
                     var bcf2000 = new Bcf2000Controller(_logger, _invoker);

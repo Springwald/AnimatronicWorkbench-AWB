@@ -6,34 +6,32 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.InputControllers.XTouchMini;
+using Awb.Core.Services;
 
 namespace Awb.Core.InputControllers.TimelineInputControllers
 {
     internal class XTouchMiniTimelineController : ITimelineController, IDisposable
     {
         private readonly XTouchMiniController _xTouchMiniController;
+        private readonly IAwbLogger _awbLogger;
         private ITimelineController.PlayStates _playState = ITimelineController.PlayStates.Editor;
 
         public string?[] ActualActuatorNames { set { } }
 
         public event EventHandler<TimelineControllerEventArgs>? OnTimelineEvent;
 
-        public XTouchMiniTimelineController(XTouchMiniController xTouchMiniController)
+        public XTouchMiniTimelineController(XTouchMiniController xTouchMiniController, IAwbLogger awbLogger)
         {
             _xTouchMiniController = xTouchMiniController;
-            if (_xTouchMiniController != null)
-            {
-                _xTouchMiniController.ActionReceived += XTouchMiniController_ActionReceived;
-            }
+            _awbLogger = awbLogger;
+            _xTouchMiniController.ActionReceived += XTouchMiniController_ActionReceived;
+            _xTouchMiniController.SetKnobPosition(1, 0);
         }
 
 
         public void Dispose()
         {
-            if (_xTouchMiniController != null)
-            {
-                _xTouchMiniController.ActionReceived -= XTouchMiniController_ActionReceived;
-            }
+            _xTouchMiniController.ActionReceived -= XTouchMiniController_ActionReceived;
         }
 
         public async Task SetPlayStateAsync(ITimelineController.PlayStates playState)
@@ -56,15 +54,14 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
         public async Task SetActuatorValueAsync(int index, double valueInPercent)
         {
             var ok = _xTouchMiniController.SetKnobPosition((byte)(index + 1), (byte)(Math.Max(0, Math.Min(127, valueInPercent * 127 / 100.0))));
-            await Task.CompletedTask;
+            if (ok == false) await _awbLogger.LogErrorAsync("SetKnobPosition failed");
         }
-
 
 
         public async Task ShowPointButtonStateAsync(int index, bool pointExists)
         {
             var ok = _xTouchMiniController.SetButtonLedState(topLine: true, (byte)(index + 1), pointExists ? LedState.On : LedState.Off);
-            await Task.CompletedTask;
+            if (ok == false) await _awbLogger.LogErrorAsync("SetButtonLedState failed");
         }
 
         private async void XTouchMiniController_ActionReceived(object? sender, XTouchMiniEventArgs e)
@@ -75,7 +72,6 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             {
                 case XTouchMiniEventArgs.InputTypes.Unknown:
                     break;
-
 
                 case XTouchMiniEventArgs.InputTypes.KnobRotation:
                     OnTimelineEvent.Invoke(this, new TimelineControllerEventArgs(
