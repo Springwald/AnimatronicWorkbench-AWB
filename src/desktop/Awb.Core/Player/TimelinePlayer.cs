@@ -95,6 +95,7 @@ namespace Awb.Core.Player
                 _timelineData.OnContentChanged -= TimelineContentChanged;
             }
             _timelineData = timelineData;
+            _allPointsMerged = null;
             _timelineData.OnContentChanged += TimelineContentChanged;
         }
 
