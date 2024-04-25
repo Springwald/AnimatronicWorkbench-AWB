@@ -12,6 +12,7 @@ using Awb.Core.Project;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace AwbStudio.TimelineEditing
@@ -29,6 +30,13 @@ namespace AwbStudio.TimelineEditing
         private readonly TimelineEditingManipulation _timelineEditingManipulation;
         private readonly IActuator[] _allActuators;
         private readonly IActuator[] _controllerTuneableActuators;
+
+        private readonly bool _writeDebug = false;
+
+        private volatile int _timelineData_ContentChangedCounter = 0;
+        private volatile int _timlineControllerUpdateCounter = 0;
+        private volatile bool _updatingByTimelineController = false;
+
 
         public TimelineEventHandling(
             TimelineData timelineData,
@@ -61,34 +69,41 @@ namespace AwbStudio.TimelineEditing
             _viewContext = viewContext;
             _viewContext.Changed += ViewContext_Changed;
 
-
-
             foreach (var timelineController in _timelineControllers)
             {
                 timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
             }
         }
 
+
         private async void TimelineData_ContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
+            var myCounter = ++_timelineData_ContentChangedCounter;
+
+            if (_writeDebug) Debug.WriteLine($"TimelineData_ContentChanged: {e.ChangeType} START ");
             switch (e.ChangeType)
             {
                 case TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged:
                 case TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged:
                 case TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged:
                     await _timelinePlayer.UpdateActuators();
-                    if (sender is ITimelineController timelineController)
-                        ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: timelineController);
-                    else
-                        ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: null);
+                    if (!_updatingByTimelineController && myCounter  == _timelineData_ContentChangedCounter)
+                    {
+                        if (sender is ITimelineController timelineController)
+                            ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: timelineController);
+                        else
+                            ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: null);
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
+            if (_writeDebug) Debug.WriteLine($"TimelineData_ContentChanged: {e.ChangeType} DONE");
         }
 
         private void PlayPos_Changed(object? sender, int newPlayPosMs)
         {
+            if (_writeDebug) Debug.WriteLine($"PlayPos_Changed: {newPlayPosMs}");
             if (sender is ITimelineController timelineController)
                 ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: timelineController);
             else
@@ -99,6 +114,7 @@ namespace AwbStudio.TimelineEditing
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
+            if (_writeDebug) Debug.WriteLine($"ViewContext_Changed: {e.ChangeType}");
             switch (e.ChangeType)
             {
                 case ViewContextChangedEventArgs.ChangeTypes.Duration:
@@ -131,6 +147,11 @@ namespace AwbStudio.TimelineEditing
         private async void TimelineController_OnTimelineEvent(object? senderController, TimelineControllerEventArgs e)
         {
             if (_timelineData == null) return;
+            _updatingByTimelineController = true;
+
+            var myUpdateCount = ++_timlineControllerUpdateCounter;
+
+            if (_writeDebug) Debug.WriteLine($"TimelineController_OnTimelineEvent: {e.EventType}, {e.ValueInPercent} START " + myUpdateCount);
 
             ITimelineController? timelineController = (ITimelineController?)senderController;
             if (senderController != null && timelineController == null)
@@ -189,6 +210,7 @@ namespace AwbStudio.TimelineEditing
                 case TimelineControllerEventArgs.EventTypes.ActuatorValueChanged:
                     if (actuator != null)
                     {
+
                         var targetPercent = e.ValueInPercent;
                         switch (actuator)
                         {
@@ -198,7 +220,10 @@ namespace AwbStudio.TimelineEditing
                             default:
                                 throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                         }
+                        if (myUpdateCount == _timlineControllerUpdateCounter) // no other update has been started in the meantime
+                            await _timelinePlayer.UpdateActuators();
                         ShowActuatorValuesOnTimelineInputController(timelineController);
+
                     }
                     break;
 
@@ -215,7 +240,8 @@ namespace AwbStudio.TimelineEditing
                             default:
                                 throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Title} is an unhandled actutuator type.");
                         }
-                        await _timelinePlayer.UpdateActuators();
+                        if (myUpdateCount == _timlineControllerUpdateCounter) // no other update has been started in the meantime
+                            await _timelinePlayer.UpdateActuators();
                     }
                     break;
 
@@ -232,8 +258,8 @@ namespace AwbStudio.TimelineEditing
                             default:
                                 throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Title} is an unhandled actutuator type.");
                         }
-
-                        await _timelinePlayer.UpdateActuators();
+                        if (myUpdateCount == _timlineControllerUpdateCounter) // no other update has been started in the meantime
+                            await _timelinePlayer.UpdateActuators();
                     }
                     break;
 
@@ -245,13 +271,15 @@ namespace AwbStudio.TimelineEditing
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.EventType)}:{e.EventType.ToString()}");
             }
+            _updatingByTimelineController = false;
+            if (_writeDebug) Debug.WriteLine($"TimelineController_OnTimelineEvent: {e.EventType}, {e.ValueInPercent} END " + myUpdateCount);
         }
 
-        public void Play()
+        public async void Play()
         {
             _timelinePlayer?.Play();
             foreach (var timelineController in _timelineControllers)
-                timelineController?.SetPlayStateAsync(ITimelineController.PlayStates.Playing);
+                await timelineController.SetPlayStateAsync(ITimelineController.PlayStates.Playing);
         }
 
         public async void Stop()
@@ -259,7 +287,7 @@ namespace AwbStudio.TimelineEditing
             // snap scrollpos to snap positions 
             _timelinePlayer?.Stop();
             foreach (var timelineController in _timelineControllers)
-                timelineController?.SetPlayStateAsync(ITimelineController.PlayStates.Editor);
+                await timelineController.SetPlayStateAsync(ITimelineController.PlayStates.Editor);
         }
 
         private void SwitchToNextBank()
@@ -275,6 +303,8 @@ namespace AwbStudio.TimelineEditing
         {
             if (_timelineControllers == null) return;
             if (_controllerTuneableActuators == null) return;
+
+            if (_writeDebug) Debug.WriteLine($"ShowActuatorValuesOnTimelineInputController");
 
             var playPosMs = _playPosSynchronizer.PlayPosMsGuaranteedSnapped;
 
