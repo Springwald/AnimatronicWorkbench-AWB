@@ -13,6 +13,8 @@ namespace Awb.Core.Project
 {
     public class AwbProject
     {
+        private string _wifiSsid;
+
         private ITimelineDataService? _timelineDataService;
 
         private Sound[]? _sounds;
@@ -22,6 +24,13 @@ namespace Awb.Core.Project
         public string? Info { get; set; }
 
         public string Title { get; set; }
+
+        public string WifiSsid
+        {
+            get => _wifiSsid ?? $"AWB-{Title}"; // todo: remove invalid chars
+            set => _wifiSsid = value;
+        }
+        public string WifiPassword { get; set; } = "awb12345";
 
         public Pca9685PwmServoConfig[]? Pca9685PwmServos { get; set; }
         public StsServoConfig[]? StsServos { get; set; }

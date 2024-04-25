@@ -7,14 +7,14 @@
 
 namespace Awb.Core.Export.ExporterParts
 {
-    internal class WifiConfigData
+    public class WifiConfigData
     {
         public string WlanSSID { get; }
         public string WlanPassword { get; }
-        public WifiConfigData(string wlanSSID, string wlanPassword)
+        public WifiConfigData(string wifiSSID, string wifiPassword)
         {
-            WlanSSID = wlanSSID;
-            WlanPassword = wlanPassword;
+            WlanSSID = wifiSSID;
+            WlanPassword = wifiPassword;
         }
     }
 }

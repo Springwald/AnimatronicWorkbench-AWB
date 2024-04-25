@@ -13,12 +13,14 @@ namespace Awb.Core.Export
     public class Esp32ClientRemoteExporter : IExporter
     {
         private readonly string _esp32ClientsSourceFolder;
+        private readonly WifiConfigData _wifiConfigData;
 
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
-        public Esp32ClientRemoteExporter(string esp32ClientsSourceFolder)
+        public Esp32ClientRemoteExporter(string esp32ClientsSourceFolder, WifiConfigData wifiConfigData)
         {
             _esp32ClientsSourceFolder = esp32ClientsSourceFolder;
+            _wifiConfigData = wifiConfigData;
         }
 
         public async Task<IExporter.ExportResult> ExportAsync(string targetPath)
@@ -39,7 +41,7 @@ namespace Awb.Core.Export
 
             var dataExporter = new[]
             {
-                new WifiConfigExporter(new WifiConfigData(wlanSSID: "test", wlanPassword: "1234567")),
+                new WifiConfigExporter(_wifiConfigData),
             };
 
             foreach(var exporter in dataExporter)

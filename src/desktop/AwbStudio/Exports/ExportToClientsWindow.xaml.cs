@@ -6,6 +6,8 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Export;
+using Awb.Core.Export.ExporterParts;
+using Awb.Core.Project;
 using Awb.Core.Services;
 using AwbStudio.Projects;
 using System;
@@ -21,6 +23,9 @@ namespace AwbStudio.Exports
         private readonly IProjectManagerService _projectManagerService;
         private readonly Brush _rememberBackground;
         private readonly IAwbLogger _awbLogger;
+        private readonly AwbProject _project;
+
+        private WifiConfigData WifiConfigData => new WifiConfigData(wifiSSID: _project.WifiSsid, wifiPassword: _project.WifiPassword);
 
         protected string? ExportFolderGlobal
         {
@@ -44,6 +49,7 @@ namespace AwbStudio.Exports
                 MessageBox.Show("No project loaded");
                 return;
             }
+            _project = projectManagerService.ActualProject;
 
             ExportFolderGlobal = System.IO.Path.Combine(projectManagerService.ActualProject.ProjectFolder, "Esp32Clients");
 
@@ -88,10 +94,9 @@ namespace AwbStudio.Exports
             var appFolder = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             var esp32ClientsSourceFolderRelative = @"..\..\..\..\..\clients";
-            var esp32ClientsSourceFolder =  Path.Combine(appFolder, esp32ClientsSourceFolderRelative);
+            var esp32ClientsSourceFolder = Path.Combine(appFolder, esp32ClientsSourceFolderRelative);
 
-            await Export(new Esp32ClientRemoteExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder), 
-                targetSubFolder: "awb_esp32_remote-controller");   
+            await Export(new Esp32ClientRemoteExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData),targetSubFolder: "awb_esp32_remote-controller");
         }
 
         private async Task Export(IExporter exporter, string targetSubFolder)
@@ -113,7 +118,7 @@ namespace AwbStudio.Exports
             }
 
             await _awbLogger.LogAsync("Exporting to " + targetFolder);
-           
+
             exporter.Processing += ExporerProcessing;
 
             var result = await exporter.ExportAsync(targetPath: targetFolder);
