@@ -8,6 +8,7 @@
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
+using Awb.Core.Project;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
@@ -79,7 +80,7 @@ namespace AwbStudio.PropertyControls
             {
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
-                    if (_viewContext.ActualFocusObject == _soundPlayer)
+                    if (_viewContext.ActualFocusObject == _soundPlayer || _viewContext.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
                         ShowActualValue();
                     break;
             }

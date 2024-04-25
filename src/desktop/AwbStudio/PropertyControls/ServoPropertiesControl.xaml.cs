@@ -8,6 +8,7 @@
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
+using Awb.Core.Project;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using System;
@@ -74,7 +75,7 @@ namespace AwbStudio.PropertyControls
             {
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
-                    if (_viewContext.ActualFocusObject == _servo)
+                    if (_viewContext.ActualFocusObject == _servo || _viewContext.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
                         ShowActualValue();
                     break;
             }

@@ -123,6 +123,7 @@ namespace AwbStudio.TimelineValuePainters
 
         protected override bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs)
         {
+            if (changedEventArgs.ChangeType == TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged) return true;
             if (changedEventArgs.ChangeType != TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged) return false;
             return changedEventArgs.ChangedObjectId == _servo.Id;
         }

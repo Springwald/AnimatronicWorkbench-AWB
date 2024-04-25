@@ -102,6 +102,7 @@ namespace AwbStudio.TimelineValuePainters
 
         protected override bool IsChangedEventSuitableForThisPainter(TimelineDataChangedEventArgs changedEventArgs)
         {
+            if (changedEventArgs.ChangeType == TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged) return true;
             if (changedEventArgs.ChangeType != TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged) return false;
             return this._soundPlayer.Id == changedEventArgs.ChangedObjectId;
         }
