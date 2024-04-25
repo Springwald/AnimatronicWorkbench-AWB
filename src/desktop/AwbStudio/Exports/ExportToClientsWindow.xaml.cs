@@ -88,13 +88,13 @@ namespace AwbStudio.Exports
             var appFolder = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             var esp32ClientsSourceFolderRelative = @"..\..\..\..\..\clients";
-
             var esp32ClientsSourceFolder =  Path.Combine(appFolder, esp32ClientsSourceFolderRelative);
 
-            await Export(new Esp32ClientRemoteExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder), targetSubFolder: "Esp32RemoteClient");   
+            await Export(new Esp32ClientRemoteExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder), 
+                targetSubFolder: "awb_esp32_remote-controller");   
         }
 
-        private async Task Export(IExporter exporter,  string targetSubFolder)
+        private async Task Export(IExporter exporter, string targetSubFolder)
         {
 
             var targetFolder = Path.Combine(ExportFolderGlobal, targetSubFolder);
