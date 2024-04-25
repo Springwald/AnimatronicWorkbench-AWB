@@ -17,7 +17,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 25.04.2024 19:37:32
+// Created on 25.04.2024 23:42:53
 
 class AutoPlayData
 {
@@ -77,12 +77,12 @@ public:
 		stsServoPoints1->push_back(StsServoPoint(6,0,2219));
 		scsServoPoints1->push_back(StsServoPoint(10,0,850));
 		scsServoPoints1->push_back(StsServoPoint(12,0,86));
-		scsServoPoints1->push_back(StsServoPoint(1,2000,515));
+		scsServoPoints1->push_back(StsServoPoint(1,2000,508));
 		scsServoPoints1->push_back(StsServoPoint(2,2000,514));
-		scsServoPoints1->push_back(StsServoPoint(1,2250,376));
-		scsServoPoints1->push_back(StsServoPoint(2,2250,636));
+		scsServoPoints1->push_back(StsServoPoint(1,2250,358));
+		scsServoPoints1->push_back(StsServoPoint(2,2250,635));
+		scsServoPoints1->push_back(StsServoPoint(2,2625,512));
 		scsServoPoints1->push_back(StsServoPoint(1,2625,512));
-		scsServoPoints1->push_back(StsServoPoint(2,2625,510));
 		scsServoPoints1->push_back(StsServoPoint(2,3000,510));
 		scsServoPoints1->push_back(StsServoPoint(1,3000,512));
 		scsServoPoints1->push_back(StsServoPoint(1,4625,512));
@@ -169,6 +169,12 @@ public:
 		scsServoPoints3->push_back(StsServoPoint(10,7750,694));
 		scsServoPoints3->push_back(StsServoPoint(12,7750,296));
 		stsServoPoints3->push_back(StsServoPoint(8,7750,1936));
+		scsServoPoints3->push_back(StsServoPoint(1,7750,508));
+		scsServoPoints3->push_back(StsServoPoint(2,7750,514));
+		scsServoPoints3->push_back(StsServoPoint(1,8000,358));
+		scsServoPoints3->push_back(StsServoPoint(2,8000,635));
+		scsServoPoints3->push_back(StsServoPoint(2,8375,512));
+		scsServoPoints3->push_back(StsServoPoint(1,8375,512));
 		stsServoPoints3->push_back(StsServoPoint(6,8625,2082));
 		stsServoPoints3->push_back(StsServoPoint(6,10000,1998));
 		stsServoPoints3->push_back(StsServoPoint(6,12250,2387));
@@ -234,12 +240,12 @@ public:
 		stsServoPoints4->push_back(StsServoPoint(6,9000,2303));
 		stsServoPoints4->push_back(StsServoPoint(7,10000,1807));
 		stsServoPoints4->push_back(StsServoPoint(8,10000,2357));
-		scsServoPoints4->push_back(StsServoPoint(1,10375,527));
-		scsServoPoints4->push_back(StsServoPoint(2,10375,499));
-		scsServoPoints4->push_back(StsServoPoint(1,10625,322));
-		scsServoPoints4->push_back(StsServoPoint(2,10625,633));
-		scsServoPoints4->push_back(StsServoPoint(1,11000,527));
-		scsServoPoints4->push_back(StsServoPoint(2,11000,499));
+		scsServoPoints4->push_back(StsServoPoint(1,10375,508));
+		scsServoPoints4->push_back(StsServoPoint(2,10375,514));
+		scsServoPoints4->push_back(StsServoPoint(1,10625,358));
+		scsServoPoints4->push_back(StsServoPoint(2,10625,635));
+		scsServoPoints4->push_back(StsServoPoint(2,11000,512));
+		scsServoPoints4->push_back(StsServoPoint(1,11000,512));
 		stsServoPoints4->push_back(StsServoPoint(6,11125,2303));
 		stsServoPoints4->push_back(StsServoPoint(6,12000,2052));
 		mp3PlayerYX5300Points4->push_back(Mp3PlayerYX5300Point(6, 0, 3000));
@@ -287,6 +293,12 @@ public:
 		stsServoPoints5->push_back(StsServoPoint(7,6000,2373));
 		stsServoPoints5->push_back(StsServoPoint(8,7000,2054));
 		stsServoPoints5->push_back(StsServoPoint(7,7000,1976));
+		scsServoPoints5->push_back(StsServoPoint(1,7000,508));
+		scsServoPoints5->push_back(StsServoPoint(2,7000,514));
+		scsServoPoints5->push_back(StsServoPoint(1,7250,358));
+		scsServoPoints5->push_back(StsServoPoint(2,7250,635));
+		scsServoPoints5->push_back(StsServoPoint(2,7625,512));
+		scsServoPoints5->push_back(StsServoPoint(1,7625,512));
 		stsServoPoints5->push_back(StsServoPoint(6,8000,2303));
 		stsServoPoints5->push_back(StsServoPoint(8,8000,2278));
 		stsServoPoints5->push_back(StsServoPoint(6,9000,1983));
@@ -345,22 +357,16 @@ public:
 		stsServoPoints7->push_back(StsServoPoint(6,0,2326));
 		stsServoPoints7->push_back(StsServoPoint(7,0,2113));
 		stsServoPoints7->push_back(StsServoPoint(8,0,2015));
-		scsServoPoints7->push_back(StsServoPoint(1,2000,515));
+		scsServoPoints7->push_back(StsServoPoint(1,2000,508));
 		scsServoPoints7->push_back(StsServoPoint(2,2000,514));
-		scsServoPoints7->push_back(StsServoPoint(1,2250,376));
-		scsServoPoints7->push_back(StsServoPoint(2,2250,636));
+		scsServoPoints7->push_back(StsServoPoint(1,2250,358));
+		scsServoPoints7->push_back(StsServoPoint(2,2250,635));
+		scsServoPoints7->push_back(StsServoPoint(2,2625,512));
 		scsServoPoints7->push_back(StsServoPoint(1,2625,512));
-		scsServoPoints7->push_back(StsServoPoint(2,2625,510));
 		scsServoPoints7->push_back(StsServoPoint(2,3000,510));
 		scsServoPoints7->push_back(StsServoPoint(1,3000,512));
-		scsServoPoints7->push_back(StsServoPoint(1,4000,508));
-		scsServoPoints7->push_back(StsServoPoint(2,4000,514));
-		scsServoPoints7->push_back(StsServoPoint(1,4250,360));
-		scsServoPoints7->push_back(StsServoPoint(2,4250,626));
 		stsServoPoints7->push_back(StsServoPoint(7,4625,1945));
 		stsServoPoints7->push_back(StsServoPoint(8,4625,2199));
-		scsServoPoints7->push_back(StsServoPoint(2,4625,512));
-		scsServoPoints7->push_back(StsServoPoint(1,4625,512));
 		stsServoPoints7->push_back(StsServoPoint(7,6000,2190));
 		stsServoPoints7->push_back(StsServoPoint(8,6000,2304));
 		stsServoPoints7->push_back(StsServoPoint(7,8500,2190));
@@ -503,7 +509,13 @@ public:
 		scsServoPoints10->push_back(StsServoPoint(5,4625,387));
 		stsServoPoints10->push_back(StsServoPoint(7,4625,1930));
 		stsServoPoints10->push_back(StsServoPoint(8,4625,2107));
+		scsServoPoints10->push_back(StsServoPoint(1,4625,508));
+		scsServoPoints10->push_back(StsServoPoint(2,4625,514));
+		scsServoPoints10->push_back(StsServoPoint(1,4875,358));
+		scsServoPoints10->push_back(StsServoPoint(2,4875,635));
 		stsServoPoints10->push_back(StsServoPoint(6,5000,1854));
+		scsServoPoints10->push_back(StsServoPoint(2,5250,512));
+		scsServoPoints10->push_back(StsServoPoint(1,5250,512));
 		scsServoPoints10->push_back(StsServoPoint(4,6125,0));
 		scsServoPoints10->push_back(StsServoPoint(5,6125,1024));
 		scsServoPoints10->push_back(StsServoPoint(10,6500,752));
