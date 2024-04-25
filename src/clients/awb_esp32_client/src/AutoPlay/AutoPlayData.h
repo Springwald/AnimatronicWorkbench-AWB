@@ -17,7 +17,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 25.04.2024 23:42:53
+// Created on 25.04.2024 23:57:56
 
 class AutoPlayData
 {
@@ -30,12 +30,18 @@ public:
 
 	int stsServoCount = 5;
 	int stsServoChannels[5] = {6, 7, 8, 9, 11};
+	int stsServoMinValue[5] = {1580, 3200, 1200, 1741, 2342};
+	int stsServoMaxValue[5] = {2547, 1257, 2870, 319, 3712};
+	int stsServoDefaultValue[5] = {2048, 2128, 2064, 502, 3549};
 	int stsServoAcceleration[5] = {10, 10, 10, 20, 20};
 	int stsServoSpeed[5] = {1500, 1500, 1500, 1000, 1000};
 	String stsServoName[5] = {"Head rotate", "Neck right", "Neck left", "Arm right", "Arm left"};
 
 	int scsServoCount = 7;
 	int scsServoChannels[7] = {1, 2, 3, 4, 5, 10, 12};
+	int scsServoMinValue[7] = {314, 443, 572, 1024, 0, 290, 685};
+	int scsServoMaxValue[7] = {580, 669, 435, 0, 1024, 1024, 0};
+	int scsServoDefaultValue[7] = {512, 512, 572, 137, 830, 548, 346};
 	int scsServoAcceleration[7] = {10, 10, 1, 1, 1, 1, 1};
 	int scsServoSpeed[7] = {1000, 1000, 300, 200, 200, 500, 500};
 	String scsServoName[7] = {"Eyes up", "Eyes low", "Mouth", "Ear right", "Ear left", "Arm lower right", "Arm lower left"};

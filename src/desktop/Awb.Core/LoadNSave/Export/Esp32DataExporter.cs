@@ -254,11 +254,17 @@ namespace Awb.Core.LoadNSave.Export
         {
             var stsServos = servoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Project.StsServoConfig>();
             var chanels = stsServos.Select(s => s.Channel).ToArray();
+            var maxValues = stsServos.Select(s => s.MaxValue).ToArray();
+            var minValues = stsServos.Select(s => s.MinValue).ToArray();
+            var defaultValues = stsServos.Select(s => s.DefaultValue).ToArray();
             var accelerations = stsServos.Select(s => s.Acceleration ?? -1).ToArray();
             var speeds = stsServos.Select(s => s.Speed ?? -1).ToArray();
             var names = stsServos.Select(s => s.Title ?? $"{s.Id}/{s.Channel}").ToArray();
             result.AppendLine($"\tint {praefix}ServoCount = {stsServos.Length};");
             result.AppendLine($"\tint {praefix}ServoChannels[{stsServos.Length}] = {{{string.Join(", ", chanels.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint {praefix}ServoMinValue[{stsServos.Length}] = {{{string.Join(", ", minValues.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint {praefix}ServoMaxValue[{stsServos.Length}] = {{{string.Join(", ", maxValues.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint {praefix}ServoDefaultValue[{stsServos.Length}] = {{{string.Join(", ", defaultValues.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint {praefix}ServoAcceleration[{stsServos.Length}] = {{{string.Join(", ", accelerations.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint {praefix}ServoSpeed[{stsServos.Length}] = {{{string.Join(", ", speeds.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tString {praefix}ServoName[{stsServos.Length}] = {{{string.Join(", ", names.Select(s => $"\"{s}\""))}}};");
