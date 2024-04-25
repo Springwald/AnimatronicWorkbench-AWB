@@ -23,7 +23,10 @@ void WlanConnector::setup()
     _server = new WebServer(80);
     _server->on("/", [this]()
                 { this->handle_Default(); });
-    //_server.on("/state/1", handle_state);
+    _server->on("/remote/servo/", [this]()
+                { this->handle_remote_servo(); });
+    _server->on("/remote/play/", [this]()
+                { this->handle_remote_play_timeline(); });
     _server->onNotFound([this]()
                         { this->handle_NotFound(); });
     _server->begin();
@@ -70,6 +73,22 @@ void WlanConnector::logInfo(String msg)
 void WlanConnector::handle_Default()
 {
     _server->send(200, "text/html", GetHtml());
+}
+
+/**
+ * remote control a servo via the webserver
+ */
+void WlanConnector::handle_remote_servo()
+{
+    _server->send(200, "text/plain", "OK");
+}
+
+/**
+ * play a timeline via the webserver
+ */
+void WlanConnector::handle_remote_play_timeline()
+{
+    _server->send(200, "text/plain", "OK");
 }
 
 /**
