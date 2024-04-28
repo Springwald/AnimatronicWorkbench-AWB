@@ -17,7 +17,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 25.04.2024 23:57:56
+// Created on 28.04.2024 02:33:08
 
 class AutoPlayData
 {
@@ -33,8 +33,8 @@ public:
 	int stsServoMinValue[5] = {1580, 3200, 1200, 1741, 2342};
 	int stsServoMaxValue[5] = {2547, 1257, 2870, 319, 3712};
 	int stsServoDefaultValue[5] = {2048, 2128, 2064, 502, 3549};
-	int stsServoAcceleration[5] = {10, 10, 10, 20, 20};
-	int stsServoSpeed[5] = {1500, 1500, 1500, 1000, 1000};
+	int stsServoAcceleration[5] = {10, 10, 10, 150, 20};
+	int stsServoSpeed[5] = {1500, 1500, 1500, 1500, 1000};
 	String stsServoName[5] = {"Head rotate", "Neck right", "Neck left", "Arm right", "Arm left"};
 
 	int scsServoCount = 7;
@@ -58,6 +58,7 @@ public:
 
 	int timelineStateIds[3] = {1, 2, 5};
 	String timelineStateNames[3] = {"InBag", "Standing", "Only Remote"};
+	bool timelineStateAutoPlay[3] = {true, true, false};
 	int timelineStatePositiveInput[3] = {1, 0, 0};
 	int timelineStateNegativeInput[3] =  {0, 1, 0};
 	int timelineStateCount = 3;
@@ -577,6 +578,62 @@ public:
 		auto state11 = new TimelineState(2, String("Standing"));
 		Timeline *timeline11 = new Timeline(state11, String("Stand - Speak Hmmm"), stsServoPoints11, scsServoPoints11, pca9685PwmServoPoints11, mp3PlayerYX5300Points11);
 		timelines->push_back(*timeline11);
+
+		auto *stsServoPoints12 = new std::vector<StsServoPoint>();
+		auto *scsServoPoints12 = new std::vector<StsServoPoint>();
+		auto *pca9685PwmServoPoints12 = new std::vector<Pca9685PwmServoPoint>();
+		auto *mp3PlayerYX5300Points12 = new std::vector<Mp3PlayerYX5300Point>();
+		stsServoPoints12->push_back(StsServoPoint(9,0,736));
+		stsServoPoints12->push_back(StsServoPoint(11,0,3367));
+		stsServoPoints12->push_back(StsServoPoint(7,0,1272));
+		stsServoPoints12->push_back(StsServoPoint(6,1500,2547));
+		stsServoPoints12->push_back(StsServoPoint(7,1500,1257));
+		stsServoPoints12->push_back(StsServoPoint(8,1500,1200));
+		stsServoPoints12->push_back(StsServoPoint(8,2500,1476));
+		stsServoPoints12->push_back(StsServoPoint(7,2500,1257));
+		stsServoPoints12->push_back(StsServoPoint(6,2500,2478));
+		scsServoPoints12->push_back(StsServoPoint(1,2500,508));
+		scsServoPoints12->push_back(StsServoPoint(2,2500,514));
+		scsServoPoints12->push_back(StsServoPoint(1,2750,358));
+		scsServoPoints12->push_back(StsServoPoint(2,2750,635));
+		scsServoPoints12->push_back(StsServoPoint(2,3125,512));
+		scsServoPoints12->push_back(StsServoPoint(1,3125,512));
+		stsServoPoints12->push_back(StsServoPoint(8,3500,1265));
+		stsServoPoints12->push_back(StsServoPoint(6,3500,2547));
+		stsServoPoints12->push_back(StsServoPoint(8,4500,1226));
+		stsServoPoints12->push_back(StsServoPoint(7,4500,1302));
+		stsServoPoints12->push_back(StsServoPoint(6,4500,2478));
+		auto state12 = new TimelineState(5, String("Only Remote"));
+		Timeline *timeline12 = new Timeline(state12, String("LookUpRight"), stsServoPoints12, scsServoPoints12, pca9685PwmServoPoints12, mp3PlayerYX5300Points12);
+		timelines->push_back(*timeline12);
+
+		auto *stsServoPoints13 = new std::vector<StsServoPoint>();
+		auto *scsServoPoints13 = new std::vector<StsServoPoint>();
+		auto *pca9685PwmServoPoints13 = new std::vector<Pca9685PwmServoPoint>();
+		auto *mp3PlayerYX5300Points13 = new std::vector<Mp3PlayerYX5300Point>();
+		stsServoPoints13->push_back(StsServoPoint(9,0,736));
+		stsServoPoints13->push_back(StsServoPoint(11,0,3367));
+		stsServoPoints13->push_back(StsServoPoint(9,375,509));
+		stsServoPoints13->push_back(StsServoPoint(9,750,734));
+		stsServoPoints13->push_back(StsServoPoint(9,2500,736));
+		mp3PlayerYX5300Points13->push_back(Mp3PlayerYX5300Point(3, 0, 750));
+		auto state13 = new TimelineState(5, String("Only Remote"));
+		Timeline *timeline13 = new Timeline(state13, String("NO"), stsServoPoints13, scsServoPoints13, pca9685PwmServoPoints13, mp3PlayerYX5300Points13);
+		timelines->push_back(*timeline13);
+
+		auto *stsServoPoints14 = new std::vector<StsServoPoint>();
+		auto *scsServoPoints14 = new std::vector<StsServoPoint>();
+		auto *pca9685PwmServoPoints14 = new std::vector<Pca9685PwmServoPoint>();
+		auto *mp3PlayerYX5300Points14 = new std::vector<Mp3PlayerYX5300Point>();
+		stsServoPoints14->push_back(StsServoPoint(9,0,736));
+		stsServoPoints14->push_back(StsServoPoint(11,0,3367));
+		stsServoPoints14->push_back(StsServoPoint(9,375,509));
+		stsServoPoints14->push_back(StsServoPoint(9,750,734));
+		stsServoPoints14->push_back(StsServoPoint(9,2500,736));
+		mp3PlayerYX5300Points14->push_back(Mp3PlayerYX5300Point(4, 0, 750));
+		auto state14 = new TimelineState(5, String("Only Remote"));
+		Timeline *timeline14 = new Timeline(state14, String("YES"), stsServoPoints14, scsServoPoints14, pca9685PwmServoPoints14, mp3PlayerYX5300Points14);
+		timelines->push_back(*timeline14);
 
     }
 

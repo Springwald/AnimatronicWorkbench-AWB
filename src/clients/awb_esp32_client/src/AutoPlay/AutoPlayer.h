@@ -85,7 +85,12 @@ public:
     /**
      * starts the timeline with the given index
      */
-    void startNewTimeline(int timelineIndex);
+    void startNewTimelineByIndex(int timelineIndex);
+
+    /**
+     * starts the timeline with the given name
+     */
+    void startNewTimelineByName(String name);
 
     /**
      * starts a new timeline suitable for the selected state

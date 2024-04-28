@@ -96,6 +96,7 @@ namespace Awb.Core.LoadNSave.Export
             var stateIds = exportStates.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
             result.AppendLine($"\tint timelineStateIds[{exportStates.Length}] = {{{string.Join(", ", stateIds)}}};");
             result.AppendLine($"\tString timelineStateNames[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"\"{s.Title}\""))}}};");
+            result.AppendLine($"\tbool timelineStateAutoPlay[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"{s.AutoPlay.ToString().ToLower()}"))}}};");
             result.AppendLine($"\tint timelineStatePositiveInput[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s =>  (s.PositiveInputs.FirstOrDefault()).ToString()))}}};");
             result.AppendLine($"\tint timelineStateNegativeInput[{exportStates.Length}] =  {{{string.Join(", ", exportStates.Select(s => (s.NegativeInputs.FirstOrDefault()).ToString()))}}};");
             result.AppendLine($"\tint timelineStateCount = {stateIds.Length};");

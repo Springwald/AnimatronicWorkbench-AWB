@@ -88,6 +88,19 @@ void WlanConnector::handle_remote_servo()
  */
 void WlanConnector::handle_remote_play_timeline()
 {
+    if (_server->args() == 0)
+    {
+        _server->send(400, "text/plain", "BAD REQUEST");
+        return;
+    }
+    // get arg "timeline" from server
+    String timeline = _server->arg("timeline");
+    if (timeline == "")
+    {
+        _server->send(400, "text/plain", "BAD REQUEST");
+        return;
+    }
+    timelineNameToPlay = new String(timeline);
     _server->send(200, "text/plain", "OK");
 }
 

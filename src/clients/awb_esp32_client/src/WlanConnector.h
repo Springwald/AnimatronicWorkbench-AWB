@@ -45,10 +45,19 @@ public:
      */
     String *memoryInfo;
 
+    String *timelineNameToPlay; /// the name of the timeline to play by remote control
+
+    int scsServoCannelToSet; /// the channel of the scs servo to set by remote control
+    int scsServoValueToSet;  /// the value of the scsservo to set by remote control (in percent)
+
+    int stsServoCannelToSet; /// the channel of the sts servo to set by remote control
+    int stsServoValueToSet;  /// the value of the sts servo to set by remote control (in percent)
+
     WlanConnector(int clientId, ActualStatusInformation *actualStatusInformation, TCallBackErrorOccured errorOccured)
         : _errorOccured(errorOccured), _clientId(clientId), _actualStatusInformation(actualStatusInformation)
     {
         _data = new AutoPlayData();
+        timelineNameToPlay = new String();
     }
 
     ~WlanConnector()
