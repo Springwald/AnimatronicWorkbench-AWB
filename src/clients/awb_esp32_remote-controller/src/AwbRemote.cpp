@@ -5,8 +5,10 @@
 #include "../lib/M5Unit-MiniJoyC/UNIT_MiniJoyC.h"
 #include <HTTPClient.h>
 
-#define POS_X 0
-#define POS_Y 1
+#define POS_X 0    // Joystick
+#define POS_Y 1    // Joystick
+#define BUTTON 2   // Joystick press
+#define BUTTON2 37 // M5Stick middle button
 
 /**
  * initialize the AWB remote control
@@ -15,16 +17,16 @@ void AwbRemote::setup()
 {
     _display.setup(); // set up the display
 
-    auto wifiConfig = WifiConfig();
+    _wifiConfig = WifiConfig();
 
-    _display.draw_message(String("connect to wifi network") + String(wifiConfig.WlanSSID), 1500, MSG_TYPE_INFO);
+    _display.draw_message(String("connect wifi\r\n") + String(_wifiConfig.WlanSSID), 1500, MSG_TYPE_INFO);
     delay(1500);
-    WiFi.mode(WIFI_STA);                                      // station mode: the ESP32 connects to an access point
-    WiFi.begin(wifiConfig.WlanSSID, wifiConfig.WlanPassword); // connect to the WiFi network
+    WiFi.mode(WIFI_STA);                                        // station mode: the ESP32 connects to an access point
+    WiFi.begin(_wifiConfig.WlanSSID, _wifiConfig.WlanPassword); // connect to the WiFi network
     int trys = 10;
-    while (WiFi.status() != WL_CONNECTED)
+    while (trys-- > 0 && WiFi.status() != WL_CONNECTED)
     {
-        _display.draw_message(String("connect to wifi network") + String(wifiConfig.WlanSSID) + " " + String(trys), 1000, MSG_TYPE_INFO);
+        _display.draw_message(String("connect wifi\r\n") + String(_wifiConfig.WlanSSID) + "\r\nRetrys " + String(trys), 1000, MSG_TYPE_INFO);
         delay(1000);
     }
     _display.draw_message(WiFi.localIP().toString(), 1000, MSG_TYPE_INFO);
@@ -34,6 +36,11 @@ void AwbRemote::setup()
         _display.draw_message(String("I2C Error"), 500, MSG_TYPE_ERROR);
         delay(500);
     }
+
+    _axp192 = AXP192();
+    _axp192.begin();
+
+    pinMode(BUTTON2, INPUT);
 }
 
 /**
@@ -52,7 +59,16 @@ void AwbRemote::loop()
         this->sendCommand("/remote/play/?timeline=LookUpRight");
     if (pos_x < -50)
         this->sendCommand("/remote/play/?timeline=LookUpMiddle");
-    _display.draw_message(String(pos_x), 500, MSG_TYPE_ERROR);
+
+    if (_sensor.getButtonStatus() == false)
+        this->sendCommand("/remote/play/?timeline=InBag+-+Wink");
+
+    if (digitalRead(BUTTON2) == LOW)
+        this->sendCommand("/remote/play/?timeline=Stand+-+Dance");
+
+    auto batPower = _axp192.GetBatVoltage();
+
+    _display.draw_message(String(_wifiConfig.WlanSSID) + "" + String(pos_x) + "/" + String(pos_y) + "\r\nBat:" + String(batPower) + "V", 500, MSG_TYPE_INFO);
     delay(500);
 }
 

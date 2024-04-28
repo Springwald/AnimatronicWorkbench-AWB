@@ -79,10 +79,10 @@ void AwbDisplay::setup()
     if (_isSmallScreen)
     {
         // font = &fonts::Font0;
-        font = &fonts::DejaVu9;
+        font = &fonts::DejaVu18;
         // font = &fonts::TomThumb;
-        _textSizeFont = 1.5f;
-        _textSizePx = _textSizeFont * 8;
+        _textSizeFont = 1.0f;
+        _textSizePx = _textSizeFont * 18;
         _textSizeLineHeight = _textSizePx + 1;
     }
     else
@@ -300,7 +300,7 @@ void AwbDisplay::set_debugStatus(String message)
 }
 
 /// @brief draw a fullscreen info text
-void AwbDisplay::draw_message(String message, int durationMs, int msgType)
+void AwbDisplay::draw_message(String messageRaw, int durationMs, int msgType)
 {
     _message_duration_left = durationMs;
     _message_duration = durationMs;
@@ -316,7 +316,7 @@ void AwbDisplay::draw_message(String message, int durationMs, int msgType)
             break;
         case MSG_TYPE_ERROR: // error
             backCol = 0xFF0000U;
-            set_debugStatus(message); // Mirror to debug status
+            set_debugStatus(messageRaw); // Mirror to debug status
             break;
         }
     }
@@ -324,70 +324,103 @@ void AwbDisplay::draw_message(String message, int durationMs, int msgType)
     primarySprite.fillScreen(backCol);
     primarySprite.setTextDatum(top_center);
 
-    int maxPerLine = (int)(primarySprite.width() / primarySprite.textWidth("o"));
+    int maxPerLine = (int)(primarySprite.width() / primarySprite.textWidth("o")) - 2;
 
-    String line = "";
     int lineCount = 0;
 
+    std::vector<String> messagesPreSplit{};
+    // int splitPos = 0;
+    //  while (splitPos != -1)
+    //  {
+    //      splitPos = messageRaw.indexOf("\r\n");
+    //      if (splitPos != -1)
+    //      {
+    //          messagesPreSplit.push_back(messageRaw.substring(0, splitPos));
+    //          messageRaw = messageRaw.substring(splitPos + 2);
+    //      }
+    //  }
+    if (messageRaw.length() > 0)
+        messagesPreSplit.push_back(messageRaw);
+
+    // create an chart array of split chars
+    auto splitChars = std::vector<char>{'.', ',', ':', '/', '=', '{', '}', 't'};
+
     std::vector<String> lines{};
-
-    while (message.length() > 0)
+    for (int i = 0; i < messagesPreSplit.size(); i++)
     {
-        int spacePos = message.indexOf(" ");
-        if (spacePos > maxPerLine || spacePos == -1)
-            spacePos = message.indexOf(".");
-        if (spacePos > maxPerLine || spacePos == -1)
-            spacePos = message.indexOf(",");
-        if (spacePos > maxPerLine || spacePos == -1)
-            spacePos = message.indexOf(":");
-        if (spacePos > maxPerLine || spacePos == -1)
-            spacePos = message.indexOf("=");
-        if (spacePos > maxPerLine || spacePos == -1)
-            spacePos = message.indexOf("{");
-        if (spacePos > maxPerLine || spacePos == -1)
-            spacePos = message.indexOf("}");
-        if (spacePos > maxPerLine || spacePos == -1)
-            spacePos = maxPerLine;
+        String message = messagesPreSplit[i];
+        String line = "";
 
-        // check if there is a space in the message (if not, spacePos will be -1
-        if (spacePos == -1)
+        while (message.length() > 0)
         {
-            spacePos = message.length() - 1;
-        }
-        if (spacePos > 0)
-        {
-            if (line.length() + spacePos < maxPerLine)
+            Serial.write("message:");
+            Serial.write(message.c_str());
+            Serial.write("\r\n");
+
+            int spacePos = message.indexOf(" ");
+            int maxSpaceInLine = maxPerLine - line.length();
+
+            // if not split by space, try to split by other chars in the split char array
+            if (spacePos == -1 || spacePos > maxSpaceInLine)
             {
-                // enough space in the line
-                if (line.length() > 0)
+                for (int j = 0; j < splitChars.size(); j++)
                 {
-                    line += " ";
+                    if (spacePos == -1 || spacePos > maxSpaceInLine)
+                    {
+                        int newSpacePos = message.indexOf("/"); // splitChars.at(j));
+                        if (newSpacePos != -1 && (spacePos == -1 || newSpacePos < spacePos))
+                            spacePos = newSpacePos;
+                    }
                 }
+            }
+
+            if (spacePos > maxSpaceInLine)
+                spacePos = maxSpaceInLine;
+
+            Serial.write("SpacePos:");
+            Serial.write(String(spacePos).c_str());
+            Serial.write("\r\n");
+
+            // check if there is a space in the message (if not, spacePos will be -1
+            // if (spacePos == -1)
+            // {
+            //     spacePos = message.length() - 1;
+            // }
+            if (spacePos >= 0)
+            {
+                if (spacePos < maxSpaceInLine)
+                {
+                    // enough space in the line
+                    if (line.length() > 0)
+                    {
+                        line += " ";
+                    }
+                }
+                else
+                {
+                    // no more space in the line
+                    if (line.length() > 0)
+                    {
+                        // draw the line and start a new one
+                        lines.push_back(line);
+                        lineCount++;
+                        line = "";
+                    }
+                }
+                line += message.substring(0, spacePos + 1);
+                message = message.substring(spacePos + 1);
             }
             else
             {
-                // no more space in the line
-                if (line.length() > 0)
-                {
-                    // draw the line and start a new one
-                    lines.push_back(line);
-                    lineCount++;
-                    line = "";
-                }
+                line = message;
+                message = "";
             }
-            line += message.substring(0, spacePos + 1);
-            message = message.substring(spacePos + 1);
         }
-        else
-        {
-            line = message;
-            message = "";
-        }
-    }
 
-    if (line.length() > 0)
-    {
-        lines.push_back(line);
+        if (line.length() > 0)
+        {
+            lines.push_back(line);
+        }
     }
 
     int y = max(0, (int)(((primarySprite.height()) - ((lineCount + 1) * _textSizeLineHeight)) / 2));
