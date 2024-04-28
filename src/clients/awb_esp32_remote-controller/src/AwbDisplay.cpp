@@ -300,7 +300,7 @@ void AwbDisplay::set_debugStatus(String message)
 }
 
 /// @brief draw a fullscreen info text
-void AwbDisplay::draw_message(String messageRaw, int durationMs, int msgType)
+void AwbDisplay::draw_message(String message, int durationMs, int msgType)
 {
     _message_duration_left = durationMs;
     _message_duration = durationMs;
@@ -316,7 +316,7 @@ void AwbDisplay::draw_message(String messageRaw, int durationMs, int msgType)
             break;
         case MSG_TYPE_ERROR: // error
             backCol = 0xFF0000U;
-            set_debugStatus(messageRaw); // Mirror to debug status
+            set_debugStatus(message); // Mirror to debug status
             break;
         }
     }
@@ -326,104 +326,40 @@ void AwbDisplay::draw_message(String messageRaw, int durationMs, int msgType)
 
     int maxPerLine = (int)(primarySprite.width() / primarySprite.textWidth("o")) - 2;
 
-    int lineCount = 0;
-
-    std::vector<String> messagesPreSplit{};
-    // int splitPos = 0;
-    //  while (splitPos != -1)
-    //  {
-    //      splitPos = messageRaw.indexOf("\r\n");
-    //      if (splitPos != -1)
-    //      {
-    //          messagesPreSplit.push_back(messageRaw.substring(0, splitPos));
-    //          messageRaw = messageRaw.substring(splitPos + 2);
-    //      }
-    //  }
-    if (messageRaw.length() > 0)
-        messagesPreSplit.push_back(messageRaw);
-
-    // create an chart array of split chars
-    auto splitChars = std::vector<char>{'.', ',', ':', '/', '=', '{', '}', 't'};
+    auto nativeLineBreaks = std::vector<char>{'\r', '\n'};
+    auto attractiveLineBreaks = std::vector<char>{' ', '\t'};
+    auto fallbackBreaks = std::vector<char>{',', ':', '/', '=', '{', '}', '?'};
 
     std::vector<String> lines{};
-    for (int i = 0; i < messagesPreSplit.size(); i++)
+    while (message.length() > 0)
     {
-        String message = messagesPreSplit[i];
-        String line = "";
-
-        while (message.length() > 0)
+        String line = getNextLine(message, maxPerLine, nativeLineBreaks, true);
+        if (line.length() == 0 || line.length() > maxPerLine)
         {
-            Serial.write("message:");
-            Serial.write(message.c_str());
-            Serial.write("\r\n");
-
-            int spacePos = message.indexOf(" ");
-            int maxSpaceInLine = maxPerLine - line.length();
-
-            // if not split by space, try to split by other chars in the split char array
-            if (spacePos == -1 || spacePos > maxSpaceInLine)
-            {
-                for (int j = 0; j < splitChars.size(); j++)
-                {
-                    if (spacePos == -1 || spacePos > maxSpaceInLine)
-                    {
-                        int newSpacePos = message.indexOf("/"); // splitChars.at(j));
-                        if (newSpacePos != -1 && (spacePos == -1 || newSpacePos < spacePos))
-                            spacePos = newSpacePos;
-                    }
-                }
-            }
-
-            if (spacePos > maxSpaceInLine)
-                spacePos = maxSpaceInLine;
-
-            Serial.write("SpacePos:");
-            Serial.write(String(spacePos).c_str());
-            Serial.write("\r\n");
-
-            // check if there is a space in the message (if not, spacePos will be -1
-            // if (spacePos == -1)
-            // {
-            //     spacePos = message.length() - 1;
-            // }
-            if (spacePos >= 0)
-            {
-                if (spacePos < maxSpaceInLine)
-                {
-                    // enough space in the line
-                    if (line.length() > 0)
-                    {
-                        line += " ";
-                    }
-                }
-                else
-                {
-                    // no more space in the line
-                    if (line.length() > 0)
-                    {
-                        // draw the line and start a new one
-                        lines.push_back(line);
-                        lineCount++;
-                        line = "";
-                    }
-                }
-                line += message.substring(0, spacePos + 1);
-                message = message.substring(spacePos + 1);
-            }
-            else
-            {
-                line = message;
-                message = "";
-            }
+            line = getNextLine(message, maxPerLine, attractiveLineBreaks, false);
+        }
+        if (line.length() == 0 || line.length() > maxPerLine)
+        {
+            line = getNextLine(message, maxPerLine, fallbackBreaks, false);
+        }
+        if (line.length() == 0 || line.length() > maxPerLine)
+        {
+            line = message.substring(0, maxPerLine);
         }
 
-        if (line.length() > 0)
+        if (line.length() == 0)
+        {
+            lines.push_back(message);
+            break;
+        }
+        else
         {
             lines.push_back(line);
+            message = message.substring(line.length());
         }
     }
 
-    int y = max(0, (int)(((primarySprite.height()) - ((lineCount + 1) * _textSizeLineHeight)) / 2));
+    int y = max(0, (int)(((primarySprite.height()) - ((lines.size() + 1) * _textSizeLineHeight)) / 2));
     for (int i = 0; i < lines.size(); i++)
     {
         // draw the line
@@ -432,6 +368,29 @@ void AwbDisplay::draw_message(String messageRaw, int durationMs, int msgType)
     }
 
     primarySprite.pushSprite(0, _primarySpriteTop);
+}
+
+String AwbDisplay::getNextLine(String input, uint maxLineLength, std::vector<char> splitChars, bool forceFirstSplit)
+{
+    int bestSplitPos = -1;
+    for (int i = 2; i < min(maxLineLength, input.length()); i++)
+    {
+        char c = input.charAt(i);
+        for (int j = 0; j < splitChars.size(); j++)
+        {
+            char splitChar = splitChars[j];
+            if (c == splitChar)
+            {
+                bestSplitPos = i;
+                if (forceFirstSplit)
+                    return input.substring(0, bestSplitPos);
+            }
+        }
+    }
+
+    if (bestSplitPos == -1)
+        return input;
+    return input.substring(0, bestSplitPos);
 }
 
 void AwbDisplay::set_debugStatus_dirty()

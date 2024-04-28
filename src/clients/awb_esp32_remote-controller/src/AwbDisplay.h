@@ -1,6 +1,8 @@
 #ifndef awb_display_h
 #define awb_display_h
 
+#include <vector>
+
 #define MSG_TYPE_INFO 0
 #define MSG_TYPE_ERROR 1
 
@@ -37,6 +39,7 @@ private:
   void showTopBar(String message); /// Show the top bar with the given message
   void draw_values();              /// Draw the values
   bool draw_debugInfos();          /// Draw the debug infos
+  String getNextLine(String input, uint maxLineLength, std::vector<char> splitChars, bool forceFirstSplit);
 
 public:
   /**

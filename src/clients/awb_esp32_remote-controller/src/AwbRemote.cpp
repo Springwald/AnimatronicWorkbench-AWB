@@ -61,14 +61,14 @@ void AwbRemote::loop()
         this->sendCommand("/remote/play/?timeline=LookUpMiddle");
 
     if (_sensor.getButtonStatus() == false)
-        this->sendCommand("/remote/play/?timeline=InBag+-+Wink");
+        this->sendCommand("/remote/play/?timeline=Wink");
 
     if (digitalRead(BUTTON2) == LOW)
         this->sendCommand("/remote/play/?timeline=Stand+-+Dance");
 
     auto batPower = _axp192.GetBatVoltage();
 
-    _display.draw_message(String(_wifiConfig.WlanSSID) + "" + String(pos_x) + "/" + String(pos_y) + "\r\nBat:" + String(batPower) + "V", 500, MSG_TYPE_INFO);
+    _display.draw_message(String(_wifiConfig.WlanSSID) + "\r\n" + String(pos_x) + "/" + String(pos_y) + "\r\nBat:" + String(batPower) + "V", 500, MSG_TYPE_INFO);
     delay(500);
 }
 
