@@ -48,6 +48,10 @@ void AwbRemote::loop()
         this->sendCommand("/remote/play/?timeline=YES");
     if (pos_y < -50)
         this->sendCommand("/remote/play/?timeline=NO");
+    if (pos_x < -50)
+        this->sendCommand("/remote/play/?timeline=LookUpRight");
+    if (pos_x > 50)
+        this->sendCommand("/remote/play/?timeline=LookUpMiddle");
     _display.draw_message(String(pos_x), 500, MSG_TYPE_ERROR);
     delay(500);
 }

@@ -17,7 +17,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 28.04.2024 02:33:08
+// Created on 28.04.2024 02:36:52
 
 class AutoPlayData
 {
@@ -586,25 +586,21 @@ public:
 		stsServoPoints12->push_back(StsServoPoint(9,0,736));
 		stsServoPoints12->push_back(StsServoPoint(11,0,3367));
 		stsServoPoints12->push_back(StsServoPoint(7,0,1272));
-		stsServoPoints12->push_back(StsServoPoint(6,1500,2547));
+		stsServoPoints12->push_back(StsServoPoint(6,1500,2097));
 		stsServoPoints12->push_back(StsServoPoint(7,1500,1257));
-		stsServoPoints12->push_back(StsServoPoint(8,1500,1200));
-		stsServoPoints12->push_back(StsServoPoint(8,2500,1476));
-		stsServoPoints12->push_back(StsServoPoint(7,2500,1257));
-		stsServoPoints12->push_back(StsServoPoint(6,2500,2478));
+		stsServoPoints12->push_back(StsServoPoint(8,1500,2870));
+		stsServoPoints12->push_back(StsServoPoint(6,2000,1991));
 		scsServoPoints12->push_back(StsServoPoint(1,2500,508));
 		scsServoPoints12->push_back(StsServoPoint(2,2500,514));
 		scsServoPoints12->push_back(StsServoPoint(1,2750,358));
 		scsServoPoints12->push_back(StsServoPoint(2,2750,635));
+		stsServoPoints12->push_back(StsServoPoint(8,3000,2541));
 		scsServoPoints12->push_back(StsServoPoint(2,3125,512));
 		scsServoPoints12->push_back(StsServoPoint(1,3125,512));
-		stsServoPoints12->push_back(StsServoPoint(8,3500,1265));
-		stsServoPoints12->push_back(StsServoPoint(6,3500,2547));
-		stsServoPoints12->push_back(StsServoPoint(8,4500,1226));
-		stsServoPoints12->push_back(StsServoPoint(7,4500,1302));
-		stsServoPoints12->push_back(StsServoPoint(6,4500,2478));
+		stsServoPoints12->push_back(StsServoPoint(8,4000,2870));
+		stsServoPoints12->push_back(StsServoPoint(6,4000,2036));
 		auto state12 = new TimelineState(5, String("Only Remote"));
-		Timeline *timeline12 = new Timeline(state12, String("LookUpRight"), stsServoPoints12, scsServoPoints12, pca9685PwmServoPoints12, mp3PlayerYX5300Points12);
+		Timeline *timeline12 = new Timeline(state12, String("LookUpMiddle"), stsServoPoints12, scsServoPoints12, pca9685PwmServoPoints12, mp3PlayerYX5300Points12);
 		timelines->push_back(*timeline12);
 
 		auto *stsServoPoints13 = new std::vector<StsServoPoint>();
@@ -613,12 +609,26 @@ public:
 		auto *mp3PlayerYX5300Points13 = new std::vector<Mp3PlayerYX5300Point>();
 		stsServoPoints13->push_back(StsServoPoint(9,0,736));
 		stsServoPoints13->push_back(StsServoPoint(11,0,3367));
-		stsServoPoints13->push_back(StsServoPoint(9,375,509));
-		stsServoPoints13->push_back(StsServoPoint(9,750,734));
-		stsServoPoints13->push_back(StsServoPoint(9,2500,736));
-		mp3PlayerYX5300Points13->push_back(Mp3PlayerYX5300Point(3, 0, 750));
+		stsServoPoints13->push_back(StsServoPoint(7,0,1272));
+		stsServoPoints13->push_back(StsServoPoint(6,1500,2547));
+		stsServoPoints13->push_back(StsServoPoint(7,1500,1257));
+		stsServoPoints13->push_back(StsServoPoint(8,1500,1200));
+		stsServoPoints13->push_back(StsServoPoint(8,2500,1476));
+		stsServoPoints13->push_back(StsServoPoint(7,2500,1257));
+		stsServoPoints13->push_back(StsServoPoint(6,2500,2478));
+		scsServoPoints13->push_back(StsServoPoint(1,2500,508));
+		scsServoPoints13->push_back(StsServoPoint(2,2500,514));
+		scsServoPoints13->push_back(StsServoPoint(1,2750,358));
+		scsServoPoints13->push_back(StsServoPoint(2,2750,635));
+		scsServoPoints13->push_back(StsServoPoint(2,3125,512));
+		scsServoPoints13->push_back(StsServoPoint(1,3125,512));
+		stsServoPoints13->push_back(StsServoPoint(8,3500,1265));
+		stsServoPoints13->push_back(StsServoPoint(6,3500,2547));
+		stsServoPoints13->push_back(StsServoPoint(8,4500,1226));
+		stsServoPoints13->push_back(StsServoPoint(7,4500,1302));
+		stsServoPoints13->push_back(StsServoPoint(6,4500,2478));
 		auto state13 = new TimelineState(5, String("Only Remote"));
-		Timeline *timeline13 = new Timeline(state13, String("NO"), stsServoPoints13, scsServoPoints13, pca9685PwmServoPoints13, mp3PlayerYX5300Points13);
+		Timeline *timeline13 = new Timeline(state13, String("LookUpRight"), stsServoPoints13, scsServoPoints13, pca9685PwmServoPoints13, mp3PlayerYX5300Points13);
 		timelines->push_back(*timeline13);
 
 		auto *stsServoPoints14 = new std::vector<StsServoPoint>();
@@ -630,10 +640,24 @@ public:
 		stsServoPoints14->push_back(StsServoPoint(9,375,509));
 		stsServoPoints14->push_back(StsServoPoint(9,750,734));
 		stsServoPoints14->push_back(StsServoPoint(9,2500,736));
-		mp3PlayerYX5300Points14->push_back(Mp3PlayerYX5300Point(4, 0, 750));
+		mp3PlayerYX5300Points14->push_back(Mp3PlayerYX5300Point(3, 0, 750));
 		auto state14 = new TimelineState(5, String("Only Remote"));
-		Timeline *timeline14 = new Timeline(state14, String("YES"), stsServoPoints14, scsServoPoints14, pca9685PwmServoPoints14, mp3PlayerYX5300Points14);
+		Timeline *timeline14 = new Timeline(state14, String("NO"), stsServoPoints14, scsServoPoints14, pca9685PwmServoPoints14, mp3PlayerYX5300Points14);
 		timelines->push_back(*timeline14);
+
+		auto *stsServoPoints15 = new std::vector<StsServoPoint>();
+		auto *scsServoPoints15 = new std::vector<StsServoPoint>();
+		auto *pca9685PwmServoPoints15 = new std::vector<Pca9685PwmServoPoint>();
+		auto *mp3PlayerYX5300Points15 = new std::vector<Mp3PlayerYX5300Point>();
+		stsServoPoints15->push_back(StsServoPoint(9,0,736));
+		stsServoPoints15->push_back(StsServoPoint(11,0,3367));
+		stsServoPoints15->push_back(StsServoPoint(9,375,509));
+		stsServoPoints15->push_back(StsServoPoint(9,750,734));
+		stsServoPoints15->push_back(StsServoPoint(9,2500,736));
+		mp3PlayerYX5300Points15->push_back(Mp3PlayerYX5300Point(4, 0, 750));
+		auto state15 = new TimelineState(5, String("Only Remote"));
+		Timeline *timeline15 = new Timeline(state15, String("YES"), stsServoPoints15, scsServoPoints15, pca9685PwmServoPoints15, mp3PlayerYX5300Points15);
+		timelines->push_back(*timeline15);
 
     }
 
