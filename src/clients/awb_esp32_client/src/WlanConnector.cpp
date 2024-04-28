@@ -101,7 +101,7 @@ void WlanConnector::handle_remote_play_timeline()
         return;
     }
     timelineNameToPlay = new String(timeline);
-    _server->send(200, "text/plain", "OK");
+    _server->send(200, "text/plain", "OK " + timeline);
 }
 
 /**

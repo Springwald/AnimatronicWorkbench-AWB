@@ -48,9 +48,9 @@ void AwbRemote::loop()
         this->sendCommand("/remote/play/?timeline=YES");
     if (pos_y < -50)
         this->sendCommand("/remote/play/?timeline=NO");
-    if (pos_x < -50)
-        this->sendCommand("/remote/play/?timeline=LookUpRight");
     if (pos_x > 50)
+        this->sendCommand("/remote/play/?timeline=LookUpRight");
+    if (pos_x < -50)
         this->sendCommand("/remote/play/?timeline=LookUpMiddle");
     _display.draw_message(String(pos_x), 500, MSG_TYPE_ERROR);
     delay(500);
@@ -79,7 +79,7 @@ void AwbRemote::sendCommand(String command)
         if (httpResponseCode > 0)
         {
             String payload = http.getString();
-            _display.draw_message("HTTP Response code: " + httpResponseCode + http.getString() + payload, 1500, MSG_TYPE_INFO);
+            _display.draw_message(payload, 1500, MSG_TYPE_INFO);
             delay(1500);
         }
         else
