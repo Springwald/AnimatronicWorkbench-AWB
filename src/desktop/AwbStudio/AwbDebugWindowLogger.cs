@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Services;
+using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,23 +15,24 @@ namespace AwbStudio
 {
     internal class AwbDebugWindowLogger : IAwbLogger, IDisposable
     {
-        private DebugWindow? _debugWindow;
-        private List<string> _output = new List<string>();
+        private DebugWindow _debugWindow;
+        private List<string> _output;
         public event EventHandler<string>? OnError;
         public event EventHandler<string>? OnLog;
 
         public AwbDebugWindowLogger(DebugWindow debugWindow)
         {
             _debugWindow = debugWindow;
+            _output = new List<string>();
         }
 
-        public async Task LogError(string message)
+        public async Task LogErrorAsync(string message)
         {
             OnError?.Invoke(this, message);
             await ShowMsg($"## Error ## {message}");
         }
 
-        public async Task Log(string message)
+        public async Task LogAsync(string message)
         {
             OnLog?.Invoke(this, message);
             await ShowMsg(message);
@@ -38,7 +40,7 @@ namespace AwbStudio
 
         private async Task ShowMsg(string msg)
         {
-            MyInvoker.Invoke(new Action(() =>
+            WpfAppInvoker.Invoke(new Action(() =>
             {
                 if (_debugWindow?.TextBox != null)
                 {
@@ -46,7 +48,8 @@ namespace AwbStudio
                     while (_output.Count > 80) _output.RemoveAt(_output.Count - 1);
                     _debugWindow.TextBox.Text = string.Join("\r\n", _output);
                 }
-            }));
+            }), System.Windows.Threading.DispatcherPriority.Background);
+            await Task.CompletedTask;
         }
 
         public void Close()

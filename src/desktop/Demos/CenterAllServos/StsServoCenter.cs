@@ -32,7 +32,7 @@ namespace ResetAllServos
                 {
                     servo.TargetValue = pos;
                     var ok = await sender.SendChangesToClients();
-                    Console.WriteLine($"{servo.Name}: {servo.TargetValue}");
+                    Console.WriteLine($"{servo.Title}: {servo.TargetValue}");
                     await Task.Delay(3000);
                 }
             }

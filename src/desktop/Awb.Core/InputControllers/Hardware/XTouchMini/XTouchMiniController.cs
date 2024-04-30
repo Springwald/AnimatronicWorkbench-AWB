@@ -1,12 +1,13 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.InputControllers.Midi;
 using Awb.Core.Services;
+using Awb.Core.Tools;
 
 namespace Awb.Core.InputControllers.XTouchMini
 {
@@ -16,9 +17,11 @@ namespace Awb.Core.InputControllers.XTouchMini
         private LedState?[] _buttonLedStates = new LedState?[16];
 
         public EventHandler<XTouchMiniEventArgs>? ActionReceived;
+        private readonly IInvoker _invoker;
 
-        public XTouchMiniController(IAwbLogger awbLogger) : base(deviceName: "X-TOUCH MINI", awbLogger: awbLogger)
+        public XTouchMiniController(IAwbLogger awbLogger, IInvoker invoker) : base(deviceName: "X-TOUCH MINI", awbLogger: awbLogger)
         {
+            _invoker = invoker;
             if (_midiPort == null || !Available) return;
             _midiPort.OnInputEvent += _midiPort_OnInputEvent;
         }
@@ -48,8 +51,9 @@ namespace Awb.Core.InputControllers.XTouchMini
                 default: throw new ArgumentOutOfRangeException(nameof(args.InputType) + ":" + args.InputType);
             }
 
-            ActionReceived?.Invoke(this, args);
-            //_awbLogger.Log($"Midi in => {e.InputId}:{e.Value}");
+            // This is important! We must not call the event handler in the timer thread, because the event handler should update the UI.
+            // so we use the invoker using the hosting wpf application thread instead.
+            _invoker.Invoke(() => ActionReceived?.Invoke(this, args));
         }
 
         /// <summary>

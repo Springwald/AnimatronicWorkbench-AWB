@@ -37,7 +37,7 @@ namespace Awb.Core.Clients
         uint ClientId { get; }
         string FriendlyName { get; }
 
-        EventHandler<ReceivedEventArgs> Received { get; }
+        EventHandler<ReceivedEventArgs>? Received { get; }
 
         Task<bool> InitAsync();
         Task<SendResult> Send(byte[] payload);

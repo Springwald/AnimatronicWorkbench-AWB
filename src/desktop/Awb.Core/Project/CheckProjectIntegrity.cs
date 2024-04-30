@@ -25,12 +25,12 @@ namespace Awb.Core.Project
                         if (state.PositiveInputs != null)
                         {
                             if (state.PositiveInputs.Length > 1)
-                                yield return $"TimelineState [{state.Id}] {state.Name} has more than 1 positive input. Actually only 1 is supported.";
+                                yield return $"TimelineState [{state.Id}] {state.Title} has more than 1 positive input. Actually only 1 is supported.";
                         }
                         if (state.NegativeInputs != null)
                         {
                             if (state.NegativeInputs.Length > 1)
-                                yield return $"TimelineState [{state.Id}] {state.Name} has more than 1 negative inputs. Actually only 1 is supported.";
+                                yield return $"TimelineState [{state.Id}] {state.Title} has more than 1 negative inputs. Actually only 1 is supported.";
                         }
                     }
 
@@ -38,7 +38,7 @@ namespace Awb.Core.Project
                 //todo: check double servo ids
                 //todo: check not existing input ids
                 //todo: check not existing sound ids
-                yield break;
+                //todo: check not existing nested timeline ids
             }
         }
 
@@ -54,15 +54,15 @@ namespace Awb.Core.Project
                 if (servo != null)
                 {
                     if (servo.MaxValue == servo.MinValue)
-                        yield return $"MaxValue and MinValue of servo [{servo.Id}] {servo.Name} are equal!";
+                        yield return $"MaxValue and MinValue of servo [{servo.Id}] {servo.Title} are equal!";
                     if (servo.MaxValue < servo.MinValue)
-                        yield return $"MaxValue < MinValue at servo [{servo.Id}] {servo.Name}!";
+                        yield return $"MaxValue < MinValue at servo [{servo.Id}] {servo.Title}!";
                     if (servo.DefaultValue != null)
                     {
                         if (servo.DefaultValue < servo.MinValue)
-                            yield return $"DefaultValue < MinValue at servo [{servo.Id}] {servo.Name}!";
+                            yield return $"DefaultValue < MinValue at servo [{servo.Id}] {servo.Title}!";
                         if (servo.DefaultValue > servo.MaxValue)
-                            yield return $"DefaultValue > MaxValue at servo [{servo.Id}] {servo.Name}!";
+                            yield return $"DefaultValue > MaxValue at servo [{servo.Id}] {servo.Title}!";
                     }
                 }
             }

@@ -218,6 +218,8 @@ void AwbClient::loop()
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
+    _wlanConnector->update();
+
     //_mp3Player->playSound(1);
 
     // update autoplay timelines and actuators
@@ -226,6 +228,14 @@ void AwbClient::loop()
         criticalTemp = this->_stSerialServoManager->servoCriticalTemp;
     if (this->_scSerialServoManager != NULL)
         criticalTemp = criticalTemp || this->_scSerialServoManager->servoCriticalTemp;
+
+    if (_wlanConnector->timelineNameToPlay != NULL && _wlanConnector->timelineNameToPlay->length() > 0)
+    {
+        // a timeline was received via wifi from a remote control
+        _autoPlayer->startNewTimelineByName(_wlanConnector->timelineNameToPlay->c_str());
+        _wlanConnector->timelineNameToPlay = NULL;
+    }
+
     _autoPlayer->update(criticalTemp);
 
     if (_autoPlayer->getStateSelectorStsServoChannel() != _lastAutoPlaySelectedStateId)
@@ -331,8 +341,6 @@ void AwbClient::loop()
     _actualStatusInformation->autoPlayerStateSelectorStsServoChannel = _autoPlayer->getStateSelectorStsServoChannel();
     _actualStatusInformation->activeTimelineStateIdsByInput = _autoPlayer->getStatesDebugInfo();
     _actualStatusInformation->inputStates = _inputManager->getDebugInfo();
-
-    _wlanConnector->update();
 
     if (millis() - _startMillis < 5000)
     {

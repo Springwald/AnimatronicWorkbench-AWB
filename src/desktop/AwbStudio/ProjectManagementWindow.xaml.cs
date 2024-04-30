@@ -8,8 +8,10 @@
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Project;
 using Awb.Core.Services;
+using Awb.Core.Tools;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
+using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -25,44 +27,66 @@ namespace AwbStudio
     /// </summary>
     public partial class ProjectManagementWindow : Window
     {
+        private const bool editConfigAvailable = false; // planned for future release
+
         private readonly IProjectManagerService _projectManagerService;
         private readonly IServiceProvider _serviceProvider;
         private readonly IAwbStudioSettingsService _awbStudioSettingsService;
+        private readonly IInvokerService _invokerService;
         private readonly IAwbLogger _awbLogger;
 
-        public ProjectManagementWindow(IProjectManagerService projectManagerService, IAwbStudioSettingsService awbStudioSettingsService, IServiceProvider serviceProvider, IAwbLogger awbLogger)
+        public ProjectManagementWindow(IProjectManagerService projectManagerService, IAwbStudioSettingsService awbStudioSettingsService, IServiceProvider serviceProvider, IInvokerService invokerService, IAwbLogger awbLogger)
         {
             InitializeComponent();
             _projectManagerService = projectManagerService;
             _serviceProvider = serviceProvider;
             _awbStudioSettingsService = awbStudioSettingsService;
+            _invokerService = invokerService;
             _awbLogger = awbLogger;
-            ShowLatestProjects();
+
             this.KeyDown += OnKeyDown;
 
             _awbLogger.OnLog += (s, args) =>
             {
-                MyInvoker.Invoke(new Action(() =>
+                WpfAppInvoker.Invoke(new Action(() =>
                 {
                     var msg = args;
                     if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
                     TextBoxDebugOutput.Text += msg + "\r\n";
-                }));
+                }), System.Windows.Threading.DispatcherPriority.Background);
             };
             _awbLogger.OnError += (s, args) =>
             {
-                MyInvoker.Invoke(new Action(() =>
+                WpfAppInvoker.Invoke(new Action(() =>
                 {
                     var msg = args;
                     if (msg.Length > 100) msg = msg.Substring(0, 100) + "...";
                     TextBoxDebugOutput.Text += msg + "\r\n";
-                }));
+                }), System.Windows.Threading.DispatcherPriority.Background);
             };
 
-            Loaded+= (s, args) =>
+            Loaded += OnLoaded;
+        }
+
+        private async void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            ShowLatestProjects();
+
+            if (_awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart)
             {
-                BringIntoView();
-            };
+                ReOpenLastProjectCheckbox.IsChecked = true;
+                var lastProjecFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.FirstOrDefault();
+                if (lastProjecFolder != null)
+                {
+                    var ok = await OpenProject(lastProjecFolder, editConfig: false);
+                }
+            }
+
+            BringIntoView();
+            if (editConfigAvailable == false)
+            {
+                ButtonEditExisting.Visibility = Visibility.Collapsed;
+            }
         }
 
         private async void OnKeyDown(object sender, KeyEventArgs e)
@@ -100,7 +124,7 @@ namespace AwbStudio
             }
         }
 
-        private void ButtonCreateNew_Click(object sender, RoutedEventArgs e)
+        private async void ButtonCreateNew_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
@@ -116,16 +140,17 @@ namespace AwbStudio
 
                     AwbProject project = CreateNewProject(projectPath);
 
-                    if (_projectManagerService.SaveProject(project, projectFolder: dialog.SelectedPath))
+                    if (await _projectManagerService.SaveProjectAsync(project, projectFolder: dialog.SelectedPath))
                     {
-                        if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
+                        var openResult = await _projectManagerService.OpenProjectAsync(projectPath);
+                        if (openResult.Success)
                         {
                             // ok, project created and opened
                             ShowProjectConfigEditor();
                         }
                         else
                         {
-                            foreach (var error in errorMessages)
+                            foreach (var error in openResult.ErrorMessages)
                                 MessageBox.Show(error, "Error opening project");
                         }
                     }
@@ -140,18 +165,17 @@ namespace AwbStudio
                 Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
                 TimelinesStates = new TimelineState[]
                 {
-                    new TimelineState(1, "sleep", export: true, positiveInputs: new[] { 1 }),
-                    new TimelineState(2, "action", export: true),
-                    new TimelineState(3, "idle", export: true),
-                    new TimelineState(4, "talk", export: true),
-                    new TimelineState(5, "joint demo", export: true),
-                    new TimelineState(6, "tests", export: false),
+                    new TimelineState(1, "sleep", export: true, autoPlay: true),
+                    new TimelineState(2, "action", export: true, autoPlay: true),
+                    new TimelineState(3, "idle", export: true, autoPlay: true),
+                    new TimelineState(4, "talk", export: true, autoPlay: true),
+                    new TimelineState(5, "joint demo", export: true, autoPlay: true, positiveInputs: new[] { 1 }),
+                    new TimelineState(6, "tests", export: false, autoPlay: false),
                 },
                 StsServos = new StsServoConfig[]
                 {
-                    new StsServoConfig(id: "StsServo1", clientId: 1, channel: 1)
+                    new StsServoConfig(id: "StsServo1", title: "Demo serial Servo 1", clientId: 1, channel: 1)
                     {
-                        Name = "Demo serial Servo 1",
                         Acceleration = 20,
                         DefaultValue = 2000,
                         MaxValue = 4095,
@@ -161,9 +185,8 @@ namespace AwbStudio
                 },
                 Pca9685PwmServos = new Pca9685PwmServoConfig[]
                 {
-                    new Pca9685PwmServoConfig(id: "PwmServo1", clientId: 1, i2cAdress: 0x40, channel: 1)
+                    new Pca9685PwmServoConfig(id: "PwmServo1",  title:"Demo PWM Servo 1" , clientId: 1, i2cAdress: 0x40, channel: 1)
                     {
-                        Name = "Demo PWM Servo 1",
                         DefaultValue = 2000,
                         MaxValue = 4095,
                         MinValue = 0,
@@ -172,7 +195,7 @@ namespace AwbStudio
                 Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", name: "Mp3Player") },
                 Inputs = new InputConfig[]
                 {
-                            new InputConfig(id: 1, name:"Sleep") { IoPin = 25 }
+                    new InputConfig(id: 1, name:"Sleep") { IoPin = 25 }
                 },
 
             };
@@ -222,10 +245,11 @@ namespace AwbStudio
                 MessageBox.Show($"No Animatronic WorkBench project found in folder '{projectPath}'");
                 return false;
             }
-            if (_projectManagerService.OpenProject(projectPath, out string[] errorMessages))
+            var openResult = await _projectManagerService.OpenProjectAsync(projectPath);
+            if (openResult.Success)
             {
                 // ok, project opened
-                if (editConfig)
+                if (editConfigAvailable == true && editConfig == true)
                     ShowProjectConfigEditor();
                 else
                     await LoadProject();
@@ -233,7 +257,7 @@ namespace AwbStudio
             }
             else
             {
-                foreach (var error in errorMessages)
+                foreach (var error in openResult.ErrorMessages)
                 {
                     MessageBox.Show(error, "Error opening project");
                 }
@@ -295,7 +319,7 @@ namespace AwbStudio
 
         private void ShowProjectTimelineEditor(IAwbClientsService clientsService, ITimelineController[] timelineControllers)
         {
-            var timelineEditorWindow = new TimelineEditorWindow(timelineControllers, _projectManagerService, clientsService, _awbLogger);
+            var timelineEditorWindow = new TimelineEditorWindow(timelineControllers, _projectManagerService, clientsService, _invokerService, _awbLogger);
             if (timelineEditorWindow != null)
             {
                 // hide the loading screen
@@ -314,6 +338,12 @@ namespace AwbStudio
         {
             GridProjectManagement.Visibility = show ? Visibility.Collapsed : Visibility.Visible;
             GridLoadingProject.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private async void ReOpenLastProjectCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            _awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart = ReOpenLastProjectCheckbox.IsChecked == true;
+            await _awbStudioSettingsService.SaveSettingsAsync();
         }
     }
 }

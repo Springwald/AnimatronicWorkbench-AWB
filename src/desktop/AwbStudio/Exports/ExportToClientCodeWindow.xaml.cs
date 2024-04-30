@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -36,6 +36,12 @@ namespace AwbStudio.Exports
             _rememberBackground = this.Background;
 
             _projectManagerService = projectManagerService;
+            if (projectManagerService.ActualProject == null)
+            {
+                MessageBox.Show("No project loaded");
+                return;
+            }   
+
             ExportFolder = projectManagerService.ActualProject.AutoPlayEsp32ExportFolder;
 
             ButtonCopyToFile.Content = $"Write to '{targetFilenameOnly}' file";
@@ -48,8 +54,14 @@ namespace AwbStudio.Exports
             Loaded -= ExportToClientCodeWindow_Loaded;
         }
 
-        private void LabelTargetFolder_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private async void LabelTargetFolder_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            if (_projectManagerService.ActualProject == null)
+            {
+                MessageBox.Show("No project loaded");
+                return;
+            }
+
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
@@ -63,8 +75,12 @@ namespace AwbStudio.Exports
                         return;
                     }
                     _projectManagerService.ActualProject.AutoPlayEsp32ExportFolder = folder;
-                    _projectManagerService.SaveProject(_projectManagerService.ActualProject, _projectManagerService.ActualProject.ProjectFolder);
-
+                    var saved = await _projectManagerService.SaveProjectAsync(_projectManagerService.ActualProject, _projectManagerService.ActualProject.ProjectFolder);
+                    if (!saved)
+                    {
+                        MessageBox.Show("Error saving project");
+                        return;
+                    }   
                     ExportFolder = folder;
                 }
             }

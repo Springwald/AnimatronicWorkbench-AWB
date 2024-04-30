@@ -39,7 +39,7 @@ namespace PacketLogistics.ComPorts.Serialization
             }
 
             // client id
-            var senderIdBytes = ByteArrayConverter.GetNextBytes(value, 8, ref pos).ToArray();
+            var senderIdBytes = ByteArrayConverter.GetNextBytes(value, 8, ref pos)?.ToArray();
             if (senderIdBytes == null)
             {
                 errorMsg = "Sender Id not found";

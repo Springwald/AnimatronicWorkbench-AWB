@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -14,6 +14,8 @@ namespace Awb.Core.Timelines
         /// </summary>
         public int TimeMs { get; set; }
 
+        public bool IsNestedTimelinePoint { get; set; }
+
         /// <summary>
         /// The title of this point
         /// </summary>
@@ -25,13 +27,21 @@ namespace Awb.Core.Timelines
         public string? Description { get; set; }
 
         /// <summary>
+        /// A checksum of the content of this point, e.g. for detecting changes
+        /// </summary>
+        public abstract string PainterCheckSum { get; }
+
+        public abstract TimelinePoint Clone();
+
+
+        /// <summary>
         /// The id of the servo or display or other actuators
         /// </summary>
-        public string TargetObjectId { get; set; }
+        public string AbwObjectId { get; set; }
 
         public TimelinePoint(string targetObjectId, int timeMs)
         {
-            TargetObjectId = targetObjectId;
+            AbwObjectId = targetObjectId;
             TimeMs = timeMs;
         }
     }

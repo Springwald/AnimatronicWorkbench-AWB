@@ -1,18 +1,14 @@
-﻿// Animatronic WorkBench
+﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
-
-using System;
 
 namespace Awb.Core.InputControllers.TimelineInputControllers
 {
     public interface ITimelineController : IDisposable
     {
-        string?[] ActualActuatorNames { set; }
-
         public enum PlayStates
         {
             Editor,
@@ -21,10 +17,10 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
 
         event EventHandler<TimelineControllerEventArgs> OnTimelineEvent;
 
-        Task SetPlayState(PlayStates playStates);
+        Task SetPlayStateAsync(PlayStates playStates);
 
-        Task SetActuatorValue(int index, double valueInPercent);
+        Task SetActuatorValueAsync(int index, double valueInPercent);
 
-        Task ShowPointButtonState(int index, bool pointExists);
+        Task ShowPointButtonStateAsync(int index, bool pointExists);
     }
 }

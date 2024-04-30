@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -10,15 +10,28 @@ using AwbStudio.StudioSettings;
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
+using static AwbStudio.Projects.IProjectManagerService;
 
 namespace AwbStudio.Projects
 {
     public interface IProjectManagerService
     {
-        AwbProject ActualProject { get; }
+        public record OpenProjectResult
+        {
+            public bool Success { get; init; }
+            public string[] ErrorMessages { get; init; }
+
+            public static OpenProjectResult SuccessResult => new() { Success = true, ErrorMessages = [] };
+            public static OpenProjectResult ErrorResult(string[] errorMessages) => new() { Success = false, ErrorMessages = errorMessages };
+
+            private OpenProjectResult() { }
+        }
+
+        AwbProject? ActualProject { get; }
         bool ExistProject(string projectPath);
-        bool OpenProject(string projectFolder, out string[] errorMessages);
-        bool SaveProject(AwbProject project, string projectFolder);
+        Task<OpenProjectResult> OpenProjectAsync(string projectFolder);
+        Task<bool> SaveProjectAsync(AwbProject project, string projectFolder);
     }
 
     public class ProjectManagerService : IProjectManagerService
@@ -38,7 +51,7 @@ namespace AwbStudio.Projects
             return File.Exists(ProjectConfigFilename(projectFolder));
         }
 
-        public bool SaveProject(AwbProject project, string projectFolder)
+        public async Task<bool> SaveProjectAsync(AwbProject project, string projectFolder)
         {
             if (!Directory.Exists(projectFolder)) return false;
 
@@ -51,17 +64,14 @@ namespace AwbStudio.Projects
             };
             project.SetProjectFolder(projectFolder);
             var jsonStr = JsonSerializer.Serialize<AwbProject>(project, options);
-            File.WriteAllText(ProjectConfigFilename(projectFolder), jsonStr);
+            await File.WriteAllTextAsync(ProjectConfigFilename(projectFolder), jsonStr);
             return true;
         }
 
-        public bool OpenProject(string projectFolder, out string[] errorMessages)
+        public async Task<OpenProjectResult> OpenProjectAsync(string projectFolder)
         {
             if (!Directory.Exists(projectFolder))
-            {
-                errorMessages = new string[] { $"Project folder '{projectFolder}' does not exist." };
-                return false;
-            }
+                return  OpenProjectResult.ErrorResult([$"Project folder '{projectFolder}' does not exist."]);
 
             // load project config from folder
             var options = new JsonSerializerOptions()
@@ -79,26 +89,21 @@ namespace AwbStudio.Projects
             }
             catch (Exception ex)
             {
-                errorMessages = new string[] { $"Project config file '{ProjectConfigFilename(projectFolder)}' could not be loaded: " + ex.Message };
-                return false;
+                return OpenProjectResult.ErrorResult([$"Project config file '{ProjectConfigFilename(projectFolder)}' could not be loaded: " + ex.Message]);
             }
 
             if (projectConfig == null)
-            {
-                errorMessages = new string[] { $"Project config file '{ProjectConfigFilename(projectFolder)}' could not be loaded: Deserialized == null" };
-                return false;
-            }
+                return OpenProjectResult.ErrorResult([$"Project config file '{ProjectConfigFilename(projectFolder)}' could not be loaded: Deserialized == null"]);
+
             projectConfig.SetProjectFolder(projectFolder);
             this.ActualProject = projectConfig;
 
             _awbStudioSettingsService.StudioSettings.AddLastProjectFolder(projectFolder);
-            _awbStudioSettingsService.SaveSettings();
+            await _awbStudioSettingsService.SaveSettingsAsync();
 
-            errorMessages = new string[] { };
-            return true;
+            return OpenProjectResult.SuccessResult;
         }
 
         private string ProjectConfigFilename(string projectFolder) => Path.Combine(projectFolder, "AwbProject.json");
-
     }
 }

@@ -82,7 +82,6 @@ namespace PacketLogistics.ComPorts
             {
                 case PacketBase.PacketTypes.DataPacket:
                     throw new NotImplementedException();
-                    break;
 
                 case PacketBase.PacketTypes.ResponsePacket:
                     // handled in packet sending method

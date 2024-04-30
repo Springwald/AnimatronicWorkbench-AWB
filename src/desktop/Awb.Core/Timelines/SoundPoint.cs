@@ -23,12 +23,19 @@ namespace Awb.Core.Timelines
         public override string Title { get; set; }
 
 
+        public override string PainterCheckSum => SoundId.ToString() + base.TimeMs.ToString() + SoundPlayerId.ToString();
+
         /// <param name="soundId">The resource id of the sound to be played. What kind of resource this is depends on the implementation of the sound player.</param>
         public SoundPoint(int timeMs, string soundPlayerId, string title, int soundId) : base(targetObjectId: soundPlayerId, timeMs: timeMs)
         {
-            this.SoundId = soundId;
-            this.Title = title;
-            this.SoundPlayerId = soundPlayerId;
+            SoundId = soundId;
+            Title = title;
+            SoundPlayerId = soundPlayerId;
+        }
+
+        public override SoundPoint Clone()
+        {
+            return new SoundPoint(timeMs:TimeMs, soundPlayerId: SoundPlayerId, title: Title, soundId: SoundId);
         }
     }
 }

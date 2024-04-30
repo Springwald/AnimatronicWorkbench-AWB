@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Timelines;
 using System.Text;
 
 namespace Awb.Core.LoadNSave.Export
@@ -94,7 +95,8 @@ namespace Awb.Core.LoadNSave.Export
             var exportStates = exportData.TimelineStates?.Where(s => s.Export).ToArray() ?? Array.Empty<TimelineState>();
             var stateIds = exportStates.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
             result.AppendLine($"\tint timelineStateIds[{exportStates.Length}] = {{{string.Join(", ", stateIds)}}};");
-            result.AppendLine($"\tString timelineStateNames[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"\"{s.Name}\""))}}};");
+            result.AppendLine($"\tString timelineStateNames[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"\"{s.Title}\""))}}};");
+            result.AppendLine($"\tbool timelineStateAutoPlay[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"{s.AutoPlay.ToString().ToLower()}"))}}};");
             result.AppendLine($"\tint timelineStatePositiveInput[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s =>  (s.PositiveInputs.FirstOrDefault()).ToString()))}}};");
             result.AppendLine($"\tint timelineStateNegativeInput[{exportStates.Length}] =  {{{string.Join(", ", exportStates.Select(s => (s.NegativeInputs.FirstOrDefault()).ToString()))}}};");
             result.AppendLine($"\tint timelineStateCount = {stateIds.Length};");
@@ -133,7 +135,7 @@ namespace Awb.Core.LoadNSave.Export
                 result.AppendLine($"\t\tauto *mp3PlayerYX5300Points{timelineNo} = new std::vector<Mp3PlayerYX5300Point>();");
 
                 // Export Servo-Points
-                foreach (var servoPoint in timeline.ServoPoints.OrderBy(p => p.TimeMs))
+                foreach (var servoPoint in timeline.Points.OfType<ServoPoint>().OrderBy(p => p.TimeMs))
                 {
                     // find STS servo
                     var stsServo = exportData.StsServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
@@ -173,7 +175,7 @@ namespace Awb.Core.LoadNSave.Export
                 }
 
                 // Export Sound-Points
-                foreach (var soundPoint in timeline.SoundPoints.OrderBy(p => p.TimeMs))
+                foreach (var soundPoint in timeline.Points.OfType<SoundPoint>().OrderBy(p => p.TimeMs))
                 {
                     if (exportData.Mp3PlayerYX5300Configs != null)
                     {
@@ -208,7 +210,7 @@ namespace Awb.Core.LoadNSave.Export
                     };
                 }
 
-                result.AppendLine($"\t\tauto state{timelineNo} = new TimelineState({state.Id}, String(\"{state.Name}\"));");
+                result.AppendLine($"\t\tauto state{timelineNo} = new TimelineState({state.Id}, String(\"{state.Title}\"));");
                 result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 
@@ -227,9 +229,9 @@ namespace Awb.Core.LoadNSave.Export
 
         private void ExportMp3PlayerYX5300Informations(Mp3PlayerYX5300Config[]? mp3PlayerYX5300Configs, StringBuilder result)
         {
-            var players = mp3PlayerYX5300Configs ?? Array.Empty<Project.Mp3PlayerYX5300Config>();
+            var players = mp3PlayerYX5300Configs ?? Array.Empty<Mp3PlayerYX5300Config>();
             var mp3PlayerYX5300Names = players?.Select(s => s.Name ?? s.SoundPlayerId).ToArray();
-            result.AppendLine($"\tint mp3PlayerYX5300Count = {players.Length};");
+            result.AppendLine($"\tint mp3PlayerYX5300Count = {players!.Length};");
             result.AppendLine($"\tint mp3PlayerYX5300RxPin[{players.Length}] = {{{string.Join(", ", players.Select(s => s.RxPin.ToString()))}}};");
             result.AppendLine($"\tint mp3PlayerYX5300TxPin[{players.Length}] = {{{string.Join(", ", players.Select(s => s.TxPin.ToString()))}}};");
             result.AppendLine($"\tString mp3PlayerYX5300Name[{players.Length}] = {{{string.Join(", ", players.Select(s => $"\"{s.SoundPlayerId}\""))}}};");
@@ -241,7 +243,7 @@ namespace Awb.Core.LoadNSave.Export
             var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Project.Pca9685PwmServoConfig>();
             var pca9685PwmServoChannels = pca9685PwmServos.Select(s => s.Channel).ToArray();
             var pca9685PwmServoI2cAdresses = pca9685PwmServos.Select(s => s.I2cAdress).ToArray();
-            var pca9685PwmServoNames = pca9685PwmServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
+            var pca9685PwmServoNames = pca9685PwmServos.Select(s => s.Title ?? $"{s.Id}/{s.Channel}").ToArray();
             result.AppendLine($"\tint pca9685PwmServoCount = {pca9685PwmServos.Length};");
             result.AppendLine($"\tint pca9685PwmServoI2cAdresses[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoI2cAdresses.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint pca9685PwmServoChannels[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoChannels.Select(s => s.ToString()))}}};");
@@ -253,11 +255,17 @@ namespace Awb.Core.LoadNSave.Export
         {
             var stsServos = servoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Project.StsServoConfig>();
             var chanels = stsServos.Select(s => s.Channel).ToArray();
+            var maxValues = stsServos.Select(s => s.MaxValue).ToArray();
+            var minValues = stsServos.Select(s => s.MinValue).ToArray();
+            var defaultValues = stsServos.Select(s => s.DefaultValue).ToArray();
             var accelerations = stsServos.Select(s => s.Acceleration ?? -1).ToArray();
             var speeds = stsServos.Select(s => s.Speed ?? -1).ToArray();
-            var names = stsServos.Select(s => s.Name ?? $"{s.Id}/{s.Channel}").ToArray();
+            var names = stsServos.Select(s => s.Title ?? $"{s.Id}/{s.Channel}").ToArray();
             result.AppendLine($"\tint {praefix}ServoCount = {stsServos.Length};");
             result.AppendLine($"\tint {praefix}ServoChannels[{stsServos.Length}] = {{{string.Join(", ", chanels.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint {praefix}ServoMinValue[{stsServos.Length}] = {{{string.Join(", ", minValues.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint {praefix}ServoMaxValue[{stsServos.Length}] = {{{string.Join(", ", maxValues.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tint {praefix}ServoDefaultValue[{stsServos.Length}] = {{{string.Join(", ", defaultValues.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint {praefix}ServoAcceleration[{stsServos.Length}] = {{{string.Join(", ", accelerations.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint {praefix}ServoSpeed[{stsServos.Length}] = {{{string.Join(", ", speeds.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tString {praefix}ServoName[{stsServos.Length}] = {{{string.Join(", ", names.Select(s => $"\"{s}\""))}}};");

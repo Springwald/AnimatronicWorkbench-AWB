@@ -28,7 +28,7 @@ namespace Awb.Core.LoadNSave.Timelines
 
         public static ServoPointSaveFormat FromServoPoint(ServoPoint servoPoint) => new ServoPointSaveFormat(
                 timeMs: servoPoint.TimeMs,
-                targetObjectId: servoPoint.TargetObjectId,
+                targetObjectId: servoPoint.AbwObjectId,
                 valuePercent: ((ServoPoint)servoPoint).ValuePercent,
                 servoId: ((ServoPoint)servoPoint).ServoId)
                     {

@@ -51,11 +51,11 @@ namespace Awb.Core.InputControllers.Midi
             }
             if (inChannel != null)
             {
-                _awbLogger.Log($"Midi: Found '{deviceName}' on INPUT channel {inChannel}");
+                _awbLogger.LogAsync($"Midi: Found '{deviceName}' on INPUT channel {inChannel}");
             }
             else
             {
-                _awbLogger.LogError($"Midi: INPUT Device'{deviceName}' not found. Found {string.Join(", ", foundNames.Select(n => "'" + n + "'"))} instead");
+                _awbLogger.LogErrorAsync($"Midi: INPUT Device'{deviceName}' not found. Found {string.Join(", ", foundNames.Select(n => "'" + n + "'"))} instead");
                 _midiPort?.Close();
                 _midiPort?.Dispose();
                 _midiPort = null;
@@ -76,11 +76,11 @@ namespace Awb.Core.InputControllers.Midi
 
             if (inChannel != null)
             {
-                _awbLogger.Log($"Midi: Found '{deviceName}' on OUTPUT channel {outChannel}");
+                _awbLogger.LogAsync($"Midi: Found '{deviceName}' on OUTPUT channel {outChannel}");
             }
             else
             {
-                _awbLogger.LogError($"Midi: OUTPUT Device'{deviceName}' not found. Found {string.Join(", ", foundNames.Select(n => "'" + n + "'"))} instead");
+                _awbLogger.LogErrorAsync($"Midi: OUTPUT Device'{deviceName}' not found. Found {string.Join(", ", foundNames.Select(n => "'" + n + "'"))} instead");
                 _midiPort?.CloseOut();
                 _midiPort?.Close();
                 _midiPort?.Dispose();

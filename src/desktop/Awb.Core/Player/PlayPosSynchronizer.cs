@@ -5,21 +5,29 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Tools;
 using System.Timers;
 
 namespace Awb.Core.Player
 {
-    public class PlayPosSynchronizer: IDisposable
+    public class PlayPosSynchronizer : IDisposable
     {
         /// <summary>
         /// The distance between two snap positions in milliseconds
         /// </summary>
         public const int SnapMs = 125;
 
+        private const int _timerIntervalMs = 100;
+
         private int _playPosMsRaw;
         private int _lastPlayPosAnnounced;
+
+        /// <summary>
+        /// Is the playpos to snap to the next snap position?
+        /// </summary>
         private bool _inSnapMode = true;
-        private System.Timers.Timer _timer;
+        private readonly IInvoker _invoker;
+        private System.Timers.Timer? _timer;
 
         /// <summary>
         /// The playpos has changed
@@ -29,35 +37,57 @@ namespace Awb.Core.Player
         /// <summary>
         /// the actual play position in  millseconds; snapped or no snapped - depending on "InSnapMode"
         /// </summary>
-        public int PlayPosMs { get; private set; }
+        public int PlayPosMsAutoSnappedOrUnSnapped { get; private set; }
 
-        public PlayPosSynchronizer()
+        /// <summary>
+        /// the actual play position in  millseconds; snapped - independing on "InSnapMode"
+        /// </summary>
+        public int PlayPosMsGuaranteedSnapped => (PlayPosMsAutoSnappedOrUnSnapped / SnapMs) * SnapMs;
+
+
+        public PlayPosSynchronizer(IInvoker invoker)
         {
+            _invoker = invoker;
             _timer = new System.Timers.Timer();
             _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent!);
-            _timer.Interval = 100; // ms
+            _timer.Interval = _timerIntervalMs; // ms
             _timer.Enabled = true;
         }
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            if (_lastPlayPosAnnounced != PlayPosMs)
+            if (_lastPlayPosAnnounced != PlayPosMsAutoSnappedOrUnSnapped)
             {
-                _lastPlayPosAnnounced = PlayPosMs;
-                this.OnPlayPosChanged?.Invoke(this, PlayPosMs);
+                _lastPlayPosAnnounced = PlayPosMsAutoSnappedOrUnSnapped;
+                // this is important! We must not call the event handler in the timer thread, because the event handler should update the UI.
+                // so we use the invoker using the hosting wpf application thread instead.
+                _invoker.Invoke(() => this.OnPlayPosChanged?.Invoke(this, PlayPosMsAutoSnappedOrUnSnapped));
             }
         }
 
-        /// <summary>
-        /// Is the playpos to snap to the next snap position?
-        /// </summary>
-        public bool InSnapMode
+
+        public TimelinePlayer.PlayStates PlayState
         {
             set
             {
-                if (_inSnapMode != value)
+                bool newInSnapMode;
+                switch (value)
                 {
-                    _inSnapMode = value;
+                    case TimelinePlayer.PlayStates.Nothing:
+                        _timer!.Interval = _timerIntervalMs;
+                        newInSnapMode = true;
+                        break;
+                    case TimelinePlayer.PlayStates.Playing:
+                        _timer!.Interval = _timerIntervalMs / 5; // higher resolution in playing mode
+                        newInSnapMode = false;
+                        break;
+                    default:
+                        throw new NotImplementedException($"{nameof(PlayState)}:{value}");
+                }
+
+                if (_inSnapMode != newInSnapMode)
+                {
+                    _inSnapMode = newInSnapMode;
                     SetNewPlayPos(_playPosMsRaw);
                 }
             }
@@ -66,7 +96,7 @@ namespace Awb.Core.Player
         public void SetNewPlayPos(int playPosMs)
         {
             _playPosMsRaw = playPosMs;
-            PlayPosMs = _inSnapMode ? (playPosMs / SnapMs) * SnapMs : playPosMs;
+            PlayPosMsAutoSnappedOrUnSnapped = _inSnapMode ? (playPosMs / SnapMs) * SnapMs : playPosMs;
         }
 
         public void Dispose()
@@ -76,7 +106,7 @@ namespace Awb.Core.Player
                 _timer.Stop();
                 _timer.Dispose();
                 _timer = null;
-            }   
+            }
         }
     }
 }

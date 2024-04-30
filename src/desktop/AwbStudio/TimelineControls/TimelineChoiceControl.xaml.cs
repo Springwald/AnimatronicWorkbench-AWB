@@ -5,7 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using AwbStudio.FileManagement;
+using Awb.Core.Services;
+using AwbStudio.TimelineEditing;
 using System;
 using System.Windows.Controls;
 
@@ -16,15 +17,25 @@ namespace AwbStudio.TimelineControls
     /// </summary>
     public partial class TimelineChoiceControl : UserControl
     {
-        private FileManager? _filenameManager;
+        private ITimelineDataService? _timelineDataService;
 
         public EventHandler<TimelineNameChosenEventArgs>? OnTimelineChosen;
+        private string _projectTitle;
 
-        public FileManager? FileManager
+        public ITimelineDataService? FileManager
         {
             set
             {
-                _filenameManager = value;
+                _timelineDataService = value;
+                Refresh();
+            }
+        }
+
+        public string ProjectTitle
+        {
+            set
+            {
+                _projectTitle = value;
                 Refresh();
             }
         }
@@ -37,19 +48,20 @@ namespace AwbStudio.TimelineControls
         public void Refresh()
         {
             this.PanelNames.Children.Clear();
-            if (_filenameManager == null)
+            if (_timelineDataService == null)
             {
                 this.LabelTitle.Content = $"Timeline Manager";
             }
             else
             {
-                this.LabelTitle.Content = $"{_filenameManager.ProjectTitle} Timelines";
-                foreach (var timelineFilename in _filenameManager.TimelineFilenames)
+                this.LabelTitle.Content = $"{_projectTitle ?? "No project title"} Timelines";
+                foreach (var timelineId in _timelineDataService.TimelineIds)
                 {
-                    var timelineMetaData = _filenameManager.GetTimelineMetaData(timelineFilename);
+                    var timelineMetaData = _timelineDataService.GetTimelineData(timelineId);
                     if (timelineMetaData == null) continue;
-                    var button = new Button { Content = $"[{timelineMetaData.StateName}] {timelineMetaData.Title}", Tag = timelineFilename };
-                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs(timelineFilename)); };
+                    var stateName = timelineMetaData.TimelineStateId; // todo: get state name from the project  states instead
+                    var button = new Button { Content = $"[{stateName}] {timelineMetaData.Title}", Tag = timelineId };
+                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs( timelineId: timelineId)); };
                     this.PanelNames.Children.Add(button);
                 }
             }

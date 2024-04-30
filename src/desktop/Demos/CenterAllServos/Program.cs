@@ -16,9 +16,8 @@ await clientService.InitAsync();
 var config = new AwbProject(title:"demo")
 {
     StsServos = Enumerable.Range(1, 2).Select(id =>
-                         new StsServoConfig(id: $"servo {id}", clientId: 2, channel: (uint)id)
+                         new StsServoConfig(id: $"servo {id}", title: $"Servo {id}", clientId: 2, channel: (uint)id)
                          {
-                             Name = $"Servo {id}",
                              MinValue = 1,
                              MaxValue = 4096,
                              DefaultValue = 2048

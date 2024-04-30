@@ -6,13 +6,12 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
-using Awb.Core.Timelines;
 
 namespace Awb.Core.LoadNSave.Export
 {
     public class Esp32ClientExportData
     {
-        public TimelineData[]? TimelineData { get; set; }
+        public TimelineExportData[]? TimelineData { get; set; }
         public TimelineState[]? TimelineStates { get; set; }
         public StsServoConfig[]? StsServoConfigs { get; set; }
         public StsServoConfig[]? ScsServoConfigs { get; set; }

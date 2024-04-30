@@ -18,6 +18,8 @@ namespace Awb.Core.Timelines
 
         public override string Title { get; set; }
 
+        public override string PainterCheckSum => ServoId + base.TimeMs.ToString() + ValuePercent.ToString();
+
         /// <summary>
         /// Move the servo to this position at this time
         /// </summary>
@@ -27,6 +29,11 @@ namespace Awb.Core.Timelines
             ServoId = servoId;
             ValuePercent = valuePercent;
             Title = $"{ServoId}: {ValuePercent:0.0}% {TimeMs}ms";
+        }
+
+        public override ServoPoint Clone()
+        {
+            return new ServoPoint(servoId: ServoId, valuePercent: ValuePercent, timeMs: TimeMs) { Title = Title };
         }
     }
 }

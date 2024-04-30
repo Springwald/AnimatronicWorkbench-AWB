@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench core routines
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -15,6 +15,7 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
         private readonly Bcf2000Controller _bcf2000Controller;
 
         public string?[] ActualActuatorNames { set { } }
+
         public Bcf2000TimelineController(Bcf2000Controller bcf2000Controller)
         {
             _bcf2000Controller = bcf2000Controller;
@@ -34,19 +35,19 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             }
         }
 
-        public async Task SetPlayState(ITimelineController.PlayStates playState)
+        public async Task SetPlayStateAsync(ITimelineController.PlayStates playState)
         {
             _playState = playState;
             await Task.CompletedTask;
         }
 
-        public async Task SetActuatorValue(int index, double valueInPercent)
+        public async Task SetActuatorValueAsync(int index, double valueInPercent)
         {
-            await _bcf2000Controller.SetFaderPosition((byte)(index + 1), (byte)(Math.Max(0, Math.Min(127, valueInPercent * 127 / 100.0))));
+            await _bcf2000Controller.SetFaderPositionAsync((byte)(index + 1), (byte)(Math.Max(0, Math.Min(127, valueInPercent * 127 / 100.0))));
         }
 
 
-        public async Task ShowPointButtonState(int index, bool pointExists)
+        public async Task ShowPointButtonStateAsync(int index, bool pointExists)
         {
             //_bcf2000Controller.SetButtonLedState(topLine: true, (byte)(index + 1), pointExists ? LedState.On : LedState.Off);
             await Task.CompletedTask;

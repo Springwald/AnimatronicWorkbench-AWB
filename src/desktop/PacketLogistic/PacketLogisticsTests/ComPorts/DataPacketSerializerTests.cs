@@ -33,10 +33,10 @@ namespace PacketLogistics.ComPorts.Tests
             Assert.AreEqual(null, errorMsg);
             Assert.IsNotNull(reversedTestPacket);
             Assert.AreEqual(testPacket.Id, reversedTestPacket.Id);
-            Assert.AreEqual(testPacket.Payload.Length, reversedTestPacket.Payload.Length);
+            Assert.AreEqual(testPacket.Payload.Length, reversedTestPacket.Payload?.Length);
             for (int i = 0; i < testPacket.Payload.Length; i++)
             {
-                Assert.AreEqual(testPacket.Payload[i], reversedTestPacket.Payload[i]);
+                Assert.AreEqual(testPacket.Payload[i], reversedTestPacket.Payload?[i]);
             }
         }
 
@@ -44,12 +44,11 @@ namespace PacketLogistics.ComPorts.Tests
         public void ByteArray2DataPacketTest()
         {
             var config = new ComPortCommandConfig(packetHeader: "XYZ");
-            uint clientId = 129;
             var serializer = new DataPacketSerializer(config);
 
             var testPacket = new DataPacket(id: 1234567890)
             {
-                Payload = ByteArrayConverter.AsciiStringToBytes("Hello World!")
+                Payload = ByteArrayConverter.AsciiStringToBytes("Hello World!"),
             };
 
             byte[] packetIdBytes = ByteArrayConverter.UintTo4Bytes(testPacket.Id);
@@ -75,7 +74,7 @@ namespace PacketLogistics.ComPorts.Tests
             Assert.AreEqual(testPacket.Payload?.Length, reversedTestPacket.Payload?.Length ?? 0, nameof(testPacket.Payload.Length));
             for (int i = 0; i < testPacket.Payload?.Length; i++)
             {
-                Assert.AreEqual(testPacket.Payload[i], reversedTestPacket?.Payload[i], "payload pos " + i);
+                Assert.AreEqual(testPacket.Payload[i], reversedTestPacket?.Payload?[i], "payload pos " + i);
             }
         }
 

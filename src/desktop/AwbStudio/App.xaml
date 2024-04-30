@@ -17,16 +17,18 @@
                 <Setter Property="BorderBrush" Value="Black"/>
                 <Setter Property="BorderThickness" Value="1px"/>
             </Style>
-            
+
             <Style TargetType="local:TimelineEditorWindow" BasedOn="{StaticResource {x:Type Window}}"/>
             <Style TargetType="local:ProjectConfigurationWindow" BasedOn="{StaticResource {x:Type Window}}"/>
             <Style TargetType="local:ProjectManagementWindow" BasedOn="{StaticResource {x:Type Window}}"/>
             <Style TargetType="local:DebugWindow" BasedOn="{StaticResource {x:Type Window}}"/>
 
             <Style TargetType="export:ExportToClientCodeWindow" BasedOn="{StaticResource {x:Type Window}}"/>
-            
+            <Style TargetType="export:ExportToClientsWindow" BasedOn="{StaticResource {x:Type Window}}"/>
+
             <Style TargetType="UserControl" BasedOn="{StaticResource {x:Type UserControl}}"/>
             <!--<Style TargetType="local:TimelineControls.TimelineViewer" BasedOn="{StaticResource {x:Type UserControl}}"/>-->
+        
         </ResourceDictionary>
     </Application.Resources>
 </Application>

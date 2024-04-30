@@ -284,6 +284,9 @@ std::vector<int> AutoPlayer::getActiveStateIdsByInputs()
 
     for (int iState = 0; iState < _data->timelineStateCount; iState++)
     {
+        if (_data->timelineStateAutoPlay[iState] == false) // is this state only available for remote activation?
+            continue;
+
         // check the positive inputs
         int inputId = _data->timelineStatePositiveInput[iState];
         if (inputId > 0)
@@ -302,6 +305,9 @@ std::vector<int> AutoPlayer::getActiveStateIdsByInputs()
     // return all, which are not disabled by negative inputs
     for (int iState = 0; iState < _data->timelineStateCount; iState++)
     {
+        if (_data->timelineStateAutoPlay[iState] == false) // is this state only available for remote activation?
+            continue;
+
         bool hasPositiveInput = false;
         int inputId = _data->timelineStatePositiveInput[iState];
         if (inputId > 0)
@@ -368,10 +374,25 @@ int AutoPlayer::selectedStateIdFromStsServoSelector()
 /**
  * Starts the auto player with the given timeline
  */
-void AutoPlayer::startNewTimeline(int timelineIndex)
+void AutoPlayer::startNewTimelineByIndex(int timelineIndex)
 {
     _actualTimelineIndex = timelineIndex;
     _playPosInActualTimeline = 0;
+}
+
+/**
+ * starts the timeline with the given name
+ */
+void AutoPlayer::startNewTimelineByName(String name)
+{
+    for (int i = 0; i < _data->timelines->size(); i++)
+    {
+        if (_data->timelines->at(i).name == name)
+        {
+            startNewTimelineByIndex(i);
+            return;
+        }
+    }
 }
 
 /**
@@ -407,7 +428,7 @@ void AutoPlayer::startNewTimelineForSelectedState()
             if (_data->timelines->at(nextTimelineIndex).state->id == stateIdFromStsServoSelector)
             {
                 // found the next timeline for the selected state
-                startNewTimeline(nextTimelineIndex);
+                startNewTimelineByIndex(nextTimelineIndex);
                 return;
             }
         }
@@ -421,7 +442,7 @@ void AutoPlayer::startNewTimelineForSelectedState()
             {
                 if (_data->timelines->at(nextTimelineIndex).state->id == activeStateIds[i])
                 {
-                    startNewTimeline(nextTimelineIndex);
+                    startNewTimelineByIndex(nextTimelineIndex);
                     return;
                 }
             }

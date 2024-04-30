@@ -33,9 +33,11 @@ private:
     String _messages[MAX_LOG_MESSAGES]; /// the log messages
     int _messagesCount = 0;             /// the number of log messages
 
-    String GetHtml();       /// get the html page for the webserver default site
-    void handle_Default();  /// handle the root http request
-    void handle_NotFound(); /// handle a not found http request
+    String GetHtml();                   /// get the html page for the webserver default site
+    void handle_Default();              /// handle the root http request
+    void handle_NotFound();             /// handle a not found http request
+    void handle_remote_servo();         /// control a servo via the webserver
+    void handle_remote_play_timeline(); /// start a timeline via the webserver
 
 public:
     /**
@@ -43,10 +45,19 @@ public:
      */
     String *memoryInfo;
 
+    String *timelineNameToPlay; /// the name of the timeline to play by remote control
+
+    int scsServoCannelToSet; /// the channel of the scs servo to set by remote control
+    int scsServoValueToSet;  /// the value of the scsservo to set by remote control (in percent)
+
+    int stsServoCannelToSet; /// the channel of the sts servo to set by remote control
+    int stsServoValueToSet;  /// the value of the sts servo to set by remote control (in percent)
+
     WlanConnector(int clientId, ActualStatusInformation *actualStatusInformation, TCallBackErrorOccured errorOccured)
         : _errorOccured(errorOccured), _clientId(clientId), _actualStatusInformation(actualStatusInformation)
     {
         _data = new AutoPlayData();
+        timelineNameToPlay = new String();
     }
 
     ~WlanConnector()
