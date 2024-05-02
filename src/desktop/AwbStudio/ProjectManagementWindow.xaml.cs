@@ -78,7 +78,7 @@ namespace AwbStudio
                 var lastProjecFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.FirstOrDefault();
                 if (lastProjecFolder != null)
                 {
-                    var ok = await OpenProject(lastProjecFolder, editConfig: false);
+                    var ok = await OpenProjectAsync(lastProjecFolder, editConfig: false);
                 }
             }
 
@@ -101,7 +101,7 @@ namespace AwbStudio
                         var projectFolder = (ListLatestProjects.Items[index] as ListBoxItem)?.ToolTip.ToString();
                         if (!string.IsNullOrWhiteSpace(projectFolder))
                         {
-                            var ok = await OpenProject(projectFolder, editConfig: false);
+                            var ok = await OpenProjectAsync(projectFolder, editConfig: false);
                         }
                     }
                 }
@@ -146,7 +146,13 @@ namespace AwbStudio
                         if (openResult.Success)
                         {
                             // ok, project created and opened
-                            ShowProjectConfigEditor();
+                            if (editConfigAvailable == true)
+                            {
+                                ShowProjectConfigEditor();
+                            } else
+                            {
+                                await LoadProjectAsync();
+                            }
                         }
                         else
                         {
@@ -211,7 +217,7 @@ namespace AwbStudio
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     var folder = dialog.SelectedPath;
-                    var ok = await OpenProject(folder, editConfig: false);
+                    var ok = await OpenProjectAsync(folder, editConfig: false);
                 }
             }
         }
@@ -224,7 +230,7 @@ namespace AwbStudio
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     var folder = dialog.SelectedPath;
-                    var ok = await OpenProject(folder, editConfig: true);
+                    var ok = await OpenProjectAsync(folder, editConfig: true);
                 }
             }
         }
@@ -234,11 +240,11 @@ namespace AwbStudio
             var folder = (ListLatestProjects.SelectedItem as ListBoxItem)?.ToolTip.ToString();
             if (folder != null)
             {
-                var ok = await OpenProject(folder, editConfig: false);
+                var ok = await OpenProjectAsync(folder, editConfig: false);
             }
         }
 
-        private async Task<bool> OpenProject(string projectPath, bool editConfig)
+        private async Task<bool> OpenProjectAsync(string projectPath, bool editConfig)
         {
             if (!_projectManagerService.ExistProject(projectPath))
             {
@@ -252,7 +258,7 @@ namespace AwbStudio
                 if (editConfigAvailable == true && editConfig == true)
                     ShowProjectConfigEditor();
                 else
-                    await LoadProject();
+                    await LoadProjectAsync();
                 return true;
             }
             else
@@ -284,7 +290,7 @@ namespace AwbStudio
             }
         }
 
-        private async Task LoadProject()
+        private async Task LoadProjectAsync()
         {
             var project = _projectManagerService.ActualProject;
             if (project != null)
