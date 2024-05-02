@@ -215,6 +215,21 @@ void AwbClient::showSetupMsg(String message)
  */
 void AwbClient::loop()
 {
+    if (false)
+    {
+        // set true to test the mp3 player
+        if (_mp3Player->playSound(10) == true)
+        {
+        }
+        else
+        {
+            delay(1000);
+            _mp3Player->playSound(1);
+        }
+        delay(1000);
+        return;
+    }
+
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
@@ -341,6 +356,7 @@ void AwbClient::loop()
     _actualStatusInformation->autoPlayerStateSelectorStsServoChannel = _autoPlayer->getStateSelectorStsServoChannel();
     _actualStatusInformation->activeTimelineStateIdsByInput = _autoPlayer->getStatesDebugInfo();
     _actualStatusInformation->inputStates = _inputManager->getDebugInfo();
+    _actualStatusInformation->lastSoundPlayed = _autoPlayer->getLastSoundPlayed();
 
     if (millis() - _startMillis < 5000)
     {

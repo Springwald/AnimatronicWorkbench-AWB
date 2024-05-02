@@ -21,6 +21,8 @@ using byte = unsigned char;
 class AwbClient
 {
 protected:
+    int trackNo;
+
     unsigned int _clientId;                      /// The client id of this client
     AwbDisplay _display;                         /// The display, oled or lcd
     DacSpeaker *_dacSpeaker;                     /// The speaker if connected

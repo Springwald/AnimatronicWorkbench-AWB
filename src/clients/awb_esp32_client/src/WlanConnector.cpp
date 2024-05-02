@@ -197,6 +197,7 @@ String WlanConnector::GetHtml()
         ptr += "<tr><td>state selector STS servo channel</td><td> " + String(_actualStatusInformation->autoPlayerStateSelectorStsServoChannel) + "</td></tr>\n";
         ptr += "<tr><td>states active by inputs</td><td> " + _actualStatusInformation->activeTimelineStateIdsByInput + "</td></tr>\n";
         ptr += "<tr><td>inputs</td><td> " + _actualStatusInformation->inputStates + "</td></tr>\n";
+        ptr += "<tr><td>last sound</td><td> " + _actualStatusInformation->lastSoundPlayed + "</td></tr>\n";
 
         ptr += "</table>\n";
         ptr += "</div>\n";

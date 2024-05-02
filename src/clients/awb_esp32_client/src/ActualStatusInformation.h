@@ -25,6 +25,7 @@ public:
     std::vector<ActuatorValue> *pwmServoValues; /// the current pwm servo status
     String activeTimelineStateIdsByInput;       /// the active timeline states by input
     String inputStates;                         /// the active timeline states by input
+    String lastSoundPlayed;                     /// the last sound played
 
     ActualStatusInformation()
     {

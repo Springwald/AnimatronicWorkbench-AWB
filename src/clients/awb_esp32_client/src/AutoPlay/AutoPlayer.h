@@ -33,7 +33,9 @@ protected:
     long _lastMsUpdate;                  // millis() of last update
     long _lastPacketReceivedMillis = -1; // millis() of last received packet
     int _actualTimelineIndex = -1;       // the index of the actual playing timeline
-    int _playPosInActualTimeline = 0;    // the actual play position in the actual playing timeline (in milliseconds)
+    long _playPosInActualTimeline = 0;   // the actual play position in the actual playing timeline (in milliseconds)
+
+    int _lastSoundPlayed = -1;
 
     int _currentStateId = -1;             // the actual selected state id
     int _stateSelectorStsServoChannel;    // the channel of the sts servo which is used to select the state
@@ -66,6 +68,8 @@ public:
      * Returns true if a state selector is available
      */
     bool getStateSelectorAvailable();
+
+    String getLastSoundPlayed();
 
     /**
      * Returns the channel of the sts servo which is used to select the state

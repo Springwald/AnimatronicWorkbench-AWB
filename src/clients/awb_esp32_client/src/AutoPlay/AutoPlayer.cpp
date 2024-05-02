@@ -55,31 +55,42 @@ String AutoPlayer::getCurrentTimelineName()
     return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
 }
 
+String AutoPlayer::getLastSoundPlayed()
+{
+    if (_lastSoundPlayed == -1)
+    {
+        return String("None");
+    }
+    return String(_lastSoundPlayed);
+}
+
 /**
  * Updates the autoplayer and plays the timelines
  */
 void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 {
+    // return of no data is set
+    if (_data == nullptr)
+        return;
+
+    int updateInterval = 20; // ms
+
     if (servoHaveErrorsLikeTooHot)
     {
         _actualTimelineIndex = -1;
         return;
     }
 
-    int diff = millis() - _lastMsUpdate;
-    if (diff < 5) // update interval in milliseconds
+    long diff = millis() - _lastMsUpdate;
+    if (diff < updateInterval) // update interval in milliseconds
         return;
 
     _lastMsUpdate = millis();
 
-    // return of no data is set
-    if (_data == nullptr)
-        return;
-
     bool packedReceivedLately = _lastPacketReceivedMillis != -1 && millis() < _lastPacketReceivedMillis + 60 * 1000; //  got a awb studio packet or last packet is newer than given seconds * 1000ms
     if (packedReceivedLately == true)
     {
-        // no data received, so we stop the auto mode
+        // data received, so we stop the auto mode
         _actualTimelineIndex = -1;
         return;
     }
@@ -92,7 +103,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     }
 
     auto actualTimelineData = _data->timelines->at(_actualTimelineIndex);
-    int rememberLastPlayPos = _playPosInActualTimeline;
+    long rememberLastPlayPos = _playPosInActualTimeline;
     _playPosInActualTimeline += diff;
 
     if (_playPosInActualTimeline > actualTimelineData.durationMs)
@@ -205,7 +216,20 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
                 Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
                 if (point->soundPlayerIndex == soundPlayerIndex && point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
                 {
-                    _mp3PlayerYX5300Manager->playSound(point->soundId);
+                    for (int trys = 0; trys < 3; trys++)
+                    {
+                        if (_mp3PlayerYX5300Manager->playSound(point->soundId) == true)
+                        {
+                            _lastSoundPlayed = point->soundId;
+                            break;
+                        }
+                        else
+                        {
+                            _mp3PlayerYX5300Manager->stopSound();
+                            _lastSoundPlayed = -100;
+                            delay(50);
+                        }
+                    }
                 }
             }
         }

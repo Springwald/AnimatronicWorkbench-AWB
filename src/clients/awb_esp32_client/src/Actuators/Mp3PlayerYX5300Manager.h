@@ -34,10 +34,12 @@ public:
     {
         _mp3Stream.begin(MD_YX5300::SERIAL_BPS);
         _mp3.begin();
+        _mp3.setSynchronous(false);
         _mp3.check(); // run the mp3 receiver
     }
 
-    void playSound(int trackNo);
+    bool playSound(int trackNo);
+    bool stopSound();
 };
 
 #endif
