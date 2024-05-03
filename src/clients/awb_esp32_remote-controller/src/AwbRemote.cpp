@@ -1,3 +1,5 @@
+#define M5STICKC_PLUS2 1 // M5StickC Plus2 has a different power on/off mechanism
+
 #include <Arduino.h>
 #include <AwbRemote.h>
 #include <WiFi.h>
@@ -15,6 +17,13 @@
  */
 void AwbRemote::setup()
 {
+
+// especially for the M5StickC Plus2 (what a monster name): we need to hold the power on by setting the GPIO pin G4 to HIGH
+#ifdef M5STICKC_PLUS2
+    pinMode(4, OUTPUT);
+    digitalWrite(4, HIGH);
+#endif
+
     _display.setup(); // set up the display
 
     _wifiConfig = WifiConfig();

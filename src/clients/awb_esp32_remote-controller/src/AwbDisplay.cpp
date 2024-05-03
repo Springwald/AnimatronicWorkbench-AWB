@@ -49,6 +49,8 @@ static LGFX_SSD1306 lcd; // Create an instance of LGFX_SSD1306 (class LGFX_SSD13
 static LGFX lcd;
 #endif
 
+
+
 static LGFX_Sprite topBarSprite(&lcd);
 static LGFX_Sprite primarySprite(&lcd);
 static LGFX_Sprite statusFooterSprite(&lcd);
@@ -60,6 +62,8 @@ static const lgfx::IFont *font = nullptr;
  */
 void AwbDisplay::setup()
 {
+
+
     resetDebugInfos();
     lcd.init();
     _isSmallScreen = lcd.height() <= 64 || lcd.width() <= 290;
