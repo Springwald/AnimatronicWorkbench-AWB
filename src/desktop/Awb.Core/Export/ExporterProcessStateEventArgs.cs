@@ -10,5 +10,6 @@ namespace Awb.Core.Export
     public class ExporterProcessStateEventArgs
     {
         public string? ErrorMessage { get; internal set; }
+        public string? Message { get; internal set; }
     }
 }

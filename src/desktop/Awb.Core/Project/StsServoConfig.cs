@@ -20,6 +20,12 @@ namespace Awb.Core.Project
         public int? Acceleration { get; set; }
         public int? Speed { get; set; }
 
+        /// <summary>
+        /// If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?
+        /// </summary>
+        public bool GlobalFault { get; set; } 
+        
+
         public StsServoConfig(string id, string title, uint clientId, uint channel)
         {
             this.Id = id;

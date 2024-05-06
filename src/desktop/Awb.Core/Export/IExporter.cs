@@ -17,6 +17,8 @@ namespace Awb.Core.Export
             public static ExportResult SuccessResult => new ExportResult();
         }
 
+        string Title { get; }
+
         // reports the current state as event
         event EventHandler<ExporterProcessStateEventArgs>? Processing;
 

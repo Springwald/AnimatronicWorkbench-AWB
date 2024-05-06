@@ -261,6 +261,7 @@ namespace Awb.Core.LoadNSave.Export
             var accelerations = stsServos.Select(s => s.Acceleration ?? -1).ToArray();
             var speeds = stsServos.Select(s => s.Speed ?? -1).ToArray();
             var names = stsServos.Select(s => s.Title ?? $"{s.Id}/{s.Channel}").ToArray();
+            var globalFaults = stsServos.Select(s => s.GlobalFault).ToArray();
             result.AppendLine($"\tint {praefix}ServoCount = {stsServos.Length};");
             result.AppendLine($"\tint {praefix}ServoChannels[{stsServos.Length}] = {{{string.Join(", ", chanels.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint {praefix}ServoMinValue[{stsServos.Length}] = {{{string.Join(", ", minValues.Select(s => s.ToString()))}}};");
@@ -268,6 +269,7 @@ namespace Awb.Core.LoadNSave.Export
             result.AppendLine($"\tint {praefix}ServoDefaultValue[{stsServos.Length}] = {{{string.Join(", ", defaultValues.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint {praefix}ServoAcceleration[{stsServos.Length}] = {{{string.Join(", ", accelerations.Select(s => s.ToString()))}}};");
             result.AppendLine($"\tint {praefix}ServoSpeed[{stsServos.Length}] = {{{string.Join(", ", speeds.Select(s => s.ToString()))}}};");
+            result.AppendLine($"\tbool {praefix}ServoGlobalFault[{stsServos.Length}] = {{{string.Join(", ", globalFaults.Select(s => s.ToString().ToLower()))}}};");
             result.AppendLine($"\tString {praefix}ServoName[{stsServos.Length}] = {{{string.Join(", ", names.Select(s => $"\"{s}\""))}}};");
             result.AppendLine();
         }

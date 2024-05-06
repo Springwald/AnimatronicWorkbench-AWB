@@ -90,19 +90,40 @@ namespace AwbStudio.Exports
 
         private async void ButtonWriteToEsp32RemoteClient_Click(object sender, RoutedEventArgs e)
         {
+            labelOutput.Content = string.Empty;
+
             // get the folder where the wpf project is located and running:
             var appFolder = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            if (appFolder == null)
+            {
+                await LogAsync("Could not determine the application folder", error: true);
+                return;
+            }
 
             var esp32ClientsSourceFolderRelative = @"..\..\..\..\..\clients";
             var esp32ClientsSourceFolder = Path.Combine(appFolder, esp32ClientsSourceFolderRelative);
 
-            await Export(new Esp32ClientRemoteExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData),targetSubFolder: "awb_esp32_remote-controller");
+            await Export(new Esp32ClientExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData), targetSubFolder: "awb_esp32_client");
+            await Export(new Esp32ClientRemoteExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData), targetSubFolder: "awb_esp32_remote-controller");
         }
+
+
 
         private async Task Export(IExporter exporter, string targetSubFolder)
         {
+            await LogAsync("-------------------------------");
+
+            await LogAsync($"Exporting {exporter.Title}");
+
+            if (string.IsNullOrWhiteSpace(ExportFolderGlobal))
+            {
+                await LogAsync("No ExportFolderGlobal set!", error: true);
+                return;
+            }
 
             var targetFolder = Path.Combine(ExportFolderGlobal, targetSubFolder);
+
             if (!Directory.Exists(targetFolder))
             {
                 var msgBoxResult = MessageBox.Show("Target folder \r\n\r\n'" + targetFolder + "'\r\n\r\n does not exist.\r\n\r\nCreate?", "Create target folder?", MessageBoxButton.YesNoCancel);
@@ -112,39 +133,55 @@ namespace AwbStudio.Exports
                 }
                 else
                 {
-                    MessageBox.Show("Export canceled");
+                    await LogAsync("Export canceled");
                     return;
                 }
             }
 
-            await _awbLogger.LogAsync("Exporting to " + targetFolder);
+            await LogAsync($"Exporting to '{targetFolder}'");
 
-            exporter.Processing += ExporerProcessing;
+            exporter.Processing += ExporterProcessing;
 
             var result = await exporter.ExportAsync(targetPath: targetFolder);
 
-            exporter.Processing -= ExporerProcessing;
+            exporter.Processing -= ExporterProcessing;
 
             if (result.Success)
             {
-                MessageBox.Show("Export done.");
+                await LogAsync("Export done.");
             }
             else
             {
-                MessageBox.Show("Export failed: " + result.ErrorMessage);
+                await LogAsync($"Export failed: {result.ErrorMessage ?? "Unknown error"}", error: true);
             }
         }
 
-        private async void ExporerProcessing(object? sender, ExporterProcessStateEventArgs e)
+        private async void ExporterProcessing(object? sender, ExporterProcessStateEventArgs e)
         {
-            if (e.ErrorMessage == null)
+            if (e.ErrorMessage != null)
             {
-                // todo: show progress
+                await LogAsync(e.ErrorMessage, error: true);
+            }
+
+            if (e.Message != null)
+            {
+                await LogAsync(e.Message);
+            }
+        }
+
+        private async Task LogAsync(string message, bool error = false)
+        {
+            if (error)
+            {
+                labelOutput.Content += "\r\nERROR: " + message;
+                await _awbLogger.LogErrorAsync(message);
             }
             else
             {
-                await _awbLogger.LogErrorAsync(e.ErrorMessage);
+                labelOutput.Content += "\r\n" + message;
+                await _awbLogger.LogAsync(message);
             }
+            await Task.CompletedTask;
         }
     }
 }

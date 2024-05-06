@@ -1,12 +1,12 @@
 #include <Arduino.h>
+#include <vector>
+#include "hardware.h"
 #include "AutoPlayer.h"
 #include "AutoPlayData.h"
-#include "Timeline.h"
-#include "TimelineState.h"
-#include "StsServoPoint.h"
-#include "Pca9685PwmServoPoint.h"
-#include "hardware.h"
-#include <vector>
+#include "../ProjectData/Timeline.h"
+#include "../ProjectData/TimelineState.h"
+#include "../ProjectData/StsServoPoint.h"
+#include "../ProjectData/Pca9685PwmServoPoint.h"
 
 /**
  * Initializes a new instance of the <see cref="AutoPlayer"/> class.

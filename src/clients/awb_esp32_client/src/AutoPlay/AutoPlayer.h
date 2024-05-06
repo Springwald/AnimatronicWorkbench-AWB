@@ -5,9 +5,9 @@
 #include <String.h>
 #include <vector>
 #include <string>
-#include "StsServoPoint.h"
-#include "Pca9685PwmServoPoint.h"
-#include "TimelineState.h"
+#include "../ProjectData/StsServoPoint.h"
+#include "../ProjectData/Pca9685PwmServoPoint.h"
+#include "../ProjectData/TimelineState.h"
 #include "AutoPlayData.h"
 #include "../Actuators/StSerialServoManager.h"
 #include "../Actuators/Pca9685PwmManager.h"
