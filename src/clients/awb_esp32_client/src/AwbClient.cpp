@@ -22,6 +22,10 @@ StaticJsonDocument<1024 * 32> jsondoc;
 void AwbClient::setup()
 {
     _display.setup(_clientId); // set up the display
+
+    // set up the debugging
+    _debugging = new Debugging(&_display);
+
     delay(1000);
 
     // set up the wlan connector
@@ -79,7 +83,7 @@ void AwbClient::setup()
     if (STS_SERVO_RXD == SCS_SERVO_RXD || STS_SERVO_RXD == SCS_SERVO_TXD || STS_SERVO_TXD == SCS_SERVO_RXD || STS_SERVO_TXD == SCS_SERVO_TXD)
     {
         showError("STS and SCS use the same RXD/TXD pins!");
-        delay(2000);
+        delay(5000);
         throw "STS and SCS use the same RXD/TXD pins!";
     }
 #endif
@@ -120,7 +124,7 @@ void AwbClient::setup()
 #endif
 
     showMsg("Found " + String(this->_stSerialServoManager == NULL ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == NULL ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
-    delay(1000);
+    delay(_debugging->isDebugging() ? 1000 : 100);
 
 #ifdef USE_PCA9685_PWM_SERVO
     showSetupMsg("setup PCA9685 PWM servos");
@@ -167,7 +171,7 @@ void AwbClient::setup()
     }
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
-    delay(1000);
+    delay(_debugging->isDebugging() ? 1000 : 100);
 }
 
 /**
@@ -175,7 +179,7 @@ void AwbClient::setup()
  */
 void AwbClient::showError(String message)
 {
-    int durationMs = 2000;
+    int durationMs = _debugging->isDebugging() ? 3000 : 2000;
     _display.draw_message(message, durationMs, MSG_TYPE_ERROR);
 
     if (_wlanConnector != NULL)
@@ -193,7 +197,7 @@ void AwbClient::showError(String message)
  */
 void AwbClient::showMsg(String message)
 {
-    int durationMs = 1000;
+    int durationMs = _debugging->isDebugging() ? 1000 : 100;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
     _wlanConnector->logInfo(message);
 }
@@ -203,7 +207,7 @@ void AwbClient::showMsg(String message)
  */
 void AwbClient::showSetupMsg(String message)
 {
-    int durationMs = 200;
+    int durationMs = _debugging->isDebugging() ? 200 : 50;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
     if (_wlanConnector != NULL) // check if wlan connector is instanciated
         _wlanConnector->logInfo(message);
@@ -215,6 +219,8 @@ void AwbClient::showSetupMsg(String message)
  */
 void AwbClient::loop()
 {
+    _debugging->setState(Debugging::MJ_LOOP, 0);
+
     if (false)
     {
         // set true to test the mp3 player
@@ -233,7 +239,11 @@ void AwbClient::loop()
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
 
-    _wlanConnector->update();
+    _debugging->setState(Debugging::MJ_LOOP, 5);
+
+    _wlanConnector->update(_debugging->isDebugging());
+
+    _debugging->setState(Debugging::MJ_LOOP, 10);
 
     //_mp3Player->playSound(1);
 
@@ -244,6 +254,8 @@ void AwbClient::loop()
     if (this->_scSerialServoManager != NULL)
         criticalTemp = criticalTemp || this->_scSerialServoManager->servoCriticalTemp;
 
+    _debugging->setState(Debugging::MJ_LOOP, 15);
+
     if (_wlanConnector->timelineNameToPlay != NULL && _wlanConnector->timelineNameToPlay->length() > 0)
     {
         // a timeline was received via wifi from a remote control
@@ -251,7 +263,11 @@ void AwbClient::loop()
         _wlanConnector->timelineNameToPlay = NULL;
     }
 
+    _debugging->setState(Debugging::MJ_LOOP, 20);
+
     _autoPlayer->update(criticalTemp);
+
+    _debugging->setState(Debugging::MJ_LOOP, 25);
 
     if (_autoPlayer->getStateSelectorStsServoChannel() != _lastAutoPlaySelectedStateId)
     {
@@ -259,6 +275,8 @@ void AwbClient::loop()
         _lastAutoPlaySelectedStateId = _autoPlayer->getStateSelectorStsServoChannel();
         _display.set_debugStatus("StateId:" + String(_lastAutoPlaySelectedStateId));
     }
+
+    _debugging->setState(Debugging::MJ_LOOP, 30);
 
     if (!_autoPlayer->getCurrentTimelineName().equals(_lastAutoPlayTimelineName))
     {
@@ -288,6 +306,8 @@ void AwbClient::loop()
         }
         _display.set_debugStatus("Timeline:" + String(_lastAutoPlayTimelineName));
     }
+
+    _debugging->setState(Debugging::MJ_LOOP, 35);
 
     bool onlyLoadCheck = false;
 
@@ -336,15 +356,23 @@ void AwbClient::loop()
         }
     }
 
+    _debugging->setState(Debugging::MJ_LOOP, 50);
+
     if (_neoPixelStatus != NULL && !packetReceived)
         _neoPixelStatus->update();
+
+    _debugging->setState(Debugging::MJ_LOOP, 55);
 
     if (_dacSpeaker != NULL)
         _dacSpeaker->update();
 
+    _debugging->setState(Debugging::MJ_LOOP, 60);
+
     // update display
     if (!packetReceived)
         _display.loop();
+
+    _debugging->setState(Debugging::MJ_LOOP, 65);
 
     // collect all status information for lcd display and WLAN status display
     _wlanConnector->memoryInfo = &_display.memoryInfo;
@@ -358,10 +386,14 @@ void AwbClient::loop()
     _actualStatusInformation->inputStates = _inputManager->getDebugInfo();
     _actualStatusInformation->lastSoundPlayed = _autoPlayer->getLastSoundPlayed();
 
+    _debugging->setState(Debugging::MJ_LOOP, 70);
+
     if (millis() - _startMillis < 5000)
     {
         _display.resetDebugInfos(); // only check memory usage after 5 seconds to avoid false alarms when starting up
     }
+
+    _debugging->setState(Debugging::MJ_LOOP, 99);
 }
 
 /**

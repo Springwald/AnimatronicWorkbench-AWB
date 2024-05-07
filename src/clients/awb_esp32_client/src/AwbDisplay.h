@@ -1,6 +1,7 @@
 #ifndef awb_display_h
 #define awb_display_h
 
+#include <Arduino.h>
 #include <vector>
 
 #define MSG_TYPE_INFO 0
@@ -12,6 +13,10 @@
 class AwbDisplay
 {
 private:
+  int _debugStateMajor;  /// The major debug state
+  int _debugStateMinor;  /// The minor debug state
+  bool _debuggingActive; /// The debug state is active
+
   int _freeMemoryOnStart;       /// The free memory on start
   String _statusMsg;            /// The last / actual status message
   int _last_debugInfos_changed; /// The last time the debug infos were changed
@@ -39,6 +44,8 @@ private:
   void showTopBar(String message); /// Show the top bar with the given message
   void draw_values();              /// Draw the values
   bool draw_debugInfos();          /// Draw the debug infos
+  void draw_debuggingState();      // Draw the small live(!) debug state
+
   String getNextLine(String input, uint maxLineLength, std::vector<char> splitChars, bool forceFirstSplit);
 
 public:
@@ -79,6 +86,8 @@ public:
    * force to redraw the debug status message
    */
   void set_debugStatus_dirty();
+
+  void set_debuggingState(bool isDebugging, int major, int minor);
 
   /**
    * Show a message on the display

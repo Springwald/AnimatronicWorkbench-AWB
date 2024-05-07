@@ -1,6 +1,10 @@
 #ifndef hardware_h
 #define hardware_h
 
+/* Debugging settings */
+#define DEBUGGING_IO_PIN 25          // the GPIO pin to use for debugging
+#define DEBUGGING_IO_PIN_ACTIVE HIGH // if the debugging pin is active low, set this to true
+
 /* Display settings */
 
 // -- M5 Stack Displays --

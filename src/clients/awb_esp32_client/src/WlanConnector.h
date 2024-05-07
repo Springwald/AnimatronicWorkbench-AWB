@@ -26,6 +26,7 @@ private:
     int _clientId;                                     /// the id of the client
     TCallBackErrorOccured _errorOccured;               /// callback function to call if an error occured
     AutoPlayData *_data;                               /// the timelime data and project meta information for the auto play
+    bool _liveDebuggingActive;                         /// the live debugging is active or not
     WebServer *_server;                                /// the webserver
     long _startTime = millis();                        /// the time when the webserver was started
     ActualStatusInformation *_actualStatusInformation; /// the actual status information of the animatronic figure
@@ -72,7 +73,7 @@ public:
     /**
      * update loof of the webserver to handle http requests
      */
-    void update();
+    void update(bool liveDebuggingActive);
 
     /**
      * log an error  message

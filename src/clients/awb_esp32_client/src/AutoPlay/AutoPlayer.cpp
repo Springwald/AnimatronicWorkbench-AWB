@@ -73,7 +73,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
     if (_data == nullptr)
         return;
 
-    int updateInterval = 20; // ms
+    int updateInterval = 50; // ms
 
     if (servoHaveErrorsLikeTooHot)
     {

@@ -52,6 +52,7 @@ static LGFX lcd;
 static LGFX_Sprite topBarSprite(&lcd);
 static LGFX_Sprite primarySprite(&lcd);
 static LGFX_Sprite statusFooterSprite(&lcd);
+static LGFX_Sprite debugStateSprite(&lcd);
 
 static const lgfx::IFont *font = nullptr;
 
@@ -75,6 +76,15 @@ void AwbDisplay::setup(int clientId)
     int colorDepth = 8;
     lcd.setRotation(1);
 #endif
+
+    // set up the debug sprite
+    debugStateSprite.setTextColor(0xFFFFFFU, 0x000000U);
+    debugStateSprite.setFont(&fonts::DejaVu9);
+    debugStateSprite.setTextSize(1.0f);
+    debugStateSprite.setColorDepth(colorDepth);
+    debugStateSprite.createSprite(40, 10);
+
+    // set up the fonts
 
     if (_isSmallScreen)
     {
@@ -191,6 +201,7 @@ void AwbDisplay::loop()
             for (int i = 0; i < (_isSmallScreen ? 2 : 4); i++)
                 primarySprite.drawFastHLine(bar, primarySprite.height() - i, primarySprite.width() - bar);
             primarySprite.pushSprite(0, _primarySpriteTop);
+            draw_debuggingState();
         }
         else
         {
@@ -198,6 +209,7 @@ void AwbDisplay::loop()
             _message_duration_left = 0;
             primarySprite.fillSprite(0xFFFFFFU);
             primarySprite.pushSprite(0, _primarySpriteTop);
+            draw_debuggingState();
         }
     }
     else
@@ -290,6 +302,7 @@ void AwbDisplay::draw_values()
     }
 
     primarySprite.pushSprite(0, _primarySpriteTop);
+    draw_debuggingState();
 }
 
 void AwbDisplay::set_debugStatus(String message)
@@ -297,6 +310,26 @@ void AwbDisplay::set_debugStatus(String message)
     _statusDirty = true;
     _last_debugInfos_changed = millis();
     _statusMsg = message;
+}
+
+void AwbDisplay::set_debuggingState(bool isDebugging, int major, int minor)
+{
+    _debuggingActive = isDebugging;
+    _debugStateMajor = major;
+    _debugStateMinor = minor;
+    draw_debuggingState();
+}
+
+void AwbDisplay::draw_debuggingState()
+{
+    if (_debuggingActive == false)
+        return;
+
+    debugStateSprite.fillSprite(0x000000U);
+    debugStateSprite.setTextDatum(top_left);
+    auto debugState = String(_debugStateMajor) + "-" + String(_debugStateMinor);
+    debugStateSprite.drawString(debugState, 0, 0);
+    debugStateSprite.pushSprite(lcd.width() - debugStateSprite.width(), lcd.height() - debugStateSprite.height());
 }
 
 /// @brief draw a fullscreen info text
@@ -368,6 +401,7 @@ void AwbDisplay::draw_message(String message, int durationMs, int msgType)
     }
 
     primarySprite.pushSprite(0, _primarySpriteTop);
+    draw_debuggingState();
 }
 
 String AwbDisplay::getNextLine(String input, uint maxLineLength, std::vector<char> splitChars, bool forceFirstSplit)
@@ -435,6 +469,7 @@ bool AwbDisplay::draw_debugInfos()
     statusFooterSprite.drawString(_statusMsg, statusFooterSprite.width() / 2, y);
 
     statusFooterSprite.pushSprite(0, _statusFooterSpriteTop);
+    draw_debuggingState();
 
     return true;
 }

@@ -41,8 +41,9 @@ void WlanConnector::setup()
 /**
  * update loof of the webserver
  */
-void WlanConnector::update()
+void WlanConnector::update(bool liveDebuggingActive)
 {
+    _liveDebuggingActive = liveDebuggingActive;
     _server->handleClient();
 }
 
@@ -135,6 +136,10 @@ String WlanConnector::GetHtml()
     if (true)
     {
         ptr += "<p>Animatronic Workbench - Client ID " + String(_clientId) + "</p>\n";
+        if (_liveDebuggingActive)
+        {
+            ptr += "<p><i>Live-debugging is active</i></p>\n";
+        }
         ptr += "<h1>'" + String(_data->ProjectName) + "' figure</h1>\n";
 
         ptr += "<p> " + String(ageHours) + " hours, " + String(ageMinutes % 60) + " minutes, " + String(ageSeconds % 60) + " seconds uptime<br/>" + *memoryInfo + "</p>\n";
