@@ -13,11 +13,13 @@ namespace Awb.Core.Export.ExporterParts
     {
         public abstract Task<IExporter.ExportResult> ExportAsync(string targetSrcFolder);
 
-        protected string GetHeader(string className)
+        protected string GetHeader(string className, string includes)
         {
             var content = new StringBuilder();
             content.AppendLine($"#ifndef _{className.ToUpper()}_H_");
             content.AppendLine($"#define _{className.ToUpper()}_H_");
+            content.AppendLine();
+            content.AppendLine(includes);
             content.AppendLine();
             content.AppendLine("// Created with Animatronic Workbench Studio");
             content.AppendLine("// https://daniel.springwald.de/post/AnimatronicWorkbench");

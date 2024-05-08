@@ -7,14 +7,18 @@
 
 using Awb.Core.Export;
 using Awb.Core.Export.ExporterParts;
+using Awb.Core.LoadNSave.Export;
 using Awb.Core.Project;
 using Awb.Core.Services;
 using AwbStudio.Projects;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace AwbStudio.Exports
 {
@@ -25,7 +29,51 @@ namespace AwbStudio.Exports
         private readonly IAwbLogger _awbLogger;
         private readonly AwbProject _project;
 
-        private WifiConfigData WifiConfigData => new WifiConfigData(wifiSSID: _project.WifiSsid, wifiPassword: _project.WifiPassword);
+        private WifiConfigExportData WifiConfigData => new WifiConfigExportData { 
+            WlanSSID = _project.WifiSsid, 
+            WlanPassword = _project.WifiPassword 
+        };
+
+        private ProjectExportData? ProjectData
+        {
+            get
+            {
+                var timelines = new List<TimelineExportData>();
+                var timelineIds = _project.TimelineDataService.TimelineIds;
+
+                foreach (var timelineId in timelineIds)
+                {
+                    var timelineData = _project.TimelineDataService.GetTimelineData(timelineId);
+                    if (timelineData == null)
+                    {
+                        MessageBox.Show($"Can't load timeline '{timelineId}'. Export canceled.");
+                        return null;
+                    }
+
+                    // convert timelineData to TimelineExportData
+                    var exportData = TimelineExportData.FromTimeline(
+                        timelineStateId: timelineData.TimelineStateId,
+                        title: timelineData.Title,
+                        points: timelineData.AllPoints,
+                        timelineDataService: _project.TimelineDataService,
+                        awbLogger: _awbLogger);
+
+                    timelines.Add(exportData);
+                }
+
+                return new ProjectExportData
+                {
+                    ProjectName = _project.Title,
+                    TimelineStates = _project.TimelinesStates,
+                    StsServoConfigs = _project.StsServos,
+                    ScsServoConfigs = _project.ScsServos,
+                    Pca9685PwmServoConfigs = _project.Pca9685PwmServos,
+                    Mp3PlayerYX5300Configs = _project.Mp3PlayersYX5300,
+                    InputConfigs = _project.Inputs,
+                    TimelineData = timelines.ToArray()
+                };
+            }
+        }
 
         protected string? ExportFolderGlobal
         {
@@ -104,7 +152,14 @@ namespace AwbStudio.Exports
             var esp32ClientsSourceFolderRelative = @"..\..\..\..\..\clients";
             var esp32ClientsSourceFolder = Path.Combine(appFolder, esp32ClientsSourceFolderRelative);
 
-            await Export(new Esp32ClientExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData), targetSubFolder: "awb_esp32_client");
+            var projectData = ProjectData;
+            if (projectData == null)
+            {
+                await LogAsync("Project data could not be loaded", error: true);
+                return;
+            }
+
+            await Export(new Esp32ClientExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData, projectData), targetSubFolder: "awb_esp32_client");
             await Export(new Esp32ClientRemoteExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData), targetSubFolder: "awb_esp32_remote-controller");
         }
 

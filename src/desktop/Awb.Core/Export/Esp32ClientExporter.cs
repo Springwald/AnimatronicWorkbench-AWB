@@ -13,16 +13,18 @@ namespace Awb.Core.Export
     public class Esp32ClientExporter : IExporter
     {
         private readonly string _esp32ClientsSourceFolder;
-        private readonly WifiConfigData _wifiConfigData;
+        private readonly WifiConfigExportData _wifiConfigData;
+        private readonly ProjectExportData _projectExportData;
 
         public string Title { get; } = "ESP32 Client";
 
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
-        public Esp32ClientExporter(string esp32ClientsSourceFolder, WifiConfigData wifiConfigData)
+        public Esp32ClientExporter(string esp32ClientsSourceFolder, WifiConfigExportData wifiConfigData, ProjectExportData projectExportData)
         {
             _esp32ClientsSourceFolder = esp32ClientsSourceFolder;
             _wifiConfigData = wifiConfigData;
+            _projectExportData = projectExportData;
         }
 
         public async Task<IExporter.ExportResult> ExportAsync(string targetPath)
@@ -41,17 +43,18 @@ namespace Awb.Core.Export
                 return new IExporter.ExportResult { ErrorMessage = cloneResult.ErrorMessage };
             }
 
-            var dataExporter = new[]
+            var dataExporter = new ExporterPartAbstract[]
             {
                 new WifiConfigExporter(_wifiConfigData),
+                new ProjectDataExporter(_projectExportData)
             };
 
             foreach (var exporter in dataExporter)
             {
                 var result = await exporter.ExportAsync(targetPath);
-                if (result != IExporter.ExportResult.SuccessResult)
+                if (!result.Success)
                 {
-                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage = result.ErrorMessage });
+                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage =  result.ErrorMessage });
                     return result;
                 }
             }

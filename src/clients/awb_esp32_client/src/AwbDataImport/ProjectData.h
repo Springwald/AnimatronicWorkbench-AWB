@@ -1,42 +1,29 @@
-#ifndef _PROJECT_DATA_H_
-#define _PROJECT_DATA_H_
+#ifndef _PROJECTDATA_H_
+#define _PROJECTDATA_H_
 
 #include <Arduino.h>
 #include <String.h>
-#include "Timeline.h"
-#include "TimelineState.h"
-#include "StsServoPoint.h"
-#include "Pca9685PwmServoPoint.h"
-#include "Mp3PlayerYX5300Point.h"
+#include "../ProjectData/Timeline.h"
+#include "../ProjectData/TimelineState.h"
+#include "../ProjectData/StsServoPoint.h"
+#include "../ProjectData/Pca9685PwmServoPoint.h"
+#include "../ProjectData/Mp3PlayerYX5300Point.h"
+#include "../ProjectData/StsScsServo.h"
+
+// Created with Animatronic Workbench Studio
+// https://daniel.springwald.de/post/AnimatronicWorkbench
+
+// Created on 09.05.2024 00:28:05
 
 class ProjectData
 {
 
-protected:
 public:
-	const char *ProjectName = "Grogu 2";   // Project Name
-	const char *WlanSSID = "AWB-Grogu 2";  // WLAN SSID Name
-	const char *WlanPassword = "awb12345"; // WLAN Password
-
-	int stsServoCount = 5;
-	int stsServoChannels[5] = {6, 7, 8, 9, 11};
-	int stsServoMinValue[5] = {1580, 3200, 1200, 1741, 2342};
-	int stsServoMaxValue[5] = {2547, 1257, 2870, 319, 3712};
-	int stsServoDefaultValue[5] = {2048, 2128, 2064, 502, 3549};
-	int stsServoAcceleration[5] = {10, 10, 10, 100, 100};
-	int stsServoSpeed[5] = {1500, 1500, 1500, 3000, 3000};
-	bool stsServoGlobalFault[5] = {false, false, false, false, false};
-	String stsServoName[5] = {"Head rotate", "Neck right", "Neck left", "Arm right", "Arm left"};
-
-	int scsServoCount = 7;
-	int scsServoChannels[7] = {1, 2, 3, 4, 5, 10, 12};
-	int scsServoMinValue[7] = {314, 443, 572, 1000, 20, 290, 685};
-	int scsServoMaxValue[7] = {580, 669, 435, 20, 1000, 1020, 5};
-	int scsServoDefaultValue[7] = {512, 512, 572, 137, 830, 548, 346};
-	int scsServoAcceleration[7] = {10, 10, 1, 1, 1, 1, 1};
-	int scsServoSpeed[7] = {1000, 1000, 300, 200, 200, 500, 500};
-	bool scsServoGlobalFault[7] = {false, false, false, false, false, false, false};
-	String scsServoName[7] = {"Eyes up", "Eyes low", "Mouth", "Ear right", "Ear left", "Arm lower right", "Arm lower left"};
+   const char *ProjectName = "Grogu 2";
+public:
+   std::vector<StsScsServo> *scsServos;
+   std::vector<StsScsServo> *stsServos;
+   std::vector<Timeline>* timelines;
 
 	int pca9685PwmServoCount = 0;
 	int pca9685PwmServoI2cAdresses[0] = {};
@@ -60,11 +47,29 @@ public:
 	uint8_t  inputIoPins[1] = {26};
 	int inputCount = 1;
 
-    std::vector<Timeline> *timelines;
 
-    AutoPlayData()
-    {
-        timelines = new std::vector<Timeline>();
+ProjectData()
+{
+
+   scsServos = new std::vector<StsScsServo>();
+   scsServos->push_back(StsScsServo(1, "Eyes up", 314, 580, 512, 10, 1000, false ));
+   scsServos->push_back(StsScsServo(2, "Eyes low", 443, 669, 512, 10, 1000, false ));
+   scsServos->push_back(StsScsServo(3, "Mouth", 572, 435, 572, 1, 300, false ));
+   scsServos->push_back(StsScsServo(4, "Ear right", 1000, 20, 137, 1, 200, false ));
+   scsServos->push_back(StsScsServo(5, "Ear left", 20, 1000, 830, 1, 200, false ));
+   scsServos->push_back(StsScsServo(10, "Arm lower right", 290, 1020, 548, 1, 500, false ));
+   scsServos->push_back(StsScsServo(12, "Arm lower left", 685, 5, 346, 1, 500, false ));
+
+   stsServos = new std::vector<StsScsServo>();
+   stsServos->push_back(StsScsServo(6, "Head rotate", 1580, 2547, 2048, 10, 1500, false ));
+   stsServos->push_back(StsScsServo(7, "Neck right", 3200, 1257, 2128, 10, 1500, false ));
+   stsServos->push_back(StsScsServo(8, "Neck left", 1200, 2870, 2064, 10, 1500, false ));
+   stsServos->push_back(StsScsServo(9, "Arm right", 1741, 319, 502, 100, 3000, false ));
+   stsServos->push_back(StsScsServo(11, "Arm left", 2342, 3712, 3549, 100, 3000, false ));
+
+
+   timelines = new std::vector<Timeline>();
+
 		auto *stsServoPoints1 = new std::vector<StsServoPoint>();
 		auto *scsServoPoints1 = new std::vector<StsServoPoint>();
 		auto *pca9685PwmServoPoints1 = new std::vector<Pca9685PwmServoPoint>();
@@ -659,11 +664,10 @@ public:
 		Timeline *timeline15 = new Timeline(state15, String("YES"), stsServoPoints15, scsServoPoints15, pca9685PwmServoPoints15, mp3PlayerYX5300Points15);
 		timelines->push_back(*timeline15);
 
-    }
 
-    ~ProjectData()
-    {
-    }
+}
+
 };
 
-#endif
+#endif // _PROJECTDATA_H_
+

@@ -13,13 +13,13 @@ namespace Awb.Core.Export
     public class Esp32ClientRemoteExporter : IExporter
     {
         private readonly string _esp32ClientsSourceFolder;
-        private readonly WifiConfigData _wifiConfigData;
+        private readonly WifiConfigExportData _wifiConfigData;
 
         public string Title { get; } = "ESP32 Remote Controller";
 
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
-        public Esp32ClientRemoteExporter(string esp32ClientsSourceFolder, WifiConfigData wifiConfigData)
+        public Esp32ClientRemoteExporter(string esp32ClientsSourceFolder, WifiConfigExportData wifiConfigData)
         {
             _esp32ClientsSourceFolder = esp32ClientsSourceFolder;
             _wifiConfigData = wifiConfigData;

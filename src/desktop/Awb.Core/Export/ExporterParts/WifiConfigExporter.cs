@@ -11,9 +11,9 @@ namespace Awb.Core.Export.ExporterParts
 {
     internal class WifiConfigExporter : ExporterPartAbstract
     {
-        private readonly WifiConfigData _wifiConfigData;
+        private readonly WifiConfigExportData _wifiConfigData;
 
-        public WifiConfigExporter(WifiConfigData wifiConfigData)
+        public WifiConfigExporter(WifiConfigExportData wifiConfigData)
         {
             _wifiConfigData = wifiConfigData;
         }
@@ -21,7 +21,7 @@ namespace Awb.Core.Export.ExporterParts
         public override async Task<IExporter.ExportResult> ExportAsync(string targetSrcFolder)
         {
             var content = new StringBuilder();
-            content.AppendLine(GetHeader("WifiConfig"));
+            content.AppendLine(GetHeader(className: "WifiConfig", includes: string.Empty));
 
             content.AppendLine("public:");
             content.AppendLine($"   const char *WlanSSID = \"{_wifiConfigData.WlanSSID}\";");
@@ -29,10 +29,15 @@ namespace Awb.Core.Export.ExporterParts
 
             content.AppendLine(GetFooter("WifiConfig"));
 
-            if (!Directory.Exists(Path.Combine(targetSrcFolder, "src")))
-                Directory.CreateDirectory(Path.Combine(targetSrcFolder, "src"));
+            if (!Directory.Exists(targetSrcFolder))
+                return new IExporter.ExportResult { ErrorMessage = $"Target folder '{targetSrcFolder}' not found" };
 
-            File.WriteAllText(Path.Combine(targetSrcFolder, "src", "WifiConfig.h"), content.ToString());
+            var folder = Path.Combine(targetSrcFolder, "src", "AwbDataImport");
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            await File.WriteAllTextAsync(Path.Combine(folder, "WifiConfig.h"), content.ToString());
+
 
             return IExporter.ExportResult.SuccessResult;
         }
