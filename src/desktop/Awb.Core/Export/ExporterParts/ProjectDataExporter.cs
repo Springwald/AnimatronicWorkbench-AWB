@@ -34,6 +34,7 @@ namespace Awb.Core.Export.ExporterParts
                 #include "../ProjectData/Pca9685PwmServoPoint.h"
                 #include "../ProjectData/Mp3PlayerYX5300Point.h"
                 #include "../ProjectData/StsScsServo.h"
+                #include "../ProjectData/Pca9685PwmServo.h"
                 """;
 
             content.AppendLine(GetHeader(className: "ProjectData", includes: includes));
@@ -44,10 +45,11 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine();
             content.AppendLine($"   std::vector<StsScsServo> *scsServos;");
             content.AppendLine($"   std::vector<StsScsServo> *stsServos;");
+            content.AppendLine($"   std::vector<Pca9685PwmServo> *pca9685PwmServos;");
             content.AppendLine($"   std::vector<Timeline>* timelines;");
 
             content.AppendLine();
-            ExportPCS9685PwmServoInformations(_projectData.Pca9685PwmServoConfigs, content);
+        
             ExportMp3PlayerYX5300Informations(_projectData.Mp3PlayerYX5300Configs, content);
             ExportTimelineStates(timelineStates: _projectData.TimelineStates, content);
             ExportInputs(inputConfigs: _projectData.InputConfigs, content);
@@ -60,6 +62,7 @@ namespace Awb.Core.Export.ExporterParts
 
             ExportStsScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs, content);
             ExportStsScsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs, content);
+            ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs, content);
             content.AppendLine();
 
             content.AppendLine("   timelines = new std::vector<Timeline>();");
@@ -123,18 +126,20 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine();
         }
 
-        private static void ExportPCS9685PwmServoInformations(Pca9685PwmServoConfig[]? pca9685PwmServoConfigs, StringBuilder result)
+        private static void ExportPCS9685PwmServos(Pca9685PwmServoConfig[]? pca9685PwmServoConfigs, StringBuilder result)
         {
             var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Project.Pca9685PwmServoConfig>();
-            var pca9685PwmServoChannels = pca9685PwmServos.Select(s => s.Channel).ToArray();
-            var pca9685PwmServoI2cAdresses = pca9685PwmServos.Select(s => s.I2cAdress).ToArray();
-            var pca9685PwmServoNames = pca9685PwmServos.Select(s => s.Title ?? $"{s.Id}/{s.Channel}").ToArray();
-            result.AppendLine($"\tint pca9685PwmServoCount = {pca9685PwmServos.Length};");
-            result.AppendLine($"\tint pca9685PwmServoI2cAdresses[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoI2cAdresses.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tint pca9685PwmServoChannels[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoChannels.Select(s => s.ToString()))}}};");
-            result.AppendLine($"\tString pca9685PwmServoName[{pca9685PwmServos.Length}] = {{{string.Join(", ", pca9685PwmServoNames.Select(s => $"\"{s}\""))}}};");
+
+            var propertyName = "pca9685PwmServos";
+            result.AppendLine($"   {propertyName} = new std::vector<Pca9685PwmServo>();");
+
+                foreach (var servo in pca9685PwmServos)
+                    // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
+                    result.AppendLine($"   {propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.DefaultValue}));");
+
             result.AppendLine();
         }
+
 
         private static void ExportMp3PlayerYX5300Informations(Mp3PlayerYX5300Config[]? mp3PlayerYX5300Configs, StringBuilder result)
         {

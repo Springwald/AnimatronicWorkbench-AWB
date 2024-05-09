@@ -6,7 +6,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 09.05.2024 00:28:05
+// Created on 09.05.2024 12:04:51
 
 class WifiConfig
 {

@@ -10,16 +10,16 @@ using Awb.Core.Export.ExporterParts;
 
 namespace Awb.Core.Export
 {
-    public class Esp32ClientRemoteExporter : IExporter
+    public class Esp32ClientRemoteM5StickJoyCExporter : IExporter
     {
         private readonly string _esp32ClientsSourceFolder;
         private readonly WifiConfigExportData _wifiConfigData;
 
-        public string Title { get; } = "ESP32 Remote Controller";
+        public string Title { get; } = "ESP32 Remote Controller - M5Stack Mini JoyC HAT";
 
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
-        public Esp32ClientRemoteExporter(string esp32ClientsSourceFolder, WifiConfigExportData wifiConfigData)
+        public Esp32ClientRemoteM5StickJoyCExporter(string esp32ClientsSourceFolder, WifiConfigExportData wifiConfigData)
         {
             _esp32ClientsSourceFolder = esp32ClientsSourceFolder;
             _wifiConfigData = wifiConfigData;
@@ -27,7 +27,7 @@ namespace Awb.Core.Export
 
         public async Task<IExporter.ExportResult> ExportAsync(string targetPath)
         {
-            var remoteSrcFolder = Path.Combine(_esp32ClientsSourceFolder, "awb_esp32_remote-controller");
+            var remoteSrcFolder = Path.Combine(_esp32ClientsSourceFolder, "awb_esp32_remote-M5Stick-Mini-JoyC-HAT");
 
             if (!Directory.Exists(remoteSrcFolder))
             {
