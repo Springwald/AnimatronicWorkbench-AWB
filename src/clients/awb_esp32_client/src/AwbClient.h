@@ -17,6 +17,7 @@
 #include "WlanConnector.h"
 #include "Hardware.h"
 #include "ActualStatusInformation.h"
+#include "StatusManagement.h"
 #include "Debugging.h"
 
 using byte = unsigned char;
@@ -26,10 +27,10 @@ class AwbClient
 protected:
     int trackNo;
 
-    unsigned int _clientId;                /// The client id of this client
-    AwbDisplay _display;                   /// The display, oled or lcd
-    DacSpeaker *_dacSpeaker;               /// The speaker if connected
-    int _displayStateCounter = 0;          /// The counter for the display state
+    unsigned int _clientId;  /// The client id of this client
+    AwbDisplay _display;     /// The display, oled or lcd
+    DacSpeaker *_dacSpeaker; /// The speaker if connected
+
     long _lastStatusMillis = 0;            /// The last time the status was udated
     long _startMillis = millis();          /// The start millis
     int _lastAutoPlaySelectedStateId = -1; /// The last selected state id for autoplay timeline filter
@@ -48,33 +49,13 @@ protected:
     AutoPlayData *_data;                               // the data exported by Animatronic Workbench Studio
     ProjectData *_projectData;                         // the project data exported by Animatronic Workbench Studio
     Debugging *_debugging;                             // the debugging class
+    StatusManagement *_statusManagement;               // the status management for acutator status information and health check
     ActualStatusInformation *_actualStatusInformation; /// The actual status information
 
     /**
      * Update the actuators
      */
     void updateActuators();
-
-    /**
-     * Read the actuators statuses
-     */
-    void readActuatorsStatuses();
-    void readStsScsServoStatuses(StSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo);
-
-    /**
-     * Show the actuator values (=mostly positions) on the display
-     */
-    void showValues();
-
-    /**
-     * Show the temperature status of the actuators on the display
-     */
-    void showTemperaturStatuses();
-
-    /**
-     * Show the load status of the actuators on the display
-     */
-    void showLoadStatuses();
 
     /**
      * Show a error message on the display
