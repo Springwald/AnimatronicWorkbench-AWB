@@ -199,7 +199,7 @@ void AwbDisplay::loop()
             primarySprite.setColor(255, 255, 255);
             long bar = min(primarySprite.width(), (_message_duration_left * lcd.width()) / _message_duration);
             for (int i = 0; i < (_isSmallScreen ? 2 : 4); i++)
-                primarySprite.drawFastHLine(bar, primarySprite.height() - i, primarySprite.width() - bar);
+                primarySprite.drawFastHLine(0, primarySprite.height() - i, bar);
             primarySprite.pushSprite(0, _primarySpriteTop);
             draw_debuggingState();
         }
@@ -207,7 +207,7 @@ void AwbDisplay::loop()
         {
             // remove the message
             _message_duration_left = 0;
-            primarySprite.fillSprite(0xFFFFFFU);
+            primarySprite.fillSprite(0x000000U);
             primarySprite.pushSprite(0, _primarySpriteTop);
             draw_debuggingState();
         }
@@ -332,6 +332,65 @@ void AwbDisplay::draw_debuggingState()
     debugStateSprite.pushSprite(lcd.width() - debugStateSprite.width(), lcd.height() - debugStateSprite.height());
 }
 
+void AwbDisplay::set_debugStatus_dirty()
+{
+    _statusDirty = true;
+}
+
+bool AwbDisplay::draw_debugInfos()
+{
+    if (_message_duration_left > 0) // primary message is visible
+    {
+        if (_isSmallScreen == true)
+        {
+            return false; // message is visible and concurs with debug infos
+        }
+    }
+
+    if (_statusDirty == false)
+        return false; // no change
+
+    if (millis() > _last_debugInfos_changed + 2000) // show debug infos for 2 seconds
+    {
+        _statusDirty = false;
+    }
+
+    int freeMemory = getFreeMemory();
+
+    String message = "";
+
+    int lostMemory = _freeMemoryOnStart - freeMemory;
+    memoryInfo = "mem:" + String(freeMemory / 1024) + "k lost:" + String(lostMemory / 1024) + "." + String((lostMemory % 1024) / 100) + "k";
+
+    message = message + "\r\n" + memoryInfo;
+    message = message + "\r\n" + _statusMsg;
+
+    draw_message(message, 0, MSG_TYPE_INFO);
+
+    return true;
+
+    statusFooterSprite.setTextColor(0xFFFFFFU, 0);
+    statusFooterSprite.setTextDatum(top_center);
+
+    int y = 0;
+
+    statusFooterSprite.fillScreen(0x000000);
+
+    y++;
+    lostMemory = _freeMemoryOnStart - freeMemory;
+    memoryInfo = "free:" + String(freeMemory / 1024) + "k lost:" + String(lostMemory / 1024) + "." + String((lostMemory % 1024) / 100) + "k";
+    statusFooterSprite.drawString(memoryInfo, statusFooterSprite.width() / 2, y);
+
+    y += _textSizeLineHeight;
+    statusFooterSprite.setTextColor(0xAAAAFFU, 0);
+    statusFooterSprite.drawString(_statusMsg, statusFooterSprite.width() / 2, y);
+
+    statusFooterSprite.pushSprite(0, _statusFooterSpriteTop);
+    draw_debuggingState();
+
+    return true;
+}
+
 /// @brief draw a fullscreen info text
 void AwbDisplay::draw_message(String message, int durationMs, int msgType)
 {
@@ -353,6 +412,7 @@ void AwbDisplay::draw_message(String message, int durationMs, int msgType)
             break;
         }
     }
+
     primarySprite.setTextColor(0xFFFFFFU, backCol);
     primarySprite.fillScreen(backCol);
     primarySprite.setTextDatum(top_center);
@@ -425,51 +485,4 @@ String AwbDisplay::getNextLine(String input, uint maxLineLength, std::vector<cha
     if (bestSplitPos == -1)
         return input;
     return input.substring(0, bestSplitPos);
-}
-
-void AwbDisplay::set_debugStatus_dirty()
-{
-    _statusDirty = true;
-}
-
-bool AwbDisplay::draw_debugInfos()
-{
-    if (_message_duration_left > 0) // primary message is visible
-    {
-        if (_isSmallScreen == true)
-        {
-            return false; // message is visible and concurs with debug infos
-        }
-    }
-
-    if (_statusDirty == false)
-        return false; // no change
-
-    if (millis() > _last_debugInfos_changed + 2000) // show debug infos for 2 seconds
-    {
-        _statusDirty = false;
-    }
-
-    int freeMemory = getFreeMemory();
-
-    statusFooterSprite.setTextColor(0xFFFFFFU, 0);
-    statusFooterSprite.setTextDatum(top_center);
-
-    int y = 0;
-
-    statusFooterSprite.fillScreen(0x000000);
-
-    y++;
-    int lostMemory = _freeMemoryOnStart - freeMemory;
-    memoryInfo = "free:" + String(freeMemory / 1024) + "k lost:" + String(lostMemory / 1024) + "." + String((lostMemory % 1024) / 100) + "k";
-    statusFooterSprite.drawString(memoryInfo, statusFooterSprite.width() / 2, y);
-
-    y += _textSizeLineHeight;
-    statusFooterSprite.setTextColor(0xAAAAFFU, 0);
-    statusFooterSprite.drawString(_statusMsg, statusFooterSprite.width() / 2, y);
-
-    statusFooterSprite.pushSprite(0, _statusFooterSpriteTop);
-    draw_debuggingState();
-
-    return true;
 }

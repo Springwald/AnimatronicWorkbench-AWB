@@ -19,11 +19,14 @@ using TCallBackMessageToShowWithDuration = std::function<void(String, int)>; // 
  */
 void AwbClient::setup()
 {
-    _display.setup(_clientId); // set up the display
-
     // set up the debugging
     _debugging = new Debugging(&_display);
+    if (_debugging->isDebugging())
+    {
+        delay(5000); // Save previous error messages
+    }
 
+    _display.setup(_clientId); // set up the display
     delay(1000);
 
     // set up the wlan connector
@@ -306,7 +309,7 @@ void AwbClient::loop()
                 }
             }
         }
-        _display.set_debugStatus("Timeline:" + String(_lastAutoPlayTimelineName));
+        _display.set_debugStatus("Timeline: " + String(_lastAutoPlayTimelineName));
     }
 
     _debugging->setState(Debugging::MJ_LOOP, 35);
