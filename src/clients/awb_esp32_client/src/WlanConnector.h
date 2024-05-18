@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "AutoPlay/AutoPlayData.h"
 #include "AutoPlay/AutoPlayer.h"
+#include "AwbDataImport/ProjectData.h"
 #include "hardware.h"
 #include <WiFi.h>
 #include <WebServer.h>
@@ -29,6 +30,7 @@ private:
     bool _liveDebuggingActive;                         /// the live debugging is active or not
     WebServer *_server;                                /// the webserver
     long _startTime = millis();                        /// the time when the webserver was started
+    ProjectData *_projectData;                         /// the project data exported by Animatronic Workbench Studio
     ActualStatusInformation *_actualStatusInformation; /// the actual status information of the animatronic figure
 
     String _messages[MAX_LOG_MESSAGES]; /// the log messages
@@ -54,8 +56,8 @@ public:
     int stsServoCannelToSet; /// the channel of the sts servo to set by remote control
     int stsServoValueToSet;  /// the value of the sts servo to set by remote control (in percent)
 
-    WlanConnector(int clientId, ActualStatusInformation *actualStatusInformation, TCallBackErrorOccured errorOccured)
-        : _errorOccured(errorOccured), _clientId(clientId), _actualStatusInformation(actualStatusInformation)
+    WlanConnector(int clientId, ProjectData *projectData, ActualStatusInformation *actualStatusInformation, TCallBackErrorOccured errorOccured)
+        : _errorOccured(errorOccured), _projectData(projectData), _clientId(clientId), _actualStatusInformation(actualStatusInformation)
     {
         _data = new AutoPlayData();
         timelineNameToPlay = new String();

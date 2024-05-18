@@ -33,37 +33,22 @@ void Pca9685PwmManager::setOscillatorFrequency(uint8_t adr, uint32_t freq)
 void Pca9685PwmManager::setTargetValue(int channel, int value, String name)
 {
     int index = -1;
-    for (int f = 0; f < this->pwmServoValues->size(); f++)
+    for (int f = 0; f < this->_pwmServos->size(); f++)
     {
-        if (this->pwmServoValues->at(f).id == channel)
+        if (this->_pwmServos->at(f).channel == channel)
         {
-            // pwm servo already added
-            index = f;
+            this->_pwmServos->at(index).targetValue = value; // set servo target value
             break;
         }
     }
-
-    if (index == -1)
-    {
-        // pwm servo not added yet. Insert it now
-        this->_messageToShow("added pwm servo id " + String(channel) + " '" + name + "' to list.");
-        ActuatorValue actuatorValue;
-        actuatorValue.id = channel;
-        actuatorValue.name = name;
-        this->pwmServoValues->push_back(actuatorValue);
-        index = this->pwmServoValues->size() - 1;
-    }
-
-    this->pwmServoValues->at(index).name = name;         // update the servo name
-    this->pwmServoValues->at(index).targetValue = value; // set servo target value
 }
 
 void Pca9685PwmManager::updateActuators()
 {
-    for (int i = 0; i < this->pwmServoValues->size(); i++)
+    for (int i = 0; i < this->_pwmServos->size(); i++)
     {
         // get a pointer to the current servo
-        ActuatorValue *servo = &this->pwmServoValues->at(i);
+        auto *servo = &this->_pwmServos->at(i);
         if (servo->targetValue == -1)
         {
             // turn servo off
@@ -75,7 +60,7 @@ void Pca9685PwmManager::updateActuators()
             if (servo->currentValue != servo->targetValue)
             {
 
-                uint8_t servoNo = servo->id;
+                uint8_t servoNo = servo->channel;
                 uint16_t microseconds = servo->targetValue;
 
                 this->_messageToShow("pwm servo no " + String(servoNo) + " to " + String(microseconds));

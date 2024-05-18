@@ -59,7 +59,7 @@ protected:
      * Read the actuators statuses
      */
     void readActuatorsStatuses();
-    void readStsScsServoStatuses(StSerialServoManager *_serialServoManager, std::vector<ActuatorValue> *servoValues, bool isScsServo);
+    void readStsScsServoStatuses(StSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo);
 
     /**
      * Show the actuator values (=mostly positions) on the display

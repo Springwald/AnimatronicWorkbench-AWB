@@ -27,12 +27,9 @@ class PacketProcessor
 
 private:
     ProjectData *_projectData;
-    AwbDisplay *_awbDisplay;
     StSerialServoManager *_stSerialServoManager;
     StSerialServoManager *_scSerialServoManager;
     Pca9685PwmManager *_pca9685PwmManager;
-    Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager;
-    InputManager *_inputManager;
     TCallBackErrorOccured _errorOccured;
     TCallBackMessageToShowWithDuration _messageToShow;
 
@@ -42,7 +39,7 @@ private:
     // void updateActuators();
 
 public:
-    PacketProcessor(ProjectData *projectData, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, AwbDisplay *awbDisplay, TCallBackErrorOccured errorOccured, TCallBackMessageToShowWithDuration messageToShow) : _projectData(projectData), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _awbDisplay(awbDisplay), _errorOccured(errorOccured), _messageToShow(messageToShow)
+    PacketProcessor(ProjectData *projectData, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured, TCallBackMessageToShowWithDuration messageToShow) : _projectData(projectData), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured), _messageToShow(messageToShow)
     {
     }
 

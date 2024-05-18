@@ -146,44 +146,27 @@ String WlanConnector::GetHtml()
 
         // Servo status
         ptr += "<div class=\"region\">\n";
-        ptr += "<span>" + String(this->_actualStatusInformation->stsServoValues->size()) + " STS-Servos, ";
-        ptr += String(this->_actualStatusInformation->pwmServoValues->size()) + " PWM-Servos</span>\n";
+        ptr += "<span>" + String(this->_projectData->stsServos->size()) + " STS-Servos, ";
+        ptr += String(this->_projectData->scsServos->size()) + " SCS-Servos, ";
+        ptr += String(this->_projectData->pca9685PwmServos->size()) + " PWM-Servos</span>\n";
         ptr += "<table>\n";
-        ptr += "<tr><th>Id</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th></tr>\n";
-        for (int i = 0; i < this->_actualStatusInformation->stsServoValues->size(); i++)
+        ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th></tr>\n";
+        for (int i = 0; i < this->_projectData->stsServos->size(); i++)
         {
-            auto servo = this->_actualStatusInformation->stsServoValues->at(i);
-            auto name = servo.name;
-            for (int a = 0; a < _data->stsServoCount; a++)
-            {
-                if (_data->stsServoChannels[a] == servo.id)
-                {
-                    name = _data->stsServoName[a];
-                    break;
-                }
-            }
-            ptr += "<tr><td>STS " + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
+            auto servo = this->_projectData->stsServos->at(i);
+            ptr += "<tr><td>STS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
         }
 
-        for (int i = 0; i < this->_actualStatusInformation->scsServoValues->size(); i++)
+        for (int i = 0; i < this->_projectData->scsServos->size(); i++)
         {
-            auto servo = this->_actualStatusInformation->scsServoValues->at(i);
-            auto name = servo.name;
-            for (int a = 0; a < _data->stsServoCount; a++)
-            {
-                if (_data->scsServoChannels[a] == servo.id)
-                {
-                    name = _data->scsServoName[a];
-                    break;
-                }
-            }
-            ptr += "<tr><td>SCS " + String(servo.id) + "</td><td>" + name + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
+            auto servo = this->_projectData->scsServos->at(i);
+            ptr += "<tr><td>SCS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
         }
 
-        for (int i = 0; i < this->_actualStatusInformation->pwmServoValues->size(); i++)
+        for (int i = 0; i < this->_projectData->pca9685PwmServos->size(); i++)
         {
-            auto servo = this->_actualStatusInformation->pwmServoValues->at(i);
-            ptr += "<tr><td>PWM " + String(servo.id) + "</td><td>" + servo.name + "</td><td>" + String(servo.currentValue) + "</td><td>-</td><td>-</tr>\n";
+            auto servo = this->_projectData->pca9685PwmServos->at(i);
+            ptr += "<tr><td>PWM " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td><td>-</td><td>-</tr>\n";
         }
 
         ptr += "</table>\n";
