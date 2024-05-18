@@ -9,9 +9,11 @@
 #include "Actuators/Mp3PlayerYX5300Manager.h"
 #include "Actuators/ActuatorValue.h"
 #include "PacketSenderReceiver.h"
+#include "PacketProcessor.h"
 #include "DacSpeaker.h"
 #include "NeoPixel/NeoPixelStatusControl.h"
 #include "AutoPlay/AutoPlayer.h"
+#include "AwbDataImport/ProjectData.h"
 #include "WlanConnector.h"
 #include "Hardware.h"
 #include "ActualStatusInformation.h"
@@ -34,6 +36,7 @@ protected:
     String _lastAutoPlayTimelineName = ""; /// The last selected timeline name for autoplay timeline filter
 
     PacketSenderReceiver *_packetSenderReceiver;       /// The packet sender receiver to communicate with the Animatronic Workbench Studio
+    PacketProcessor *_packetProcessor;                 /// The packet processor to process the received packets from the Animatronic Workbench Studio
     Pca9685PwmManager *_pca9685pwmManager;             /// The pwm manager to control the Pca9685 pwm board
     StSerialServoManager *_stSerialServoManager;       /// The serial servo manager to control the sts serial servos
     StSerialServoManager *_scSerialServoManager;       /// The serial servo manager to control the scs serial servos
@@ -43,13 +46,9 @@ protected:
     AutoPlayer *_autoPlayer;                           /// The auto player to play timeline animations
     WlanConnector *_wlanConnector;                     /// The wlan connector to open a WLAN AP and display status information as a web page
     AutoPlayData *_data;                               // the data exported by Animatronic Workbench Studio
+    ProjectData *_projectData;                         // the project data exported by Animatronic Workbench Studio
     Debugging *_debugging;                             // the debugging class
     ActualStatusInformation *_actualStatusInformation; /// The actual status information
-
-    /**
-     * Process a packet received from the Animatronic Workbench Studio
-     */
-    void processPacket(String payload);
 
     /**
      * Update the actuators
@@ -87,6 +86,10 @@ protected:
      */
     void showMsg(String message);
 
+    /**
+     * Show a message on the display (no error!)
+     */
+    void showMsgWithDuration(String message, int duration);
     /**
      * Show a message during the setup process on the display for only a short moment (no error!)
      */

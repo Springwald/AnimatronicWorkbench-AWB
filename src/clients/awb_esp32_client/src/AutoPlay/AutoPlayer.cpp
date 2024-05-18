@@ -87,7 +87,12 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 
     _lastMsUpdate = millis();
 
-    bool packedReceivedLately = _lastPacketReceivedMillis != -1 && millis() < _lastPacketReceivedMillis + 60 * 1000; //  got a awb studio packet or last packet is newer than given seconds * 1000ms
+    bool forgetLastPacketReceived = false;
+
+    if (forgetLastPacketReceived == true && _lastPacketReceivedMillis != -1 && millis() > _lastPacketReceivedMillis + 60 * 1000) // 60 seconds
+        _lastPacketReceivedMillis = -1;                                                                                          // forget the last packet received
+
+    bool packedReceivedLately = _lastPacketReceivedMillis != -1;
     if (packedReceivedLately == true)
     {
         // data received, so we stop the auto mode

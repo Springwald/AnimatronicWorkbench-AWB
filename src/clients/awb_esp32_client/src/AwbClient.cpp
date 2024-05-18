@@ -2,17 +2,15 @@
 #include "AwbDisplay.h"
 #include "Packet.h"
 #include "PacketSenderReceiver.h"
+#include "PacketProcessor.h"
 #include <ArduinoJson.h>
 #include "WlanConnector.h"
 #include "AwbClient.h"
 
-bool demoMode = false;
-
 using TCallBackPacketReceived = std::function<void(unsigned int, String)>;
 using TCallBackErrorOccured = std::function<void(String)>;
-using TCallBackMessageToShow = std::function<void(String)>;
-
-StaticJsonDocument<1024 * 32> jsondoc;
+using TCallBackMessageToShow = std::function<void(String)>;                  // message, duration in ms (0=auto duration)
+using TCallBackMessageToShowWithDuration = std::function<void(String, int)>; // message, duration in ms (0=auto duration)
 
 #define DEFAULT_VOLUME 5
 
@@ -38,6 +36,7 @@ void AwbClient::setup()
 
     // load the AWB project data
     _data = new AutoPlayData();
+    _projectData = new ProjectData();
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     showSetupMsg("setup neopixel");
@@ -57,6 +56,10 @@ void AwbClient::setup()
     // set up error callbacks for the different components
     const TCallBackErrorOccured packetErrorOccured = [this](String message)
     { showError(message); };
+    const TCallBackErrorOccured packetProcessorErrorOccured = [this](String message)
+    { showError(message); };
+    const TCallBackMessageToShowWithDuration packetProcessorMessageToShow = [this](String message, int duration)
+    { showMsgWithDuration(message, duration); };
     const TCallBackErrorOccured pca9685PwmErrorOccured = [this](String message)
     { showError(message); };
     const TCallBackMessageToShow pca9685PwmMessageToShow = [this](String message)
@@ -156,11 +159,15 @@ void AwbClient::setup()
         // process the packet
         if (clientId == this->_clientId)
         {
-            this->processPacket(payload);
+            this->_packetProcessor->processPacket(payload);
         }
     };
     char *packetHeader = (char *)"AWB";
     this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, packetErrorOccured);
+
+    // setup the packet processor to process packets from the Animatronic Workbench Studio
+    showSetupMsg("setup AWB studio packet processor");
+    this->_packetProcessor = new PacketProcessor(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, &_display, packetProcessorErrorOccured, packetProcessorMessageToShow);
 
     if (this->_dacSpeaker != NULL)
     {
@@ -195,11 +202,20 @@ void AwbClient::showError(String message)
 /**
  * show an info message on the display (no error)
  */
-void AwbClient::showMsg(String message)
+void AwbClient::showMsgWithDuration(String message, int durationMs)
 {
-    int durationMs = _debugging->isDebugging() ? 1000 : 100;
+    if (durationMs <= 0)
+        durationMs = _debugging->isDebugging() ? 1000 : 100;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
     _wlanConnector->logInfo(message);
+}
+
+/**
+ * show an info message on the display (no error)
+ */
+void AwbClient::showMsg(String message)
+{
+    this->showMsgWithDuration(message, 0);
 }
 
 /**
@@ -238,6 +254,8 @@ void AwbClient::loop()
 
     // receive packets
     bool packetReceived = this->_packetSenderReceiver->loop();
+    if (packetReceived)
+        _autoPlayer->stopBecauseOfIncommingPackage();
 
     _debugging->setState(Debugging::MJ_LOOP, 5);
 
@@ -394,138 +412,6 @@ void AwbClient::loop()
     }
 
     _debugging->setState(Debugging::MJ_LOOP, 99);
-}
-
-/**
- * process a received packet from the Animatronic Workbench Studio
- */
-void AwbClient::processPacket(String payload)
-{
-    if (demoMode == true)
-    {
-        _display.set_debugStatus("demo:" + payload); // show payload string 1:1 on display
-        return;
-    }
-
-    DeserializationError error = deserializeJson(jsondoc, payload);
-    if (error)
-    {
-        // packet content is not valid json
-        showError("json:" + String(error.c_str()));
-        return;
-    }
-
-    if (jsondoc.containsKey("DispMsg")) // packat contains a display message
-    {
-        const char *message = jsondoc["DispMsg"]["Msg"];
-        if (message == NULL)
-        {
-            // should not happen, instead the whole DispMsg should be missing
-            _display.draw_message("DispMsg?!? " + payload, 5000, MSG_TYPE_ERROR);
-        }
-        else
-        {
-            int duration = jsondoc["DispMsg"]["Ms"];
-            showMsg(message);
-        }
-    }
-
-    if (jsondoc.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
-    {
-        JsonArray servos = jsondoc["Pca9685Pwm"]["Servos"];
-        for (size_t i = 0; i < servos.size(); i++)
-        {
-            if (this->_pca9685pwmManager == NULL)
-            {
-                showError("Pca9685Pwm not configured!");
-                return;
-            }
-            int channel = servos[i]["Ch"];
-            int value = servos[i]["TVal"];
-            String name = servos[i]["Name"];
-            // store the method showMsg in an anonymous function
-            _pca9685pwmManager->setTargetValue(channel, value, name);
-        }
-    }
-    if (this->_pca9685pwmManager != NULL)
-        _pca9685pwmManager->updateActuators();
-
-    if (jsondoc.containsKey("STS")) // package contains STS bus servo data
-    {
-        JsonArray servos = jsondoc["STS"]["Servos"];
-        int stsCount = 0;
-        for (size_t i = 0; i < servos.size(); i++)
-        {
-            if (this->_stSerialServoManager == NULL)
-            {
-                showError("STS not configured!");
-                return;
-            }
-
-            int id = servos[i]["Ch"];
-            int value = servos[i]["TVal"];
-            String name = servos[i]["Name"];
-
-            bool done = false;
-            for (int f = 0; f < this->_actualStatusInformation->stsServoValues->size(); f++)
-            {
-                if (this->_actualStatusInformation->stsServoValues->at(f).id == id)
-                {
-                    // set servo target value
-                    this->_actualStatusInformation->stsServoValues->at(f).id = id;
-                    this->_actualStatusInformation->stsServoValues->at(f).targetValue = value;
-                    this->_actualStatusInformation->stsServoValues->at(f).name = name;
-                    done = true;
-                    break;
-                }
-            }
-            if (!done)
-                showError("STS Servo " + String(id) + " not attached!");
-        }
-    }
-    if (this->_stSerialServoManager != NULL)
-        _stSerialServoManager->updateActuators();
-
-    if (jsondoc.containsKey("SCS")) // package contains SCS bus servo data
-    {
-        JsonArray servos = jsondoc["SCS"]["Servos"];
-        int stsCount = 0;
-        for (size_t i = 0; i < servos.size(); i++)
-        {
-            if (this->_scSerialServoManager == NULL)
-            {
-                showError("SCS not configured!");
-                return;
-            }
-            int id = servos[i]["Ch"];
-            int value = servos[i]["TVal"];
-            String name = servos[i]["Name"];
-
-            bool done = false;
-            for (int f = 0; f < this->_actualStatusInformation->scsServoValues->size(); f++)
-            {
-                if (this->_actualStatusInformation->scsServoValues->at(f).id == id)
-                {
-                    // set servo target value
-                    this->_actualStatusInformation->scsServoValues->at(f).id = id;
-                    this->_actualStatusInformation->scsServoValues->at(f).targetValue = value;
-                    this->_actualStatusInformation->scsServoValues->at(f).name = name;
-                    done = true;
-                    break;
-                }
-            }
-            if (!done)
-                showError("SCS Servo " + String(id) + " not attached!");
-        }
-    }
-    if (this->_scSerialServoManager != NULL)
-        _scSerialServoManager->updateActuators();
-
-    _autoPlayer->stopBecauseOfIncommingPackage();
-
-#ifdef USE_NEOPIXEL_STATUS_CONTROL
-    _neoPixelStatus->showActivity();
-#endif
 }
 
 /**
