@@ -14,7 +14,7 @@ class StSerialServoManager
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:
-    std::vector<StsScsServo> *_servos;    /// The sts / scs servos
+    std::vector<StsScsServo> *_servos;   /// The sts / scs servos
     TCallBackErrorOccured _errorOccured; /// callback functio to call if an error occured
     int _speed;                          /// the speed to use for the sts servos
     int _acc;                            /// the acceleration to use for the sts servos
@@ -29,14 +29,14 @@ private:
 
 public:
     /**
-     * has any servo a critical temperature?
+     * has any servo with global fault a critical temperature?
      */
-    bool servoCriticalTemp = false;
+    bool servoCriticalTempGlobal = false;
 
     /**
-     * has any servo a critical load?
+     * has any servo with global fault a critical load?
      */
-    bool servoCriticalLoad = false;
+    bool servoCriticalLoadGlobal = false;
 
     /**
      * the ids of the servos (1-253)

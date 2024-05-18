@@ -246,9 +246,9 @@ void AwbClient::loop()
     // update autoplay timelines and actuators
     auto criticalTemp = false;
     if (this->_stSerialServoManager != NULL)
-        criticalTemp = this->_stSerialServoManager->servoCriticalTemp;
+        criticalTemp = this->_stSerialServoManager->servoCriticalTempGlobal;
     if (this->_scSerialServoManager != NULL)
-        criticalTemp = criticalTemp || this->_scSerialServoManager->servoCriticalTemp;
+        criticalTemp = criticalTemp || this->_scSerialServoManager->servoCriticalTempGlobal;
 
     _debugging->setState(Debugging::MJ_LOOP, 15);
 
@@ -427,26 +427,32 @@ void AwbClient::readStsScsServoStatuses(StSerialServoManager *serialServoManager
     // Scs serial bus servos
     for (int i = 0; i < servos->size(); i++)
     {
-        if (servos->at(i).title.length() > 0)
+        StsScsServo *servo = &servos->at(i);
+        if (servo->title.length() > 0)
         {
-            servos->at(i).temperature = serialServoManager->readTemperature(servos->at(i).channel);
-            if (servos->at(i).temperature > (isScsServo ? SCS_SERVO_MAX_TEMPERATURE : STS_SERVO_MAX_TEMPERATURE))
+            servo->isFault = false;
+
+            servo->temperature = serialServoManager->readTemperature(servo->channel);
+            if (servo->temperature > (isScsServo ? SCS_SERVO_MAX_TEMPERATURE : STS_SERVO_MAX_TEMPERATURE))
             {
                 criticalTemp = true;
-                serialServoManager->setTorque(servos->at(i).channel, false);
-                showError("Servo " + String(servos->at(i).channel) + " critical temperature! " + String(servos->at(i).temperature) + "C");
+                serialServoManager->setTorque(servo->channel, false);
+                showError("Servo " + String(servo->channel) + " critical temperature! " + String(servo->temperature) + "C");
+                servo->isFault = true;
             }
-            servos->at(i).load = serialServoManager->readLoad(servos->at(i).channel);
-            if (abs(servos->at(i).load) > (isScsServo ? SCS_SERVO_MAX_LOAD : STS_SERVO_MAX_LOAD))
+
+            servo->load = serialServoManager->readLoad(servo->channel);
+            if (abs(servo->load) > (isScsServo ? SCS_SERVO_MAX_LOAD : STS_SERVO_MAX_LOAD))
             {
                 criticalLoad = true;
-                serialServoManager->setTorque(servos->at(i).channel, false);
-                showError("Servo " + String(servos->at(i).channel) + " critical load! " + String(servos->at(i).load));
+                serialServoManager->setTorque(servo->channel, false);
+                showError("Servo " + String(servo->channel) + " critical load! " + String(servo->load));
+                servo->isFault = true;
             }
         }
     }
-    serialServoManager->servoCriticalTemp = criticalTemp;
-    serialServoManager->servoCriticalLoad = criticalLoad;
+    serialServoManager->servoCriticalTempGlobal = criticalTemp;
+    serialServoManager->servoCriticalLoadGlobal = criticalLoad;
 }
 
 /**

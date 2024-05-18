@@ -42,13 +42,17 @@ void StSerialServoManager::setup()
  */
 void StSerialServoManager::updateActuators()
 {
-    if (servoCriticalTemp == true || servoCriticalLoad == true)
+    if (servoCriticalTempGlobal == true || servoCriticalLoadGlobal == true)
         return;
 
     for (int i = 0; i < this->_servos->size(); i++)
     {
         // get a pointer to the current servo
         StsScsServo *servo = &this->_servos->at(i);
+
+        if (servo->isFault)
+            continue;
+
         if (servo->targetValue == -1)
         {
             // turn servo off

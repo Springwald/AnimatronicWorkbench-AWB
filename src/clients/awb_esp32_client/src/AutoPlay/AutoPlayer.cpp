@@ -67,7 +67,7 @@ String AutoPlayer::getLastSoundPlayed()
 /**
  * Updates the autoplayer and plays the timelines
  */
-void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
+void AutoPlayer::update(bool servoHaveGlobalyRelavantErrorsLikeTooHot)
 {
     // return of no data is set
     if (_data == nullptr)
@@ -75,7 +75,7 @@ void AutoPlayer::update(bool servoHaveErrorsLikeTooHot)
 
     int updateInterval = 50; // ms
 
-    if (servoHaveErrorsLikeTooHot)
+    if (servoHaveGlobalyRelavantErrorsLikeTooHot)
     {
         _actualTimelineIndex = -1;
         return;
