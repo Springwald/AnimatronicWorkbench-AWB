@@ -17,13 +17,10 @@ private:
   int _debugStateMinor;  /// The minor debug state
   bool _debuggingActive; /// The debug state is active
 
-  int _freeMemoryOnStart;       /// The free memory on start
-  String _statusMsg;            /// The last / actual status message
-  int _last_debugInfos_changed; /// The last time the debug infos were changed
-  unsigned long _last_loop;     /// The last time the loop was called
-  bool _statusDirty;            /// The status is dirty and must be redrawn
-  bool _isSmallScreen;          /// The screen is small (e.g. 128x32)
-  bool _debugInfosVisible;      /// The debug infos are visible
+
+  String _actualStatusInfo; /// The actual status message
+  unsigned long _last_loop; /// The last time the loop was called
+  bool _isSmallScreen;      /// The screen is small (e.g. 128x32)
 
   int _message_duration;      /// how long should the actual message be shown (in ms)
   int _message_duration_left; /// how long should the actual message still be shown (in ms)
@@ -39,13 +36,10 @@ private:
   int _valuesCount = 0;      /// The count of values to show
   bool _valuesDirty = false; /// The values are dirty and must be redrawn
 
-  int getFreeMemory(); /// Get the free memory
-
   void showTopBar(String message); /// Show the top bar with the given message
-  void draw_values();              /// Draw the values
-  bool draw_debugInfos();          /// Draw the debug infos
   void draw_debuggingState();      // Draw the small live(!) debug state
 
+  void draw_string(String message, int backCol);
   String getNextLine(String input, uint maxLineLength, std::vector<char> splitChars, bool forceFirstSplit);
 
 public:
@@ -64,28 +58,12 @@ public:
    */
   void loop();
 
-  void resetDebugInfos();
   void clear();
 
   /**
    * Set the status message
    */
-  void set_statusMsg(String message);
-
-  /**
-   * Set the actuator values to show
-   */
-  void set_values(String values[], int count);
-
-  /**
-   * Set a debug status message to show
-   */
-  void set_debugStatus(String message);
-
-  /**
-   * force to redraw the debug status message
-   */
-  void set_debugStatus_dirty();
+  void set_actual_status_info(String infos);
 
   void set_debuggingState(bool isDebugging, int major, int minor);
 

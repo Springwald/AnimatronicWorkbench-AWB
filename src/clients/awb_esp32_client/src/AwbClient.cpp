@@ -154,7 +154,7 @@ void AwbClient::setup()
 
     // set up the status management
     showSetupMsg("setup status management");
-    _statusManagement = new StatusManagement(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, statusManagementErrorOccured);
+    _statusManagement = new StatusManagement(_projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, statusManagementErrorOccured);
 
     if (this->_dacSpeaker != NULL)
     {
@@ -278,7 +278,7 @@ void AwbClient::loop()
     {
         // an other timeline filter state was selected
         _lastAutoPlaySelectedStateId = _autoPlayer->getStateSelectorStsServoChannel();
-        _display.set_debugStatus("StateId:" + String(_lastAutoPlaySelectedStateId));
+        _statusManagement->setDebugStatus("StateId:" + String(_lastAutoPlaySelectedStateId));
     }
 
     _debugging->setState(Debugging::MJ_LOOP, 30);
@@ -309,7 +309,7 @@ void AwbClient::loop()
                 }
             }
         }
-        _display.set_debugStatus("Timeline: " + String(_lastAutoPlayTimelineName));
+        _statusManagement->setDebugStatus("Timeline: " + String(_lastAutoPlayTimelineName));
     }
 
     _debugging->setState(Debugging::MJ_LOOP, 35);
@@ -354,7 +354,7 @@ void AwbClient::loop()
 
     if (millis() - _startMillis < 5000)
     {
-        _display.resetDebugInfos(); // only check memory usage after 5 seconds to avoid false alarms when starting up
+        _statusManagement->resetDebugInfos(); // only check memory usage after 5 seconds to avoid false alarms when starting up
     }
 
     _debugging->setState(Debugging::MJ_LOOP, 99);

@@ -28,7 +28,7 @@ class StatusManagement
     using TCallBackMessageToShowWithDuration = std::function<void(String, int)>;
 
 private:
-    AwbDisplay _awbDisplay; /// The display, oled or lcd
+    AwbDisplay *_awbDisplay; /// The display, oled or lcd
     ProjectData *_projectData;
     StSerialServoManager *_stSerialServoManager;
     StSerialServoManager *_scSerialServoManager;
@@ -36,6 +36,8 @@ private:
     TCallBackErrorOccured _errorOccured;
     TCallBackMessageToShowWithDuration _messageToShow;
     int _displayStateCounter = 0; /// The counter for the display state
+    String _debugState;           /// The debug state to show on the display
+    int _freeMemoryOnStart;       /// The free memory on start
 
     /**
      * read the status information from the actuators
@@ -59,9 +61,13 @@ private:
      */
     void showLoadStatuses();
 
+    void draw_debugInfos();
+
+    int getFreeMemory();
+
 public:
-    StatusManagement(ProjectData *projectData, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured)
-        : _projectData(projectData), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured)
+    StatusManagement(ProjectData *projectData, AwbDisplay *awbDisplay, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured)
+        : _projectData(projectData), _awbDisplay(awbDisplay), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured)
     {
     }
 
@@ -71,6 +77,8 @@ public:
     }
 
     void update(boolean criticalTemp);
+    void setDebugStatus(String state);
+    void resetDebugInfos();
 };
 
 #endif

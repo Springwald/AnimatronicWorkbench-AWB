@@ -6,6 +6,11 @@
 #include "WlanConnector.h"
 #include "StatusManagement.h"
 
+void StatusManagement::setDebugStatus(String state)
+{
+    _debugState = state;
+}
+
 void StatusManagement::update(boolean criticalTemp)
 {
     bool onlyLoadCheck = false;
@@ -43,13 +48,55 @@ void StatusManagement::update(boolean criticalTemp)
             {
                 if (_displayStateCounter == 151)
                 {
-                    _awbDisplay.set_debugStatus_dirty();
+                    draw_debugInfos();
                 }
             }
             else
                 _displayStateCounter = 0;
         }
     }
+}
+
+void StatusManagement::resetDebugInfos()
+{
+    _freeMemoryOnStart = getFreeMemory();
+}
+
+void StatusManagement::draw_debugInfos()
+{
+    int freeMemory = getFreeMemory();
+
+    String message = "";
+
+    int lostMemory = _freeMemoryOnStart - freeMemory;
+    String memoryInfo = "mem:" + String(freeMemory / 1024) + "k lost:" + String(lostMemory / 1024) + "." + String((lostMemory % 1024) / 100) + "k";
+
+    message = message + "\r\n" + memoryInfo;
+    message = message + "\r\n" + _debugState;
+
+    _awbDisplay->set_actual_status_info(message);
+
+    /*
+        statusFooterSprite.setTextColor(0xFFFFFFU, 0);
+        statusFooterSprite.setTextDatum(top_center);
+
+        int y = 0;
+
+        statusFooterSprite.fillScreen(0x000000);
+
+        y++;
+        lostMemory = _freeMemoryOnStart - freeMemory;
+        memoryInfo = "free:" + String(freeMemory / 1024) + "k lost:" + String(lostMemory / 1024) + "." + String((lostMemory % 1024) / 100) + "k";
+        statusFooterSprite.drawString(memoryInfo, statusFooterSprite.width() / 2, y);
+
+        y += _textSizeLineHeight;
+        statusFooterSprite.setTextColor(0xAAAAFFU, 0);
+        statusFooterSprite.drawString(_statusMsg, statusFooterSprite.width() / 2, y);
+
+        statusFooterSprite.pushSprite(0, _statusFooterSpriteTop);
+        draw_debuggingState();
+
+        return true;*/
 }
 
 /**
@@ -120,6 +167,7 @@ void StatusManagement::readStsScsServoStatuses(StSerialServoManager *serialServo
  */
 void StatusManagement::showValues()
 {
+    /*
     String values[100]; //_stsServoValues->size()];
     int used = 0;
     for (int i = 0; i < this->_projectData->stsServos->size(); i++)
@@ -149,7 +197,7 @@ void StatusManagement::showValues()
             used++;
         }
     }
-    _awbDisplay.set_values(values, used);
+    _awbDisplay.set_values(values, used);*/
 }
 
 /**
@@ -157,29 +205,26 @@ void StatusManagement::showValues()
  */
 void StatusManagement::showTemperaturStatuses()
 {
-    int maxValues = this->_projectData->stsServos->size() + this->_projectData->scsServos->size();
-    String statuses[maxValues];
-    int used = 0;
+    String message = "";
+
     for (int i = 0; i < this->_projectData->stsServos->size(); i++)
     {
         // sts serial bus servos
-        if (this->_projectData->stsServos->at(i).title.length() > 0 && used < maxValues)
+        if (this->_projectData->stsServos->at(i).title.length() > 0)
         {
-            statuses[used] = String(this->_projectData->stsServos->at(i).channel) + ":" + this->_projectData->stsServos->at(i).temperature + "C";
-            used++;
+            message += String(this->_projectData->stsServos->at(i).channel) + ":" + this->_projectData->stsServos->at(i).temperature + "C|";
         }
     }
     for (int i = 0; i < this->_projectData->scsServos->size(); i++)
     {
         // scs serial bus servos
-        if (this->_projectData->scsServos->at(i).title.length() > 0 && used < maxValues)
+        if (this->_projectData->scsServos->at(i).title.length() > 0)
         {
-            statuses[used] = String(this->_projectData->scsServos->at(i).channel) + ":" + this->_projectData->scsServos->at(i).temperature + "C";
-            used++;
+            message += String(this->_projectData->scsServos->at(i).channel) + ":" + this->_projectData->scsServos->at(i).temperature + "C|";
         }
     }
 
-    _awbDisplay.set_values(statuses, used);
+    _awbDisplay->set_actual_status_info(message);
 }
 
 /**
@@ -187,23 +232,28 @@ void StatusManagement::showTemperaturStatuses()
  */
 void StatusManagement::showLoadStatuses()
 {
-    int maxValues = this->_projectData->stsServos->size() + this->_projectData->scsServos->size();
-    String statuses[maxValues];
-    int used = 0;
-    for (int i = 0; i < maxValues; i++)
+    String message = "";
+
+    for (int i = 0; i < this->_projectData->stsServos->size(); i++)
     {
         // sts serial bus servos
-        if (this->_projectData->stsServos->at(i).title.length() > 0 && used < maxValues)
+        if (this->_projectData->stsServos->at(i).title.length() > 0)
         {
-            statuses[used] = String(this->_projectData->stsServos->at(i).channel) + ":" + this->_projectData->stsServos->at(i).load;
-            used++;
-        }
-        // scs serial bus servos
-        if (this->_projectData->scsServos->at(i).title.length() > 0 && used < maxValues)
-        {
-            statuses[used] = String(this->_projectData->scsServos->at(i).channel) + ":" + this->_projectData->scsServos->at(i).load;
-            used++;
+            message += String(this->_projectData->stsServos->at(i).channel) + ":" + this->_projectData->stsServos->at(i).load + "|";
         }
     }
-    _awbDisplay.set_values(statuses, used);
+    for (int i = 0; i < this->_projectData->scsServos->size(); i++)
+    {
+        // scs serial bus servos
+        if (this->_projectData->scsServos->at(i).title.length() > 0)
+        {
+            message += String(this->_projectData->scsServos->at(i).channel) + ":" + this->_projectData->scsServos->at(i).load + "|";
+        }
+    }
+    _awbDisplay->set_actual_status_info(message);
+}
+
+int StatusManagement::getFreeMemory()
+{
+    return ESP.getFreeHeap(); // ESP.getMaxAllocHeap(), ESP.getMinFreeHeap()
 }
