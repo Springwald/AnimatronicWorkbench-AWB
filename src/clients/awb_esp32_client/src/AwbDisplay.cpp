@@ -209,8 +209,8 @@ void AwbDisplay::set_debuggingState(bool isDebugging, int major, int minor)
 
 void AwbDisplay::draw_debuggingState()
 {
-    // if (_debuggingActive == false)
-    //     return;
+    if (_debuggingActive == false)
+        return;
 
     debugStateSprite.fillSprite(0x000000U);
     debugStateSprite.setTextDatum(top_left);

@@ -178,14 +178,17 @@ String WlanConnector::GetHtml()
         ptr += String(this->_projectData->scsServos->size()) + " SCS-Servos, ";
         ptr += String(this->_projectData->pca9685PwmServos->size()) + " PWM-Servos</span>\n";
         ptr += "<table>\n";
-        ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th></tr>\n";
+        ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th><th>fault</th></tr>\n";
 
         _debugging->setState(Debugging::MJ_WLAN, 36);
 
         for (int i = 0; i < this->_projectData->stsServos->size(); i++)
         {
             auto servo = this->_projectData->stsServos->at(i);
-            ptr += "<tr><td>STS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
+            ptr += "<tr><td>STS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
+                   this->getTd(String(servo.temperature), servo.temperature > STS_SERVO_MAX_TEMPERATURE) +
+                   this->getTd(String(servo.load), abs(servo.load) > STS_SERVO_MAX_LOAD) +
+                   this->getTd(String(servo.isFault ? "!!!" : ""), servo.isFault) + "</tr>\n";
         }
 
         _debugging->setState(Debugging::MJ_WLAN, 38);
@@ -193,7 +196,10 @@ String WlanConnector::GetHtml()
         for (int i = 0; i < this->_projectData->scsServos->size(); i++)
         {
             auto servo = this->_projectData->scsServos->at(i);
-            ptr += "<tr><td>SCS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td><td>" + String(servo.temperature) + "</td><td>" + String(servo.load) + " </tr>\n";
+            ptr += "<tr><td>SCS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
+                   this->getTd(String(servo.temperature), servo.temperature > SCS_SERVO_MAX_TEMPERATURE) +
+                   this->getTd(String(servo.load), abs(servo.load) > SCS_SERVO_MAX_LOAD) +
+                   this->getTd(String(servo.isFault ? "!!!" : ""), servo.isFault) + "</tr>\n";
         }
 
         _debugging->setState(Debugging::MJ_WLAN, 40);
@@ -201,7 +207,7 @@ String WlanConnector::GetHtml()
         for (int i = 0; i < this->_projectData->pca9685PwmServos->size(); i++)
         {
             auto servo = this->_projectData->pca9685PwmServos->at(i);
-            ptr += "<tr><td>PWM " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td><td>-</td><td>-</tr>\n";
+            ptr += "<tr><td>PWM " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td><td>-</td><td>-</td><td>-</td></tr>\n";
         }
 
         _debugging->setState(Debugging::MJ_WLAN, 42);
@@ -262,4 +268,13 @@ String WlanConnector::GetHtml()
     ptr += "</body>\n";
     ptr += "</html>\n";
     return ptr;
+}
+
+String WlanConnector::getTd(String content, boolean isError)
+{
+    if (isError)
+    {
+        return "<td style=\"background-color: #ff0000; color: #ffffff;\"> " + content + "</td>";
+    }
+    return "<td> " + content + "</td>";
 }

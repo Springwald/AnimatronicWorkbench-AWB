@@ -39,11 +39,12 @@ private:
     String _messages[MAX_LOG_MESSAGES]; /// the log messages
     int _messagesCount = 0;             /// the number of log messages
 
-    String GetHtml();                   /// get the html page for the webserver default site
-    void handle_Default();              /// handle the root http request
-    void handle_NotFound();             /// handle a not found http request
-    void handle_remote_servo();         /// control a servo via the webserver
-    void handle_remote_play_timeline(); /// start a timeline via the webserver
+    String GetHtml();                              /// get the html page for the webserver default site
+    void handle_Default();                         /// handle the root http request
+    void handle_NotFound();                        /// handle a not found http request
+    void handle_remote_servo();                    /// control a servo via the webserver
+    void handle_remote_play_timeline();            /// start a timeline via the webserver
+    String getTd(String content, boolean isError); /// get the  table style for a error message
 
 public:
     /**
