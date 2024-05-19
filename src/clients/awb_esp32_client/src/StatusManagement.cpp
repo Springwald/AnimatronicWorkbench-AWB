@@ -112,7 +112,7 @@ String StatusManagement::updateStsScsServoStatuses(StSerialServoManager *serialS
                     _isAnyGlobalFaultActuatorInCriticalState = true;
 
                 serialServoManager->setTorque(servo->channel, false);
-                //_errorOccured("Servo " + String(servo->title) + " critical temp! " + String(servo->temperature) + "C");
+                _errorOccured("Servo " + String(servo->title) + " critical temp! " + String(servo->temperature) + "C");
                 errors += "Servo " + String(servo->title) + ":" + String(servo->temperature) + "C\r\n";
             }
 
@@ -123,7 +123,7 @@ String StatusManagement::updateStsScsServoStatuses(StSerialServoManager *serialS
                 if (servo->globalFault == true)
                     _isAnyGlobalFaultActuatorInCriticalState = true;
                 serialServoManager->setTorque(servo->channel, false);
-                //_errorOccured("Servo " + String(servo->channel) + "' critical load! " + String(servo->load));
+                _errorOccured("Servo " + String(servo->channel) + "' critical load! " + String(servo->load));
                 errors += "Servo " + String(servo->title) + ":L" + String(servo->temperature) + "\r\n";
             }
         }
