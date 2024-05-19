@@ -29,17 +29,17 @@ void AwbClient::setup()
     _display.setup(_clientId); // set up the display
     delay(1000);
 
+    // load the AWB project data
+    _data = new AutoPlayData();
+    _projectData = new ProjectData();
+
     // set up the wlan connector
     showSetupMsg("setup wifi");
     const TCallBackErrorOccured wlanErrorOccured = [this](String message)
     { showError(message); };
-    _wlanConnector = new WlanConnector(_clientId, _projectData, _actualStatusInformation, wlanErrorOccured);
+    _wlanConnector = new WlanConnector(_clientId, _projectData, _actualStatusInformation, _debugging, wlanErrorOccured);
     _wlanConnector->setup();
     showSetupMsg("setup wifi done");
-
-    // load the AWB project data
-    _data = new AutoPlayData();
-    _projectData = new ProjectData();
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     showSetupMsg("setup neopixel");
@@ -142,6 +142,8 @@ void AwbClient::setup()
         // process the packet
         if (clientId == this->_clientId)
         {
+            if (this->_statusManagement->getIsAnyGlobalFaultActuatorInCriticalState() == false)
+                return;
             this->_packetProcessor->processPacket(payload);
         }
     };
@@ -222,7 +224,7 @@ void AwbClient::showSetupMsg(String message)
  */
 void AwbClient::loop()
 {
-    _debugging->setState(Debugging::MJ_LOOP, 0);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 0);
 
     if (false)
     {
@@ -244,22 +246,16 @@ void AwbClient::loop()
     if (packetReceived)
         _autoPlayer->stopBecauseOfIncommingPackage();
 
-    _debugging->setState(Debugging::MJ_LOOP, 5);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 5);
 
     _wlanConnector->update(_debugging->isDebugging());
 
-    _debugging->setState(Debugging::MJ_LOOP, 10);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 10);
 
     //_mp3Player->playSound(1);
 
     // update autoplay timelines and actuators
-    auto criticalTemp = false;
-    if (this->_stSerialServoManager != NULL)
-        criticalTemp = this->_stSerialServoManager->servoCriticalTempGlobal;
-    if (this->_scSerialServoManager != NULL)
-        criticalTemp = criticalTemp || this->_scSerialServoManager->servoCriticalTempGlobal;
-
-    _debugging->setState(Debugging::MJ_LOOP, 15);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 15);
 
     if (_wlanConnector->timelineNameToPlay != NULL && _wlanConnector->timelineNameToPlay->length() > 0)
     {
@@ -268,11 +264,10 @@ void AwbClient::loop()
         _wlanConnector->timelineNameToPlay = NULL;
     }
 
-    _debugging->setState(Debugging::MJ_LOOP, 20);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 20);
+    _autoPlayer->update(_statusManagement->getIsAnyGlobalFaultActuatorInCriticalState());
 
-    _autoPlayer->update(criticalTemp);
-
-    _debugging->setState(Debugging::MJ_LOOP, 25);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 25);
 
     if (_autoPlayer->getStateSelectorStsServoChannel() != _lastAutoPlaySelectedStateId)
     {
@@ -281,7 +276,7 @@ void AwbClient::loop()
         _statusManagement->setDebugStatus("StateId:" + String(_lastAutoPlaySelectedStateId));
     }
 
-    _debugging->setState(Debugging::MJ_LOOP, 30);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 30);
 
     if (!_autoPlayer->getCurrentTimelineName().equals(_lastAutoPlayTimelineName))
     {
@@ -312,31 +307,28 @@ void AwbClient::loop()
         _statusManagement->setDebugStatus("Timeline: " + String(_lastAutoPlayTimelineName));
     }
 
-    _debugging->setState(Debugging::MJ_LOOP, 35);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 35);
 
-    if (!packetReceived && millis() > _lastStatusMillis + 100) // update status every 100ms
-    {
-        _statusManagement->update(criticalTemp);
-        _lastStatusMillis = millis();
-    }
+    if (!packetReceived)
+        _statusManagement->update();
 
-    _debugging->setState(Debugging::MJ_LOOP, 50);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 50);
 
     if (_neoPixelStatus != NULL && !packetReceived)
         _neoPixelStatus->update();
 
-    _debugging->setState(Debugging::MJ_LOOP, 55);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 55);
 
     if (_dacSpeaker != NULL)
         _dacSpeaker->update();
 
-    _debugging->setState(Debugging::MJ_LOOP, 60);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 60);
 
     // update display
     if (!packetReceived)
         _display.loop();
 
-    _debugging->setState(Debugging::MJ_LOOP, 65);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 65);
 
     // collect all status information for lcd display and WLAN status display
     _wlanConnector->memoryInfo = &_display.memoryInfo;
@@ -350,12 +342,12 @@ void AwbClient::loop()
     _actualStatusInformation->inputStates = _inputManager->getDebugInfo();
     _actualStatusInformation->lastSoundPlayed = _autoPlayer->getLastSoundPlayed();
 
-    _debugging->setState(Debugging::MJ_LOOP, 70);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 70);
 
     if (millis() - _startMillis < 5000)
     {
         _statusManagement->resetDebugInfos(); // only check memory usage after 5 seconds to avoid false alarms when starting up
     }
 
-    _debugging->setState(Debugging::MJ_LOOP, 99);
+    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 99);
 }

@@ -36,32 +36,22 @@ private:
     TCallBackErrorOccured _errorOccured;
     TCallBackMessageToShowWithDuration _messageToShow;
     int _displayStateCounter = 0; /// The counter for the display state
-    String _debugState;           /// The debug state to show on the display
-    int _freeMemoryOnStart;       /// The free memory on start
+    long _millisLastDisplayChange = millis();
+    String _debugState;     /// The debug state to show on the display
+    int _freeMemoryOnStart; /// The free memory on start
+
+    boolean _isAnyGlobalFaultActuatorInCriticalState = false;
+
+    String _actualActuatorsStateInfo = "";
 
     /**
      * read the status information from the actuators
      */
-    void readActuatorsStatuses();
+    String updateActuatorsStatuses();
 
-    void readStsScsServoStatuses(StSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo);
+    String updateStsScsServoStatuses(StSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo);
 
-    /**
-     * show the target values of the actuators on the display
-     */
-    void showValues();
-
-    /**
-     * show the temperature values of the actuators on the display
-     */
-    void showTemperaturStatuses();
-
-    /**
-     * show the load (torque) status of the actuators on the display
-     */
-    void showLoadStatuses();
-
-    void draw_debugInfos();
+    String getDebugInfos();
 
     int getFreeMemory();
 
@@ -76,8 +66,13 @@ public:
         // delete _packetSenderReceiver;
     }
 
-    void update(boolean criticalTemp);
+    bool getIsAnyGlobalFaultActuatorInCriticalState()
+    {
+        return _isAnyGlobalFaultActuatorInCriticalState;
+    }
+
     void setDebugStatus(String state);
+    void update();
     void resetDebugInfos();
 };
 

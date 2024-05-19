@@ -48,7 +48,7 @@
 #define SCS_SERVO_ACC 1              // acceleration, default = 100
 #define SCS_SERVO_RXD 18             // eg. GPIO 18 for waveshare servo driver
 #define SCS_SERVO_TXD 19             // eg. GPIO 19 for waveshare servo driver
-#define SCS_SERVO_MAX_TEMPERATURE 55 // max temperature (celsius) before servo is disabled
+#define SCS_SERVO_MAX_TEMPERATURE 35 // max temperature (celsius) before servo is disabled
 #define SCS_SERVO_MAX_LOAD 600       // max load before servo is disabled
 
 /* PCA9685 PWM servo settings */

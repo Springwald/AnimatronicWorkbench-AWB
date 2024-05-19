@@ -40,18 +40,19 @@ void StSerialServoManager::setup()
 /**
  * update the sts servos
  */
-void StSerialServoManager::updateActuators()
+void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState)
 {
-    if (servoCriticalTempGlobal == true || servoCriticalLoadGlobal == true)
-        return;
-
     for (int i = 0; i < this->_servos->size(); i++)
     {
         // get a pointer to the current servo
         StsScsServo *servo = &this->_servos->at(i);
 
-        if (servo->isFault)
+        if (servo->isFault || anyServoWithGlobalFaultHasCiriticalState == true)
+        {
+            // turn servo off when is fault or another servo is defined as global fault and in critical state
+            setTorque(servo->channel, false);
             continue;
+        }
 
         if (servo->targetValue == -1)
         {

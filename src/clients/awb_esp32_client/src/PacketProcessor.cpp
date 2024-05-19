@@ -55,7 +55,7 @@ void PacketProcessor::processPacket(String payload)
         }
     }
     if (this->_pca9685PwmManager != NULL)
-        _pca9685PwmManager->updateActuators();
+        _pca9685PwmManager->updateActuators(false);
 
     if (jsondoc.containsKey("STS")) // package contains STS bus servo data
     {
@@ -90,7 +90,7 @@ void PacketProcessor::processPacket(String payload)
         }
     }
     if (this->_stSerialServoManager != NULL)
-        _stSerialServoManager->updateActuators();
+        _stSerialServoManager->updateActuators(false);
 
     if (jsondoc.containsKey("SCS")) // package contains SCS bus servo data
     {
@@ -123,7 +123,7 @@ void PacketProcessor::processPacket(String payload)
         }
     }
     if (this->_scSerialServoManager != NULL)
-        _scSerialServoManager->updateActuators();
+        _scSerialServoManager->updateActuators(false);
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->showActivity();

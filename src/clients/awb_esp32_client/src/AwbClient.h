@@ -31,7 +31,6 @@ protected:
     AwbDisplay _display;     /// The display, oled or lcd
     DacSpeaker *_dacSpeaker; /// The speaker if connected
 
-    long _lastStatusMillis = 0;            /// The last time the status was udated
     long _startMillis = millis();          /// The start millis
     int _lastAutoPlaySelectedStateId = -1; /// The last selected state id for autoplay timeline filter
     String _lastAutoPlayTimelineName = ""; /// The last selected timeline name for autoplay timeline filter

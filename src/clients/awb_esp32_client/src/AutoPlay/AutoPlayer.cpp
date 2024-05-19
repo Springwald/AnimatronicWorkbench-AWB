@@ -67,7 +67,7 @@ String AutoPlayer::getLastSoundPlayed()
 /**
  * Updates the autoplayer and plays the timelines
  */
-void AutoPlayer::update(bool servoHaveGlobalyRelavantErrorsLikeTooHot)
+void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 {
     // return of no data is set
     if (_data == nullptr)
@@ -75,7 +75,7 @@ void AutoPlayer::update(bool servoHaveGlobalyRelavantErrorsLikeTooHot)
 
     int updateInterval = 50; // ms
 
-    if (servoHaveGlobalyRelavantErrorsLikeTooHot)
+    if (anyServoWithGlobalFaultHasCiriticalState)
     {
         _actualTimelineIndex = -1;
         return;
@@ -133,7 +133,7 @@ void AutoPlayer::update(bool servoHaveGlobalyRelavantErrorsLikeTooHot)
 
             _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
-        _stSerialServoManager->updateActuators();
+        _stSerialServoManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
     }
 
     // Play SCS Servos
@@ -151,7 +151,7 @@ void AutoPlayer::update(bool servoHaveGlobalyRelavantErrorsLikeTooHot)
 
             _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
-        _scSerialServoManager->updateActuators();
+        _scSerialServoManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
     }
 
     // Play PWM Servos
@@ -208,7 +208,7 @@ void AutoPlayer::update(bool servoHaveGlobalyRelavantErrorsLikeTooHot)
             }
             _pca9685PwmManager->setTargetValue(servoChannel, targetValue, servoName);
         }
-        _pca9685PwmManager->updateActuators();
+        _pca9685PwmManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
     }
 
     // Play MP3

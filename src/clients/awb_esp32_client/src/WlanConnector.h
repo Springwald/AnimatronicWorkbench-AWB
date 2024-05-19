@@ -5,12 +5,14 @@
 #include "AutoPlay/AutoPlayData.h"
 #include "AutoPlay/AutoPlayer.h"
 #include "AwbDataImport/ProjectData.h"
+#include "AwbDataImport/WifiConfig.h"
 #include "hardware.h"
 #include <WiFi.h>
 #include <WebServer.h>
 #include "Actuators/ActuatorValue.h"
 #include <String.h>
 #include "ActualStatusInformation.h"
+#include "Debugging.h"
 
 using byte = unsigned char;
 
@@ -26,11 +28,12 @@ class WlanConnector
 private:
     int _clientId;                                     /// the id of the client
     TCallBackErrorOccured _errorOccured;               /// callback function to call if an error occured
-    AutoPlayData *_data;                               /// the timelime data and project meta information for the auto play
     bool _liveDebuggingActive;                         /// the live debugging is active or not
+    WifiConfig *_wifiConfig;                           /// the wifi configuration
     WebServer *_server;                                /// the webserver
     long _startTime = millis();                        /// the time when the webserver was started
     ProjectData *_projectData;                         /// the project data exported by Animatronic Workbench Studio
+    Debugging *_debugging;                             /// the debugging class
     ActualStatusInformation *_actualStatusInformation; /// the actual status information of the animatronic figure
 
     String _messages[MAX_LOG_MESSAGES]; /// the log messages
@@ -56,11 +59,11 @@ public:
     int stsServoCannelToSet; /// the channel of the sts servo to set by remote control
     int stsServoValueToSet;  /// the value of the sts servo to set by remote control (in percent)
 
-    WlanConnector(int clientId, ProjectData *projectData, ActualStatusInformation *actualStatusInformation, TCallBackErrorOccured errorOccured)
-        : _errorOccured(errorOccured), _projectData(projectData), _clientId(clientId), _actualStatusInformation(actualStatusInformation)
+    WlanConnector(int clientId, ProjectData *projectData, ActualStatusInformation *actualStatusInformation, Debugging *debugging, TCallBackErrorOccured errorOccured)
+        : _errorOccured(errorOccured), _projectData(projectData), _clientId(clientId), _actualStatusInformation(actualStatusInformation), _debugging(debugging)
     {
-        _data = new AutoPlayData();
         timelineNameToPlay = new String();
+        _wifiConfig = new WifiConfig();
     }
 
     ~WlanConnector()

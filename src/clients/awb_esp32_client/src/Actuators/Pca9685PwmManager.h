@@ -73,7 +73,7 @@ public:
     };
 
     void setTargetValue(int channel, int value, String name);
-    void updateActuators();
+    void updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState);
 };
 
 #endif

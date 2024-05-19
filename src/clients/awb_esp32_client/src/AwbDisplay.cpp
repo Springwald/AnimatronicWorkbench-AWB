@@ -74,11 +74,18 @@ void AwbDisplay::setup(int clientId)
     lcd.setRotation(1);
 #endif
 
+    // set up the debug sprite
+    debugStateSprite.setTextColor(0xFFFFFFU, 0x000000U);
+    debugStateSprite.setFont(&fonts::DejaVu9);
+    debugStateSprite.setTextSize(1.0f);
+    debugStateSprite.setColorDepth(colorDepth);
+    debugStateSprite.createSprite(40, 10);
+
     // set up the fonts
     if (_isSmallScreen)
     {
-        // font = &fonts::Font0;
-        font = &fonts::DejaVu9;
+        font = &fonts::Font0;
+        // font = &fonts::DejaVu9;
         // font = &fonts::TomThumb;
         _textSizeFont = 1.0f;
         _textSizePx = _textSizeFont * 8;
@@ -214,9 +221,6 @@ void AwbDisplay::draw_debuggingState()
 
 void AwbDisplay::draw_message(String message, int durationMs, int msgType)
 {
-    if (msgType == MSG_TYPE_ERROR)
-        return;
-
     _message_duration_left = durationMs;
     _message_duration = durationMs;
 
@@ -245,7 +249,7 @@ void AwbDisplay::draw_string(String message, int backCol)
     primarySprite.fillScreen(backCol);
     primarySprite.setTextDatum(top_center);
 
-    int maxPerLine = (int)(primarySprite.width() / primarySprite.textWidth("o")) - 2;
+    int maxPerLine = (int)(primarySprite.width() / primarySprite.textWidth("o"));
 
     auto nativeLineBreaks = std::vector<char>{'\r', '\n'};
     auto attractiveLineBreaks = std::vector<char>{' ', '\t'};

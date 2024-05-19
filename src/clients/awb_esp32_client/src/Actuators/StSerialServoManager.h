@@ -29,16 +29,6 @@ private:
 
 public:
     /**
-     * has any servo with global fault a critical temperature?
-     */
-    bool servoCriticalTempGlobal = false;
-
-    /**
-     * has any servo with global fault a critical load?
-     */
-    bool servoCriticalLoadGlobal = false;
-
-    /**
      * the ids of the servos (1-253)
      */
     std::vector<u8> *servoIds;
@@ -53,7 +43,7 @@ public:
     /**
      * update the sts servos
      */
-    void updateActuators();
+    void updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState);
 
     /**
      * write the position to the servo, including speed and acceleration

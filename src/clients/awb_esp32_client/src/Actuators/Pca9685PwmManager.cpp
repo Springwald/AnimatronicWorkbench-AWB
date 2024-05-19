@@ -43,13 +43,14 @@ void Pca9685PwmManager::setTargetValue(int channel, int value, String name)
     }
 }
 
-void Pca9685PwmManager::updateActuators()
+void Pca9685PwmManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState)
 {
     for (int i = 0; i < this->_pwmServos->size(); i++)
     {
         // get a pointer to the current servo
         auto *servo = &this->_pwmServos->at(i);
-        if (servo->targetValue == -1)
+
+        if (servo->targetValue == -1 || anyServoWithGlobalFaultHasCiriticalState == true)
         {
             // turn servo off
             // todo: implement
