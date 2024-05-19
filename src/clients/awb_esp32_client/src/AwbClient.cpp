@@ -168,6 +168,8 @@ void AwbClient::setup()
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
     delay(_debugging->isDebugging() ? 1000 : 100);
+
+    _startMillis = millis(); /// The start millis
 }
 
 /**

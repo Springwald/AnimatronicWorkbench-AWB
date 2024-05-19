@@ -45,6 +45,7 @@ private:
     void handle_remote_servo();                    /// control a servo via the webserver
     void handle_remote_play_timeline();            /// start a timeline via the webserver
     String getTd(String content, boolean isError); /// get the  table style for a error message
+    String getTdVal(String content, int maxValue, int minValue, int value);
 
 public:
     /**

@@ -59,6 +59,7 @@ public:
     StatusManagement(ProjectData *projectData, AwbDisplay *awbDisplay, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured)
         : _projectData(projectData), _awbDisplay(awbDisplay), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured)
     {
+        resetDebugInfos();
     }
 
     ~StatusManagement()

@@ -45,7 +45,7 @@ String StatusManagement::getDebugInfos()
 
     String message = "";
 
-    int lostMemory = _freeMemoryOnStart - freeMemory;
+    long lostMemory = _freeMemoryOnStart - freeMemory;
     String memoryInfo = "mem:" + String(freeMemory / 1024) + "k lost:" + String(lostMemory / 1024) + "." + String((lostMemory % 1024) / 100) + "k";
 
     message = message + "\r\n" + memoryInfo;

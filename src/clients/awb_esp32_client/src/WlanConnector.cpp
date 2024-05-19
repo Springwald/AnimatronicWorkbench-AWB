@@ -186,7 +186,7 @@ String WlanConnector::GetHtml()
         {
             auto servo = this->_projectData->stsServos->at(i);
             ptr += "<tr><td>STS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
-                   this->getTd(String(servo.temperature), servo.temperature > STS_SERVO_MAX_TEMPERATURE) +
+                   this->getTdVal(String(servo.temperature), STS_SERVO_MAX_TEMPERATURE, 25, servo.temperature) +
                    this->getTd(String(servo.load), abs(servo.load) > STS_SERVO_MAX_LOAD) +
                    this->getTd(String(servo.isFault ? "!!!" : ""), servo.isFault) + "</tr>\n";
         }
@@ -197,7 +197,7 @@ String WlanConnector::GetHtml()
         {
             auto servo = this->_projectData->scsServos->at(i);
             ptr += "<tr><td>SCS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
-                   this->getTd(String(servo.temperature), servo.temperature > SCS_SERVO_MAX_TEMPERATURE) +
+                   this->getTdVal(String(servo.temperature), SCS_SERVO_MAX_TEMPERATURE, 25, servo.temperature) +
                    this->getTd(String(servo.load), abs(servo.load) > SCS_SERVO_MAX_LOAD) +
                    this->getTd(String(servo.isFault ? "!!!" : ""), servo.isFault) + "</tr>\n";
         }
@@ -276,5 +276,17 @@ String WlanConnector::getTd(String content, boolean isError)
     {
         return "<td style=\"background-color: #ff0000; color: #ffffff;\"> " + content + "</td>";
     }
+    return "<td> " + content + "</td>";
+}
+
+String WlanConnector::getTdVal(String content, int maxValue, int minValue, int value)
+{
+
+    if (value >= maxValue)
+        return "<td style=\"background-color: #ff0000; color: #ffffff;\"> " + content + "</td>";
+
+    if (value > (maxValue - minValue) * 0.8 + minValue)
+        return "<td style=\"background-color: #ffa060; color: #000000;\"> " + content + "</td>";
+
     return "<td> " + content + "</td>";
 }
