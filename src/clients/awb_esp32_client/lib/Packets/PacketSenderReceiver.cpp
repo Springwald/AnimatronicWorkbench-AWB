@@ -163,7 +163,7 @@ void PacketSenderReceiver::processDataPacket(String packetContent)
     if (checksum != checksumExpected)
     {
         errorReceiving("check " + String(checksum) + "!=" + String(checksumExpected) + " packet " + String(packetId));
-        sendResponsePacket(packetId, false, "packet " + String(packetId) + ": check " + String(checksum) + "!=" + String(checksumExpected) + " packet " + String(packetId));
+        sendResponsePacket(packetId, false, "response " + String(packetId) + ": check " + String(checksum) + "!=" + String(checksumExpected) + " packet " + String(packetId));
         return; // checksum not valid
     }
 
