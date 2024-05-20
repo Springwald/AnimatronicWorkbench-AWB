@@ -32,6 +32,8 @@ void PacketProcessor::processPacket(String payload)
         else
         {
             int duration = jsondoc["DispMsg"]["Ms"];
+            if (duration < 100)
+                duration = 5000; // default duration
             _messageToShow(message, duration);
         }
     }

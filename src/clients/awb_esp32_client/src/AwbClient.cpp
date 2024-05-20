@@ -135,6 +135,10 @@ void AwbClient::setup()
     showSetupMsg("setup autoplay");
     _autoPlayer = new AutoPlayer(_data, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
 
+    // setup the packet processor to process packets from the Animatronic Workbench Studio
+    showSetupMsg("setup AWB studio packet processor");
+    this->_packetProcessor = new PacketProcessor(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, packetProcessorErrorOccured, packetProcessorMessageToShow);
+
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet receiver");
     const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload)
@@ -142,17 +146,17 @@ void AwbClient::setup()
         // process the packet
         if (clientId == this->_clientId)
         {
-            if (this->_statusManagement->getIsAnyGlobalFaultActuatorInCriticalState() == false)
+            if (this->_statusManagement->getIsAnyGlobalFaultActuatorInCriticalState())
+            {
+                showError("Packet received, but dropped because at least one actuator is in critical state!");
                 return;
+            }
+
             this->_packetProcessor->processPacket(payload);
         }
     };
     char *packetHeader = (char *)"AWB";
     this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, packetErrorOccured);
-
-    // setup the packet processor to process packets from the Animatronic Workbench Studio
-    showSetupMsg("setup AWB studio packet processor");
-    this->_packetProcessor = new PacketProcessor(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, packetProcessorErrorOccured, packetProcessorMessageToShow);
 
     // set up the status management
     showSetupMsg("setup status management");

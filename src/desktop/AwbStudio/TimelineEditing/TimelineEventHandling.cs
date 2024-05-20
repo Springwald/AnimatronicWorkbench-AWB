@@ -86,7 +86,7 @@ namespace AwbStudio.TimelineEditing
                 case TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged:
                 case TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged:
                 case TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged:
-                    await _timelinePlayer.UpdateActuators();
+                    await _timelinePlayer.RequestActuatorUpdate();
                     if (!_updatingByTimelineController && myCounter  == _timelineData_ContentChangedCounter)
                     {
                         if (sender is ITimelineController timelineController)
@@ -221,7 +221,7 @@ namespace AwbStudio.TimelineEditing
                                 throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
                         }
                         if (myUpdateCount == _timlineControllerUpdateCounter) // no other update has been started in the meantime
-                            await _timelinePlayer.UpdateActuators();
+                            await _timelinePlayer.RequestActuatorUpdate();
                         ShowActuatorValuesOnTimelineInputController(timelineController);
 
                     }
@@ -241,7 +241,7 @@ namespace AwbStudio.TimelineEditing
                                 throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Title} is an unhandled actutuator type.");
                         }
                         if (myUpdateCount == _timlineControllerUpdateCounter) // no other update has been started in the meantime
-                            await _timelinePlayer.UpdateActuators();
+                            await _timelinePlayer.RequestActuatorUpdate();
                     }
                     break;
 
@@ -259,7 +259,7 @@ namespace AwbStudio.TimelineEditing
                                 throw new ArgumentOutOfRangeException($"{actuator.Id}/{actuator.Title} is an unhandled actutuator type.");
                         }
                         if (myUpdateCount == _timlineControllerUpdateCounter) // no other update has been started in the meantime
-                            await _timelinePlayer.UpdateActuators();
+                            await _timelinePlayer.RequestActuatorUpdate();
                     }
                     break;
 

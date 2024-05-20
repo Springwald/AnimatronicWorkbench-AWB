@@ -41,6 +41,7 @@ private:
 public:
     PacketProcessor(ProjectData *projectData, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured, TCallBackMessageToShowWithDuration messageToShow) : _projectData(projectData), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured), _messageToShow(messageToShow)
     {
+       
     }
 
     ~PacketProcessor()

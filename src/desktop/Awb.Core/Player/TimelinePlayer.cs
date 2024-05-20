@@ -37,25 +37,30 @@ namespace Awb.Core.Player
             }
         }
 
+        private const int _updatePlayPeriodMs = 50;
+        private const int _updateActuatorsPeriodMs = 2000;
+
+        private TimelineData _timelineData;
+
+        
         private volatile bool _timerFiring;
         private volatile bool _updating;
+        private volatile bool _actuatorUpdateRequested;
         private int _playPosMsOnLastUpdate;
-
-        private int _updatePlayPeriodMs = 50;
         private Timer? _playTimer;
+        private Timer _actuatorUpdateTimer;
         private DateTime? _lastPlayUpdate;
 
         private readonly IActuatorsService _actuatorsService;
         private readonly ITimelineDataService _timelineDataService;
         private readonly IAwbLogger _logger;
-
         private readonly ChangesToClientSender _sender;
         private readonly IInvoker _myInvoker;
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
         public EventHandler<SoundPlayEventArgs>? OnPlaySound;
-        private TimelineData _timelineData;
         private volatile TimelinePoint[]? _allPointsMerged;
         public readonly PlayPosSynchronizer PlayPosSynchronizer;
+
 
         /// <summary>
         /// The timeline to play
@@ -66,6 +71,7 @@ namespace Awb.Core.Player
         /// 1 = normal Speed
         /// </summary>
         public double PlaybackSpeed { get; set; } = 1;
+
 
         /// <remarks>
         /// After construction the player the "Play" method should be called with zero TimeSpan
@@ -83,10 +89,16 @@ namespace Awb.Core.Player
             _myInvoker = invokerService.GetInvoker();
 
             PlayPosSynchronizer = playPosSynchronizer;
-            PlayPosSynchronizer.OnPlayPosChanged += async (sender, playPosMs) => await this.UpdateActuators();
+            PlayPosSynchronizer.OnPlayPosChanged += async (sender, playPosMs) => await this.RequestActuatorUpdate();
 
             this.SetTimelineData(timelineData);
+
+            // Set up the actuator update timer
+            _actuatorUpdateTimer = new Timer(ActuatorUpdateTimerCallback);
+            _actuatorUpdateTimer.Change(dueTime: _updateActuatorsPeriodMs, period: _updateActuatorsPeriodMs);
         }
+
+       
 
         public void SetTimelineData(TimelineData timelineData)
         {
@@ -124,15 +136,30 @@ namespace Awb.Core.Player
         }
 
 
+        public async Task RequestActuatorUpdate()
+        {
+            _actuatorUpdateRequested = true;
+            await Task.CompletedTask;
+        }
+
+        private async void ActuatorUpdateTimerCallback(object? state)
+        {
+            if (!_actuatorUpdateRequested) return;
+            if (await UpdateActuatorsInternal())
+            {
+                _actuatorUpdateRequested = false;
+            }
+        }
+
         /// <summary>
         /// Move the actual play position to the given new position.
         /// Needed changes on the actuators will be communicated to the servos etc..
         /// </summary>
-        public async Task UpdateActuators()
+        private async Task<bool> UpdateActuatorsInternal()
         {
             if (_updating)
             {
-                return;
+                return false;
             }
 
             var playPos = PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped;
@@ -174,7 +201,7 @@ namespace Awb.Core.Player
                 var targetServo = _actuatorsService.Servos.SingleOrDefault(o => o.Id.Equals(servoTargetObjectId));
                 if (targetServo == null)
                 {
-                    await _logger.LogErrorAsync($"{nameof(UpdateActuators)}: Targets servo object with id {servoTargetObjectId} not found.");
+                    await _logger.LogErrorAsync($"{nameof(UpdateActuatorsInternal)}: Targets servo object with id {servoTargetObjectId} not found.");
                 }
                 else
                 {
@@ -212,7 +239,7 @@ namespace Awb.Core.Player
                 var targetSoundPlayer = _actuatorsService.SoundPlayers.SingleOrDefault(o => o.Id.Equals(soundTargetObjectId));
                 if (targetSoundPlayer == null)
                 {
-                    await _logger.LogErrorAsync($"{nameof(UpdateActuators)}: Target soundplayer object with id {soundTargetObjectId} not found.");
+                    await _logger.LogErrorAsync($"{nameof(UpdateActuatorsInternal)}: Target soundplayer object with id {soundTargetObjectId} not found.");
                 }
                 else
                 {
@@ -264,7 +291,7 @@ namespace Awb.Core.Player
 
             var ok = await _sender.SendChangesToClients();
             _updating = false;
-
+            return ok;
         }
 
         private void PlayTimerCallback(object? state)
@@ -306,6 +333,11 @@ namespace Awb.Core.Player
 
         public async void Dispose()
         {
+            _actuatorUpdateTimer.Dispose();
+
+            if (_playTimer != null)
+                _playTimer.Dispose();
+
             var servos = _actuatorsService.Servos;
             foreach (var servo in servos)
             {

@@ -363,7 +363,7 @@ namespace AwbStudio
 
             if (_timelinePlayer != null)
             {
-                await _timelinePlayer.UpdateActuators();
+                await _timelinePlayer.RequestActuatorUpdate();
                 _timelineEventHandling = new TimelineEventHandling(
                     timelineData: data,
                     timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
