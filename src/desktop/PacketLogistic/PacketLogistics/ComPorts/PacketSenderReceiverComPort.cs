@@ -1,7 +1,7 @@
 ﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
 // https://github.com/Springwald/PacketLogistics
 //
-// (C) 2023 Daniel Springwald, Bochum Germany
+// (C) 2024 Daniel Springwald, Bochum Germany
 // Springwald Software  -   www.springwald.de
 // daniel@springwald.de -  +49 234 298 788 46
 // All rights reserved
@@ -17,7 +17,7 @@ namespace PacketLogistics.ComPorts
     {
         private Esp32SerialPort? _serialPort;
         private readonly string _serialPortName;
-        private uint _actualPacketId;
+        private uint _actualPacketId = 1;
         private readonly IComPortCommandConfig _comPortCommandConfig;
         private readonly DataPacketSerializer _packetSerializer;
         private ConcurrentBag<PacketBase> _receivedPackets = new();
@@ -150,11 +150,33 @@ namespace PacketLogistics.ComPorts
                 TimestampUtc = DateTime.UtcNow
             };
 
+
             // send packet
             var message = _packetSerializer.DataPacket2ByteArray(packet, this.ClientId);
+
+            foreach (var b in message)
+            {
+                for (int i = 0; i < _comPortCommandConfig.CommandBytes.Length; i++)
+                {
+                    if (b == _comPortCommandConfig.CommandBytes[i])
+                    {
+                        base.Error($"Packet contains command byte {b}!");
+                        return new PacketSendResult
+                        {
+                            Ok = false,
+                            OriginalPacketId = packet.Id,
+                            OriginalPacketTimestampUtc = packet.TimestampUtc,
+                            Message = $"Packet contains command byte {b}!",
+                        };
+                    }
+                }
+            }
+
+
             //serialPort.DiscardOutBuffer();
             serialPort.Write(_comPortCommandConfig.PacketHeaderBytes, 0, _comPortCommandConfig.PacketHeaderBytes.Length);
             serialPort.Write(message, 0, message.Length);
+            var x = string.Join(", ", message.Select(b => b.ToString()));
             serialPort.Write(_comPortCommandConfig.PacketHeaderBytes, 0, _comPortCommandConfig.PacketHeaderBytes.Length);
 
             var timeOutDateTime = DateTime.UtcNow + base._timeout;

@@ -9,6 +9,7 @@
 
 using PacketLogistics.ComPorts.ComportPackets;
 using PacketLogistics.Tools;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("PacketLogisticsTests")]
@@ -56,10 +57,20 @@ namespace PacketLogistics.ComPorts.Serialization
             }
             var paketId = ByteArrayConverter.UintFrom4Bytes(ByteArrayConverter.UnSplitBytes(packetIdBytes).ToArray());
 
+
+            // payload length
+            var payloadLengthBytes = ByteArrayConverter.GetNextBytes(value, 8, ref pos);
+            if (payloadLengthBytes == null)
+            {
+                errorMsg = "Payload length not found";
+                return null;
+            }
+            var payloadLength = ByteArrayConverter.UintFrom4Bytes(ByteArrayConverter.UnSplitBytes(packetIdBytes).ToArray());
+
             var dataPacket = new DataPacket(id: paketId)
             {
                 SenderId = senderIdFromPacket,
-                Payload = ByteArrayConverter.GetNextBytes(value, value.Length - pos - 2, ref pos)
+                Payload = ByteArrayConverter.GetNextBytes(value, (int)payloadLength, ref pos)
             };
 
             // checksum
@@ -87,18 +98,23 @@ namespace PacketLogistics.ComPorts.Serialization
         {
             if (packet == null) throw new ArgumentNullException(nameof(packet));
             if (packet.Payload == null) throw new ArgumentNullException(nameof(packet.Payload));
-            if (packet.Payload.Contains(_comPortCommandConfig.PacketHeaderBytes)) throw new ArgumentOutOfRangeException($"{nameof(packet.Payload)} contains packet-header bytes!");
-            if (packet.Payload.Contains(_comPortCommandConfig.SearchForClientByte)) throw new ArgumentOutOfRangeException($"{nameof(packet.Payload)} contains search-for-client byte!");
+            foreach(var b in _comPortCommandConfig.CommandBytes)
+                if (packet.Payload.Contains(b)) throw new ArgumentOutOfRangeException($"{nameof(packet.Payload)} contains command byte {b}!");
             if (senderId < 1) throw new ArgumentOutOfRangeException(paramName: nameof(senderId), message: "senderId must be >= 0 but is " + senderId);
 
             var checksum = ChecksumCalculator.Calculate(packet);
+
+           // Debug.WriteLine($"DataPacket2ByteArray: PacketId: {packet.Id}; SenderId: {senderId}; Checksum: {checksum}; PayloadLength: {packet.Payload.Length}");
+
+            uint payloadLength = (uint)packet.Payload.Length;
 
             var packetBytes = new List<byte>();
             packetBytes.Add((byte)PacketBase.PacketTypes.DataPacket);          // 1 byte
             packetBytes.AddRange(ByteArrayConverter.SplitBytes(ByteArrayConverter.UintTo4Bytes(senderId)));   // 4*2 bytes
             packetBytes.AddRange(ByteArrayConverter.SplitBytes(ByteArrayConverter.UintTo4Bytes(packet.Id)));  // 4*2 bytes
+            packetBytes.AddRange(ByteArrayConverter.SplitBytes(ByteArrayConverter.UintTo4Bytes(payloadLength)));  // 4*2 bytes
             packetBytes.AddRange(packet.Payload);                              // ...
-            packetBytes.AddRange(ByteArrayConverter.SplitByte(checksum));       // 1*2 byte
+            packetBytes.AddRange(ByteArrayConverter.SplitByte(checksum));      // 1*2 byte
             return packetBytes.ToArray();
         }
     }

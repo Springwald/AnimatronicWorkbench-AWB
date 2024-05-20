@@ -1,14 +1,13 @@
 ﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
 // https://github.com/Springwald/PacketLogistics
 //
-// (C) 2023 Daniel Springwald, Bochum Germany
+// (C) 2024 Daniel Springwald, Bochum Germany
 // Springwald Software  -   www.springwald.de
 // daniel@springwald.de -  +49 234 298 788 46
 // All rights reserved
 // Licensed under MIT License
 
 using PacketLogistics.ComPorts.ComportPackets;
-using System.Management;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("PacketLogisticsTests")]
@@ -28,7 +27,7 @@ namespace PacketLogistics.ComPorts.Serialization
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (value.Length == 0) throw new ArgumentOutOfRangeException(nameof(value));
 
-            
+
             // packet type
             var packetType = value[0];
             if (packetType != (byte)PacketBase.PacketTypes.ResponsePacket)
@@ -70,14 +69,6 @@ namespace PacketLogistics.ComPorts.Serialization
                 errorMsg = "Checksum not found";
                 return null;
             }
-
-            // packet end byte
-            //var endByte = ByteArrayConverter.GetNextBytes(value, 1, ref pos)?.FirstOrDefault();
-            //if (endByte != _comPortCommandConfig.PacketStartEndByte)
-            //{
-            //    errorMsg = $"Packet end not {_comPortCommandConfig.PacketStartEndByte} but {endByte}";
-            //    return null;
-            //}
 
             var expectedChecksum = ChecksumCalculator.Calculate(packetResponse);
 

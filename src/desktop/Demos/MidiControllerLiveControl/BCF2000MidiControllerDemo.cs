@@ -106,7 +106,7 @@ namespace MidiControllerLiveControl
                     var servo = _actuatorsService.Servos.SingleOrDefault(s => s.Id.Equals(servoId));
                     if (servo == null)
                     {
-                        await _logger.LogError($"Servo with ID '{servoId}' not configured");
+                        await _logger.LogErrorAsync($"Servo with ID '{servoId}' not configured");
                     }
                     else
                     {

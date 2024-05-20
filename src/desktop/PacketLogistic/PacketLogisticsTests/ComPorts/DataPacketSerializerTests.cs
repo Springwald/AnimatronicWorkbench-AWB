@@ -108,5 +108,16 @@ namespace PacketLogistics.ComPorts.Tests
                 Assert.AreEqual(expectedBytes[i], testPacketBytes[i]);
             }
         }
+
+        [TestMethod()]
+        public void IntByteConverterTest1()
+        {
+            for (int i = 0; i < 32000; i++)
+            {
+                var bytes = ByteArrayConverter.UintTo4Bytes((uint)i);
+                int reversed = (int)ByteArrayConverter.UintFrom4Bytes(bytes);
+                Assert.AreEqual(i, reversed);
+            }
+        }
     }
 }

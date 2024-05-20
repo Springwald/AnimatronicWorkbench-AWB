@@ -19,6 +19,8 @@ namespace Awb.Core.Player
     //todo: no concept for ramping behaviour yet: Value changes are submittet to the actuatator imidiatelly
     public class TimelinePlayer : IDisposable
     {
+        const bool throttlePackets = false;
+
         public enum PlayStates
         {
             Nothing,
@@ -38,7 +40,7 @@ namespace Awb.Core.Player
         }
 
         private const int _updatePlayPeriodMs = 50;
-        private const int _updateActuatorsPeriodMs = 2000;
+        private const int _updateActuatorsPeriodMs = 100;
 
         private TimelineData _timelineData;
 
@@ -48,7 +50,7 @@ namespace Awb.Core.Player
         private volatile bool _actuatorUpdateRequested;
         private int _playPosMsOnLastUpdate;
         private Timer? _playTimer;
-        private Timer _actuatorUpdateTimer;
+        private Timer? _actuatorUpdateTimer;
         private DateTime? _lastPlayUpdate;
 
         private readonly IActuatorsService _actuatorsService;
@@ -94,11 +96,12 @@ namespace Awb.Core.Player
             this.SetTimelineData(timelineData);
 
             // Set up the actuator update timer
-            _actuatorUpdateTimer = new Timer(ActuatorUpdateTimerCallback);
-            _actuatorUpdateTimer.Change(dueTime: _updateActuatorsPeriodMs, period: _updateActuatorsPeriodMs);
+            if (throttlePackets == false)
+            {
+                _actuatorUpdateTimer = new Timer(ActuatorUpdateTimerCallback);
+                _actuatorUpdateTimer.Change(dueTime: _updateActuatorsPeriodMs, period: _updateActuatorsPeriodMs);
+            }
         }
-
-       
 
         public void SetTimelineData(TimelineData timelineData)
         {
@@ -138,8 +141,17 @@ namespace Awb.Core.Player
 
         public async Task RequestActuatorUpdate()
         {
-            _actuatorUpdateRequested = true;
-            await Task.CompletedTask;
+            if (throttlePackets)
+            {
+#pragma warning disable CS0162 // Unreachable code detected
+                _actuatorUpdateRequested = true;
+#pragma warning restore CS0162 // Unreachable code detected
+                await Task.CompletedTask;
+                
+            } else
+            {
+                await UpdateActuatorsInternal();
+            }
         }
 
         private async void ActuatorUpdateTimerCallback(object? state)
@@ -252,7 +264,7 @@ namespace Awb.Core.Player
                     {
                         targetSoundPlayer.PlaySound(soundPoint.SoundId);
                         targetSoundPlayer.IsDirty = true;
-                        if (OnPlaySound != null) OnPlaySound.Invoke(this, new SoundPlayEventArgs(soundPoint.SoundId));
+                        if (OnPlaySound != null) _myInvoker.Invoke(() => OnPlaySound.Invoke(this, new SoundPlayEventArgs(soundPoint.SoundId)));
                     }
                 }
             }
@@ -333,7 +345,7 @@ namespace Awb.Core.Player
 
         public async void Dispose()
         {
-            _actuatorUpdateTimer.Dispose();
+            _actuatorUpdateTimer?.Dispose();
 
             if (_playTimer != null)
                 _playTimer.Dispose();

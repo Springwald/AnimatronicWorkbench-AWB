@@ -17,7 +17,7 @@ void PacketProcessor::processPacket(String payload)
     if (error)
     {
         // packet content is not valid json
-        _errorOccured("json:" + String(error.c_str()));
+        //_errorOccured("json:" + String(error.c_str()));
         return;
     }
 

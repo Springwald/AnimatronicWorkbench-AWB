@@ -20,6 +20,7 @@ AwbClient awbClient = AwbClient(CLIENT_ID);
 
 void setup()
 {
+  Serial.setRxBufferSize(4096);
   Serial.begin(115200);
   awbClient.setup();
 }

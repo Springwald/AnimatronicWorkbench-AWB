@@ -18,6 +18,7 @@ namespace PacketLogistics.ComPorts
             this.PortName = portName;
 
             // settings for ESP32 UART
+            // this.BaudRate =  115200;
             this.BaudRate = 115200;
             //this.Parity = Parity.None;
             //this.DataBits = 8;

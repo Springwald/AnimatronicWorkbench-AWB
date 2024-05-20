@@ -9,12 +9,11 @@
 using Awb.Core.Player;
 using Awb.Core.Sounds;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Diagnostics;
-using AwbStudio.Tools;
 
 namespace AwbStudio.TimelineControls
 {
@@ -71,12 +70,9 @@ namespace AwbStudio.TimelineControls
                 {
                     _lastPlayedSoundId = sound.Id;
                     _lastPlayedSoundUtcTime = DateTime.UtcNow;
-                    //MyInvoker.Invoke(new Action(() =>
-                    {
-                        _mediaPlayer.Stop();
-                        _mediaPlayer.Open(new Uri(sound.Mp3Filename));
-                        _mediaPlayer.Play();
-                    }//));
+                    _mediaPlayer.Stop();
+                    _mediaPlayer.Open(new Uri(sound.Mp3Filename));
+                    _mediaPlayer.Play();
                 }
             }
         }

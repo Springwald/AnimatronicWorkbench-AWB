@@ -12,7 +12,7 @@ namespace Awb.Core.Clients
     internal class AwbEsp32ComportClientConfig : ComPortCommandConfig
     {
         public AwbEsp32ComportClientConfig() :
-            base(packetHeader: "AWB", headerStartByte: 255, headerEndByte: 254)
+            base(packetHeader: "AWB")
         {
         }
     }

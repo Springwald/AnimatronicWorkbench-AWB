@@ -1,6 +1,7 @@
 #include "ByteArrayConverter.h"
 
 using byte = unsigned char;
+byte splitPoint = 128;
 
 // static function to convert unsigned int to an array of 4 byte
 byte *ByteArrayConverter::UintTo4Bytes(unsigned int value)
@@ -18,10 +19,10 @@ unsigned int ByteArrayConverter::UintFrom4Bytes(byte value[])
 byte *ByteArrayConverter::SplitByte(byte value)
 {
     auto result = new byte[2];
-    if (value > 200)
+    if (value > splitPoint)
     {
-        result[0] = 200;
-        result[1] = (byte)(value - 200);
+        result[0] = splitPoint;
+        result[1] = (byte)(value - splitPoint);
     }
     else
     {
@@ -37,10 +38,10 @@ byte *ByteArrayConverter::SplitBytes4(byte value[4])
     auto result = new byte[8];
     for (int i = 0; i < 4; i++)
     {
-        if (value[i] > 200)
+        if (value[i] > splitPoint)
         {
-            result[i * 2] = 200;
-            result[i * 2 + 1] = (byte)(value[i] - 200);
+            result[i * 2] = splitPoint;
+            result[i * 2 + 1] = (byte)(value[i] - splitPoint);
         }
         else
         {

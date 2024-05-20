@@ -9,7 +9,7 @@ bool PacketSenderReceiver::loop()
     bool receivedPacket = false;
 
     // receive data
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 200; i++)
     {
         if (Serial.available() > 0)
         {
@@ -17,6 +17,8 @@ bool PacketSenderReceiver::loop()
 
             if (value == REQUEST_ALIFE_PACKET_BYTE) // request for alife packet
             {
+                errorReceiving("Sent alife packet");
+
                 // send alife packet header with client id
                 byte packetType = 1; // 1 = alife packet
                 this->sendPacketStart(packetType);
@@ -29,21 +31,32 @@ bool PacketSenderReceiver::loop()
 
                 free(clientIdArr);
                 this->sendPacketEnd();
+                _receiveBufferCount = 0;
             }
             else
             {
                 // normal data received
-                _receiveBuffer += value;
+                _receiveBuffer[_receiveBufferCount] = value;
+                _receiveBufferCount++;
 
                 // check if _receiveBuffer ends with _packetHeader
-                if (_receiveBuffer.endsWith(_packetHeaderString))
-                // if (StringToolbox::stringEndsWith(_receiveBuffer, _packetHeader))
+                bool recieverBufferEndsWithPacketHeader = true;
+                for (int i = 0; i < 9; i++)
+                {
+                    if (_receiveBuffer[_receiveBufferCount - 9 + i] != _packetHeader[i])
+                    {
+                        recieverBufferEndsWithPacketHeader = false;
+                        break;
+                    }
+                }
+
+                if (recieverBufferEndsWithPacketHeader)
                 {
                     // packet start/end byte found
-                    if (_receiveBuffer.length() <= 9)
+                    if (_receiveBufferCount <= 9)
                     {
                         // only packet header received
-                        _receiveBuffer = "";
+                        _receiveBufferCount = 0;
                         return false;
                     }
 
@@ -57,8 +70,9 @@ bool PacketSenderReceiver::loop()
                     case 1: // alife packet
                         break;
 
-                    case 2:                                                                          // data packet
-                        processDataPacket(_receiveBuffer.substring(1, _receiveBuffer.length() - 9)); // remove packet header and packet type
+                    case 2: // data packet
+                        // processDataPacket(_receiveBuffer.substring(1, _receiveBuffer.length() - 9)); // remove packet header and packet type
+                        processDataPacket(_receiveBufferCount - 9); // remove packet header and packet type
                         receivedPacket = true;
                         break;
 
@@ -70,7 +84,7 @@ bool PacketSenderReceiver::loop()
                     }
 
                     // clear receive buffer
-                    _receiveBuffer = "";
+                    _receiveBufferCount = 0;
                 }
             }
         }
@@ -126,36 +140,54 @@ static byte CalculateChecksumForResponsePacket(String message, byte packetId[4],
     return result;
 }
 
-void PacketSenderReceiver::processDataPacket(String packetContent)
+void PacketSenderReceiver::processDataPacket(u_int length)
 {
-    int pos = 0;
-
-    if (packetContent.length() < 18) // sender id (4*2 bytes), packet id (4*2 bytes), checksum (1*2 byte)
+    if (length < 20) // sender id (4*2 bytes), packet id (4*2 bytes), checksum (1*2 byte)
     {
         // packet content not long enough
         errorReceiving("Packet content not long enough");
         return;
     }
 
+    int pos = 0;
+
+    // packet type
+    pos++; // skip packet type ( byte - packet type: 1 = alife packet, 2 = data packet, 3 = response packet)
+
     // sender id
-    byte senderIdArrRaw[8] = {packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++]}; // get 4*2 byte packet id
-    byte *senderIdArr = ByteArrayConverter::UnSplitBytes8(senderIdArrRaw);                                                                                                                                     // split 8 bytes to 4 bytes
-    unsigned int senderId = ByteArrayConverter::UintFrom4Bytes(senderIdArr);                                                                                                                                   // convert 4 bytes to int
+    byte senderIdArrRaw[8] = {_receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++]}; // get 4*2 byte sender id
+    byte *senderIdArr = ByteArrayConverter::UnSplitBytes8(senderIdArrRaw);                                                                                                                                             // split 8 bytes to 4 bytes
+    unsigned int senderId = ByteArrayConverter::UintFrom4Bytes(senderIdArr);                                                                                                                                           // convert 4 bytes to int
 
     // packet id
-    byte packetIdArrRaw[8] = {packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++], packetContent[pos++]}; // get 4 byte packet id
-    byte *packetIdArr = ByteArrayConverter::UnSplitBytes8(packetIdArrRaw);                                                                                                                                     // split 8 bytes to 4 bytes
-    unsigned int packetId = ByteArrayConverter::UintFrom4Bytes(packetIdArr);                                                                                                                                   // convert 4 bytes to int
+    byte packetIdArrRaw[8] = {_receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++]}; // get 4 byte packet id
+    byte *packetIdArr = ByteArrayConverter::UnSplitBytes8(packetIdArrRaw);                                                                                                                                             // split 8 bytes to 4 bytes
+    unsigned int packetId = ByteArrayConverter::UintFrom4Bytes(packetIdArr);
+
+    // payload length
+    byte payloadLengthArrRaw[8] = {_receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++]}; // get 4 byte payload length id
+    byte *payloadLengthArr = ByteArrayConverter::UnSplitBytes8(payloadLengthArrRaw);                                                                                                                                        // split 8 bytes to 4 bytes
+    unsigned int payloadLength = ByteArrayConverter::UintFrom4Bytes(payloadLengthArr);                                                                                                                                      // convert 4 bytes to int
 
     // get payload
-    // get all bytes from _receiveBuffer except first 28 bytes (header 9, client id 4*2, packet type 1, packet id 4*2 checksum * 2) till end byte
-    uint payloadLength = packetContent.length() - pos - 2;
+    // get all bytes from _receiveBuffer except first bytes (header 9, client id 4*2, packet type 1, packet id 4*2 checksum * 2) till end byte
+    int payloadLengthReal = length - pos - 2;
+
+    //_errorOccured(String(packetId) + " " + String(payloadLength) + " " + String(length));
+
+    if (payloadLength != payloadLengthReal)
+    {
+        errorReceiving("payloadLength " + String(payloadLength) + "!=" + String(payloadLengthReal) + " packet " + String(packetId));
+        sendResponsePacket(packetId, false, "response " + String(packetId) + ": payloadLength " + String(payloadLength) + "!= payloadLengthReal " + String(payloadLengthReal) + " packet " + String(packetId));
+        return; // payload length not valid
+    }
+
     byte payloadArr[payloadLength];
     for (int i = 0; i < payloadLength; i++)
-        payloadArr[i] = packetContent[i + pos];
+        payloadArr[i] = _receiveBuffer[i + pos];
 
     // get checksum
-    byte checksumRaw[2] = {packetContent[packetContent.length() - 2], packetContent[packetContent.length() - 1]};
+    byte checksumRaw[2] = {_receiveBuffer[length - 2], _receiveBuffer[length - 1]};
     byte checksum = ByteArrayConverter::UnSplitBytes2(checksumRaw);
 
     // calculate checksum

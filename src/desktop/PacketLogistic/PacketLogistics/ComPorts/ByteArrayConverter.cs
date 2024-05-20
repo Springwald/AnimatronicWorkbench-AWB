@@ -15,6 +15,8 @@ namespace PacketLogistics.ComPorts
 {
     public static class ByteArrayConverter
     {
+        const byte splitPoint = 128;
+
         /// <summary>
         /// to prevent usage of the reserved bytes for packet headers, we split the bytes into 2 parts
         /// </summary>
@@ -27,10 +29,10 @@ namespace PacketLogistics.ComPorts
         {
             foreach (var b in bytes)
             {
-                if (b > 200)
+                if (b > splitPoint)
                 {
-                    yield return 200;
-                    yield return (byte)(b - 200);
+                    yield return splitPoint;
+                    yield return (byte)(b - splitPoint);
                 }
                 else
                 {

@@ -18,6 +18,7 @@ namespace PacketLogistics.ComPorts
     {
         string PacketHeader { get; }
         byte[] PacketHeaderBytes { get; }
+        byte[] CommandBytes { get; }
         byte SearchForClientByte { get; }
     }
 
@@ -33,9 +34,11 @@ namespace PacketLogistics.ComPorts
         /// </summary>
         public byte[] PacketHeaderBytes { get; }
 
+        public byte[] CommandBytes { get; }
+
         public byte SearchForClientByte { get; }
 
-        public ComPortCommandConfig(string packetHeader, byte headerStartByte = (byte)255, byte headerEndByte = (byte)254, byte searchForClientByte = (byte)253)
+        public ComPortCommandConfig(string packetHeader, byte headerStartByte = (byte)250, byte headerEndByte = (byte)251, byte searchForClientByte = (byte)252)
         {
             if (packetHeader?.Length != 3) throw new System.ArgumentOutOfRangeException(nameof(packetHeader), "must have 3 chars");
 
@@ -52,6 +55,10 @@ namespace PacketLogistics.ComPorts
                 headerStartByte, headerStartByte, headerStartByte,
                 headerInBytes[0], headerInBytes[1], headerInBytes[2],
                 headerEndByte, headerEndByte, headerEndByte
+            };
+            this.CommandBytes = new[]
+            {
+                headerStartByte, headerEndByte, searchForClientByte,
             };
         }
     }

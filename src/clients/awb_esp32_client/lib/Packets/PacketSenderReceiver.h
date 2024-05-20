@@ -4,11 +4,13 @@
 #include "Packet.h"
 #include <Arduino.h>
 
-#define PACKET_HEADER_START_BYTE 255
-#define PACKET_HEADER_END_BYTE 254
-#define REQUEST_ALIFE_PACKET_BYTE 253
+#define PACKET_HEADER_START_BYTE 250
+#define PACKET_HEADER_END_BYTE 251
+#define REQUEST_ALIFE_PACKET_BYTE 252
 
 using byte = unsigned char;
+
+#define PACKET_BUFFER_SIZE 4000
 
 /**
  * sends and receives packets over the serial port
@@ -26,12 +28,15 @@ private:
 
     TCallBackPacketReceived _packetReceived; /// callback function to call if a packet was received
     TCallBackErrorOccured _errorOccured;     /// callback function to call if an error occured
-    String _receiveBuffer;                   /// the buffer to store the received data
+
+    const int _receiveBufferSize = PACKET_BUFFER_SIZE;
+    unsigned char _receiveBuffer[PACKET_BUFFER_SIZE];
+    int _receiveBufferCount = 0;
 
     /**
      * process a received data packet
      */
-    void processDataPacket(String packetContent);
+    void processDataPacket(u_int length);
 
     /**
      * send a packet to the serial port
