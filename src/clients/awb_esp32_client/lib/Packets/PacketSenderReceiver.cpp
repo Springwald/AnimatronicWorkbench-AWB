@@ -9,7 +9,7 @@ bool PacketSenderReceiver::loop()
     bool receivedPacket = false;
 
     // receive data
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < 1000; i++)
     {
         if (Serial.available() > 0)
         {
@@ -17,7 +17,7 @@ bool PacketSenderReceiver::loop()
 
             if (value == REQUEST_ALIFE_PACKET_BYTE) // request for alife packet
             {
-                errorReceiving("Sent alife packet");
+                //errorReceiving("Sent alife packet");
 
                 // send alife packet header with client id
                 byte packetType = 1; // 1 = alife packet
