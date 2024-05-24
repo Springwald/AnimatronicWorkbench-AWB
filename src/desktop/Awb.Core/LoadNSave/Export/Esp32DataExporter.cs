@@ -19,11 +19,13 @@ namespace Awb.Core.LoadNSave.Export
             
             #include <Arduino.h>
             #include <String.h>
-            #include "Timeline.h"
-            #include "TimelineState.h"
-            #include "StsServoPoint.h"
-            #include "Pca9685PwmServoPoint.h"
-            #include "Mp3PlayerYX5300Point.h"
+            #include "../ProjectData/Timeline.h"
+            #include "../ProjectData/TimelineState.h"
+            #include "../ProjectData/StsServoPoint.h"
+            #include "../ProjectData/Pca9685PwmServoPoint.h"
+            #include "../ProjectData/Mp3PlayerYX5300Point.h"
+            #include "../ProjectData/StsScsServo.h"
+            #include "../ProjectData/Pca9685PwmServo.h"
             
             /// <summary>
             /// This is a prototype for the AutoPlayData class.
