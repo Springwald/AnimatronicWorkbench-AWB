@@ -25,10 +25,10 @@ void StatusManagement::update()
     case 1:
         _awbDisplay->set_actual_status_info(getDebugInfos());
         break;
-    case 2:
+    case 3:
         _awbDisplay->set_actual_status_info(updateActuatorsStatuses());
         break;
-    case 3:
+    case 4:
         _displayStateCounter = 0;
         break;
     }
