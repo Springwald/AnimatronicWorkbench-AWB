@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <vector>
-#include <AutoPlay/AutoPlayData.h>
+#include <AwbDataImport/ProjectData.h>
 
 class InputManager
 {
@@ -12,12 +12,12 @@ class InputManager
 
 private:
     TCallBackErrorOccured _errorOccured;
-    AutoPlayData *_data; // the data exported by Animatronic Workbench Studio
+    ProjectData *_data; // the data exported by Animatronic Workbench Studio
     void init();
 
 public:
     // the constructor
-    InputManager(AutoPlayData *data, TCallBackErrorOccured errorOccured) : _errorOccured(errorOccured), _data(data)
+    InputManager(ProjectData *data, TCallBackErrorOccured errorOccured) : _errorOccured(errorOccured), _data(data)
     {
         init();
     }

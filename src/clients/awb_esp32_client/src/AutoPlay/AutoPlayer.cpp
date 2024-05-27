@@ -121,11 +121,11 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     // Play STS Servos
     if (_stSerialServoManager != NULL)
     {
-        for (int servoIndex = 0; servoIndex < _data->stsServoCount; servoIndex++)
+        for (int servoIndex = 0; servoIndex < _data->stsServos->size(); servoIndex++)
         {
-            u8 servoChannel = _data->stsServoChannels[servoIndex];
-            int servoSpeed = _data->stsServoSpeed[servoIndex];
-            int servoAccelleration = _data->stsServoAcceleration[servoIndex];
+            u8 servoChannel = _data->stsServos->at(servoIndex).channel;
+            int servoSpeed = _data->stsServos->at(servoIndex).defaultSpeed;
+            int servoAccelleration = _data->stsServos->at(servoIndex).defaultAcceleration;
 
             int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.stsServoPoints);
             if (targetValue == -1)
@@ -139,11 +139,11 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     // Play SCS Servos
     if (_scSerialServoManager != NULL)
     {
-        for (int servoIndex = 0; servoIndex < _data->scsServoCount; servoIndex++)
+        for (int servoIndex = 0; servoIndex < _data->scsServos->size(); servoIndex++)
         {
-            u8 servoChannel = _data->scsServoChannels[servoIndex];
-            int servoSpeed = _data->scsServoSpeed[servoIndex];
-            int servoAccelleration = _data->scsServoAcceleration[servoIndex];
+            u8 servoChannel = _data->scsServos->at(servoIndex).channel;
+            int servoSpeed = _data->scsServos->at(servoIndex).defaultSpeed;
+            int servoAccelleration = _data->scsServos->at(servoIndex).defaultAcceleration;
 
             int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.scsServoPoints);
             if (targetValue == -1)
@@ -157,10 +157,10 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     // Play PWM Servos
     if (_pca9685PwmManager != NULL)
     {
-        for (int servoIndex = 0; servoIndex < _data->pca9685PwmServoCount; servoIndex++)
+        for (int servoIndex = 0; servoIndex < _data->pca9685PwmServos->size(); servoIndex++)
         {
-            int servoChannel = _data->pca9685PwmServoChannels[servoIndex];
-            auto servoName = _data->pca9685PwmServoName[servoIndex];
+            int servoChannel = _data->pca9685PwmServos->at(servoIndex).channel;
+            auto servoName = _data->pca9685PwmServos->at(servoIndex).title;
 
             Pca9685PwmServoPoint *point1 = nullptr;
             Pca9685PwmServoPoint *point2 = nullptr;

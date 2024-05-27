@@ -14,7 +14,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 24.05.2024 19:27:04
+// Created on 27.05.2024 23:39:14
 
 class ProjectData
 {
@@ -54,8 +54,8 @@ ProjectData()
    scsServos->push_back(StsScsServo(3, "Mouth", 572, 435, 572, 1, 300, false ));
    scsServos->push_back(StsScsServo(4, "Ear right", 1000, 20, 137, 1, 200, false ));
    scsServos->push_back(StsScsServo(5, "Ear left", 20, 1000, 830, 1, 200, false ));
-   scsServos->push_back(StsScsServo(10, "Arm lower right", 290, 1020, 548, 1, 500, false ));
-   scsServos->push_back(StsScsServo(12, "Arm lower left", 685, 5, 346, 1, 500, false ));
+   scsServos->push_back(StsScsServo(10, "Arm lower right", 290, 1020, 548, 1, 200, false ));
+   scsServos->push_back(StsScsServo(12, "Arm lower left", 685, 5, 346, 1, 200, false ));
 
    stsServos = new std::vector<StsScsServo>();
    stsServos->push_back(StsScsServo(6, "Head rotate", 1580, 2547, 2048, 10, 1500, false ));
@@ -320,19 +320,31 @@ ProjectData()
 		scsServoPoints6->push_back(StsServoPoint(10,-250,640));
 		stsServoPoints6->push_back(StsServoPoint(9,500,1741));
 		stsServoPoints6->push_back(StsServoPoint(11,500,2342));
+		stsServoPoints6->push_back(StsServoPoint(9,1000,1595));
 		stsServoPoints6->push_back(StsServoPoint(11,1500,2342));
-		stsServoPoints6->push_back(StsServoPoint(9,2000,1449));
 		scsServoPoints6->push_back(StsServoPoint(12,2000,346));
+		stsServoPoints6->push_back(StsServoPoint(11,2000,2525));
+		scsServoPoints6->push_back(StsServoPoint(12,2500,251));
 		stsServoPoints6->push_back(StsServoPoint(11,3000,2525));
 		scsServoPoints6->push_back(StsServoPoint(10,3000,640));
 		scsServoPoints6->push_back(StsServoPoint(12,3000,251));
+		scsServoPoints6->push_back(StsServoPoint(10,3500,761));
 		scsServoPoints6->push_back(StsServoPoint(10,4000,761));
 		stsServoPoints6->push_back(StsServoPoint(11,4000,2525));
+		scsServoPoints6->push_back(StsServoPoint(12,4500,251));
+		stsServoPoints6->push_back(StsServoPoint(11,4500,2525));
 		stsServoPoints6->push_back(StsServoPoint(11,5000,2590));
+		scsServoPoints6->push_back(StsServoPoint(12,5000,540));
+		scsServoPoints6->push_back(StsServoPoint(10,5500,749));
+		stsServoPoints6->push_back(StsServoPoint(11,5500,2342));
+		stsServoPoints6->push_back(StsServoPoint(9,5500,1573));
 		stsServoPoints6->push_back(StsServoPoint(11,6000,2342));
 		scsServoPoints6->push_back(StsServoPoint(10,6000,502));
 		scsServoPoints6->push_back(StsServoPoint(12,6000,545));
 		stsServoPoints6->push_back(StsServoPoint(9,6000,1427));
+		stsServoPoints6->push_back(StsServoPoint(9,6500,1741));
+		scsServoPoints6->push_back(StsServoPoint(12,6500,288));
+		scsServoPoints6->push_back(StsServoPoint(10,7500,508));
 		stsServoPoints6->push_back(StsServoPoint(9,8000,1741));
 		stsServoPoints6->push_back(StsServoPoint(11,8000,2342));
 		scsServoPoints6->push_back(StsServoPoint(10,8000,657));
@@ -358,28 +370,40 @@ ProjectData()
 		stsServoPoints7->push_back(StsServoPoint(11,2500,2342));
 		scsServoPoints7->push_back(StsServoPoint(2,3000,510));
 		scsServoPoints7->push_back(StsServoPoint(1,3000,512));
+		stsServoPoints7->push_back(StsServoPoint(9,3000,1595));
 		stsServoPoints7->push_back(StsServoPoint(11,3500,2342));
-		stsServoPoints7->push_back(StsServoPoint(9,4000,1449));
 		scsServoPoints7->push_back(StsServoPoint(12,4000,346));
+		stsServoPoints7->push_back(StsServoPoint(11,4000,2525));
+		scsServoPoints7->push_back(StsServoPoint(12,4500,251));
 		stsServoPoints7->push_back(StsServoPoint(7,4625,1945));
 		stsServoPoints7->push_back(StsServoPoint(8,4625,2199));
 		stsServoPoints7->push_back(StsServoPoint(11,5000,2525));
 		scsServoPoints7->push_back(StsServoPoint(10,5000,640));
 		scsServoPoints7->push_back(StsServoPoint(12,5000,251));
+		scsServoPoints7->push_back(StsServoPoint(10,5500,761));
 		stsServoPoints7->push_back(StsServoPoint(7,6000,2190));
 		stsServoPoints7->push_back(StsServoPoint(8,6000,2304));
 		scsServoPoints7->push_back(StsServoPoint(10,6000,761));
 		stsServoPoints7->push_back(StsServoPoint(11,6000,2525));
+		scsServoPoints7->push_back(StsServoPoint(12,6500,251));
+		stsServoPoints7->push_back(StsServoPoint(11,6500,2525));
 		stsServoPoints7->push_back(StsServoPoint(11,7000,2590));
+		scsServoPoints7->push_back(StsServoPoint(12,7000,540));
+		scsServoPoints7->push_back(StsServoPoint(10,7500,749));
+		stsServoPoints7->push_back(StsServoPoint(11,7500,2342));
+		stsServoPoints7->push_back(StsServoPoint(9,7500,1573));
 		stsServoPoints7->push_back(StsServoPoint(11,8000,2342));
 		scsServoPoints7->push_back(StsServoPoint(10,8000,502));
 		scsServoPoints7->push_back(StsServoPoint(12,8000,545));
 		stsServoPoints7->push_back(StsServoPoint(9,8000,1427));
 		stsServoPoints7->push_back(StsServoPoint(7,8500,2190));
 		stsServoPoints7->push_back(StsServoPoint(8,8500,2304));
+		stsServoPoints7->push_back(StsServoPoint(9,8500,1741));
+		scsServoPoints7->push_back(StsServoPoint(12,8500,288));
 		stsServoPoints7->push_back(StsServoPoint(6,9125,2326));
 		stsServoPoints7->push_back(StsServoPoint(7,9500,1899));
 		stsServoPoints7->push_back(StsServoPoint(8,9500,2067));
+		scsServoPoints7->push_back(StsServoPoint(10,9500,508));
 		stsServoPoints7->push_back(StsServoPoint(9,10000,1741));
 		stsServoPoints7->push_back(StsServoPoint(11,10000,2342));
 		scsServoPoints7->push_back(StsServoPoint(10,10000,657));
@@ -444,18 +468,21 @@ ProjectData()
 		stsServoPoints9->push_back(StsServoPoint(9,1500,1741));
 		stsServoPoints9->push_back(StsServoPoint(11,1500,2342));
 		stsServoPoints9->push_back(StsServoPoint(6,2000,1854));
+		stsServoPoints9->push_back(StsServoPoint(9,2000,1595));
 		scsServoPoints9->push_back(StsServoPoint(10,2250,737));
 		scsServoPoints9->push_back(StsServoPoint(12,2250,497));
 		stsServoPoints9->push_back(StsServoPoint(11,2500,2342));
 		stsServoPoints9->push_back(StsServoPoint(7,2750,2144));
-		stsServoPoints9->push_back(StsServoPoint(9,3000,1449));
 		scsServoPoints9->push_back(StsServoPoint(12,3000,346));
+		stsServoPoints9->push_back(StsServoPoint(11,3000,2525));
+		scsServoPoints9->push_back(StsServoPoint(12,3500,251));
 		stsServoPoints9->push_back(StsServoPoint(8,3875,1765));
 		scsServoPoints9->push_back(StsServoPoint(10,4000,749));
 		scsServoPoints9->push_back(StsServoPoint(12,4000,465));
 		stsServoPoints9->push_back(StsServoPoint(11,4000,2525));
 		scsServoPoints9->push_back(StsServoPoint(10,4000,640));
 		scsServoPoints9->push_back(StsServoPoint(12,4000,251));
+		scsServoPoints9->push_back(StsServoPoint(10,4500,761));
 		scsServoPoints9->push_back(StsServoPoint(4,4625,721));
 		scsServoPoints9->push_back(StsServoPoint(5,4625,390));
 		stsServoPoints9->push_back(StsServoPoint(7,4625,1930));
@@ -469,19 +496,28 @@ ProjectData()
 		stsServoPoints9->push_back(StsServoPoint(11,5000,2525));
 		scsServoPoints9->push_back(StsServoPoint(2,5250,512));
 		scsServoPoints9->push_back(StsServoPoint(1,5250,512));
+		scsServoPoints9->push_back(StsServoPoint(12,5500,251));
+		stsServoPoints9->push_back(StsServoPoint(11,5500,2525));
 		stsServoPoints9->push_back(StsServoPoint(11,6000,2590));
+		scsServoPoints9->push_back(StsServoPoint(12,6000,540));
 		scsServoPoints9->push_back(StsServoPoint(4,6125,20));
 		scsServoPoints9->push_back(StsServoPoint(5,6125,1000));
 		scsServoPoints9->push_back(StsServoPoint(10,6500,749));
 		scsServoPoints9->push_back(StsServoPoint(12,6500,470));
+		scsServoPoints9->push_back(StsServoPoint(10,6500,749));
+		stsServoPoints9->push_back(StsServoPoint(11,6500,2342));
+		stsServoPoints9->push_back(StsServoPoint(9,6500,1573));
 		stsServoPoints9->push_back(StsServoPoint(6,7000,2082));
 		stsServoPoints9->push_back(StsServoPoint(11,7000,2342));
 		scsServoPoints9->push_back(StsServoPoint(10,7000,502));
 		scsServoPoints9->push_back(StsServoPoint(12,7000,545));
 		stsServoPoints9->push_back(StsServoPoint(9,7000,1427));
+		stsServoPoints9->push_back(StsServoPoint(9,7500,1741));
+		scsServoPoints9->push_back(StsServoPoint(12,7500,288));
 		scsServoPoints9->push_back(StsServoPoint(10,7750,692));
 		scsServoPoints9->push_back(StsServoPoint(12,7750,502));
 		stsServoPoints9->push_back(StsServoPoint(8,7750,1936));
+		scsServoPoints9->push_back(StsServoPoint(10,8500,508));
 		stsServoPoints9->push_back(StsServoPoint(6,8625,2082));
 		stsServoPoints9->push_back(StsServoPoint(9,9000,1741));
 		stsServoPoints9->push_back(StsServoPoint(11,9000,2342));

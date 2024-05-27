@@ -23,7 +23,6 @@
             <Style TargetType="local:ProjectManagementWindow" BasedOn="{StaticResource {x:Type Window}}"/>
             <Style TargetType="local:DebugWindow" BasedOn="{StaticResource {x:Type Window}}"/>
 
-            <Style TargetType="export:ExportToClientCodeWindow" BasedOn="{StaticResource {x:Type Window}}"/>
             <Style TargetType="export:ExportToClientsWindow" BasedOn="{StaticResource {x:Type Window}}"/>
 
             <Style TargetType="UserControl" BasedOn="{StaticResource {x:Type UserControl}}"/>

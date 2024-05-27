@@ -9,7 +9,7 @@ using Awb.Core.Services;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
 
-namespace Awb.Core.LoadNSave.Export
+namespace Awb.Core.Export.ExporterParts
 {
     public class TimelineExportData
     {
@@ -17,7 +17,8 @@ namespace Awb.Core.LoadNSave.Export
         public string Title { get; set; }
         public TimelinePoint[] Points { get; set; }
 
-        private TimelineExportData(string title, int timelineStateId, TimelinePoint[] points) {
+        private TimelineExportData(string title, int timelineStateId, TimelinePoint[] points)
+        {
             Title = title;
             TimelineStateId = timelineStateId;
             Points = points;

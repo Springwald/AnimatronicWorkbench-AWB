@@ -45,7 +45,6 @@ protected:
     NeoPixelStatusControl *_neoPixelStatus;            /// The neopixel status control
     AutoPlayer *_autoPlayer;                           /// The auto player to play timeline animations
     WlanConnector *_wlanConnector;                     /// The wlan connector to open a WLAN AP and display status information as a web page
-    AutoPlayData *_data;                               // the data exported by Animatronic Workbench Studio
     ProjectData *_projectData;                         // the project data exported by Animatronic Workbench Studio
     Debugging *_debugging;                             // the debugging class
     StatusManagement *_statusManagement;               // the status management for acutator status information and health check

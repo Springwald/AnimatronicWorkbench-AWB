@@ -30,7 +30,6 @@ void AwbClient::setup()
     delay(1000);
 
     // load the AWB project data
-    _data = new AutoPlayData();
     _projectData = new ProjectData();
 
     // set up the wlan connector
@@ -130,10 +129,10 @@ void AwbClient::setup()
 #endif
 
     showSetupMsg("setup input manager");
-    _inputManager = new InputManager(_data, inputManagerErrorOccured);
+    _inputManager = new InputManager(_projectData, inputManagerErrorOccured);
 
     showSetupMsg("setup autoplay");
-    _autoPlayer = new AutoPlayer(_data, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
+    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
 
     // setup the packet processor to process packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet processor");

@@ -104,7 +104,6 @@
                 <StackPanel Grid.Row="0">
                     <!-- project data and export -->
                     <Label Content="Project:"/>
-                    <Button x:Name="ButtonExportEsp32Old" Content="Export autoplay.h (old)" Click="ButtonExportEsp32Old_Click" />
                     <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 clients" Click="ButtonExportEsp32_Click" />
                     <Button x:Name="ButtonClear" Content="New Timeline" Click="ButtonClear_Click" />
                     <Label Content="Load existing timeline:" />

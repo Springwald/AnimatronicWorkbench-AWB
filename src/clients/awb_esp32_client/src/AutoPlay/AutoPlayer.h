@@ -8,7 +8,7 @@
 #include "../ProjectData/StsServoPoint.h"
 #include "../ProjectData/Pca9685PwmServoPoint.h"
 #include "../ProjectData/TimelineState.h"
-#include "AutoPlayData.h"
+#include "../AwbDataImport/ProjectData.h"
 #include "../Actuators/StSerialServoManager.h"
 #include "../Actuators/Pca9685PwmManager.h"
 #include "../Actuators/Mp3PlayerYX5300Manager.h"
@@ -28,7 +28,7 @@ protected:
     Pca9685PwmManager *_pca9685PwmManager;           // the PCA9685 PWM manager
     Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager; // the MP3 player manager
     InputManager *_inputManager;                     // the input manager
-    AutoPlayData *_data;                             // the data exported by Animatronic Workbench Studio
+    ProjectData *_data;                              // the data exported by Animatronic Workbench Studio
 
     long _lastMsUpdate;                  // millis() of last update
     long _lastPacketReceivedMillis = -1; // millis() of last received packet
@@ -45,7 +45,7 @@ protected:
     int calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints);
 
 public:
-    AutoPlayer(AutoPlayData *data, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _data(data), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
+    AutoPlayer(ProjectData *data, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _data(data), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
     {
         _lastMsUpdate = millis();
     }

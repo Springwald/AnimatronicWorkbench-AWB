@@ -6,7 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.InputControllers.TimelineInputControllers;
-using Awb.Core.LoadNSave.Export;
+using Awb.Core.Export.ExporterParts;
 using Awb.Core.Player;
 using Awb.Core.Project;
 using Awb.Core.Services;
@@ -504,68 +504,7 @@ namespace AwbStudio
             exportWindow.Show();
         }
 
-        private void ButtonExportEsp32Old_Click(object sender, RoutedEventArgs e)
-        {
-            if (_unsavedChanges == true)
-            {
-                var choice = MessageBox.Show("Save changes to the current timeline?", "Unsaved changes!", MessageBoxButton.YesNoCancel);
-                switch (choice)
-                {
-                    case MessageBoxResult.Yes:
-                        if (SaveTimelineData() == false) return;
-                        break;
-                    case MessageBoxResult.No:
-                        break;
-                    case MessageBoxResult.Cancel:
-                        return;
-                    default:
-                        throw new ArgumentOutOfRangeException($"{nameof(choice)}:{choice}");
-                }
-            }
-
-            var exportWindow = new ExportToClientCodeWindow(_projectManagerService);
-
-            var timelines = new List<TimelineExportData>();
-            var timelineIds = _timelineDataService.TimelineIds;
-
-            foreach (var timelineId in timelineIds)
-            {
-                var timelineData = _timelineDataService.GetTimelineData(timelineId);
-                if (timelineData == null)
-                {
-                    MessageBox.Show($"Can't load timeline '{timelineId}'. Export canceled.");
-                    return;
-                }
-
-                // convert timelineData to TimelineExportData
-                var exportData = TimelineExportData.FromTimeline(
-                    timelineStateId: timelineData.TimelineStateId, 
-                    title: timelineData.Title, 
-                    points: timelineData.AllPoints, 
-                    timelineDataService: _timelineDataService,
-                    awbLogger: _awbLogger);
-
-                timelines.Add(exportData);
-            }
-
-            var data = new Esp32ClientExportData()
-            {
-                ProjectName = _project.Title,
-                TimelineStates = _project.TimelinesStates,
-                StsServoConfigs = _project.StsServos,
-                ScsServoConfigs = _project.ScsServos,
-                Pca9685PwmServoConfigs = _project.Pca9685PwmServos,
-                Mp3PlayerYX5300Configs = _project.Mp3PlayersYX5300,
-                InputConfigs = _project.Inputs,
-                TimelineData = timelines.ToArray()
-            };
-            var exporter = new Esp32DataExporter();
-            var result = exporter.GetExportCode(data);
-
-            exportWindow.Show();
-            exportWindow.ShowResult(result);
-        }
-
+    
         #endregion Button Events
 
         private void timelineScrollValueChanged(object sender, ScrollChangedEventArgs e)
