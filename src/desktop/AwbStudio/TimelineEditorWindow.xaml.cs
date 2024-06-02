@@ -6,7 +6,6 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.InputControllers.TimelineInputControllers;
-using Awb.Core.Export.ExporterParts;
 using Awb.Core.Player;
 using Awb.Core.Project;
 using Awb.Core.Services;
@@ -59,7 +58,7 @@ namespace AwbStudio
 
             DebugOutputLabel.Content = string.Empty;
 
-            _awbLogger = awbLogger; 
+            _awbLogger = awbLogger;
             awbLogger.OnLog += (s, args) =>
             {
                 WpfAppInvoker.Invoke(new Action(() =>
@@ -113,7 +112,7 @@ namespace AwbStudio
             _actuatorsService = new ActuatorsService(_project, _clientsService, _logger);
 
             this._timelineData = CreateNewTimelineData("");
-            _timelinePlayer = new TimelinePlayer(timelineData: _timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService,  timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
+            _timelinePlayer = new TimelinePlayer(timelineData: _timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
             _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
             var timelineCaptions = new TimelineCaptions();
@@ -137,7 +136,7 @@ namespace AwbStudio
 
             // fill timeline state chooser
             ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
-            TimelineChooser.ProjectTitle = _project.Title;  
+            TimelineChooser.ProjectTitle = _project.Title;
             TimelineChooser.FileManager = _timelineDataService;
 
             Closing += TimelineEditorWindow_Closing;
@@ -372,7 +371,7 @@ namespace AwbStudio
                     timelineControllers: _timelineControllers,
                     viewContext: _viewContext,
                     playPosSynchronizer: _playPosSynchronizer,
-                    awbLogger: _awbLogger );
+                    awbLogger: _awbLogger);
 
                 FocusObjectPropertyEditorControl.Init(_viewContext, data, _playPosSynchronizer, _timelineDataService, _project.Sounds);
             }
@@ -504,7 +503,7 @@ namespace AwbStudio
             exportWindow.Show();
         }
 
-    
+
         #endregion Button Events
 
         private void timelineScrollValueChanged(object sender, ScrollChangedEventArgs e)

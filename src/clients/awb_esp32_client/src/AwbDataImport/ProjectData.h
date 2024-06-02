@@ -14,7 +14,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 27.05.2024 23:39:14
+// Created on 02.06.2024 15:05:42
 
 class ProjectData
 {
@@ -61,8 +61,8 @@ ProjectData()
    stsServos->push_back(StsScsServo(6, "Head rotate", 1580, 2547, 2048, 10, 1500, false ));
    stsServos->push_back(StsScsServo(7, "Neck right", 3200, 1257, 2128, 10, 1500, false ));
    stsServos->push_back(StsScsServo(8, "Neck left", 1200, 2870, 2064, 10, 1500, false ));
-   stsServos->push_back(StsScsServo(9, "Arm right", 1741, 319, 502, 100, 3000, false ));
-   stsServos->push_back(StsScsServo(11, "Arm left", 2342, 3712, 3549, 100, 3000, false ));
+   stsServos->push_back(StsScsServo(9, "Arm right", 1741, 319, 502, 200, 3000, false ));
+   stsServos->push_back(StsScsServo(11, "Arm left", 2342, 3712, 3549, 200, 3000, false ));
 
    pca9685PwmServos = new std::vector<Pca9685PwmServo>();
 
@@ -243,6 +243,8 @@ ProjectData()
 		stsServoPoints4->push_back(StsServoPoint(6,9000,2303));
 		stsServoPoints4->push_back(StsServoPoint(7,10000,1807));
 		stsServoPoints4->push_back(StsServoPoint(8,10000,2357));
+		scsServoPoints4->push_back(StsServoPoint(4,10375,699));
+		scsServoPoints4->push_back(StsServoPoint(5,10375,328));
 		scsServoPoints4->push_back(StsServoPoint(1,10375,508));
 		scsServoPoints4->push_back(StsServoPoint(2,10375,514));
 		scsServoPoints4->push_back(StsServoPoint(1,10625,358));
@@ -250,6 +252,8 @@ ProjectData()
 		scsServoPoints4->push_back(StsServoPoint(2,11000,512));
 		scsServoPoints4->push_back(StsServoPoint(1,11000,512));
 		stsServoPoints4->push_back(StsServoPoint(6,11125,2303));
+		scsServoPoints4->push_back(StsServoPoint(4,11250,20));
+		scsServoPoints4->push_back(StsServoPoint(5,11750,1000));
 		stsServoPoints4->push_back(StsServoPoint(6,12000,2052));
 		mp3PlayerYX5300Points4->push_back(Mp3PlayerYX5300Point(6, 0, 3000));
 		auto state4 = new TimelineState(1, String("InBag"));
