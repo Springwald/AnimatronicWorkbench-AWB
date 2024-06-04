@@ -11,8 +11,9 @@ namespace Awb.Core.Project
     {
         /// <summary>
         /// the unqiue id of the device
-        /// the unqiue id of the device
         /// </summary>
         public string Id { get; set; }
+
+       
     }
 }

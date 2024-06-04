@@ -97,7 +97,7 @@ namespace Awb.Core.Export.ExporterParts
             // export the inputs
             var exportInputs = inputConfigs ?? Array.Empty<InputConfig>();
             result.AppendLine($"\tint inputIds[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(i => i.Id.ToString()))}}};");
-            result.AppendLine($"\tString inputNames[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(s => $"\"{s.Name}\""))}}};");
+            result.AppendLine($"\tString inputNames[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(s => $"\"{s.Title}\""))}}};");
             result.AppendLine($"\tuint8_t  inputIoPins[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(s => s.IoPin.ToString()))}}};");
             result.AppendLine($"\tint inputCount = {exportInputs.Length};");
             result.AppendLine();
@@ -144,7 +144,7 @@ namespace Awb.Core.Export.ExporterParts
         private static void ExportMp3PlayerYX5300Informations(Mp3PlayerYX5300Config[]? mp3PlayerYX5300Configs, StringBuilder result)
         {
             var players = mp3PlayerYX5300Configs ?? Array.Empty<Mp3PlayerYX5300Config>();
-            var mp3PlayerYX5300Names = players?.Select(s => s.Name ?? s.SoundPlayerId).ToArray();
+            var mp3PlayerYX5300Titles = players?.Select(s => s.Title ?? s.SoundPlayerId).ToArray();
             result.AppendLine($"\tint mp3PlayerYX5300Count = {players!.Length};");
             result.AppendLine($"\tint mp3PlayerYX5300RxPin[{players.Length}] = {{{string.Join(", ", players.Select(s => s.RxPin.ToString()))}}};");
             result.AppendLine($"\tint mp3PlayerYX5300TxPin[{players.Length}] = {{{string.Join(", ", players.Select(s => s.TxPin.ToString()))}}};");

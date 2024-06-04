@@ -29,7 +29,7 @@
                 <Button x:Name="ButtonOpenExisting" Content="Open existing project"  Grid.Row="0" Click="ButtonOpenExisting_Click"/>
                 <Label Content="Latest projects:" Grid.Row="1"/>
                 <ListBox x:Name="ListLatestProjects" Grid.Row="2" SelectionChanged="ListLatestProjects_SelectionChanged" SelectionMode="Single"/>
-                <CheckBox Content="Open last project on start" Grid.Row="3" x:Name="ReOpenLastProjectCheckbox" Margin="5" Checked="ReOpenLastProjectCheckbox_Checked"/>
+                <CheckBox Content="Open last project on start" Grid.Row="3" x:Name="ReOpenLastProjectCheckbox" Margin="5" Unchecked="ReOpenLastProjectCheckbox_Checked" Checked="ReOpenLastProjectCheckbox_Checked"/>
                 
                 <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="4" Click="ButtonCreateNew_Click"/>
                 <Button x:Name="ButtonEditExisting" Content="Edit existing project configuration"  Grid.Row="5" Click="ButtonEditExisting_Click"/>

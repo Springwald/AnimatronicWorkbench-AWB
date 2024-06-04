@@ -41,8 +41,6 @@ namespace Awb.Core.Project
 
         public int ItemsPerBank { get; set; } = 8;
 
-        public string? AutoPlayEsp32ExportFolder { get; set; }
-
         [JsonIgnore]
         public ITimelineDataService TimelineDataService => _timelineDataService ?? throw new Exception("TimelineDataService not set! Have you set the project folder?");
 

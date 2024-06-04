@@ -7,7 +7,7 @@
 
 namespace Awb.Core.Project
 {
-    public class Pca9685PwmServoConfig : IDeviceConfig
+    public class Pca9685PwmServoConfig : IDeviceConfig, IProjectObjectListable
     {
         public string Id { get; set; }
         public uint ClientId { get; set; }
@@ -17,6 +17,10 @@ namespace Awb.Core.Project
         public int MinValue { get; set; }
         public int MaxValue { get; set; }
         public int? DefaultValue { get; set; }
+
+        public string TitleShort => Title ?? $"no title for Pca9685PwmServo '{Id}'";
+
+        public string TitleDetailled => throw new NotImplementedException();
 
         public Pca9685PwmServoConfig(string id, uint clientId, uint i2cAdress, uint channel, string title)
         {

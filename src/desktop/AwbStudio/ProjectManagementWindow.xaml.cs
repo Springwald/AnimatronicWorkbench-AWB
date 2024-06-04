@@ -27,7 +27,7 @@ namespace AwbStudio
     /// </summary>
     public partial class ProjectManagementWindow : Window
     {
-        private const bool editConfigAvailable = false; // planned for future release
+        private const bool editConfigAvailable = true; // planned for future release
 
         private readonly IProjectManagerService _projectManagerService;
         private readonly IServiceProvider _serviceProvider;
@@ -198,10 +198,10 @@ namespace AwbStudio
                         MinValue = 0,
                     },
                 },
-                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", name: "Mp3Player") },
+                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, id:"mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player") },
                 Inputs = new InputConfig[]
                 {
-                    new InputConfig(id: 1, name:"Sleep") { IoPin = 25 }
+                    new InputConfig(id: 1, title:"Sleep") { IoPin = 25 }
                 },
 
             };
@@ -351,5 +351,7 @@ namespace AwbStudio
             _awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart = ReOpenLastProjectCheckbox.IsChecked == true;
             await _awbStudioSettingsService.SaveSettingsAsync();
         }
+
+
     }
 }

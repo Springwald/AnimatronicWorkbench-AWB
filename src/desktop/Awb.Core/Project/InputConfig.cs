@@ -10,13 +10,13 @@ namespace Awb.Core.Project
     public class InputConfig
     {
         public int Id { get;  set; }
-        public string Name { get;  set; }
+        public string Title { get;  set; }
         public int? IoPin { get;  set; } 
 
-        public InputConfig(int id, string name)
+        public InputConfig(int id, string title)
         {
             Id = id;
-            Name = name;
+            Title = title;
         }
     }
 }

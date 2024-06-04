@@ -11,7 +11,7 @@
             <TextBlock TextWrapping="Wrap" Text="Animatronic WorkBench (AWB) Studio" FontSize="24" FontWeight="Bold" Margin="5"  />
             </Label>
                 <Label Content="Open source software for animatronic figures" Margin="10"/>
-        <Label Content="Version: 0.3.0" Margin="10"/>
+        <Label Content="Version: 0.4.0" Margin="10"/>
         <Label>
             <TextBlock  Margin="5">           
                 <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB/AnimatronicWorkbench-EN" RequestNavigate="Hyperlink_RequestNavigate">

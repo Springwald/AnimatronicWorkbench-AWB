@@ -61,8 +61,8 @@
             
         </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10 10 10 10">
-            <Button Margin="40 0 0 0" Content="Cancel without saving" Click="ButtonClose_Click"/>
-            <Button Margin="40 0 0 0" Content="Save" Click="ButtonSave_Click"/>
+            <Button Margin="40 0 0 0" Content="Cancel without saving" Click="ButtonCloseWithoutSaving_Click"/>
+            <Button Margin="40 0 0 0" Content="Save and close" Click="ButtonSaveAndClose_Click"/>
         </StackPanel>
     </Grid>
 </Window>

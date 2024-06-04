@@ -7,7 +7,7 @@
 
 namespace Awb.Core.Project
 {
-    public class Mp3PlayerYX5300Config
+    public class Mp3PlayerYX5300Config : IDeviceConfig, IProjectObjectListable
     {
         public uint ClientId { get; set; }
 
@@ -16,7 +16,12 @@ namespace Awb.Core.Project
         /// </summary>
         public string SoundPlayerId { get; set; }
 
-        public string? Name { get; set; } 
+        public string Title { get; set; }
+
+        public string TitleShort => Title ?? $"No Title for Mp3PlayerYX5300 '{Id}'";
+
+        public string TitleDetailled => $"{TitleShort} (ClientId: {ClientId}, SoundPlayerId: {SoundPlayerId})";
+
 
         /// <summary>
         /// the RX pin of the serial connection to the YX5300 MP3 player
@@ -27,14 +32,17 @@ namespace Awb.Core.Project
         /// the TX pin of the serial connection to the YX5300 MP3 player
         /// </summary>
         public uint TxPin { get; } = 14;
+        public string Id { get; set; }
+    
 
-        public Mp3PlayerYX5300Config(uint clientId, uint rxPin, uint txPin, string soundPlayerId, string? name)
+        public Mp3PlayerYX5300Config(uint clientId, string id, uint rxPin, uint txPin, string soundPlayerId, string title)
         {
             ClientId = clientId;
+            Id = id;
             RxPin = rxPin;
             TxPin = txPin;
             SoundPlayerId = soundPlayerId;
-            Name = name;
+            Title = title;
         }
 
 

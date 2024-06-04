@@ -7,10 +7,9 @@
 
 namespace Awb.Core.Project
 {
-    public class StsServoConfig : IDeviceConfig
+    public class StsServoConfig : IDeviceConfig, IProjectObjectListable
     {
         public string Id { get; set; }
-
         public uint ClientId { get; set; }
         public uint Channel { get; set; }
         public string Title { get; set; }
@@ -23,8 +22,11 @@ namespace Awb.Core.Project
         /// <summary>
         /// If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?
         /// </summary>
-        public bool GlobalFault { get; set; } 
-        
+        public bool GlobalFault { get; set; }
+
+        public string TitleShort => Title ?? $"StsServo has no title set '{Id}'";
+
+        public string TitleDetailled => $"StsServo '{TitleShort}' (Id: {Id}, ClientId: {ClientId}, Channel: {Channel})";
 
         public StsServoConfig(string id, string title, uint clientId, uint channel)
         {

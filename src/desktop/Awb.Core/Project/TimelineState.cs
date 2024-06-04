@@ -7,7 +7,7 @@
 
 namespace Awb.Core.Project
 {
-    public class TimelineState
+    public class TimelineState: IProjectObjectListable
     {
         public int Id { get; internal set; }
         public string Title { get; internal set; }
@@ -33,6 +33,10 @@ namespace Awb.Core.Project
         /// </summary>
         public int[] NegativeInputs { get; internal set; }
 
+        public string TitleShort =>  Title ?? $"TimelineState has no title set '{Id}'";
+
+        public string TitleDetailled => $"TimelineState {TitleShort}";
+
         public TimelineState(int id, string title, bool export, bool autoPlay, int[]? positiveInputs = null, int[]? negativeInputs = null)
         {
             Id = id;
@@ -43,6 +47,8 @@ namespace Awb.Core.Project
             AutoPlay = autoPlay;
         }
 
-        public override string ToString() => $"[{Id}] {Title}";
+        
+        //todo!
+        public override string ToString() => $"[{Id}] {Title}"; 
     }
 }
