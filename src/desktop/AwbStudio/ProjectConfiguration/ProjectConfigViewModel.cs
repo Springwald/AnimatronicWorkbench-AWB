@@ -50,7 +50,6 @@ namespace AwbStudio.ProjectConfiguration
             set
             {
                 _scsServos = value;
-                //OnPropertyChanged(nameof(ScsServos));
                 OnPropertyChanged();
             }
         }

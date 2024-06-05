@@ -32,7 +32,7 @@
                     <Label Content="SCS servos" FontSize="15" FontWeight="Bold" />
                     <ProjectConfiguration:ProjectObjectListControl x:Name="ScsServosList" 
                        ProjectObjects="{Binding ScsServos}"/> 
-                    <Button  Content="Add SCS servo"/>
+                    <Button  Content="Add SCS servo" Click="ButtonAddScsServo_Click"/>
 
                     <Label Content="STS servos" FontSize="15" FontWeight="Bold" />
                     <Button  Content="Add STS servo"/>
