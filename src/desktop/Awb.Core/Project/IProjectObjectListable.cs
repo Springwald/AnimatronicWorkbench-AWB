@@ -5,15 +5,9 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Awb.Core.Project
 {
-    internal interface IProjectObjectListable
+    public interface IProjectObjectListable
     {
         /// <summary>
         /// a displayable short title e.g to list in the project configuration window
