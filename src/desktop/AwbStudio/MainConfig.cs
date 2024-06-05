@@ -19,11 +19,11 @@ namespace AwbStudio
     /// </remarks>
     internal static class MainConfig
     {
-        public const string Version = "0.4.0";
-        public static DateTime VersionReleaseDate = new DateTime(2024, 5, 6);
+        public const string Version = "0.5.0";
+        public static DateTime VersionReleaseDate = new DateTime(2029, 1, 1);
         
 
-        public static bool ProjectConfigEditorAvailable = false; // todo: set to true when the project config editor is available, planned for future releases
+        public static bool ProjectConfigEditorAvailable = true; // todo: set to true when the project config editor is available, planned for future releases
 
     }
 }
