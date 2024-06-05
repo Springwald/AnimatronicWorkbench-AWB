@@ -21,7 +21,7 @@ namespace AwbStudio
     {
         public const string Version = "0.4.0";
         public static DateTime VersionReleaseDate = new DateTime(2024, 5, 6);
-        public static string VersionLabelInfo => $"Version {Version} ({VersionReleaseDate:yyyy MMMM dd})";
+        
 
         public static bool ProjectConfigEditorAvailable = false; // todo: set to true when the project config editor is available, planned for future releases
 
