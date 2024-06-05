@@ -5,10 +5,12 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Project;
 using AwbStudio.ProjectConfiguration;
 using AwbStudio.Projects;
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -19,7 +21,7 @@ namespace AwbStudio
     /// </summary>
     public partial class ProjectConfigurationWindow : Window
     {
-        
+
         private ProjectConfigViewModel _viewModel;
         private readonly IProjectManagerService _projectManagerService;
 
@@ -28,9 +30,13 @@ namespace AwbStudio
             _projectManagerService = projectManagerService;
             var awbProject = projectManagerService.ActualProject ?? throw new ArgumentNullException(nameof(projectManagerService.ActualProject));
             _viewModel = new ProjectConfigViewModel { AwbProject = awbProject };
+
             this.DataContext = _viewModel;
 
             InitializeComponent();
+
+           // this.ScsServosList.ProjectObjects = _viewModel.ScsServos;
+           
 
             Loaded += ProjectConfigurationWindow_Loaded;
         }

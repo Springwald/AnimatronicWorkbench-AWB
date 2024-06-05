@@ -30,7 +30,8 @@
                     <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
                     <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />
                     <Label Content="SCS servos" FontSize="15" FontWeight="Bold" />
-                    <ProjectConfiguration:ProjectObjectListControl/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="ScsServosList" 
+                       ProjectObjects="{Binding ScsServos}"/> 
                     <Button  Content="Add SCS servo"/>
 
                     <Label Content="STS servos" FontSize="15" FontWeight="Bold" />

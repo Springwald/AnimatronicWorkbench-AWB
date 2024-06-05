@@ -7,8 +7,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        
-            <ListBox ItemsSource="{Binding ProjectObjects}"/>
+
+        <!-- <ListBox x:Name="ListProjectObjects" /> -->
+
+        <ListBox x:Name="ListProjectObjects" ItemsSource="{Binding ProjectObjects,
+         RelativeSource={RelativeSource AncestorType=UserControl}}" /> 
 
 
 
