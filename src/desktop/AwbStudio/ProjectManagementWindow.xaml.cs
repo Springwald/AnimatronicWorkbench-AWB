@@ -27,7 +27,7 @@ namespace AwbStudio
     /// </summary>
     public partial class ProjectManagementWindow : Window
     {
-        private const bool editConfigAvailable = true; // planned for future release
+        private static bool editConfigAvailable = MainConfig.ProjectConfigEditorAvailable; // planned for future release
 
         private readonly IProjectManagerService _projectManagerService;
         private readonly IServiceProvider _serviceProvider;

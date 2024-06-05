@@ -46,9 +46,5 @@ namespace Awb.Core.Project
             Export = export;
             AutoPlay = autoPlay;
         }
-
-        
-        //todo!
-        public override string ToString() => $"[{Id}] {Title}"; 
     }
 }
