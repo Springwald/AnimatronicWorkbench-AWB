@@ -12,9 +12,9 @@ using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
 {
-    public class AwbProject
+    public class AwbProject: AwbProjectFileVersion
     {
-        private string _wifiSsid;
+        private string? _wifiSsid;
 
         private ITimelineDataService? _timelineDataService;
 
@@ -33,7 +33,7 @@ namespace Awb.Core.Project
         }
         public string WifiPassword { get; set; } = "awb12345";
 
-        public  ObservableCollection<Pca9685PwmServoConfig> Pca9685PwmServos { get; init; } = new ObservableCollection<Pca9685PwmServoConfig>();
+        public ObservableCollection<Pca9685PwmServoConfig> Pca9685PwmServos { get; init; } = new ObservableCollection<Pca9685PwmServoConfig>();
         public ObservableCollection<StsServoConfig> StsServos { get; init; } = new ObservableCollection<StsServoConfig>();
         public ObservableCollection<StsServoConfig> ScsServos { get; init; } = new ObservableCollection<StsServoConfig>();
         public ObservableCollection<Mp3PlayerYX5300Config> Mp3PlayersYX5300 { get; init; } = new ObservableCollection<Mp3PlayerYX5300Config>();
