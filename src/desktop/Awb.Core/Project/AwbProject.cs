@@ -33,12 +33,12 @@ namespace Awb.Core.Project
         }
         public string WifiPassword { get; set; } = "awb12345";
 
-        public required ObservableCollection<Pca9685PwmServoConfig> Pca9685PwmServos { get; init; }
-        public required ObservableCollection<StsServoConfig> StsServos { get; init; }
-        public required ObservableCollection<StsServoConfig> ScsServos { get; init; }
-        public required ObservableCollection<Mp3PlayerYX5300Config> Mp3PlayersYX5300 { get; init; }
-        public required ObservableCollection<TimelineState> TimelinesStates { get; init; }
-        public required  ObservableCollection<InputConfig> Inputs { get; init; }
+        public  ObservableCollection<Pca9685PwmServoConfig> Pca9685PwmServos { get; init; } = new ObservableCollection<Pca9685PwmServoConfig>();
+        public ObservableCollection<StsServoConfig> StsServos { get; init; } = new ObservableCollection<StsServoConfig>();
+        public ObservableCollection<StsServoConfig> ScsServos { get; init; } = new ObservableCollection<StsServoConfig>();
+        public ObservableCollection<Mp3PlayerYX5300Config> Mp3PlayersYX5300 { get; init; } = new ObservableCollection<Mp3PlayerYX5300Config>();
+        public ObservableCollection<TimelineState> TimelinesStates { get; init; } = new ObservableCollection<TimelineState>();
+        public ObservableCollection<InputConfig> Inputs { get; init; } = new ObservableCollection<InputConfig>();
 
         public int ItemsPerBank { get; set; } = 8;
 

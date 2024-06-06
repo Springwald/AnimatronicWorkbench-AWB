@@ -39,12 +39,36 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         public StsServoConfig StsServoConfig
         {
             get { return (StsServoConfig)GetValue(StsServoConfigProperty); }
-            set { SetValue(StsServoConfigProperty, value); }
+            set { 
+                SetValue(StsServoConfigProperty, value); 
+            }
         }
+
+        public IEnumerable<string> Errors { get; private set; }
+
         public ScsServoEditorControl()
         {
             InitializeComponent();
-            this.DataContext = StsServoConfig;
+        }
+
+        private void WriteDataToEditor(StsServoConfig stsServoConfig)
+        {
+
+        }
+
+        private void ReadDataFromEditor(StsServoConfig stsServoConfig)
+        {
+
+        }
+
+        private SinglePropertyEditorControl AddEditor(string name, string value, string validationPattern)
+        {
+            var editor = new SinglePropertyEditorControl();
+            editor.PropertyName = name;
+            editor.PropertyContent = value;
+            editor.ValidationPattern = validationPattern;
+            this.EditorStackPanel.Children.Add(editor);
+            return editor;
         }
     }
 }

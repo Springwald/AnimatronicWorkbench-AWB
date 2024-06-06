@@ -18,9 +18,8 @@ namespace MidiControllerLiveControl
             {
                 return new AwbProject(title: "demo")
                 {
-                    StsServos = new StsServoConfig[]
+                    StsServos = new System.Collections.ObjectModel.ObservableCollection<StsServoConfig>
                      {
-
                          new StsServoConfig(id:"Servo 1",title:"Mouth upper", clientId: 2, channel:1)
                          {
                              MinValue = 1800,
