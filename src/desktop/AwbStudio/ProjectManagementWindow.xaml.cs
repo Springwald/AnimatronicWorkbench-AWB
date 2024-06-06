@@ -73,6 +73,22 @@ namespace AwbStudio
         {
             ShowLatestProjects();
 
+            BringIntoView();
+            if (editConfigAvailable == false)
+            {
+                ButtonEditConfigurationExisting.Visibility = Visibility.Collapsed;
+            }
+
+            if (MainConfig.TestMode)
+            {
+                var lastProjectFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.FirstOrDefault();
+                if (lastProjectFolder != null)
+                {
+                    await OpenProjectAsync(lastProjectFolder, editConfig: true);
+                    return;
+                }
+            }
+
             if (_awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart)
             {
                 ReOpenLastProjectCheckbox.IsChecked = true;
@@ -83,11 +99,7 @@ namespace AwbStudio
                 }
             }
 
-            BringIntoView();
-            if (editConfigAvailable == false)
-            {
-                ButtonEditConfigurationExisting.Visibility = Visibility.Collapsed;
-            }
+           
         }
 
         private async void OnKeyDown(object sender, KeyEventArgs e)

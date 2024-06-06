@@ -28,26 +28,27 @@
             <ScrollViewer Grid.Column="0">
                 <StackPanel>
                     <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
+                    
                     <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />
-                    <Label Content="SCS servos" FontSize="15" FontWeight="Bold" />
+                    
                     <ProjectConfiguration:ProjectObjectListControl x:Name="ScsServosList" 
-                       ProjectObjects="{Binding ScsServos}" ProjectObjectSelected="ProjectObjectSelected"/>
-                    <Button  Content="Add SCS servo" Click="ButtonAddScsServo_Click"/>
+                        ProjectObjects="{Binding ScsServos}" Title="SCS servos" ProjectObjectSelected="ProjectObjectSelected"/>
 
-                    <Label Content="STS servos" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add STS servo"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="StsServosList" 
+                        ProjectObjects="{Binding StsServos}" Title="STS servos" ProjectObjectSelected="ProjectObjectSelected"/>
 
-                    <Label Content="Pca9685 PWM servos" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add Pca9685 servo"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="Pca9685PWMServosList" 
+                        ProjectObjects="{Binding Pca9685PwmServos}" Title="Pca9685 PWM servos" ProjectObjectSelected="ProjectObjectSelected"/>
 
-                    <Label Content="Mp3 player YX5300" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add YX5300 mp3 player"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="Mp3PlayerYX5300List" 
+                        ProjectObjects="{Binding Mp3PlayerYX5300}" Title="Mp3 player YX5300" ProjectObjectSelected="ProjectObjectSelected"/>
 
-                    <Label Content="Inputs" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add input"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="InputsList" 
+                        ProjectObjects="{Binding Inputs}" Title="Inputs" ProjectObjectSelected="ProjectObjectSelected"/>
 
-                    <Label Content="Timelines states" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="add timeline state"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="TimelineStates" 
+                        ProjectObjects="{Binding TimelineStates}" Title="Timeline states" ProjectObjectSelected="ProjectObjectSelected"/>
+
                 </StackPanel>
             </ScrollViewer>
 

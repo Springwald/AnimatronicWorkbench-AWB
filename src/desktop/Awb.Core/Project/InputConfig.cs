@@ -7,11 +7,15 @@
 
 namespace Awb.Core.Project
 {
-    public class InputConfig
+    public class InputConfig : IProjectObjectListable
     {
         public int Id { get;  set; }
         public string Title { get;  set; }
-        public int? IoPin { get;  set; } 
+        public int? IoPin { get;  set; }
+
+        public string TitleShort => Title ?? $"no title for input '{Id}'";
+
+        public string TitleDetailled => $"Input {TitleShort}";
 
         public InputConfig(int id, string title)
         {

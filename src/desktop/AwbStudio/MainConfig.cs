@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System;
+using System.Diagnostics;
 
 namespace AwbStudio
 {
@@ -24,6 +25,9 @@ namespace AwbStudio
         
 
         public static bool ProjectConfigEditorAvailable = true; // todo: set to true when the project config editor is available, planned for future releases
+
+        //public static bool TestMode = false; // set to false for production before pull request for release
+        public static bool TestMode = Debugger.IsAttached; // remove this line for production 
 
     }
 }
