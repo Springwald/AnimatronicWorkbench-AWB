@@ -19,13 +19,11 @@ namespace AwbStudio.Projects
     {
         public record OpenProjectResult
         {
-            public bool Success { get; init; }
-            public string[] ErrorMessages { get; init; }
+            public required bool Success { get; init; }
+            public required string[] ErrorMessages { get; init; }
 
             public static OpenProjectResult SuccessResult => new() { Success = true, ErrorMessages = [] };
             public static OpenProjectResult ErrorResult(string[] errorMessages) => new() { Success = false, ErrorMessages = errorMessages };
-
-            private OpenProjectResult() { }
         }
 
         AwbProject? ActualProject { get; }
@@ -73,6 +71,11 @@ namespace AwbStudio.Projects
             if (!Directory.Exists(projectFolder))
                 return  OpenProjectResult.ErrorResult([$"Project folder '{projectFolder}' does not exist."]);
 
+            var projectFilename = ProjectConfigFilename(projectFolder);
+
+            if (!File.Exists(projectFilename))
+                return OpenProjectResult.ErrorResult([$"Project config file '{projectFilename}' does not exist."]);
+
             // load project config from folder
             var options = new JsonSerializerOptions()
             {
@@ -104,6 +107,6 @@ namespace AwbStudio.Projects
             return OpenProjectResult.SuccessResult;
         }
 
-        private string ProjectConfigFilename(string projectFolder) => Path.Combine(projectFolder, "AwbProject.json");
+        private string ProjectConfigFilename(string projectFolder) => Path.Combine(projectFolder, "AwbProject.awbprj");
     }
 }

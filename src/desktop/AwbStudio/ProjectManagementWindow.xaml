@@ -32,7 +32,7 @@
                 <CheckBox Content="Open last project on start" Grid.Row="3" x:Name="ReOpenLastProjectCheckbox" Margin="5" Unchecked="ReOpenLastProjectCheckbox_Checked" Checked="ReOpenLastProjectCheckbox_Checked"/>
                 
                 <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="4" Click="ButtonCreateNew_Click"/>
-                <Button x:Name="ButtonEditExisting" Content="Edit existing project configuration"  Grid.Row="5" Click="ButtonEditExisting_Click"/>
+                <Button x:Name="ButtonEditConfigurationExisting" Content="Edit existing project configuration"  Grid.Row="5" Click="ButtonEditConfigurationExisting_Click"/>
             </Grid>
             <Grid x:Name="GridLoadingProject" Visibility="Collapsed" Margin="20">
                 <Grid.RowDefinitions>

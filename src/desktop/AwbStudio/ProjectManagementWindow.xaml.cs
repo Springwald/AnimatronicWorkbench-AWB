@@ -86,7 +86,7 @@ namespace AwbStudio
             BringIntoView();
             if (editConfigAvailable == false)
             {
-                ButtonEditExisting.Visibility = Visibility.Collapsed;
+                ButtonEditConfigurationExisting.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -135,7 +135,7 @@ namespace AwbStudio
                     var projectPath = dialog.SelectedPath;
                     if (_projectManagerService.ExistProject(projectPath))
                     {
-                        System.Windows.MessageBox.Show($"Folder '{projectPath}' already contains an Animatronic WorkBench project.");
+                        MessageBox.Show($"Folder '{projectPath}' already contains an Animatronic WorkBench project.");
                         return;
                     }
 
@@ -150,7 +150,8 @@ namespace AwbStudio
                             if (editConfigAvailable == true)
                             {
                                 ShowProjectConfigEditor();
-                            } else
+                            }
+                            else
                             {
                                 await LoadProjectAsync();
                             }
@@ -210,7 +211,7 @@ namespace AwbStudio
                         MinValue = 0,
                     },
                 },
-                Mp3PlayersYX5300 = new ObservableCollection<Mp3PlayerYX5300Config> { new Mp3PlayerYX5300Config(clientId: 1, id:"mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player") },
+                Mp3PlayersYX5300 = new ObservableCollection<Mp3PlayerYX5300Config> { new Mp3PlayerYX5300Config(clientId: 1, id: "mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player") },
                 Inputs = new ObservableCollection<InputConfig>
                 {
                     new InputConfig(id: 1, title:"Sleep") { IoPin = 25 }
@@ -223,28 +224,15 @@ namespace AwbStudio
 
         private async void ButtonOpenExisting_Click(object sender, RoutedEventArgs e)
         {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
-            {
-                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    var folder = dialog.SelectedPath;
-                    var ok = await OpenProjectAsync(folder, editConfig: false);
-                }
-            }
+            var folder = ChooseExistingProjectFolder();
+            if (folder == null) return;
+            var ok = await OpenProjectAsync(folder, editConfig: false);
         }
 
-        private async void ButtonEditExisting_Click(object sender, RoutedEventArgs e)
+        private async void ButtonEditConfigurationExisting_Click(object sender, RoutedEventArgs e)
         {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
-            {
-                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    var folder = dialog.SelectedPath;
-                    var ok = await OpenProjectAsync(folder, editConfig: true);
-                }
-            }
+            var folder = ChooseExistingProjectFolder();
+            if (folder != null) await OpenProjectAsync(folder, editConfig: true);
         }
 
         private async void ListLatestProjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -364,6 +352,37 @@ namespace AwbStudio
             await _awbStudioSettingsService.SaveSettingsAsync();
         }
 
+        private string? ChooseExistingProjectFolder()
+        {
+            const string extension = ".awbprj";
+
+            // Create OpenFileDialog
+            Microsoft.Win32.OpenFileDialog openFileDlg = new Microsoft.Win32.OpenFileDialog();
+
+            // Set filter for file extension and default file extension  
+            openFileDlg.DefaultExt = extension;
+            openFileDlg.Filter = $"Animatronic WorkBench project ({extension})|*{extension}";
+
+            // Launch OpenFileDialog by calling ShowDialog method
+            Nullable<bool> result = openFileDlg.ShowDialog();
+            // Get the selected file name and display in a TextBox.
+            // Load content of file in a TextBlock
+            if (result == false) return null;
+
+            var filename = openFileDlg.FileName;
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                MessageBox.Show("No file selected");
+                return null;
+            }
+            var folder = System.IO.Path.GetDirectoryName(filename);
+            if (folder == null)
+            {
+                MessageBox.Show($"No folder found for file '{filename}'");
+                return null;
+            }
+            return folder;
+        }
 
     }
 }
