@@ -123,9 +123,13 @@ namespace AwbStudio
 
         #endregion
 
+        #region add new objects buttons
+
         private void ButtonAddScsServo_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.ScsServos.Add(new StsServoConfig(id: "", title: "", clientId:1, channel: 1));
         }
+
+        #endregion
     }
 }

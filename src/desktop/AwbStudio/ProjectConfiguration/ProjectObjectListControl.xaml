@@ -11,7 +11,17 @@
         <!-- <ListBox x:Name="ListProjectObjects" /> -->
 
         <ListBox x:Name="ListProjectObjects" ItemsSource="{Binding ProjectObjects,
-         RelativeSource={RelativeSource AncestorType=UserControl}}" /> 
+         RelativeSource={RelativeSource AncestorType=UserControl}}" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Label Name="lblFirstName" 
+                               Content="{Binding TitleShort, Mode=OneWay}"
+                                Grid.Column="0"></Label>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
 
 
