@@ -13,12 +13,12 @@ namespace Awb.Core.Export.ExporterParts
     {
         public required string ProjectName { get; init; }
 
-        public required TimelineExportData[] TimelineData { get; init; }
-        public required TimelineState[] TimelineStates { get; init; }
-        public required StsServoConfig[] StsServoConfigs { get; init; }
-        public required StsServoConfig[] ScsServoConfigs { get; init; }
-        public required Pca9685PwmServoConfig[] Pca9685PwmServoConfigs { get; init; }
-        public required Mp3PlayerYX5300Config[] Mp3PlayerYX5300Configs { get; init; }
-        public required InputConfig[] InputConfigs { get; init; }
+        public required IEnumerable<TimelineExportData> TimelineData { get; init; }
+        public required IEnumerable<TimelineState> TimelineStates { get; init; }
+        public required IEnumerable<StsServoConfig> StsServoConfigs { get; init; }
+        public required IEnumerable<StsServoConfig> ScsServoConfigs { get; init; }
+        public required IEnumerable<Pca9685PwmServoConfig> Pca9685PwmServoConfigs { get; init; }
+        public required IEnumerable<Mp3PlayerYX5300Config> Mp3PlayerYX5300Configs { get; init; }
+        public required IEnumerable<InputConfig> InputConfigs { get; init; }
     }
 }

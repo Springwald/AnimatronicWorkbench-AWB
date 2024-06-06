@@ -92,18 +92,18 @@ namespace Awb.Core.Export.ExporterParts
             return IExporter.ExportResult.SuccessResult;
         }
 
-        private static void ExportInputs(InputConfig[] inputConfigs, StringBuilder result)
+        private static void ExportInputs( IEnumerable<InputConfig> inputConfigs, StringBuilder result)
         {
             // export the inputs
             var exportInputs = inputConfigs ?? Array.Empty<InputConfig>();
-            result.AppendLine($"\tint inputIds[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(i => i.Id.ToString()))}}};");
-            result.AppendLine($"\tString inputNames[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(s => $"\"{s.Title}\""))}}};");
-            result.AppendLine($"\tuint8_t  inputIoPins[{exportInputs.Length}] = {{{string.Join(", ", exportInputs.Select(s => s.IoPin.ToString()))}}};");
-            result.AppendLine($"\tint inputCount = {exportInputs.Length};");
+            result.AppendLine($"\tint inputIds[{exportInputs.Count()}] = {{{string.Join(", ", exportInputs.Select(i => i.Id.ToString()))}}};");
+            result.AppendLine($"\tString inputNames[{exportInputs.Count()}] = {{{string.Join(", ", exportInputs.Select(s => $"\"{s.Title}\""))}}};");
+            result.AppendLine($"\tuint8_t  inputIoPins[{exportInputs.Count()}] = {{{string.Join(", ", exportInputs.Select(s => s.IoPin.ToString()))}}};");
+            result.AppendLine($"\tint inputCount = {exportInputs.Count()};");
             result.AppendLine();
         }
 
-        private static void ExportTimelineStates(TimelineState[] timelineStates, StringBuilder result)
+        private static void ExportTimelineStates(IEnumerable<TimelineState> timelineStates, StringBuilder result)
         {
             // export the states
             var exportStates = timelineStates?.Where(s => s.Export).ToArray() ?? Array.Empty<TimelineState>();
@@ -117,7 +117,7 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine();
         }
 
-        private static void ExportStsScsServos(string propertyName, StsServoConfig[] servos, StringBuilder result)
+        private static void ExportStsScsServos(string propertyName, IEnumerable<StsServoConfig> servos, StringBuilder result)
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
             foreach (var servo in servos)
@@ -126,7 +126,7 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine();
         }
 
-        private static void ExportPCS9685PwmServos(Pca9685PwmServoConfig[]? pca9685PwmServoConfigs, StringBuilder result)
+        private static void ExportPCS9685PwmServos(IEnumerable<Pca9685PwmServoConfig> pca9685PwmServoConfigs, StringBuilder result)
         {
             var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Project.Pca9685PwmServoConfig>();
 
@@ -141,14 +141,14 @@ namespace Awb.Core.Export.ExporterParts
         }
 
 
-        private static void ExportMp3PlayerYX5300Informations(Mp3PlayerYX5300Config[]? mp3PlayerYX5300Configs, StringBuilder result)
+        private static void ExportMp3PlayerYX5300Informations(IEnumerable<Mp3PlayerYX5300Config>? mp3PlayerYX5300Configs, StringBuilder result)
         {
             var players = mp3PlayerYX5300Configs ?? Array.Empty<Mp3PlayerYX5300Config>();
             var mp3PlayerYX5300Titles = players?.Select(s => s.Title ?? s.SoundPlayerId).ToArray();
-            result.AppendLine($"\tint mp3PlayerYX5300Count = {players!.Length};");
-            result.AppendLine($"\tint mp3PlayerYX5300RxPin[{players.Length}] = {{{string.Join(", ", players.Select(s => s.RxPin.ToString()))}}};");
-            result.AppendLine($"\tint mp3PlayerYX5300TxPin[{players.Length}] = {{{string.Join(", ", players.Select(s => s.TxPin.ToString()))}}};");
-            result.AppendLine($"\tString mp3PlayerYX5300Name[{players.Length}] = {{{string.Join(", ", players.Select(s => $"\"{s.SoundPlayerId}\""))}}};");
+            result.AppendLine($"\tint mp3PlayerYX5300Count = {players.Count()};");
+            result.AppendLine($"\tint mp3PlayerYX5300RxPin[{players.Count()}] = {{{string.Join(", ", players.Select(s => s.RxPin.ToString()))}}};");
+            result.AppendLine($"\tint mp3PlayerYX5300TxPin[{players!.Count()}] = {{{string.Join(", ", players.Select(s => s.TxPin.ToString()))}}};");
+            result.AppendLine($"\tString mp3PlayerYX5300Name[{players!.Count()}] = {{{string.Join(", ", players.Select(s => $"\"{s.SoundPlayerId}\""))}}};");
             result.AppendLine();
         }
 
@@ -214,9 +214,9 @@ namespace Awb.Core.Export.ExporterParts
                     {
                         // find Mp3PlayerYX5300 soundplayer
                         var soundPlayerIndex = -1;
-                        for (int i = 0; i < projectData.Mp3PlayerYX5300Configs?.Length; i++)
+                        for (int i = 0; i < projectData.Mp3PlayerYX5300Configs?.Count(); i++)
                         {
-                            if (projectData.Mp3PlayerYX5300Configs[i].SoundPlayerId == soundPoint.SoundPlayerId)
+                            if (projectData.Mp3PlayerYX5300Configs.ElementAt(i).SoundPlayerId == soundPoint.SoundPlayerId)
                             {
                                 soundPlayerIndex = i;
                                 break;
@@ -224,7 +224,7 @@ namespace Awb.Core.Export.ExporterParts
                         }
                         if (soundPlayerIndex != -1)
                         {
-                            var soundPlayer = projectData.Mp3PlayerYX5300Configs![soundPlayerIndex];
+                            var soundPlayer = projectData.Mp3PlayerYX5300Configs!.ElementAt(soundPlayerIndex);
                             if (soundPlayer != null)
                             {
                                 result.AppendLine($"\t\tmp3PlayerYX5300Points{timelineNo}->push_back(Mp3PlayerYX5300Point({soundPoint.SoundId}, {soundPlayerIndex}, {soundPoint.TimeMs}));");

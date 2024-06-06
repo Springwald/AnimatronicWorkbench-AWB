@@ -7,6 +7,7 @@
 
 using Awb.Core.Services;
 using Awb.Core.Sounds;
+using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
@@ -32,12 +33,12 @@ namespace Awb.Core.Project
         }
         public string WifiPassword { get; set; } = "awb12345";
 
-        public Pca9685PwmServoConfig[]? Pca9685PwmServos { get; set; }
-        public StsServoConfig[]? StsServos { get; set; }
-        public StsServoConfig[]? ScsServos { get; set; }
-        public Mp3PlayerYX5300Config[]? Mp3PlayersYX5300 { get; set; }
-        public TimelineState[]? TimelinesStates { get; set; }
-        public InputConfig[]? Inputs { get; set; }
+        public required ObservableCollection<Pca9685PwmServoConfig> Pca9685PwmServos { get; init; }
+        public required ObservableCollection<StsServoConfig> StsServos { get; init; }
+        public required ObservableCollection<StsServoConfig> ScsServos { get; init; }
+        public required ObservableCollection<Mp3PlayerYX5300Config> Mp3PlayersYX5300 { get; init; }
+        public required ObservableCollection<TimelineState> TimelinesStates { get; init; }
+        public required  ObservableCollection<InputConfig> Inputs { get; init; }
 
         public int ItemsPerBank { get; set; } = 8;
 
@@ -53,6 +54,7 @@ namespace Awb.Core.Project
         public AwbProject(string title)
         {
             Title = title;
+
         }
 
         public void SetProjectFolder(string folder)

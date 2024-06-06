@@ -14,6 +14,7 @@ using AwbStudio.StudioSettings;
 using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -169,7 +170,7 @@ namespace AwbStudio
             var project = new AwbProject(title: "no project title")
             {
                 Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
-                TimelinesStates = new TimelineState[]
+                TimelinesStates = new ObservableCollection<TimelineState>
                 {
                     new TimelineState(1, "sleep", export: true, autoPlay: true),
                     new TimelineState(2, "action", export: true, autoPlay: true),
@@ -178,7 +179,7 @@ namespace AwbStudio
                     new TimelineState(5, "joint demo", export: true, autoPlay: true, positiveInputs: new[] { 1 }),
                     new TimelineState(6, "tests", export: false, autoPlay: false),
                 },
-                StsServos = new StsServoConfig[]
+                StsServos = new ObservableCollection<StsServoConfig>
                 {
                     new StsServoConfig(id: "StsServo1", title: "Demo serial Servo 1", clientId: 1, channel: 1)
                     {
@@ -189,7 +190,18 @@ namespace AwbStudio
                         Speed = 1000,
                     },
                 },
-                Pca9685PwmServos = new Pca9685PwmServoConfig[]
+                ScsServos = new ObservableCollection<StsServoConfig>
+                {
+                    new StsServoConfig(id: "ScsServo1", title: "Demo serial Servo 2", clientId: 1, channel: 1)
+                    {
+                        Acceleration = 20,
+                        DefaultValue = 2000,
+                        MaxValue = 1023,
+                        MinValue = 0,
+                        Speed = 1000,
+                    },
+                },
+                Pca9685PwmServos = new ObservableCollection<Pca9685PwmServoConfig>
                 {
                     new Pca9685PwmServoConfig(id: "PwmServo1",  title:"Demo PWM Servo 1" , clientId: 1, i2cAdress: 0x40, channel: 1)
                     {
@@ -198,8 +210,8 @@ namespace AwbStudio
                         MinValue = 0,
                     },
                 },
-                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, id:"mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player") },
-                Inputs = new InputConfig[]
+                Mp3PlayersYX5300 = new ObservableCollection<Mp3PlayerYX5300Config> { new Mp3PlayerYX5300Config(clientId: 1, id:"mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player") },
+                Inputs = new ObservableCollection<InputConfig>
                 {
                     new InputConfig(id: 1, title:"Sleep") { IoPin = 25 }
                 },

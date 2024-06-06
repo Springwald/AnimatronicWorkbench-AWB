@@ -20,7 +20,7 @@ namespace Awb.Core.Project
 
         public string TitleShort => Title ?? $"no title for Pca9685PwmServo '{Id}'";
 
-        public string TitleDetailled => throw new NotImplementedException();
+        public string TitleDetailled => "Pca9685PwmServo " + TitleShort;
 
         public Pca9685PwmServoConfig(string id, uint clientId, uint i2cAdress, uint channel, string title)
         {

@@ -62,8 +62,11 @@ namespace AwbStudio.ProjectConfiguration
         private void UpdateProjectObjectLists()
         {
             this.ScsServos.Clear();
-            foreach (var scsServo in _awbProject?.ScsServos ?? Array.Empty<IProjectObjectListable>())
-                this.ScsServos.Add(scsServo);
+            if (_awbProject == null) return;
+
+            if (_awbProject?.ScsServos != null)
+                foreach (var scsServo in _awbProject.ScsServos)
+                    this.ScsServos.Add(scsServo);
         }
     }
 }

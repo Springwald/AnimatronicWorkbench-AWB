@@ -47,7 +47,7 @@ namespace Awb.Core.Project
             _project = awbProject;
         }
 
-        private IEnumerable<string> StsScsServoProblems(StsServoConfig[] stsServoConfigs)
+        private IEnumerable<string> StsScsServoProblems(IEnumerable<StsServoConfig> stsServoConfigs)
         {
             foreach (var servo in stsServoConfigs)
             {
