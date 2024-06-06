@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AwbStudio"
-        xmlns:ProjectConfiguration="clr-namespace:AwbStudio.ProjectConfiguration" x:Class="AwbStudio.ProjectConfigurationWindow"
+        xmlns:ProjectConfiguration="clr-namespace:AwbStudio.ProjectConfiguration" xmlns:PropertyEditors="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors" x:Class="AwbStudio.ProjectConfigurationWindow"
         mc:Ignorable="d"
         
         Title="ProjectConfigurationWindow" Height="800" Width="900">
@@ -31,7 +31,7 @@
                     <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />
                     <Label Content="SCS servos" FontSize="15" FontWeight="Bold" />
                     <ProjectConfiguration:ProjectObjectListControl x:Name="ScsServosList" 
-                       ProjectObjects="{Binding ScsServos}"/> 
+                       ProjectObjects="{Binding ScsServos}" ProjectObjectSelected="ProjectObjectSelected"/>
                     <Button  Content="Add SCS servo" Click="ButtonAddScsServo_Click"/>
 
                     <Label Content="STS servos" FontSize="15" FontWeight="Bold" />
@@ -58,9 +58,7 @@
                 </Grid.RowDefinitions>
                 <Label  Grid.Row="0" Content="Properties" FontSize="15" FontWeight="Bold" />
                 <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" Padding="10 10 10 10" Margin="10 10 10 10"/>
-                <ScrollViewer Grid.Row="1">
-                    
-                </ScrollViewer>
+                <PropertyEditors:PropertyEditorControl x:Name="PropertyEditor" Grid.Row="1"/>
             </Grid>
 
         </Grid>

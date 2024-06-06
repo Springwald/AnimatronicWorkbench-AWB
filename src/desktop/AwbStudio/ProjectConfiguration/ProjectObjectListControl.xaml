@@ -11,7 +11,7 @@
         <!-- <ListBox x:Name="ListProjectObjects" /> -->
 
         <ListBox x:Name="ListProjectObjects" ItemsSource="{Binding ProjectObjects,
-         RelativeSource={RelativeSource AncestorType=UserControl}}" >
+         RelativeSource={RelativeSource AncestorType=UserControl}}" SelectionChanged="ListProjectObjects_SelectionChanged" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

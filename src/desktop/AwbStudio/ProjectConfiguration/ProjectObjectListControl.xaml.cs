@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,14 @@ namespace AwbStudio.ProjectConfiguration
     /// </summary>
     public partial class ProjectObjectListControl : UserControl
     {
+        public class  ProjectObjectSelectedEventArgs: EventArgs
+        {
+            public required IProjectObjectListable? ProjectObject { get; set; }
+        }
+
+        // the event, when a project object is selected
+        public event EventHandler<ProjectObjectSelectedEventArgs> ProjectObjectSelected;
+
         public ObservableCollection<IProjectObjectListable> ProjectObjects
         {
             get {
@@ -102,6 +111,12 @@ namespace AwbStudio.ProjectConfiguration
 
 
 
+        }
+
+        private void ListProjectObjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ProjectObjectSelected?.Invoke(this,
+                new ProjectObjectSelectedEventArgs { ProjectObject = ListProjectObjects.SelectedItem as IProjectObjectListable });
         }
     }
 }

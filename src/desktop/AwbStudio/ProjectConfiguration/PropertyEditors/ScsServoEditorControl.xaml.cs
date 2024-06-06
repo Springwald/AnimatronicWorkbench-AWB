@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
+using Awb.Core.Project;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +29,22 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     /// </summary>
     public partial class ScsServoEditorControl : UserControl
     {
+
+        public static readonly DependencyProperty StsServoConfigProperty =
+            DependencyProperty.Register(nameof(StsServoConfig),typeof(StsServoConfig),typeof(ScsServoEditorControl),
+                new PropertyMetadata(null)
+                               //new PropertyMetadata("DEFAULT")
+                                               );
+
+        public StsServoConfig StsServoConfig
+        {
+            get { return (StsServoConfig)GetValue(StsServoConfigProperty); }
+            set { SetValue(StsServoConfigProperty, value); }
+        }
         public ScsServoEditorControl()
         {
             InitializeComponent();
+            this.DataContext = StsServoConfig;
         }
     }
 }

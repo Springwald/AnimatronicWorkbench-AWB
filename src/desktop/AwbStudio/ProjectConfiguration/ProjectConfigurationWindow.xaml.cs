@@ -131,5 +131,10 @@ namespace AwbStudio
         }
 
         #endregion
+
+        private void ProjectObjectSelected(object sender, ProjectObjectListControl.ProjectObjectSelectedEventArgs e)
+        {
+            PropertyEditor.ProjectObject = e.ProjectObject;
+        }
     }
 }
