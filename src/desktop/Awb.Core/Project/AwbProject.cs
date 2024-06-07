@@ -7,39 +7,26 @@
 
 using Awb.Core.Services;
 using Awb.Core.Sounds;
-using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
 {
-    public class AwbProject: AwbProjectFileVersion
+    public class AwbProject : AwbProjectFileVersion
     {
-        private string? _wifiSsid;
-
         private ITimelineDataService? _timelineDataService;
-
         private Sound[]? _sounds;
-
         public string? _projectFolder;
 
-        public string? Info { get; set; }
+        public ProjectMetaData ProjectMetaData { get; set; } = new ProjectMetaData();
 
-        public string Title { get; set; }
+        public Esp32ClientHardwareConfig Esp32ClientHardware { get; set; } = new Esp32ClientHardwareConfig();
 
-        public string WifiSsid
-        {
-            get => _wifiSsid ?? $"AWB-{Title}"; // todo: remove invalid chars
-            set => _wifiSsid = value;
-        }
-        public string WifiPassword { get; set; } = "awb12345";
-
-        public ObservableCollection<Pca9685PwmServoConfig> Pca9685PwmServos { get; init; } = new ObservableCollection<Pca9685PwmServoConfig>();
-        public ObservableCollection<StsServoConfig> StsServos { get; init; } = new ObservableCollection<StsServoConfig>();
-        public ObservableCollection<StsServoConfig> ScsServos { get; init; } = new ObservableCollection<StsServoConfig>();
-        public ObservableCollection<Mp3PlayerYX5300Config> Mp3PlayersYX5300 { get; init; } = new ObservableCollection<Mp3PlayerYX5300Config>();
-        public ObservableCollection<TimelineState> TimelinesStates { get; init; } = new ObservableCollection<TimelineState>();
-        public ObservableCollection<InputConfig> Inputs { get; init; } = new ObservableCollection<InputConfig>();
-
+        public Pca9685PwmServoConfig[] Pca9685PwmServos { get; set; }
+        public StsServoConfig[] StsServos { get; set; }
+        public StsServoConfig[] ScsServos { get; set; }
+        public Mp3PlayerYX5300Config[] Mp3PlayersYX5300 { get; set; }
+        public TimelineState[] TimelinesStates { get; set; }
+        public InputConfig[] Inputs { get; set; }
         public int ItemsPerBank { get; set; } = 8;
 
         [JsonIgnore]
@@ -50,12 +37,6 @@ namespace Awb.Core.Project
 
         [JsonIgnore]
         public string ProjectFolder => _projectFolder ?? throw new Exception("Project folder not set!");
-
-        public AwbProject(string title)
-        {
-            Title = title;
-
-        }
 
         public void SetProjectFolder(string folder)
         {

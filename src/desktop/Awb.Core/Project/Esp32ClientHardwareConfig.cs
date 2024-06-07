@@ -5,22 +5,26 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace Awb.Core.Project
 {
-    public interface IProjectObjectListable
+    public class Esp32ClientHardwareConfig : IProjectObjectListable
     {
-        /// <summary>
-        /// a displayable short title e.g to list in the project configuration window
-        /// </summary>
-        [JsonIgnore]
-        public string TitleShort { get; }
+        private string? _wifiSsid;
 
-        /// <summary>
-        /// a displayable long title e.g to show details or log problems
-        /// </summary>
         [JsonIgnore]
-        public string TitleDetailled { get; }
+        public string TitleShort => "ESP32 client hardware";
+
+        [JsonIgnore]
+        public string TitleDetailled => TitleShort;
+
+
+
     }
 }

@@ -14,7 +14,6 @@ using AwbStudio.StudioSettings;
 using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -99,7 +98,7 @@ namespace AwbStudio
                 }
             }
 
-           
+
         }
 
         private async void OnKeyDown(object sender, KeyEventArgs e)
@@ -180,20 +179,22 @@ namespace AwbStudio
 
         private static AwbProject CreateNewProject(string projectPath)
         {
-            var project = new AwbProject(title: "no project title")
+            var project = new AwbProject()
             {
-                Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
-                TimelinesStates = new ObservableCollection<TimelineState>
+                ProjectMetaData = new ProjectMetaData
                 {
+                    Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
+                },
+                TimelinesStates =
+                [
                     new TimelineState(1, "sleep", export: true, autoPlay: true),
                     new TimelineState(2, "action", export: true, autoPlay: true),
                     new TimelineState(3, "idle", export: true, autoPlay: true),
                     new TimelineState(4, "talk", export: true, autoPlay: true),
                     new TimelineState(5, "joint demo", export: true, autoPlay: true, positiveInputs: new[] { 1 }),
                     new TimelineState(6, "tests", export: false, autoPlay: false),
-                },
-                StsServos = new ObservableCollection<StsServoConfig>
-                {
+                ],
+                StsServos = [
                     new StsServoConfig(id: "StsServo1", title: "Demo serial Servo 1", clientId: 1, channel: 1)
                     {
                         Acceleration = 20,
@@ -202,9 +203,8 @@ namespace AwbStudio
                         MinValue = 0,
                         Speed = 1000,
                     },
-                },
-                ScsServos = new ObservableCollection<StsServoConfig>
-                {
+                ],
+                ScsServos = [
                     new StsServoConfig(id: "ScsServo1", title: "Demo serial Servo 2", clientId: 1, channel: 1)
                     {
                         Acceleration = 20,
@@ -213,22 +213,23 @@ namespace AwbStudio
                         MinValue = 0,
                         Speed = 1000,
                     },
-                },
-                Pca9685PwmServos = new ObservableCollection<Pca9685PwmServoConfig>
-                {
+                ],
+                Pca9685PwmServos = [
                     new Pca9685PwmServoConfig(id: "PwmServo1",  title:"Demo PWM Servo 1" , clientId: 1, i2cAdress: 0x40, channel: 1)
                     {
                         DefaultValue = 2000,
                         MaxValue = 4095,
                         MinValue = 0,
                     },
-                },
-                Mp3PlayersYX5300 = new ObservableCollection<Mp3PlayerYX5300Config> { new Mp3PlayerYX5300Config(clientId: 1, id: "mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player") },
-                Inputs = new ObservableCollection<InputConfig>
-                {
+                ],
+                Mp3PlayersYX5300 = [
+                    new Mp3PlayerYX5300Config(clientId: 1, id: "mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player")
+                ]
+                ,
+                Inputs =
+                [
                     new InputConfig(id: 1, title:"Sleep") { IoPin = 25 }
-                },
-
+                ],
             };
             project.SetProjectFolder(projectPath);
             return project;

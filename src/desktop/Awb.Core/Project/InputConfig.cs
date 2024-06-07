@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.Text.Json.Serialization;
+
 namespace Awb.Core.Project
 {
     public class InputConfig : IProjectObjectListable
@@ -13,8 +15,10 @@ namespace Awb.Core.Project
         public string Title { get;  set; }
         public int? IoPin { get;  set; }
 
+        [JsonIgnore]
         public string TitleShort => Title ?? $"no title for input '{Id}'";
 
+        [JsonIgnore]
         public string TitleDetailled => $"Input {TitleShort}";
 
         public InputConfig(int id, string title)

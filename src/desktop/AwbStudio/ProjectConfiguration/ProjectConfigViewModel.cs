@@ -5,10 +5,12 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Project;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace AwbStudio.ProjectConfiguration
 {
@@ -27,24 +29,26 @@ namespace AwbStudio.ProjectConfiguration
                 handler(this, e);
         }
 
-         private AwbProject? _awbProject;
-
-        public required AwbProject AwbProject
-        {
-            get => _awbProject! ?? throw new NullReferenceException("AwbProject not set!");
-            init
-            {
-                _awbProject = value ?? throw new ArgumentNullException(nameof(AwbProject));
-                this.UpdateProjectObjectLists();
-            }
-        }
-        public bool UnsavedChanges { get; set; }
+        public bool UnsavedChanges { get; set; } = true;
 
         #region project objects
 
-        private ObservableCollection<IProjectObjectListable> _scsServos;
+        public string _projectFolder;
+        public string ProjectFolder
+        {
+
+            get => _projectFolder;
+            set
+            {
+                _projectFolder = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<IProjectObjectListable> _scsServos = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> ScsServos
         {
+
             get => _scsServos;
             set
             {
@@ -53,7 +57,7 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        private ObservableCollection<IProjectObjectListable> _stsServos;
+        private ObservableCollection<IProjectObjectListable> _stsServos = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> StsServos
         {
             get => _stsServos;
@@ -64,7 +68,7 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        private ObservableCollection<IProjectObjectListable> _pca9685PwmServos;
+        private ObservableCollection<IProjectObjectListable> _pca9685PwmServos = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> Pca9685PwmServos
         {
             get => _pca9685PwmServos;
@@ -75,7 +79,7 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        private ObservableCollection<IProjectObjectListable> _mp3PlayerYX5300;
+        private ObservableCollection<IProjectObjectListable> _mp3PlayerYX5300 = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> Mp3PlayerYX5300
         {
             get => _mp3PlayerYX5300;
@@ -86,7 +90,7 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-                 private ObservableCollection<IProjectObjectListable> _inputs;
+        private ObservableCollection<IProjectObjectListable> _inputs = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> Inputs
         {
             get => _inputs;
@@ -97,7 +101,7 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        private ObservableCollection<IProjectObjectListable> _timelineStates;
+        private ObservableCollection<IProjectObjectListable> _timelineStates = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> TimelineStates
         {
             get => _timelineStates;
@@ -111,45 +115,50 @@ namespace AwbStudio.ProjectConfiguration
 
         #endregion
 
-        public ProjectConfigViewModel()
+        public ProjectConfigViewModel(AwbProject awbProject)
         {
-            _scsServos = new ObservableCollection<IProjectObjectListable>();
-            _stsServos = new ObservableCollection<IProjectObjectListable>();
-            _pca9685PwmServos = new ObservableCollection<IProjectObjectListable>();
-            _mp3PlayerYX5300 = new ObservableCollection<IProjectObjectListable>();
-            _inputs = new ObservableCollection<IProjectObjectListable>();
-            _timelineStates = new ObservableCollection<IProjectObjectListable>();
+            FillFromProject(awbProject);
         }
 
-        private void UpdateProjectObjectLists()
+        public void WriteToProject(AwbProject awbProject)
         {
-            this.ScsServos.Clear();
-            if (_awbProject == null) return;
+            awbProject.ScsServos = this.ScsServos.Cast<StsServoConfig>().ToArray();
+            awbProject.StsServos = this.StsServos.Cast<StsServoConfig>().ToArray();
+            awbProject.Pca9685PwmServos = this.Pca9685PwmServos.Cast<Pca9685PwmServoConfig>().ToArray();
+            awbProject.Mp3PlayersYX5300 = this.Mp3PlayerYX5300.Cast<Mp3PlayerYX5300Config>().ToArray();
+            awbProject.Inputs = this.Inputs.Cast<InputConfig>().ToArray();
+            awbProject.TimelinesStates = this.TimelineStates.Cast<TimelineState>().ToArray();
+        }
 
-            if (_awbProject?.ScsServos != null)
-                foreach (var scsServo in _awbProject.ScsServos)
+        private void FillFromProject(AwbProject awbProject)
+        {
+            if (awbProject == null) return;
+
+            this.ProjectFolder = awbProject.ProjectFolder;
+
+            if (awbProject?.ScsServos != null)
+                foreach (var scsServo in awbProject.ScsServos)
                     this.ScsServos.Add(scsServo);
 
-            if (_awbProject?.StsServos != null)
-                foreach (var stsServo in _awbProject.StsServos)
+            if (awbProject?.StsServos != null)
+                foreach (var stsServo in awbProject.StsServos)
                     this.StsServos.Add(stsServo);
 
-            if (_awbProject?.Pca9685PwmServos != null)
-                foreach (var pca9685PwmServo in _awbProject.Pca9685PwmServos)
+            if (awbProject?.Pca9685PwmServos != null)
+                foreach (var pca9685PwmServo in awbProject.Pca9685PwmServos)
                     this.Pca9685PwmServos.Add(pca9685PwmServo);
 
-            if (_awbProject?.Mp3PlayersYX5300 != null)
-                foreach (var mp3PlayerYX5300 in _awbProject.Mp3PlayersYX5300)
+            if (awbProject?.Mp3PlayersYX5300 != null)
+                foreach (var mp3PlayerYX5300 in awbProject.Mp3PlayersYX5300)
                     this.Mp3PlayerYX5300.Add(mp3PlayerYX5300);
 
-            if (_awbProject?.Inputs != null)
-                foreach (var input in _awbProject.Inputs)
+            if (awbProject?.Inputs != null)
+                foreach (var input in awbProject.Inputs)
                     this.Inputs.Add(input);
 
-            if (_awbProject?.TimelinesStates != null)
-                foreach (var timelineState in _awbProject.TimelinesStates)
-                    this.TimelineStates.Add(timelineState); 
-
+            if (awbProject?.TimelinesStates != null)
+                foreach (var timelineState in awbProject.TimelinesStates)
+                    this.TimelineStates.Add(timelineState);
         }
     }
 }

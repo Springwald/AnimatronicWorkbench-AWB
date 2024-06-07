@@ -24,19 +24,17 @@ namespace AwbStudio
 
         private ProjectConfigViewModel _viewModel;
         private readonly IProjectManagerService _projectManagerService;
+        private readonly AwbProject _awbProject;
 
         public ProjectConfigurationWindow(IProjectManagerService projectManagerService)
         {
             _projectManagerService = projectManagerService;
-            var awbProject = projectManagerService.ActualProject ?? throw new ArgumentNullException(nameof(projectManagerService.ActualProject));
-            _viewModel = new ProjectConfigViewModel { AwbProject = awbProject };
+            _awbProject = projectManagerService.ActualProject ?? throw new ArgumentNullException(nameof(projectManagerService.ActualProject));
+            _viewModel = new ProjectConfigViewModel(_awbProject);
 
             this.DataContext = _viewModel;
 
             InitializeComponent();
-
-           // this.ScsServosList.ProjectObjects = _viewModel.ScsServos;
-           
 
             Loaded += ProjectConfigurationWindow_Loaded;
         }
@@ -57,7 +55,8 @@ namespace AwbStudio
 
         private async Task<bool> SaveProjectConfigAsync()
         {
-            var ok = await _projectManagerService.SaveProjectAsync(_viewModel.AwbProject, _viewModel.AwbProject.ProjectFolder);
+            _viewModel.WriteToProject(_awbProject);
+            var ok = await _projectManagerService.SaveProjectAsync(_awbProject, _awbProject.ProjectFolder);
             if (ok) _viewModel.UnsavedChanges = false; else MessageBox.Show("Error saving project configuration!");
             return ok;
         }
@@ -115,9 +114,8 @@ namespace AwbStudio
         {
             if (_viewModel.UnsavedChanges == true)
             {
-                if (SaveProjectConfigAsync().Result == false) return;
+                if (await SaveProjectConfigAsync() == false) return;
             }
-
             this.Close();
         }
 

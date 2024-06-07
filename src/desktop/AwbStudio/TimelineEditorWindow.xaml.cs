@@ -136,7 +136,7 @@ namespace AwbStudio
 
             // fill timeline state chooser
             ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
-            TimelineChooser.ProjectTitle = _project.Title;
+            TimelineChooser.ProjectTitle = _project.ProjectMetaData.ProjectTitle;
             TimelineChooser.FileManager = _timelineDataService;
 
             Closing += TimelineEditorWindow_Closing;

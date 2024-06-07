@@ -29,8 +29,8 @@ namespace AwbStudio.Exports
         private readonly AwbProject _project;
 
         private WifiConfigExportData WifiConfigData => new WifiConfigExportData { 
-            WlanSSID = _project.WifiSsid, 
-            WlanPassword = _project.WifiPassword 
+            WlanSSID = _project.ProjectMetaData.WifiSsid, 
+            WlanPassword = _project.ProjectMetaData.WifiPassword 
         };
 
         private ProjectExportData? ProjectData
@@ -62,7 +62,7 @@ namespace AwbStudio.Exports
 
                 return new ProjectExportData
                 {
-                    ProjectName = _project.Title,
+                    ProjectName = _project.ProjectMetaData.ProjectTitle,
                     TimelineStates = _project.TimelinesStates,
                     StsServoConfigs = _project.StsServos,
                     ScsServoConfigs = _project.ScsServos,

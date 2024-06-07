@@ -16,10 +16,14 @@ namespace MidiControllerLiveControl
         {
             get
             {
-                return new AwbProject(title: "demo")
+                return new AwbProject()
                 {
-                    StsServos = new System.Collections.ObjectModel.ObservableCollection<StsServoConfig>
-                     {
+                    ProjectMetaData = new ProjectMetaData
+                    {
+                        ProjectTitle = "demo"
+                    },
+                    StsServos =
+                     [
                          new StsServoConfig(id:"Servo 1",title:"Mouth upper", clientId: 2, channel:1)
                          {
                              MinValue = 1800,
@@ -44,8 +48,7 @@ namespace MidiControllerLiveControl
                              MaxValue = 3000,
                              DefaultValue = null
                          },
-
-                     }
+                     ]
                 };
             }
         }
