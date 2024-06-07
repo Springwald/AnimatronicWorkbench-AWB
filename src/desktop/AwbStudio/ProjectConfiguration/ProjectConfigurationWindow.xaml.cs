@@ -134,5 +134,15 @@ namespace AwbStudio
         {
             PropertyEditor.ProjectObject = e.ProjectObject;
         }
+
+        private void EditProjectMetaDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            PropertyEditor.ProjectObject = _viewModel.ProjectMetaData;
+        }
+
+        private void EditEsp32HardwareButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

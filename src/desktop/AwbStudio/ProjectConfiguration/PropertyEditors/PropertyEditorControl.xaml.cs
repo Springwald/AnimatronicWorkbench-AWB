@@ -69,6 +69,10 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                                 ActualEditor = new ScsServoEditorControl() { StsServoConfig = stsServoConfig };
                                 break;
 
+                            case ProjectMetaData projectMetaData:
+                                ActualEditor = new ProjectMetaDataEditorControl() { ProjectMetaData = projectMetaData };
+                                break;
+
                             default:
                                 throw new ArgumentOutOfRangeException(nameof(ProjectObject) + ":" + _projectObject.ToString());
                         }

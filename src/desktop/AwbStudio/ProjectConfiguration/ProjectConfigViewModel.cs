@@ -33,7 +33,7 @@ namespace AwbStudio.ProjectConfiguration
 
         #region project objects
 
-        public string _projectFolder;
+        private string _projectFolder;
         public string ProjectFolder
         {
 
@@ -44,6 +44,19 @@ namespace AwbStudio.ProjectConfiguration
                 OnPropertyChanged();
             }
         }
+
+        private ProjectMetaData? _projectMetaData { get;  set; }
+        public ProjectMetaData? ProjectMetaData
+        {
+
+            get => _projectMetaData;
+            set
+            {
+                _projectMetaData = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         private ObservableCollection<IProjectObjectListable> _scsServos = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> ScsServos
@@ -112,6 +125,8 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
+        
+
 
         #endregion
 
@@ -135,6 +150,7 @@ namespace AwbStudio.ProjectConfiguration
             if (awbProject == null) return;
 
             this.ProjectFolder = awbProject.ProjectFolder;
+            this.ProjectMetaData = awbProject.ProjectMetaData;
 
             if (awbProject?.ScsServos != null)
                 foreach (var scsServo in awbProject.ScsServos)

@@ -28,8 +28,10 @@
             <ScrollViewer Grid.Column="0">
                 <StackPanel>
                     <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
+                    <Button x:Name="EditProjectMetaDataButton" Content="Edit meta data" Click="EditProjectMetaDataButton_Click"></Button>
                     
                     <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />
+                    <Button x:Name="EditEsp32HardwareButton" Content="Edit ESP32 hardware" Click="EditEsp32HardwareButton_Click"></Button> 
                     
                     <ProjectConfiguration:ProjectObjectListControl x:Name="ScsServosList" 
                         ProjectObjects="{Binding ScsServos}" Title="SCS servos" ProjectObjectSelected="ProjectObjectSelected"/>
