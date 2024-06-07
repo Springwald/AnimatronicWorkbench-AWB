@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.Text.Json.Serialization;
+
 namespace Awb.Core.Project
 {
     public class StsServoConfig : IDeviceConfig, IProjectObjectListable
@@ -24,8 +26,10 @@ namespace Awb.Core.Project
         /// </summary>
         public bool GlobalFault { get; set; }
 
+        [JsonIgnore]
         public string TitleShort => Title ?? $"StsServo has no title set '{Id}'";
 
+        [JsonIgnore]
         public string TitleDetailled => $"StsServo '{TitleShort}' (Id: {Id}, ClientId: {ClientId}, Channel: {Channel})";
 
         public StsServoConfig(string id, string title, uint clientId, uint channel)

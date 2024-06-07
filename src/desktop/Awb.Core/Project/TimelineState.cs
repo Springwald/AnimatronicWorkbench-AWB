@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.Text.Json.Serialization;
+
 namespace Awb.Core.Project
 {
     public class TimelineState: IProjectObjectListable
@@ -33,8 +35,10 @@ namespace Awb.Core.Project
         /// </summary>
         public int[] NegativeInputs { get; internal set; }
 
+        [JsonIgnore]
         public string TitleShort =>  Title ?? $"TimelineState has no title set '{Id}'";
 
+        [JsonIgnore]
         public string TitleDetailled => $"TimelineState {TitleShort}";
 
         public TimelineState(int id, string title, bool export, bool autoPlay, int[]? positiveInputs = null, int[]? negativeInputs = null)

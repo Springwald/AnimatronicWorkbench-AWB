@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.Text.Json.Serialization;
+
 namespace Awb.Core.Project
 {
     public class Mp3PlayerYX5300Config : IDeviceConfig, IProjectObjectListable
@@ -18,8 +20,10 @@ namespace Awb.Core.Project
 
         public string Title { get; set; }
 
+        [JsonIgnore] 
         public string TitleShort => Title ?? $"No Title for Mp3PlayerYX5300 '{Id}'";
 
+        [JsonIgnore]
         public string TitleDetailled => $"{TitleShort} (ClientId: {ClientId}, SoundPlayerId: {SoundPlayerId})";
 
 

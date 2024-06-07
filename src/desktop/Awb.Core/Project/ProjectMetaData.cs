@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Awb.Core.Project
@@ -21,8 +22,10 @@ namespace Awb.Core.Project
         [DataMember(Name = "Project title")]
         public string ProjectTitle { get; set; } = string.Empty;
 
+        [JsonIgnore]
         public string TitleShort => "AWB project meta data";
 
+        [JsonIgnore]
         public string TitleDetailled => TitleShort;
 
         public string? Info { get; set; }
