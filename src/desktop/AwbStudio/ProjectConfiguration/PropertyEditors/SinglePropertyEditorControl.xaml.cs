@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core;
+using Awb.Core.Tools;
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -185,7 +187,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     if (int.TryParse(newValue, out var intValue))
                     {
                         prop.SetValue(_targetObject, intValue);
-                    } else
+                    }
+                    else
                     {
                         ErrorMessagesJoined = "Value is not a valid integer";
                     }
@@ -195,7 +198,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     if (uint.TryParse(newValue, out var uintValue))
                     {
                         prop.SetValue(_targetObject, uintValue);
-                    } else
+                    }
+                    else
                     {
                         ErrorMessagesJoined = "Value is not a valid unsigned integer";
                     }
@@ -207,6 +211,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 else
                 {
                     throw new Exception($"Unsupported property type '{propertyType}'");
+                }
+
+                if (ErrorMessagesJoined == string.Empty)
+                {
+                    // validate the property value using DataAnnotations (e.g. Range, Required, etc.)
+                    UpdateErrorMessagesByValidationAttributes();
                 }
             }
         }
@@ -221,6 +231,23 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 var prop = _targetObject.GetType().GetProperty(_propertyName);
                 if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
                 prop.SetValue(_targetObject, true);
+            }
+        }
+
+        private void UpdateErrorMessagesByValidationAttributes()
+        {
+            ErrorMessagesJoined = string.Empty;
+
+            if (_targetObject != null && _propertyName != null)
+            {
+                var objType = _targetObject.GetType();
+                var prop = objType.GetProperty(_propertyName);
+                if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
+
+                var value = prop.GetValue(_targetObject);
+
+                var errors = NonGenericValidator.ValidateProperty(objType, value, _propertyName);
+                ErrorMessagesJoined = string.Join("; ", errors);
             }
         }
 

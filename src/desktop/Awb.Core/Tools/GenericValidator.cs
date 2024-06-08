@@ -18,6 +18,8 @@ namespace Awb.Core
     /// <typeparam name="T"></typeparam>
     public class GenericValidator<T>
     {
+       
+
         // This loop into all DataAnnotations and return all errors strings
         public IEnumerable<string> ValidateProperty(object? propertyValue, string propertyName)
         {

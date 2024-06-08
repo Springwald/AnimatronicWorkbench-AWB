@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
@@ -20,6 +21,7 @@ namespace Awb.Core.Project
 
         [DisplayName("Servo ID")]
         [Description("The ID of the servo on the servo bus (1-254).")]
+        [Range(1, 254)]
         public uint Channel { get; set; }
 
         [DisplayName("Title")]
@@ -27,12 +29,15 @@ namespace Awb.Core.Project
         public string Title { get; set; }
 
         [DisplayName("Lowest value")]
+        [Range(0, 4095)]
         public int MinValue { get; set; }
 
         [DisplayName("Highest value")]
+        [Range(0, 4095)]
         public int MaxValue { get; set; }
 
         [DisplayName("Default value")]
+        [Range(0, 4095)]
         public int? DefaultValue { get; set; }
 
         [DisplayName("Acceleration")]
