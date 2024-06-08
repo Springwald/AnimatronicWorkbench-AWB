@@ -35,7 +35,9 @@
                     Checked="CheckBoxPropertyContentBoolEditor_Checked"
                     IsChecked="{Binding PropertyContentBool, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 </CheckBox>
-                <Label Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" Content="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}" ></Label>
+                <Label Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" 
+                       Content="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       ToolTip="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}"></Label>
             </Grid>
         </StackPanel>
     </Border>

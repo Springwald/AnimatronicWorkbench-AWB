@@ -152,6 +152,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 PropertyContentText = value?.ToString() ?? string.Empty;
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
             }
+
+            UpdateErrorMessagesByValidationAttributes();
         }
 
         private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)

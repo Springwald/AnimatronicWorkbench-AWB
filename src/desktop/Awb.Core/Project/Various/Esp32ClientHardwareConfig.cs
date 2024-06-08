@@ -16,15 +16,10 @@ namespace Awb.Core.Project.Various
 {
     public class Esp32ClientHardwareConfig : IProjectObjectListable
     {
-        private string? _wifiSsid;
-
         [JsonIgnore]
         public string TitleShort => "ESP32 client hardware";
 
         [JsonIgnore]
         public string TitleDetailled => TitleShort;
-
-
-
     }
 }

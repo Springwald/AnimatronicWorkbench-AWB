@@ -5,13 +5,9 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Awb.Core.Project.Various
 {
@@ -19,15 +15,13 @@ namespace Awb.Core.Project.Various
     {
         private string? _wifiSsid;
 
-        [DataMember(Name = "Project title")]
+        [DisplayName("Project title")]
+        [Description("The working title of the project, often a figure name.")]
+        [Length(1,16)]
+        [RegularExpression(pattern:"[A-Za-z0-9_-]+",ErrorMessage ="Only chars A-Z,a-z, 0-9 and '__' or '-' allowed (e.g. no space).")]
         public string ProjectTitle { get; set; } = string.Empty;
 
-        [JsonIgnore]
-        public string TitleShort => "AWB project meta data";
-
-        [JsonIgnore]
-        public string TitleDetailled => TitleShort;
-
+        [DisplayName("Info description")]
         public string? Info { get; set; }
 
         public string WifiSsid
@@ -35,9 +29,15 @@ namespace Awb.Core.Project.Various
             get => _wifiSsid ?? $"AWB-{ProjectTitle}"; // todo: remove invalid chars
             set => _wifiSsid = value;
         }
+
+        [DisplayName("Wifi password")]
         public string WifiPassword { get; set; } = "awb12345";
 
+        [JsonIgnore]
+        public string TitleShort => "AWB project meta data";
 
+        [JsonIgnore]
+        public string TitleDetailled => TitleShort;
 
     }
 }
