@@ -7,8 +7,8 @@
 
 using System;
 using System.ComponentModel;
-using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
@@ -16,28 +16,80 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     /// <summary>
     /// Interaction logic for ValueEditorControl.xaml
     /// </summary>
-    public partial class ValueEditorControl : UserControl
+    public partial class ValueEditorControl : UserControl, INotifyPropertyChanged
     {
         private object? _targetObject;
         private string? _propertyName;
 
-        public string? PropertyTitle { get; set; }
+        private string? _propertyTitle;
+        public string? PropertyTitle
+        {
+            get { return _propertyTitle; }
+            set
+            {
+                if (_propertyTitle != value)
+                {
+                    _propertyTitle = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-        public string? ErrorMessagesJoined { get; private set; }
+        private string? _errorMessagesJoined;
+        public string? ErrorMessagesJoined
+        {
+            get { return _errorMessagesJoined; }
+            set
+            {
+                if (_errorMessagesJoined != value)
+                {
+                    _errorMessagesJoined = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
+        private string? _propertyContentText;
         public string? PropertyContentText
         {
-            get;
-            set;
+            get { return _propertyContentText; }
+            set
+            {
+                if (_propertyContentText != value)
+                {
+                    _propertyContentText = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
+        private bool _propertyContentBool;
         public bool PropertyContentBool
         {
-            get;
-            set;
+            get { return _propertyContentBool; }
+            set
+            {
+                if (_propertyContentBool != value)
+                {
+                    _propertyContentBool = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
-        public string? PropertyDescription { get; private set; }
+        private string? _propertyDescription;
+        public string? PropertyDescription
+        {
+            get { return _propertyDescription; }
+            set
+            {
+                if (_propertyDescription != value)
+                {
+                    _propertyDescription = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public ValueEditorControl()
         {
@@ -84,7 +136,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             // activate the correct editor control for this type of property
             // e.g. a checkbox for bool, a textbox for string, a numeric up down for int, etc.
             var value = prop.GetValue(target); // get the value of the property
-            
 
             var propertyType = prop.PropertyType;
             if (propertyType == typeof(bool))
@@ -99,22 +150,85 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 PropertyContentText = value?.ToString() ?? string.Empty;
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
             }
-
-
-            //if (!string.IsNullOrEmpty(input))
-            //{
-            //    var prop = target.GetType().GetProperty(propertyName);
-            //    prop.SetValue(target, input);
-            //}
         }
 
         private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ErrorMessagesJoined = string.Empty;
+
+            // set the value of the property to the value of the textbox,
+            // casting to the correct type e.g. int
+            if (_targetObject != null && _propertyName != null)
+            {
+                var newValue = TextPropertyContentTextEditor.Text;
+
+                var prop = _targetObject.GetType().GetProperty(_propertyName);
+                if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
+
+                // convert the string to the correct type
+                var propertyType = prop.PropertyType;
+
+                // first check if the value is null or empty
+                var isNullable = Nullable.GetUnderlyingType(propertyType) != null;
+
+                if (string.IsNullOrWhiteSpace(newValue))
+                {
+                    if (isNullable)
+                        prop.SetValue(_targetObject, null);
+                    else
+                        ErrorMessagesJoined = "Value is empty";
+                    return;
+                }
+
+                if (propertyType == typeof(int) || propertyType == typeof(int?))
+                {
+                    if (int.TryParse(newValue, out var intValue))
+                    {
+                        prop.SetValue(_targetObject, intValue);
+                    } else
+                    {
+                        ErrorMessagesJoined = "Value is not a valid integer";
+                    }
+                }
+                else if (propertyType == typeof(uint) || propertyType == typeof(uint?))
+                {
+                    if (uint.TryParse(newValue, out var uintValue))
+                    {
+                        prop.SetValue(_targetObject, uintValue);
+                    } else
+                    {
+                        ErrorMessagesJoined = "Value is not a valid unsigned integer";
+                    }
+                }
+                else if (propertyType == typeof(string))
+                {
+                    prop.SetValue(_targetObject, newValue);
+                }
+                else
+                {
+                    throw new Exception($"Unsupported property type '{propertyType}'");
+                }
+            }
         }
 
         private void CheckBoxPropertyContentBoolEditor_Checked(object sender, System.Windows.RoutedEventArgs e)
         {
+            ErrorMessagesJoined = string.Empty;
 
+            // set the value of the property to the value of the checkbox
+            if (_targetObject != null && _propertyName != null)
+            {
+                var prop = _targetObject.GetType().GetProperty(_propertyName);
+                if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
+                prop.SetValue(_targetObject, true);
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
