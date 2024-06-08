@@ -5,60 +5,96 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System.Windows;
+using System;
+using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
     /// <summary>
-    /// Interaction logic for SinglePropertyEditorControl.xaml
+    /// Interaction logic for ValueEditorControl.xaml
     /// </summary>
-    public partial class SinglePropertyEditorControl : UserControl
+    public partial class ValueEditorControl : UserControl//, INotifyPropertyChanged
     {
-        /// <summary>
-        /// The name of the property to edit
-        /// </summary>
-        public string PropertyName
-        {
-            get { return (string)GetValue(PropertyNameProperty); }
-            set { SetValue(PropertyNameProperty, value); }
-        }
+        private object _targetObject;
+        private string _propertyName;
 
-        // Using a DependencyProperty as the backing store for PropertyName.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty PropertyNameProperty =
-            DependencyProperty.Register("PropertyName", typeof(string), typeof(SinglePropertyEditorControl), new PropertyMetadata(null));
+        public string PropertyTitle { get; set; }
 
+        public string ErrorMessagesJoined { get; private set; }
 
-        /// <summary>
-        /// the content of the property
-        /// </summary>
         public string PropertyContent
-        {
-            get { return (string)GetValue(PropertyContentProperty); }
-            set { SetValue(PropertyContentProperty, value); }
-        }
+        { get; set; }
+        public string PropertyDescription { get; private set; }
 
-        // Using a DependencyProperty as the backing store for PropertyContent.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty PropertyContentProperty =
-            DependencyProperty.Register("PropertyContent", typeof(string), typeof(SinglePropertyEditorControl), new PropertyMetadata(null));
+        /*{
+get { return (string)GetValue(PropertyContentProperty); }
+set { SetValue(PropertyContentProperty, value); }
+} 
 
+public static readonly DependencyProperty PropertyContentProperty =
+DependencyProperty.Register("PropertyContent", typeof(string), typeof(ValueEditorControl), new PropertyMetadata(null));
+*/
 
-        /// <summary>
-        /// the regular expression pattern for validation
-        /// </summary>
-        public string ValidationPattern
-        {
-            get { return (string)GetValue(ValidationPatternProperty); }
-            set { SetValue(ValidationPatternProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ValidationPattern.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ValidationPatternProperty =
-            DependencyProperty.Register("ValidationPattern", typeof(string), typeof(SinglePropertyEditorControl), new PropertyMetadata(null));
-
-        public SinglePropertyEditorControl()
+        public ValueEditorControl()
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// set property to edit by property expression
+        /// </summary>
+        /// <example>
+        /// SetPropertyToEditByExpression(() => stsServoConfig.ClientId);
+        /// </example>
+        public void SetPropertyToEditByExpression<T>(Expression<Func<T>> property)
+        {
+            var propertyInfo = ((MemberExpression)property.Body).Member as PropertyInfo;
+            if (propertyInfo == null)
+                throw new ArgumentException("The lambda expression 'property' should point to a valid Property");
+
+            PropertyTitle= propertyInfo.Name;
+            PropertyContent = property.Compile()()?.ToString() ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Set property to edit by name
+        /// </summary>
+        public void SetPropertyToEditByName(object target, string propertyName)
+        {
+            _targetObject = target;
+            _propertyName = propertyName;
+
+            var prop = target.GetType().GetProperty(propertyName);
+            if (prop == null) throw new Exception($"Property '{propertyName}' not found");
+
+            // get the value of the property
+            var value = prop.GetValue(target);
+            PropertyContent = value?.ToString() ?? string.Empty;
+
+            // get the title of the property using the DisplayName annotation
+            var displayNameAttribute = prop.GetCustomAttribute<DisplayNameAttribute>();
+            PropertyTitle = displayNameAttribute?.DisplayName ?? propertyName;
+
+            // get get description of the property using the Description annotation
+            var descriptionAttribute = prop.GetCustomAttribute<DescriptionAttribute>();
+            PropertyDescription = descriptionAttribute?.Description ?? string.Empty;
+
+            //if (!string.IsNullOrEmpty(input))
+            //{
+            //    var prop = target.GetType().GetProperty(propertyName);
+            //    prop.SetValue(target, input);
+            //}
+        }
+
+        //protected virtual void OnPropertyChanged(string propertyName)
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //}
+
+        //public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="AwbStudio.ProjectConfiguration.PropertyEditors.SinglePropertyEditorControl"
+﻿<UserControl x:Class="AwbStudio.ProjectConfiguration.PropertyEditors.ValueEditorControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,12 +6,21 @@
              xmlns:local="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Label Grid.Column="0" Content="{Binding PropertyName}" HorizontalAlignment="Right" VerticalAlignment="Center"></Label>
-        <TextBox Grid.Column="1" Text="{Binding PropertyContent, Mode=TwoWay}"></TextBox>
-    </Grid>
+    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0 0 0 5"  >
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Grid.Column="0" FontWeight="Bold" Height="auto" Content="{Binding PropertyTitle, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Right" VerticalAlignment="Center"></Label>
+                <Label Grid.Column="1" FontStyle="Italic" Height="auto" Content="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}"></Label>
+            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Text="{Binding PropertyContent, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                </TextBox>
+                <Label Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" Content="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}" ></Label>
+            </Grid>
+        </StackPanel>
+    </Border>
 </UserControl>
