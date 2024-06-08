@@ -6,6 +6,8 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Project.Servos;
+using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using ResetAllServos;
 
@@ -20,8 +22,12 @@ var config = new AwbProject
         ProjectTitle = "demo"
     },
     StsServos = Enumerable.Range(1, 2).Select(id =>
-            new StsServoConfig(id: $"servo {id}", title: $"Servo {id}", clientId: 2, channel: (uint)id)
+            new StsFeetechServoConfig
             {
+                Id = $"servo {id}",
+                Title = $"Servo {id}",
+                ClientId = 2,
+                Channel = (uint)id,
                 MinValue = 1,
                 MaxValue = 4096,
                 DefaultValue = 2048

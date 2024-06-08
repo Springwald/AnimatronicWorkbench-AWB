@@ -6,9 +6,6 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
-using Awb.Core.Project.Servos;
-using Awb.Core.Project.Various;
-using System;
 using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
@@ -59,16 +56,11 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                         // e.g. ScsServoEditorControl for ScsServoConfig
                         switch (_projectObject)
                         {
-                            case ScsFeetechServoConfig scsServoConfig:
-                                ActualEditor = new ScsServoEditorControl() { ScsServoConfig = scsServoConfig };
-                                break;
-
-                            case ProjectMetaData projectMetaData:
-                                ActualEditor = new ScsServoEditorControl() {  ScsServoConfig  = projectMetaData };
-                                break;
-
+                            // case ScsFeetechServoConfig scsServoConfig:
+                            //     break;
                             default:
-                                throw new ArgumentOutOfRangeException(nameof(ProjectObject) + ":" + _projectObject.ToString());
+                                ActualEditor = new ProjectObjectGenericEditorControl() { ProjectObjectToEdit = _projectObject };
+                                break;
                         }
                     }
                 }

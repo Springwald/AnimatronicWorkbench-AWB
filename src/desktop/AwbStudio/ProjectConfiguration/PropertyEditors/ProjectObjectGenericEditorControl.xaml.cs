@@ -16,12 +16,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     /// <summary>
     /// Interaction logic for ScsServoEditorControl.xaml
     /// </summary>
-    public partial class ScsServoEditorControl : UserControl
+    public partial class ProjectObjectGenericEditorControl : UserControl
     {
         private List<ValueEditorControl> _editors;
         private IProjectObjectListable _projectObject;
 
-        public IProjectObjectListable ScsServoConfig
+        public IProjectObjectListable ProjectObjectToEdit
         {
             get
             {
@@ -37,10 +37,10 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         public IEnumerable<string> Errors { get; private set; }
 
-        public ScsServoEditorControl()
+        public ProjectObjectGenericEditorControl()
         {
             InitializeComponent();
-            this.DataContext = ScsServoConfig;
+            this.DataContext = ProjectObjectToEdit;
         }
 
         private void WriteDataToEditor(IProjectObjectListable stsServoConfig)
