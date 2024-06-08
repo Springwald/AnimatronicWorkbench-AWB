@@ -8,11 +8,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <ScrollViewer>
         <StackPanel x:Name="EditorStackPanel">
-            <StackPanel Orientation="Horizontal">
-                <Label x:Name="LabelObjectTypeTitle" FontWeight="Bold">SCS Servo</Label>
-                <Label x:Name="LabelObjectId" FontStyle="Italic">ID 102</Label>
-            </StackPanel>
-
+            <Label x:Name="LabelObjectTypeTitle" FontWeight="Bold">SCS Servo</Label>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

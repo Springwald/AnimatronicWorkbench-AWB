@@ -219,6 +219,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     UpdateErrorMessagesByValidationAttributes();
                 }
             }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
         }
 
         private void CheckBoxPropertyContentBoolEditor_Checked(object sender, System.Windows.RoutedEventArgs e)
@@ -232,6 +233,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
                 prop.SetValue(_targetObject, true);
             }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
         }
 
         private void UpdateErrorMessagesByValidationAttributes()

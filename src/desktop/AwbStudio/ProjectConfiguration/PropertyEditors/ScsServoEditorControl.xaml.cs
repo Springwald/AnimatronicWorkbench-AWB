@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,9 +25,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         public static readonly DependencyProperty ScsServoConfigProperty =
             DependencyProperty.Register(nameof(ScsFeetechServoConfig), typeof(ScsFeetechServoConfig), typeof(ScsServoEditorControl),
-                new PropertyMetadata(null)
-                                               //new PropertyMetadata("DEFAULT")
-                                               );
+                new PropertyMetadata(null));
 
         public ScsFeetechServoConfig ScsServoConfig
         {
@@ -52,10 +51,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             this.DataContext = ScsServoConfig;
         }
 
-
-        private void WriteDataToEditor(ScsFeetechServoConfig stsServoConfig)
+        private void WriteDataToEditor(IProjectObjectListable stsServoConfig)
         {
             if (_editors != null) throw new System.Exception("Object to edit is already set.");
+
+            
+
             var type = stsServoConfig.GetType();
             _editors = new List<ValueEditorControl>();
 
@@ -69,6 +70,10 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 var editor = new ValueEditorControl();
                 //editor.SetPropertyToEditByExpression(() => stsServoConfig.GetType().GetProperty(property.Name));
                 editor.SetPropertyToEditByName(target: stsServoConfig, propertyName: property.Name);
+                editor.PropertyChanged += (s, e) =>
+                {
+                    LabelObjectTypeTitle.Content = stsServoConfig.TitleDetailled;
+                };
                 _editors.Add(editor);
                 this.EditorStackPanel.Children.Add(editor);
             }
