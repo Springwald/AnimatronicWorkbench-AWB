@@ -42,7 +42,19 @@ namespace AwbStudio.ProjectConfiguration
         {
             get { return (string)GetValue(TitleProperty); }
             set { SetValue(TitleProperty, value); }
-        } 
+        }
+
+        public IProjectObjectListable? SelectedProjectObject
+        {
+            get => ListProjectObjects.SelectedItem as IProjectObjectListable;
+            set
+            {
+                if (ListProjectObjects.Items.Contains(value))
+                    ListProjectObjects.SelectedItem = value;
+                else
+                    ListProjectObjects.SelectedItem = null;
+            }
+        }
 
         // Using a DependencyProperty as the backing store for Title.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TitleProperty =
@@ -55,8 +67,9 @@ namespace AwbStudio.ProjectConfiguration
         }
         private void ListProjectObjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (SelectedProjectObject == null) return;
             ProjectObjectSelected?.Invoke(this,
-                new ProjectObjectSelectedEventArgs { ProjectObject = ListProjectObjects.SelectedItem as IProjectObjectListable });
+                new ProjectObjectSelectedEventArgs { ProjectObject = this.SelectedProjectObject });
         }
     }
 }

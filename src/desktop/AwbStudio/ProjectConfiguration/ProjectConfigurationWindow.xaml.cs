@@ -132,17 +132,31 @@ namespace AwbStudio
 
         private void ProjectObjectSelected(object sender, ProjectObjectListControl.ProjectObjectSelectedEventArgs e)
         {
-            PropertyEditor.ProjectObject = e.ProjectObject;
+            SetObjectToEdit(e.ProjectObject);
         }
 
         private void EditProjectMetaDataButton_Click(object sender, RoutedEventArgs e)
         {
-            PropertyEditor.ProjectObject = _viewModel.ProjectMetaData;
+            SetObjectToEdit(_viewModel.ProjectMetaData);
         }
 
         private void EditEsp32HardwareButton_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void SetObjectToEdit(IProjectObjectListable? projectObject)
+        {
+            // iterator through all ProjectObjectListControl in this control and set the projectObject to each of them as selected object
+            foreach(var control in StackPanelProjectObjectLists.Children)
+            {
+                if (control is ProjectObjectListControl list)
+                {
+                    list.SelectedProjectObject = projectObject;
+                }
+            }
+
+            PropertyEditor.ProjectObject = projectObject;
         }
     }
 }

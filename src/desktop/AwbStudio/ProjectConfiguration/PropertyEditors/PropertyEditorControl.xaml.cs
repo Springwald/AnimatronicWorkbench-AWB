@@ -31,6 +31,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private UserControl? _actualEditor;
         private IProjectObjectListable? _projectObject;
 
+
+
         private UserControl? ActualEditor
         {
             get => _actualEditor;

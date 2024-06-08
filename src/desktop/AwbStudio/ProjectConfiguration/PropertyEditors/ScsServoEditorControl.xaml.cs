@@ -5,22 +5,10 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.Project;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
@@ -30,17 +18,27 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     public partial class ScsServoEditorControl : UserControl
     {
 
+        private List<ValueEditorControl> _editors;
+
         public static readonly DependencyProperty StsServoConfigProperty =
-            DependencyProperty.Register(nameof(StsServoConfig),typeof(StsServoConfig),typeof(ScsServoEditorControl),
+            DependencyProperty.Register(nameof(StsServoConfig), typeof(StsServoConfig), typeof(ScsServoEditorControl),
                 new PropertyMetadata(null)
-                               //new PropertyMetadata("DEFAULT")
+                                               //new PropertyMetadata("DEFAULT")
                                                );
 
         public StsServoConfig StsServoConfig
         {
-            get { return (StsServoConfig)GetValue(StsServoConfigProperty); }
-            set { 
-                SetValue(StsServoConfigProperty, value); 
+            get
+            {
+                var value = (StsServoConfig)GetValue(StsServoConfigProperty);
+                ReadDataFromEditor(value);
+                return value;
+            }
+            set
+            {
+                
+                SetValue(StsServoConfigProperty, value);
+                WriteDataToEditor(value);
             }
         }
 
@@ -49,10 +47,27 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         public ScsServoEditorControl()
         {
             InitializeComponent();
+            this.DataContext = StsServoConfig;
         }
+
 
         private void WriteDataToEditor(StsServoConfig stsServoConfig)
         {
+            if (_editors != null) throw new System.Exception("Object to edit is already set.");
+            var type = stsServoConfig.GetType();
+            _editors = new List<ValueEditorControl>();
+            /*foreach (var property in type.GetProperties())
+            {
+                var editor = new ValueEditorControl();
+                editor.SetPropertyToEdit(() => stsServoConfig.GetType().GetProperty(property.Name));
+                _editors.Add(editor);
+                this.EditorStackPanel.Children.Add(editor);
+            }*/
+
+            var editor = new ValueEditorControl();
+            editor.SetPropertyToEdit(() => stsServoConfig.ClientId);
+            _editors.Add(editor);
+            this.EditorStackPanel.Children.Add(editor);
 
         }
 

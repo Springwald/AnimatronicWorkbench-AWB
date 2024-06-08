@@ -26,7 +26,7 @@
             </Grid.ColumnDefinitions>
 
             <ScrollViewer Grid.Column="0">
-                <StackPanel>
+                <StackPanel x:Name="StackPanelProjectObjectLists">
                     <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
                     <Button x:Name="EditProjectMetaDataButton" Content="Edit meta data" Click="EditProjectMetaDataButton_Click"></Button>
                     
