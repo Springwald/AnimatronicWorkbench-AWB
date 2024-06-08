@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
@@ -12,7 +13,13 @@ namespace Awb.Core.Project
     public class StsServoConfig : IDeviceConfig, IProjectObjectListable
     {
         public string Id { get; set; }
+
+        [DisplayName("Client ID")]
+        [Description("The ID of the AWB client device that controls this servo.")]
         public uint ClientId { get; set; }
+
+        [DisplayName("Servo ID")]
+        [Description("The ID of the servo on the servo bus.")]
         public uint Channel { get; set; }
         public string Title { get; set; }
         public int MinValue { get; set; }

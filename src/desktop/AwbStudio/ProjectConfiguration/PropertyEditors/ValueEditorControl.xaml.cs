@@ -1,43 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Animatronic WorkBench
+// https://github.com/Springwald/AnimatronicWorkBench-AWB
+//
+// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
+// https://daniel.springwald.de - daniel@springwald.de
+// All rights reserved   -  Licensed under MIT License
+
+using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
     /// <summary>
     /// Interaction logic for ValueEditorControl.xaml
     /// </summary>
-    public partial class ValueEditorControl : UserControl, INotifyPropertyChanged
+    public partial class ValueEditorControl : UserControl//, INotifyPropertyChanged
     {
+        private object _targetObject;
         private string _propertyName;
 
-        public string PropertyName { get; set; }
-      /*  {
-            get => _propertyName; //{ return (string)GetValue(PropertyNameProperty); }
-            set
-            {
-                _propertyName = value;
-                //SetValue(PropertyNameProperty, value);
-                //OnPropertyChanged(nameof(PropertyName));
-            }
-        }*/
-
-        //public static readonly DependencyProperty PropertyNameProperty =
-        //    DependencyProperty.Register("PropertyName", typeof(string), typeof(ValueEditorControl), new PropertyMetadata(null));
+        public string PropertyTitle { get; set; }
 
         public string PropertyContent
         { get; set; }
@@ -55,34 +40,53 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             InitializeComponent();
         }
 
-        public void SetPropertyToEdit<T>(Expression<Func<T>> property)
+        /// <summary>
+        /// set property to edit by property expression
+        /// </summary>
+        /// <example>
+        /// SetPropertyToEditByExpression(() => stsServoConfig.ClientId);
+        /// </example>
+        public void SetPropertyToEditByExpression<T>(Expression<Func<T>> property)
         {
             var propertyInfo = ((MemberExpression)property.Body).Member as PropertyInfo;
             if (propertyInfo == null)
                 throw new ArgumentException("The lambda expression 'property' should point to a valid Property");
 
-            PropertyName = propertyInfo.Name;
+            PropertyTitle= propertyInfo.Name;
             PropertyContent = property.Compile()()?.ToString() ?? string.Empty;
-
-            return;
-            switch (property.Parameters.Count())
-            {
-                case 0:
-                    PropertyContent = string.Empty;
-                    break;
-                case 1:
-                    PropertyContent = property.Parameters[0].ToString();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(property.Parameters.Count() + " parameters not supported yet.");
-            }
         }
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        /// <summary>
+        /// Set property to edit by name
+        /// </summary>
+        public void SetPropertyToEditByName(object target, string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            _targetObject = target;
+            _propertyName = propertyName;
+
+            var prop = target.GetType().GetProperty(propertyName);
+            if (prop == null) throw new Exception($"Property '{propertyName}' not found");
+
+            // get the value of the property
+            var value = prop.GetValue(target);
+            PropertyContent = value?.ToString() ?? string.Empty;
+
+            // get the title of the property using the DisplayName annotation
+            var displayNameAttribute = prop.GetCustomAttribute<DisplayNameAttribute>();
+            PropertyTitle = displayNameAttribute?.DisplayName ?? propertyName;
+
+            //if (!string.IsNullOrEmpty(input))
+            //{
+            //    var prop = target.GetType().GetProperty(propertyName);
+            //    prop.SetValue(target, input);
+            //}
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        //protected virtual void OnPropertyChanged(string propertyName)
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //}
+
+        //public event PropertyChangedEventHandler PropertyChanged;
     }
 }

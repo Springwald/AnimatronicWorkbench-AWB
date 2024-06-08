@@ -7,6 +7,8 @@
 
 using Awb.Core.Project;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -64,10 +66,25 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 this.EditorStackPanel.Children.Add(editor);
             }*/
 
-            var editor = new ValueEditorControl();
-            editor.SetPropertyToEdit(() => stsServoConfig.ClientId);
-            _editors.Add(editor);
-            this.EditorStackPanel.Children.Add(editor);
+            // iterate trough all properties  of the object which have a DataAnnotation for "Name" and add an editor for each
+            foreach (var property in type.GetProperties())
+            {
+                // check if the property has a name set via DisplayName Annotation
+                var displayNameAttribute = property.GetCustomAttribute<DisplayNameAttribute>();
+                if (displayNameAttribute == null) continue;
+
+                var editor = new ValueEditorControl();
+                //editor.SetPropertyToEditByExpression(() => stsServoConfig.GetType().GetProperty(property.Name));
+                editor.SetPropertyToEditByName(target: stsServoConfig, propertyName: property.Name);
+                _editors.Add(editor);
+                this.EditorStackPanel.Children.Add(editor);
+            }
+
+
+            //editor.SetPropertyToEditByExpression(() => stsServoConfig.ClientId);
+            //editor.SetPropertyToEditByName(stsServoConfig, "ClientId");
+            //_editors.Add(editor);
+            //this.EditorStackPanel.Children.Add(editor);
 
         }
 
@@ -76,14 +93,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         }
 
-        private SinglePropertyEditorControl AddEditor(string name, string value, string validationPattern)
-        {
-            var editor = new SinglePropertyEditorControl();
-            editor.PropertyName = name;
-            editor.PropertyContent = value;
-            editor.ValidationPattern = validationPattern;
-            this.EditorStackPanel.Children.Add(editor);
-            return editor;
-        }
+
     }
 }

@@ -11,7 +11,7 @@
             <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label Grid.Column="0" Content="{Binding PropertyName, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Right" VerticalAlignment="Center"></Label>
+        <Label Grid.Column="0" Content="{Binding PropertyTitle, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Right" VerticalAlignment="Center"></Label>
         <TextBox Grid.Column="1" Text="{Binding PropertyContent, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}"></TextBox>
     </Grid>
 </UserControl>
