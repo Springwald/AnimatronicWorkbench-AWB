@@ -9,16 +9,32 @@
     <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0 0 0 5"  >
         <StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label Grid.Column="0" FontWeight="Bold" Height="auto" Content="{Binding PropertyTitle, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Right" VerticalAlignment="Center"></Label>
-                <Label Grid.Column="1" FontStyle="Italic" Height="auto" Content="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}"></Label>
+                <Label 
+                    Grid.Column="0" FontWeight="Bold" Height="auto" 
+                    Content="{Binding PropertyTitle, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                    HorizontalAlignment="Right" VerticalAlignment="Center"></Label>
+                <Label 
+                    Grid.Column="1" FontStyle="Italic" Height="auto" 
+                    ToolTip="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                    Content="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}"></Label>
             </StackPanel>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" Text="{Binding PropertyContent, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                <TextBox 
+                    x:Name="TextPropertyContentTextEditor"
+                    Grid.Column="0" 
+                    TextChanged="TextBoxPropertyContent_TextChanged"
+                    Text="{Binding PropertyContentText, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 </TextBox>
+                <CheckBox
+                    x:Name="CheckBoxPropertyContentBoolEditor"
+                    Grid.Column="0"
+                    Checked="CheckBoxPropertyContentBoolEditor_Checked"
+                    IsChecked="{Binding PropertyContentBool, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                </CheckBox>
                 <Label Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" Content="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}" ></Label>
             </Grid>
         </StackPanel>

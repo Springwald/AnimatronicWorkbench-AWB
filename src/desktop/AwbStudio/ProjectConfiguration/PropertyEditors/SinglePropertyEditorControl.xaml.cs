@@ -10,40 +10,41 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Controls;
-using System.Windows.Documents;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
     /// <summary>
     /// Interaction logic for ValueEditorControl.xaml
     /// </summary>
-    public partial class ValueEditorControl : UserControl//, INotifyPropertyChanged
+    public partial class ValueEditorControl : UserControl
     {
-        private object _targetObject;
-        private string _propertyName;
+        private object? _targetObject;
+        private string? _propertyName;
 
-        public string PropertyTitle { get; set; }
+        public string? PropertyTitle { get; set; }
 
-        public string ErrorMessagesJoined { get; private set; }
+        public string? ErrorMessagesJoined { get; private set; }
 
-        public string PropertyContent
-        { get; set; }
-        public string PropertyDescription { get; private set; }
+        public string? PropertyContentText
+        {
+            get;
+            set;
+        }
 
-        /*{
-get { return (string)GetValue(PropertyContentProperty); }
-set { SetValue(PropertyContentProperty, value); }
-} 
+        public bool PropertyContentBool
+        {
+            get;
+            set;
+        }
 
-public static readonly DependencyProperty PropertyContentProperty =
-DependencyProperty.Register("PropertyContent", typeof(string), typeof(ValueEditorControl), new PropertyMetadata(null));
-*/
+        public string? PropertyDescription { get; private set; }
 
         public ValueEditorControl()
         {
             InitializeComponent();
         }
 
+        /*
         /// <summary>
         /// set property to edit by property expression
         /// </summary>
@@ -56,9 +57,10 @@ DependencyProperty.Register("PropertyContent", typeof(string), typeof(ValueEdito
             if (propertyInfo == null)
                 throw new ArgumentException("The lambda expression 'property' should point to a valid Property");
 
-            PropertyTitle= propertyInfo.Name;
-            PropertyContent = property.Compile()()?.ToString() ?? string.Empty;
+            PropertyTitle = propertyInfo.Name;
+            PropertyContentText = property.Compile()()?.ToString() ?? string.Empty;
         }
+        */
 
         /// <summary>
         /// Set property to edit by name
@@ -71,10 +73,6 @@ DependencyProperty.Register("PropertyContent", typeof(string), typeof(ValueEdito
             var prop = target.GetType().GetProperty(propertyName);
             if (prop == null) throw new Exception($"Property '{propertyName}' not found");
 
-            // get the value of the property
-            var value = prop.GetValue(target);
-            PropertyContent = value?.ToString() ?? string.Empty;
-
             // get the title of the property using the DisplayName annotation
             var displayNameAttribute = prop.GetCustomAttribute<DisplayNameAttribute>();
             PropertyTitle = displayNameAttribute?.DisplayName ?? propertyName;
@@ -83,6 +81,26 @@ DependencyProperty.Register("PropertyContent", typeof(string), typeof(ValueEdito
             var descriptionAttribute = prop.GetCustomAttribute<DescriptionAttribute>();
             PropertyDescription = descriptionAttribute?.Description ?? string.Empty;
 
+            // activate the correct editor control for this type of property
+            // e.g. a checkbox for bool, a textbox for string, a numeric up down for int, etc.
+            var value = prop.GetValue(target); // get the value of the property
+            
+
+            var propertyType = prop.PropertyType;
+            if (propertyType == typeof(bool))
+            {
+                // for bool properties use the checkbox editor
+                PropertyContentBool = value != null && (bool)value;
+                TextPropertyContentTextEditor.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                // for all other types use the text editor
+                PropertyContentText = value?.ToString() ?? string.Empty;
+                CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
+            }
+
+
             //if (!string.IsNullOrEmpty(input))
             //{
             //    var prop = target.GetType().GetProperty(propertyName);
@@ -90,11 +108,13 @@ DependencyProperty.Register("PropertyContent", typeof(string), typeof(ValueEdito
             //}
         }
 
-        //protected virtual void OnPropertyChanged(string propertyName)
-        //{
-        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        //}
+        private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)
+        {
+        }
 
-        //public event PropertyChangedEventHandler PropertyChanged;
+        private void CheckBoxPropertyContentBoolEditor_Checked(object sender, System.Windows.RoutedEventArgs e)
+        {
+
+        }
     }
 }
