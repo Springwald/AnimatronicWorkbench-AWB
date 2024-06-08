@@ -6,11 +6,9 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
-using Awb.Core.Project.Servos;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
@@ -20,25 +18,19 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     /// </summary>
     public partial class ScsServoEditorControl : UserControl
     {
-
         private List<ValueEditorControl> _editors;
+        private IProjectObjectListable _projectObject;
 
-        public static readonly DependencyProperty ScsServoConfigProperty =
-            DependencyProperty.Register(nameof(ScsFeetechServoConfig), typeof(ScsFeetechServoConfig), typeof(ScsServoEditorControl),
-                new PropertyMetadata(null));
-
-        public ScsFeetechServoConfig ScsServoConfig
+        public IProjectObjectListable ScsServoConfig
         {
             get
             {
-                var value = (ScsFeetechServoConfig)GetValue(ScsServoConfigProperty);
-                ReadDataFromEditor(value);
-                return value;
+                ReadDataFromEditor(_projectObject);
+                return _projectObject;
             }
             set
             {
-                
-                SetValue(ScsServoConfigProperty, value);
+                _projectObject = value;
                 WriteDataToEditor(value);
             }
         }
@@ -54,8 +46,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private void WriteDataToEditor(IProjectObjectListable stsServoConfig)
         {
             if (_editors != null) throw new System.Exception("Object to edit is already set.");
-
-            
 
             var type = stsServoConfig.GetType();
             _editors = new List<ValueEditorControl>();
@@ -85,7 +75,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         }
 
-        private void ReadDataFromEditor(ScsFeetechServoConfig scsServoConfig)
+        private void ReadDataFromEditor(IProjectObjectListable scsServoConfig)
         {
 
         }

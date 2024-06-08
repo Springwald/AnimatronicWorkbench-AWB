@@ -64,7 +64,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                                 break;
 
                             case ProjectMetaData projectMetaData:
-                                ActualEditor = new ProjectMetaDataEditorControl() { ProjectMetaData = projectMetaData };
+                                ActualEditor = new ScsServoEditorControl() {  ScsServoConfig  = projectMetaData };
                                 break;
 
                             default:
