@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Awb.Core.Project
+namespace Awb.Core.Project.Various
 {
     public class ProjectMetaData : IProjectObjectListable
     {

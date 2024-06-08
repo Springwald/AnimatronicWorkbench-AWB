@@ -7,7 +7,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace Awb.Core.Project
+namespace Awb.Core.Project.Various
 {
     public class Mp3PlayerYX5300Config : IDeviceConfig, IProjectObjectListable
     {
@@ -20,7 +20,7 @@ namespace Awb.Core.Project
 
         public string Title { get; set; }
 
-        [JsonIgnore] 
+        [JsonIgnore]
         public string TitleShort => Title ?? $"No Title for Mp3PlayerYX5300 '{Id}'";
 
         [JsonIgnore]
@@ -37,7 +37,7 @@ namespace Awb.Core.Project
         /// </summary>
         public uint TxPin { get; } = 14;
         public string Id { get; set; }
-    
+
 
         public Mp3PlayerYX5300Config(uint clientId, string id, uint rxPin, uint txPin, string soundPlayerId, string title)
         {

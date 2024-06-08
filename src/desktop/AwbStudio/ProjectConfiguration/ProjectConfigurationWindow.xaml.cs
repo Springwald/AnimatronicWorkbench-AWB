@@ -7,6 +7,7 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.Project;
+using Awb.Core.Project.Servos;
 using AwbStudio.ProjectConfiguration;
 using AwbStudio.Projects;
 using System;
@@ -125,7 +126,13 @@ namespace AwbStudio
 
         private void ButtonAddScsServo_Click(object sender, RoutedEventArgs e)
         {
-            _viewModel.ScsServos.Add(new StsServoConfig(id: "", title: "", clientId:1, channel: 1));
+            _viewModel.ScsServos.Add(new ScsFeetechServoConfig
+            {
+                Id = _awbProject.CreateNewObjectId("ScsServo"),
+                Title = "",
+                ClientId = 1,
+                Channel = 1
+            });
         }
 
         #endregion

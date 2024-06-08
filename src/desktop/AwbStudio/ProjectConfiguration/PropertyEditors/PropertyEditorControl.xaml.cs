@@ -6,20 +6,10 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Project.Servos;
+using Awb.Core.Project.Various;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
@@ -46,14 +36,14 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 _actualEditor = value;
                 PropertyEditorScrollViewer.Content = _actualEditor;
             }
-        } 
+        }
 
         public IProjectObjectListable? ProjectObject
         {
             get => _projectObject;
             set
             {
-              
+
                 if (_projectObject != value)
                 {
                     _projectObject = value;
@@ -61,14 +51,16 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     if (_projectObject == null)
                     {
                         ActualEditor = null;
-                    } else {
+                    }
+                    else
+                    {
 
                         // instanciate the suiting editor control for the object type using switch
                         // e.g. ScsServoEditorControl for ScsServoConfig
                         switch (_projectObject)
                         {
-                            case StsServoConfig stsServoConfig:
-                                ActualEditor = new ScsServoEditorControl() { StsServoConfig = stsServoConfig };
+                            case ScsFeetechServoConfig scsServoConfig:
+                                ActualEditor = new ScsServoEditorControl() { ScsServoConfig = scsServoConfig };
                                 break;
 
                             case ProjectMetaData projectMetaData:

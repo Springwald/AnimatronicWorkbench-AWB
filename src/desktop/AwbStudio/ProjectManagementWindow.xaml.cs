@@ -7,6 +7,7 @@
 
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Project;
+using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Tools;
 using AwbStudio.Projects;
@@ -185,51 +186,12 @@ namespace AwbStudio
                 {
                     Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
                 },
-                TimelinesStates =
-                [
-                    new TimelineState(1, "sleep", export: true, autoPlay: true),
-                    new TimelineState(2, "action", export: true, autoPlay: true),
-                    new TimelineState(3, "idle", export: true, autoPlay: true),
-                    new TimelineState(4, "talk", export: true, autoPlay: true),
-                    new TimelineState(5, "joint demo", export: true, autoPlay: true, positiveInputs: new[] { 1 }),
-                    new TimelineState(6, "tests", export: false, autoPlay: false),
-                ],
-                StsServos = [
-                    new StsServoConfig(id: "StsServo1", title: "Demo serial Servo 1", clientId: 1, channel: 1)
-                    {
-                        Acceleration = 20,
-                        DefaultValue = 2000,
-                        MaxValue = 4095,
-                        MinValue = 0,
-                        Speed = 1000,
-                    },
-                ],
-                ScsServos = [
-                    new StsServoConfig(id: "ScsServo1", title: "Demo serial Servo 2", clientId: 1, channel: 1)
-                    {
-                        Acceleration = 20,
-                        DefaultValue = 2000,
-                        MaxValue = 1023,
-                        MinValue = 0,
-                        Speed = 1000,
-                    },
-                ],
-                Pca9685PwmServos = [
-                    new Pca9685PwmServoConfig(id: "PwmServo1",  title:"Demo PWM Servo 1" , clientId: 1, i2cAdress: 0x40, channel: 1)
-                    {
-                        DefaultValue = 2000,
-                        MaxValue = 4095,
-                        MinValue = 0,
-                    },
-                ],
-                Mp3PlayersYX5300 = [
-                    new Mp3PlayerYX5300Config(clientId: 1, id: "mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player")
-                ]
-                ,
-                Inputs =
-                [
-                    new InputConfig(id: 1, title:"Sleep") { IoPin = 25 }
-                ],
+                TimelinesStates = [],
+                StsServos = [],
+                ScsServos = [],
+                Pca9685PwmServos = [],
+                Mp3PlayersYX5300 = [],
+                Inputs = [],
             };
             project.SetProjectFolder(projectPath);
             return project;

@@ -7,13 +7,13 @@
 
 using System.Text.Json.Serialization;
 
-namespace Awb.Core.Project
+namespace Awb.Core.Project.Various
 {
     public class InputConfig : IProjectObjectListable
     {
-        public int Id { get;  set; }
-        public string Title { get;  set; }
-        public int? IoPin { get;  set; }
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public int? IoPin { get; set; }
 
         [JsonIgnore]
         public string TitleShort => Title ?? $"no title for input '{Id}'";

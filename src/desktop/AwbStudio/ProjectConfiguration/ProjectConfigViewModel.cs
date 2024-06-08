@@ -5,9 +5,9 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.Project;
-using System;
+using Awb.Core.Project.Servos;
+using Awb.Core.Project.Various;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -45,7 +45,7 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        private ProjectMetaData? _projectMetaData { get;  set; }
+        private ProjectMetaData? _projectMetaData { get; set; }
         public ProjectMetaData? ProjectMetaData
         {
 
@@ -125,7 +125,7 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        
+
 
 
         #endregion
@@ -137,8 +137,8 @@ namespace AwbStudio.ProjectConfiguration
 
         public void WriteToProject(AwbProject awbProject)
         {
-            awbProject.ScsServos = this.ScsServos.Cast<StsServoConfig>().ToArray();
-            awbProject.StsServos = this.StsServos.Cast<StsServoConfig>().ToArray();
+            awbProject.ScsServos = this.ScsServos.Cast<ScsFeetechServoConfig>().ToArray();
+            awbProject.StsServos = this.StsServos.Cast<StsFeetechServoConfig>().ToArray();
             awbProject.Pca9685PwmServos = this.Pca9685PwmServos.Cast<Pca9685PwmServoConfig>().ToArray();
             awbProject.Mp3PlayersYX5300 = this.Mp3PlayerYX5300.Cast<Mp3PlayerYX5300Config>().ToArray();
             awbProject.Inputs = this.Inputs.Cast<InputConfig>().ToArray();

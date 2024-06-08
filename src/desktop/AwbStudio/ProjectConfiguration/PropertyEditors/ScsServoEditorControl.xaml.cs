@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Project;
+using Awb.Core.Project.Servos;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
@@ -22,24 +22,24 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         private List<ValueEditorControl> _editors;
 
-        public static readonly DependencyProperty StsServoConfigProperty =
-            DependencyProperty.Register(nameof(StsServoConfig), typeof(StsServoConfig), typeof(ScsServoEditorControl),
+        public static readonly DependencyProperty ScsServoConfigProperty =
+            DependencyProperty.Register(nameof(ScsFeetechServoConfig), typeof(ScsFeetechServoConfig), typeof(ScsServoEditorControl),
                 new PropertyMetadata(null)
                                                //new PropertyMetadata("DEFAULT")
                                                );
 
-        public StsServoConfig StsServoConfig
+        public ScsFeetechServoConfig ScsServoConfig
         {
             get
             {
-                var value = (StsServoConfig)GetValue(StsServoConfigProperty);
+                var value = (ScsFeetechServoConfig)GetValue(ScsServoConfigProperty);
                 ReadDataFromEditor(value);
                 return value;
             }
             set
             {
                 
-                SetValue(StsServoConfigProperty, value);
+                SetValue(ScsServoConfigProperty, value);
                 WriteDataToEditor(value);
             }
         }
@@ -49,22 +49,15 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         public ScsServoEditorControl()
         {
             InitializeComponent();
-            this.DataContext = StsServoConfig;
+            this.DataContext = ScsServoConfig;
         }
 
 
-        private void WriteDataToEditor(StsServoConfig stsServoConfig)
+        private void WriteDataToEditor(ScsFeetechServoConfig stsServoConfig)
         {
             if (_editors != null) throw new System.Exception("Object to edit is already set.");
             var type = stsServoConfig.GetType();
             _editors = new List<ValueEditorControl>();
-            /*foreach (var property in type.GetProperties())
-            {
-                var editor = new ValueEditorControl();
-                editor.SetPropertyToEdit(() => stsServoConfig.GetType().GetProperty(property.Name));
-                _editors.Add(editor);
-                this.EditorStackPanel.Children.Add(editor);
-            }*/
 
             // iterate trough all properties  of the object which have a DataAnnotation for "Name" and add an editor for each
             foreach (var property in type.GetProperties())
@@ -80,7 +73,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 this.EditorStackPanel.Children.Add(editor);
             }
 
-
             //editor.SetPropertyToEditByExpression(() => stsServoConfig.ClientId);
             //editor.SetPropertyToEditByName(stsServoConfig, "ClientId");
             //_editors.Add(editor);
@@ -88,7 +80,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         }
 
-        private void ReadDataFromEditor(StsServoConfig stsServoConfig)
+        private void ReadDataFromEditor(ScsFeetechServoConfig scsServoConfig)
         {
 
         }

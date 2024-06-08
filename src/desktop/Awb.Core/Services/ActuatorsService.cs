@@ -58,7 +58,7 @@ namespace Awb.Core.Services
                     var client = awbClientsService.GetClient(stsServoConfig.ClientId);
                     if (client == null)
                         logger.LogErrorAsync($"ActuatorsService: Client with Id '{stsServoConfig.ClientId}' for stsServo '{stsServoConfig.Title}' not found!");
-                    var stsServo = new StsScsServo(stsServoConfig, StsScsServo.StsScsTypes.Sts);
+                    var stsServo = new StsScsServo(stsServoConfig);
                     servos.Add(stsServo);
                 }
             }
@@ -72,7 +72,7 @@ namespace Awb.Core.Services
                     var client = awbClientsService.GetClient(scsServoConfig.ClientId);
                     if (client == null)
                         logger.LogErrorAsync($"ActuatorsService: Client with Id '{scsServoConfig.ClientId}' for scsServo '{scsServoConfig.Title}' not found!");
-                    var scsServo = new StsScsServo(scsServoConfig, StsScsServo.StsScsTypes.Scs);
+                    var scsServo = new StsScsServo(scsServoConfig);
                     servos.Add(scsServo);
                 }
             }

@@ -6,7 +6,8 @@
 // All rights reserved   -  Licensed under MIT License
 
 
-using Awb.Core.Project;
+using Awb.Core.Project.Servos;
+using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using System.Text;
 
@@ -60,8 +61,8 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine();
 
 
-            ExportStsScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs, content);
-            ExportStsScsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs, content);
+            ExportScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs, content);
+            ExportStsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs, content);
             ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs, content);
             content.AppendLine();
 
@@ -117,7 +118,16 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine();
         }
 
-        private static void ExportStsScsServos(string propertyName, IEnumerable<StsServoConfig> servos, StringBuilder result)
+        private static void ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos, StringBuilder result)
+        {
+            result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
+            foreach (var servo in servos)
+                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
+                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.DefaultValue}, 0, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+            result.AppendLine();
+        }
+
+        private static void ExportStsServos(string propertyName, IEnumerable<StsFeetechServoConfig> servos, StringBuilder result)
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
             foreach (var servo in servos)
@@ -128,7 +138,7 @@ namespace Awb.Core.Export.ExporterParts
 
         private static void ExportPCS9685PwmServos(IEnumerable<Pca9685PwmServoConfig> pca9685PwmServoConfigs, StringBuilder result)
         {
-            var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Project.Pca9685PwmServoConfig>();
+            var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Pca9685PwmServoConfig>();
 
             var propertyName = "pca9685PwmServos";
             result.AppendLine($"   {propertyName} = new std::vector<Pca9685PwmServo>();");

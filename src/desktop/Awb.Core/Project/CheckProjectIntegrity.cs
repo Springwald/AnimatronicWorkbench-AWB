@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Project.Servos;
+
 namespace Awb.Core.Project
 {
     internal class CheckProjectIntegrity
@@ -15,8 +17,8 @@ namespace Awb.Core.Project
         {
             get
             {
-                if (_project.StsServos != null) foreach (var problem in StsScsServoProblems(_project.StsServos)) yield return problem;
-                if (_project.ScsServos != null) foreach (var problem in StsScsServoProblems(_project.ScsServos)) yield return problem;
+                //if (_project.StsServos != null) foreach (var problem in StsScsServoProblems(_project.StsServos)) yield return problem;
+                //if (_project.ScsServos != null) foreach (var problem in StsScsServoProblems(_project.ScsServos)) yield return problem;
 
                 // check the timeline states
                 if (_project.TimelinesStates != null)
@@ -47,6 +49,7 @@ namespace Awb.Core.Project
             _project = awbProject;
         }
 
+        /*
         private IEnumerable<string> StsScsServoProblems(IEnumerable<StsServoConfig> stsServoConfigs)
         {
             foreach (var servo in stsServoConfigs)
@@ -66,7 +69,7 @@ namespace Awb.Core.Project
                     }
                 }
             }
-        }
+        }*/
 
     }
 }

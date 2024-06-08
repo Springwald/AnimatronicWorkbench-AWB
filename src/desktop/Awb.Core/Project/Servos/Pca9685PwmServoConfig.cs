@@ -7,7 +7,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace Awb.Core.Project
+namespace Awb.Core.Project.Servos
 {
     public class Pca9685PwmServoConfig : IDeviceConfig, IProjectObjectListable
     {
@@ -23,7 +23,7 @@ namespace Awb.Core.Project
         [JsonIgnore]
         public string TitleShort => Title ?? $"no title for Pca9685PwmServo '{Id}'";
 
-        
+
         [JsonIgnore]
         public string TitleDetailled => "Pca9685PwmServo " + TitleShort;
 

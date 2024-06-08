@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Project;
+using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
 using AwbStudio.PropertyControls;

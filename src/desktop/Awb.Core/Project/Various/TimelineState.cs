@@ -7,9 +7,9 @@
 
 using System.Text.Json.Serialization;
 
-namespace Awb.Core.Project
+namespace Awb.Core.Project.Various
 {
-    public class TimelineState: IProjectObjectListable
+    public class TimelineState : IProjectObjectListable
     {
         public int Id { get; internal set; }
         public string Title { get; internal set; }
@@ -36,7 +36,7 @@ namespace Awb.Core.Project
         public int[] NegativeInputs { get; internal set; }
 
         [JsonIgnore]
-        public string TitleShort =>  Title ?? $"TimelineState has no title set '{Id}'";
+        public string TitleShort => Title ?? $"TimelineState has no title set '{Id}'";
 
         [JsonIgnore]
         public string TitleDetailled => $"TimelineState {TitleShort}";
