@@ -5,19 +5,48 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Servos
 {
     public class Pca9685PwmServoConfig : IDeviceConfig, IProjectObjectListable
     {
-        public string Id { get; set; }
-        public uint ClientId { get; set; }
-        public uint I2cAdress { get; set; }
-        public uint Channel { get; set; }
-        public string Title { get; set; }
+        public required string Id { get; set; }
+
+        [DisplayName("Client ID")]
+        [Description("The ID of the AWB client device that controls this servo.")]
+        [Range(1, 254)]
+        public required uint ClientId { get; set; } = 1;
+
+        [DisplayName("I2C Address")]
+        [Description("The I2C address of the PCA9685 PWM controller that controls this servo.")]
+        [Range(0x40, 0x7F)]
+        public required uint I2cAdress { get; set; }
+
+        [DisplayName("Channel")]
+        [Description("The channel of the PCA9685 PWM controller that controls this servo.")]
+        [Range(0, 15)]
+        public required uint Channel { get; set; }
+
+        [DisplayName("Title")]
+        [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
+        public required string Title { get; set; }
+
+        [DisplayName("Lowest value")]
+        [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
+        [Range(0, 4095)]
         public int MinValue { get; set; }
+
+        [DisplayName("Highest value")]
+        [Description("The value when the servo curve is at its highest point. Possibly confusing: Can be greater than the value for 'low'.")]
+        [Range(0, 4095)]
         public int MaxValue { get; set; }
+
+        [DisplayName("Default value")]
+        [Description("Must be between the highest and lowest value.")]
+        [Range(0, 4095)]
         public int? DefaultValue { get; set; }
 
         [JsonIgnore]
@@ -26,14 +55,5 @@ namespace Awb.Core.Project.Servos
 
         [JsonIgnore]
         public string TitleDetailled => "Pca9685PwmServo " + TitleShort;
-
-        public Pca9685PwmServoConfig(string id, uint clientId, uint i2cAdress, uint channel, string title)
-        {
-            Id = id;
-            ClientId = clientId;
-            I2cAdress = i2cAdress;
-            Channel = channel;
-            Title = title;
-        }
     }
 }

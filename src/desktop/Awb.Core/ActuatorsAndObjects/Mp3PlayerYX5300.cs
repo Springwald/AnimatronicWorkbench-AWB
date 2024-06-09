@@ -68,13 +68,13 @@ namespace Awb.Core.Actuators
 
         public Mp3PlayerYX5300(Mp3PlayerYX5300Config config)
         {
-            Id = config.SoundPlayerId;
+            Id = config.Id;
             ClientId = config.ClientId;
             TxPin = config.TxPin;
             RxPin = config.RxPin;
             ActualSoundId = 0;
             IsDirty = true;
-            Title = string.IsNullOrWhiteSpace(config.Title) ? $"MP3-{config.SoundPlayerId}" : config.Title;
+            Title = string.IsNullOrWhiteSpace(config.Title) ? $"MP3-{config.Id}" : config.Title;
         }
 
         public void PlaySound(int soundId)

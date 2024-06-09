@@ -5,50 +5,38 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Various
 {
     public class TimelineState : IProjectObjectListable
     {
-        public int Id { get; internal set; }
-        public string Title { get; internal set; }
+        public required int Id { get;  set; }
 
-        /// <summary>
-        /// Export timelines with this state to the client project souurce code
-        /// </summary>
-        public bool Export { get; internal set; } = true;
+        [DisplayName("Title")]
+        public required string Title { get;  set; }
 
-        /// <summary>
-        /// Play the timeline automatically when the state is active.
-        /// If false: The timeline will be played when the user activates it manually by remote control
-        /// </summary>
-        public bool AutoPlay { get; internal set; } = true;
+        [DisplayName("Export")]
+        [Description("Export timelines with this state to the client project souurce code")]
+        public bool Export { get;  set; } = true;
 
-        /// <summary>
-        /// The state is only available when one of this inputs are on
-        /// </summary>
-        public int[] PositiveInputs { get; internal set; }
+        [DisplayName("Autoplay")]
+        [Description("Play the timeline automatically when the state is active.\r\nIf false: The timeline will be played when the user activates it manually by remote control")]
+        public bool AutoPlay { get;  set; } = true;
 
-        /// <summary>
-        /// The state not available when one of this inputs are on
-        /// </summary>
-        public int[] NegativeInputs { get; internal set; }
+        [DisplayName("Positive inputs IDs")]
+        [Description("The state is only available when one of this inputs is on")]
+        public int[] PositiveInputs { get;  set; } = Array.Empty<int>();
+
+        [DisplayName("Negative inputs IDs")]
+        [Description("The state is NOT available when one of this inputs is on")]
+        public int[] NegativeInputs { get;  set; } = Array.Empty<int>();
 
         [JsonIgnore]
         public string TitleShort => Title ?? $"TimelineState has no title set '{Id}'";
 
         [JsonIgnore]
         public string TitleDetailled => $"TimelineState {TitleShort}";
-
-        public TimelineState(int id, string title, bool export, bool autoPlay, int[]? positiveInputs = null, int[]? negativeInputs = null)
-        {
-            Id = id;
-            Title = title;
-            PositiveInputs = positiveInputs ?? Array.Empty<int>();
-            NegativeInputs = negativeInputs ?? Array.Empty<int>();
-            Export = export;
-            AutoPlay = autoPlay;
-        }
     }
 }

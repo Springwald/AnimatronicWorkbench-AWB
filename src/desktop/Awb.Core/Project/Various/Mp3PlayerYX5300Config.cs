@@ -5,49 +5,40 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Various
 {
     public class Mp3PlayerYX5300Config : IDeviceConfig, IProjectObjectListable
     {
-        public uint ClientId { get; set; }
+        public required string Id { get; set; }
 
-        /// <summary>
-        ///  A specific if for multi puppet / multi loudspeaker scenarios
-        /// </summary>
-        public string SoundPlayerId { get; set; }
+        [DisplayName("Client ID")]
+        [Description("The ID of the AWB client device that controls this mp3 player.")]
+        [Range(1, 254)]
+        public required uint ClientId { get; set; }
 
-        public string Title { get; set; }
+        [DisplayName("Title")]
+        [Description("A descriptive title for this mp3 player like 'yx5300 mp3 player'.")]
+        public required string Title { get; set; }
+
+        [DisplayName("RX Pin")]
+        [Description("The RX pin of the serial connection to the YX5300 MP3 player.")]
+        [Range(1,64)]
+        public required uint RxPin { get; set; } = 13;
+
+        [DisplayName("TX Pin")]
+        [Description("The TX pin of the serial connection to the YX5300 MP3 player.")]
+        [Range(1, 64)]
+        public required uint TxPin { get; set; } = 14;
 
         [JsonIgnore]
         public string TitleShort => Title ?? $"No Title for Mp3PlayerYX5300 '{Id}'";
 
         [JsonIgnore]
-        public string TitleDetailled => $"{TitleShort} (ClientId: {ClientId}, SoundPlayerId: {SoundPlayerId})";
-
-
-        /// <summary>
-        /// the RX pin of the serial connection to the YX5300 MP3 player
-        /// </summary>
-        public uint RxPin { get; } = 13;
-
-        /// <summary>
-        /// the TX pin of the serial connection to the YX5300 MP3 player
-        /// </summary>
-        public uint TxPin { get; } = 14;
-        public string Id { get; set; }
-
-
-        public Mp3PlayerYX5300Config(uint clientId, string id, uint rxPin, uint txPin, string soundPlayerId, string title)
-        {
-            ClientId = clientId;
-            Id = id;
-            RxPin = rxPin;
-            TxPin = txPin;
-            SoundPlayerId = soundPlayerId;
-            Title = title;
-        }
+        public string TitleDetailled => $"{TitleShort} (ClientId: {ClientId}, SoundPlayerId: {Id})";
 
 
     }

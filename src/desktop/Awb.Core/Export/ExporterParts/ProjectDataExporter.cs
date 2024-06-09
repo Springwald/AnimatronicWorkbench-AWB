@@ -154,11 +154,11 @@ namespace Awb.Core.Export.ExporterParts
         private static void ExportMp3PlayerYX5300Informations(IEnumerable<Mp3PlayerYX5300Config>? mp3PlayerYX5300Configs, StringBuilder result)
         {
             var players = mp3PlayerYX5300Configs ?? Array.Empty<Mp3PlayerYX5300Config>();
-            var mp3PlayerYX5300Titles = players?.Select(s => s.Title ?? s.SoundPlayerId).ToArray();
+            var mp3PlayerYX5300Titles = players?.Select(s => s.Title ?? s.Id).ToArray() ?? Array.Empty<string>();
             result.AppendLine($"\tint mp3PlayerYX5300Count = {players.Count()};");
             result.AppendLine($"\tint mp3PlayerYX5300RxPin[{players.Count()}] = {{{string.Join(", ", players.Select(s => s.RxPin.ToString()))}}};");
             result.AppendLine($"\tint mp3PlayerYX5300TxPin[{players!.Count()}] = {{{string.Join(", ", players.Select(s => s.TxPin.ToString()))}}};");
-            result.AppendLine($"\tString mp3PlayerYX5300Name[{players!.Count()}] = {{{string.Join(", ", players.Select(s => $"\"{s.SoundPlayerId}\""))}}};");
+            result.AppendLine($"\tString mp3PlayerYX5300Name[{players!.Count()}] = {{{string.Join(", ", mp3PlayerYX5300Titles)}}};");
             result.AppendLine();
         }
 
@@ -226,7 +226,7 @@ namespace Awb.Core.Export.ExporterParts
                         var soundPlayerIndex = -1;
                         for (int i = 0; i < projectData.Mp3PlayerYX5300Configs?.Count(); i++)
                         {
-                            if (projectData.Mp3PlayerYX5300Configs.ElementAt(i).SoundPlayerId == soundPoint.SoundPlayerId)
+                            if (projectData.Mp3PlayerYX5300Configs.ElementAt(i).Id == soundPoint.SoundPlayerId)
                             {
                                 soundPlayerIndex = i;
                                 break;
