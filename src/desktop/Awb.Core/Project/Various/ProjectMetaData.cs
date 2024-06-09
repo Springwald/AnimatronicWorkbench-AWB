@@ -31,6 +31,7 @@ namespace Awb.Core.Project.Various
         }
 
         [DisplayName("Wifi password")]
+        [Length(8, 32)]
         public string WifiPassword { get; set; } = "awb12345";
 
         [JsonIgnore]

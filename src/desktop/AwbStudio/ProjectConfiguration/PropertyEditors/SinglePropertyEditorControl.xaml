@@ -13,12 +13,14 @@
                     Grid.Column="0" FontWeight="Bold" Height="auto" 
                     Content="{Binding PropertyTitle, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                     HorizontalAlignment="Right" VerticalAlignment="Center"></Label>
-                <Label 
+                <TextBlock 
+                    HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center"
                     Grid.Column="1" FontStyle="Italic" Height="auto" 
+                    Margin="10 0 0 0"
                     ToolTip="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                    Content="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}"></Label>
+                    Text="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}"></TextBlock>
             </StackPanel>
-            <Grid>
+            <Grid Margin="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
@@ -35,9 +37,11 @@
                     Checked="CheckBoxPropertyContentBoolEditor_Checked"
                     IsChecked="{Binding PropertyContentBool, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 </CheckBox>
-                <Label Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" 
-                       Content="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                       ToolTip="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}"></Label>
+                <TextBlock Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" 
+                       Margin="10 0 0 0"
+                       HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center"
+                       Text="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       ToolTip="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}"></TextBlock>
             </Grid>
         </StackPanel>
     </Border>

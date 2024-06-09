@@ -6,14 +6,6 @@
              xmlns:local="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-        </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="Property editor"/>
-        <ScrollViewer x:Name="PropertyEditorScrollViewer" Grid.Row="1">
+        <ScrollViewer x:Name="PropertyEditorScrollViewer">
         </ScrollViewer>
-
-    </Grid>
 </UserControl>

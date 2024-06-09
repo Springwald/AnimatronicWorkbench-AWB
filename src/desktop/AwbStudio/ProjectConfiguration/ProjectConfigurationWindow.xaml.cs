@@ -42,6 +42,9 @@ namespace AwbStudio
 
         private void ProjectConfigurationWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // select the project properties as default
+            SetObjectToEdit(_viewModel.ProjectMetaData);
+
             Loaded -= ProjectConfigurationWindow_Loaded;
             Closing += ProjectConfigurationWindow_Closing;
             Unloaded += ProjectConfigurationWindow_Unloaded;
