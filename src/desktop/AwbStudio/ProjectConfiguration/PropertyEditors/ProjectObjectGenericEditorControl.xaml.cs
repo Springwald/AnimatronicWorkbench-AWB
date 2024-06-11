@@ -6,9 +6,11 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using System.Text;
 using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
@@ -21,6 +23,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private List<ValueEditorControl> _editors;
         private IProjectObjectListable _projectObject;
 
+        public EventHandler OnUpdatedData { get; private set; }
+
         public IProjectObjectListable ProjectObjectToEdit
         {
             get
@@ -32,10 +36,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             {
                 _projectObject = value;
                 WriteDataToEditor(value);
+                UpdateProblems();
             }
         }
-
-        public IEnumerable<string> Errors { get; private set; }
 
         public ProjectObjectGenericEditorControl()
         {
@@ -63,6 +66,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 editor.PropertyChanged += (s, e) =>
                 {
                     LabelObjectTypeTitle.Content = stsServoConfig.TitleDetailled;
+                    this.UpdateProblems();
+                    this.OnUpdatedData?.Invoke(this, EventArgs.Empty);
                 };
                 _editors.Add(editor);
                 this.EditorStackPanel.Children.Add(editor);
@@ -72,6 +77,28 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             //editor.SetPropertyToEditByName(stsServoConfig, "ClientId");
             //_editors.Add(editor);
             //this.EditorStackPanel.Children.Add(editor);
+
+        }
+
+        private void UpdateProblems()
+        {
+            var problemsText = new StringBuilder();
+
+            foreach (var problem in _projectObject.GetProblems(null))
+            {
+                problemsText.AppendLine(problem.Message);
+            }
+
+            if (problemsText.Length == 0)
+            {
+                TextProblems.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                TextProblems.Text = problemsText.ToString();
+                TextProblems.Visibility = System.Windows.Visibility.Visible;
+            }
+
 
         }
 

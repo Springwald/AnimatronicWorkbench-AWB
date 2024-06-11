@@ -24,5 +24,12 @@ namespace Awb.Core.Project.Servos
         [Description("The speed is the number of steps per second, 50 steps/sec≈2.928RPM. 0=Max speed")] 
         [Range(0, 3073)]
         public override int? Speed { get; set; }
+
+        public override IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        {
+            foreach (var item in GetBaseProblems(project)) yield return item;
+
+            // add SCS specific checks heres
+        }
     }
 }

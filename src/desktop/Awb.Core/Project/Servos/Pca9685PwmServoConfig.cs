@@ -49,12 +49,10 @@ namespace Awb.Core.Project.Servos
         [Range(0, 4095)]
         public int? DefaultValue { get; set; }
 
-
         public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
         {
             yield break;
         }
-
 
         [JsonIgnore]
         public string TitleShort => Title ?? $"no title for Pca9685PwmServo '{Id}'";
@@ -62,5 +60,7 @@ namespace Awb.Core.Project.Servos
 
         [JsonIgnore]
         public string TitleDetailled => "Pca9685PwmServo " + TitleShort;
+
+      
     }
 }

@@ -28,10 +28,10 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 if (_actualEditor != null)
                 {
                     // remove an existing editor first
-                    PropertyEditorScrollViewer.Content = null;
+                    PropertyEditorGrid.Children.Clear();
                 }
                 _actualEditor = value;
-                PropertyEditorScrollViewer.Content = _actualEditor;
+                PropertyEditorGrid.Children.Add(_actualEditor);
             }
         }
 

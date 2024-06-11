@@ -9,6 +9,7 @@ using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
+using Awb.Core.Timelines;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
@@ -46,6 +47,18 @@ namespace Awb.Core.Project
             _projectFolder = folder;
             _sounds = new SoundManager(Path.Combine(_projectFolder, "audio")).Sounds;
             _timelineDataService = new TimelineDataServiceByJsonFiles(_projectFolder);
+        }
+
+        /// <summary>
+        /// All problems or hints of this project
+        /// </summary>
+        public IEnumerable<ProjectProblem> GetProjectProblems(IEnumerable<TimelineData> timelines)
+        {
+            var projectProblems = GetAllListableObjects().SelectMany(x => x.GetProblems(this));
+            foreach (var item in projectProblems) yield return item;
+
+            var timelineProblems = timelines.SelectMany(x => x.GetProblems(this));
+            foreach (var item in timelineProblems) yield return item;
         }
 
         public IEnumerable<IProjectObjectListable> GetAllListableObjects()

@@ -49,10 +49,17 @@ namespace Awb.Core.Project.Servos
         [DisplayName("Speed")]
         public abstract int? Speed { get; set; }
 
+        public abstract IEnumerable<ProjectProblem> GetProblems(AwbProject project);
 
-        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        protected IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project)
         {
-            yield break;
+            yield return new ProjectProblem
+            {
+                ProblemType = ProjectProblem.ProblemTypes.Hint,
+                Category = ProjectProblem.Categoroies.Servo,
+                Source = TitleShort,
+                Message = $"Servo '{Id}' has no problems."
+            };
         }
 
         [JsonIgnore]

@@ -8,12 +8,15 @@
 using Awb.Core.Actuators;
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
+using Awb.Core.Timelines;
 using AwbStudio.ProjectConfiguration;
 using AwbStudio.Projects;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace AwbStudio
 {
@@ -158,7 +161,7 @@ namespace AwbStudio
         private void SetObjectToEdit(IProjectObjectListable? projectObject)
         {
             // iterator through all ProjectObjectListControl in this control and set the projectObject to each of them as selected object
-            foreach(var control in StackPanelProjectObjectLists.Children)
+            foreach (var control in StackPanelProjectObjectLists.Children)
             {
                 if (control is ProjectObjectListControl list)
                 {
@@ -167,6 +170,15 @@ namespace AwbStudio
             }
 
             PropertyEditor.ProjectObject = projectObject;
+        }
+
+        private void UpdateProblemsDisplay()
+        {
+            var timelines = new List<TimelineData>();
+            foreach (var projectObject in _awbProject.GetProjectProblems(timelines))
+            {
+
+            }
         }
     }
 }

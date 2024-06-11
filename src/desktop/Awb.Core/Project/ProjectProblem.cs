@@ -9,6 +9,16 @@ namespace Awb.Core.Project
 {
     public class ProjectProblem
     {
+        public enum Categoroies
+        {
+            Input,
+            Servo,
+            Sound,
+            Timeline,
+            TimelineState,
+            Various,
+        }
+
         public enum ProblemTypes
         {
             Error,
@@ -16,9 +26,26 @@ namespace Awb.Core.Project
             Hint
         }
 
+        /// <summary>
+        /// the problem type - how critical is this problem?
+        /// </summary>
         public required ProblemTypes ProblemType { get; init; }
 
-        public required string ProblemText { get; init; }
+        /// <summary>
+        /// thematic category like "Servo" or "Timeline"
+        /// </summary>
+        public Categoroies Category { get; init; } = Categoroies.Various;
 
+        /// <summary>
+        /// The name of the object that has the problem
+        /// </summary>
+        public string? Source { get; init; }
+
+        /// <summary>
+        /// a message that describes the problem
+        /// </summary>
+        public required string Message { get; init; }
+
+        public string PlaintTextDescription => $"{Category} {Source} [{ProblemType.ToString()}]: {Message}";
     }
 }

@@ -30,5 +30,12 @@ namespace Awb.Core.Project.Servos
         [Description("Set the start/stop acceleration. The smaller the value, the lower the acceleration. The maximum value that can be set is 150.")]
         [Range(0, 150)]
         public int? Acceleration { get; set; }
+
+        public override IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        {
+            foreach (var item in GetBaseProblems(project)) yield return item;
+
+            // add STS specific checks here
+        }
     }
 }
