@@ -15,12 +15,10 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     /// </summary>
     public partial class PropertyEditorControl : UserControl
     {
-        private UserControl? _actualEditor;
+        private ProjectObjectGenericEditorControl? _actualEditor;
         private IProjectObjectListable? _projectObject;
 
-
-
-        private UserControl? ActualEditor
+        private ProjectObjectGenericEditorControl? ActualEditor
         {
             get => _actualEditor;
             set
@@ -38,33 +36,35 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         public IProjectObjectListable? ProjectObject
         {
             get => _projectObject;
-            set
+        }
+
+        public bool TrySetProjectObject(IProjectObjectListable? projectObject)
+        {
+            if (_projectObject != projectObject)
             {
-
-                if (_projectObject != value)
+                if (projectObject == null)
                 {
-                    _projectObject = value;
+                    ActualEditor = null;
+                }
+                else
+                {
+                    // Check if there are problems with the object in the editor
+                    if (ActualEditor!= null && ActualEditor.ActualProblems != null) return false;
 
-                    if (_projectObject == null)
+                    // instanciate the suiting editor control for the object type using switch
+                    // e.g. ScsServoEditorControl for ScsServoConfig
+                    switch (_projectObject)
                     {
-                        ActualEditor = null;
-                    }
-                    else
-                    {
-
-                        // instanciate the suiting editor control for the object type using switch
-                        // e.g. ScsServoEditorControl for ScsServoConfig
-                        switch (_projectObject)
-                        {
-                            // case ScsFeetechServoConfig scsServoConfig:
-                            //     break;
-                            default:
-                                ActualEditor = new ProjectObjectGenericEditorControl() { ProjectObjectToEdit = _projectObject };
-                                break;
-                        }
+                        // case ScsFeetechServoConfig scsServoConfig:
+                        //     break;
+                        default:
+                            ActualEditor = new ProjectObjectGenericEditorControl() { ProjectObjectToEdit = projectObject };
+                            break;
                     }
                 }
+                _projectObject = projectObject;
             }
+            return true;
         }
 
         public PropertyEditorControl()

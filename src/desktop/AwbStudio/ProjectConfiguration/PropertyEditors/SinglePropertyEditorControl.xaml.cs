@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Project;
 using Awb.Core.Tools.Validation;
 using System;
 using System.ComponentModel;
@@ -18,7 +17,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     /// <summary>
     /// Interaction logic for ValueEditorControl.xaml
     /// </summary>
-    public partial class ValueEditorControl : UserControl, INotifyPropertyChanged
+    public partial class SinglePropertyEditorControl : UserControl, INotifyPropertyChanged
     {
         private object? _targetObject;
         private string? _propertyName;
@@ -42,8 +41,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private string? _errorMessagesJoined;
         public string? ErrorMessagesJoined
         {
-            get {
-                return _errorMessagesJoined; 
+            get
+            {
+                return _errorMessagesJoined;
             }
             set
             {
@@ -97,7 +97,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
         }
 
-        public ValueEditorControl()
+        public SinglePropertyEditorControl()
         {
             InitializeComponent();
         }

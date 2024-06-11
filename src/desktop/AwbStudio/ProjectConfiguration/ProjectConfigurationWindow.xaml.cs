@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Timelines;
@@ -13,10 +12,8 @@ using AwbStudio.ProjectConfiguration;
 using AwbStudio.Projects;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
 
 namespace AwbStudio
 {
@@ -160,16 +157,16 @@ namespace AwbStudio
 
         private void SetObjectToEdit(IProjectObjectListable? projectObject)
         {
-            // iterator through all ProjectObjectListControl in this control and set the projectObject to each of them as selected object
-            foreach (var control in StackPanelProjectObjectLists.Children)
+            if (!PropertyEditor.TrySetProjectObject(projectObject))
             {
-                if (control is ProjectObjectListControl list)
-                {
-                    list.SelectedProjectObject = projectObject;
-                }
+                projectObject = PropertyEditor.ProjectObject; // reject new project object fall back to the actual project object
+                MessageBox.Show("Please fix property errors before changing active object.");
             }
 
-            PropertyEditor.ProjectObject = projectObject;
+            // iterator through all ProjectObjectListControl in this control and set the projectObject to each of them as selected object
+            foreach (var control in StackPanelProjectObjectLists.Children)
+                if (control is ProjectObjectListControl list)
+                    list.SelectedProjectObject = projectObject;
         }
 
         private void UpdateProblemsDisplay()
