@@ -42,7 +42,7 @@ namespace Awb.Core.Project.Various
         [Description("The state is only available when one of this inputs is on.\r\nFormat: Use commas to list multiple IDs.")]
         [RegularExpression(@"(\d{1,4}(,\d{1,4})*)?", ErrorMessage = "Please enter a comma separated list of integer input IDs.")]
         [JsonIgnore]
-        public string PositiveInputsAsString
+        public string? PositiveInputsAsString 
         {
             get => StringFromIntArray(PositiveInputs);
             set => PositiveInputs = IntArrayFromString(value);

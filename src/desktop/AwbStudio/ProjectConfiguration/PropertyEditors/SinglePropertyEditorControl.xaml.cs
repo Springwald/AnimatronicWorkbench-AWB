@@ -153,7 +153,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
             }
 
-            ErrorMessagesJoined = GetErrorMessagesByValidationAttributes(value);
+            _ = CheckErrorMessages(value);
         }
 
         private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)
@@ -165,53 +165,72 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             if (_targetObject != null && _propertyName != null)
             {
                 var newValue = TextPropertyContentTextEditor.Text;
+                if (CheckErrorMessages(newValue) == false) return;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
+            }
+        }
 
-                var prop = _targetObject.GetType().GetProperty(_propertyName);
-                if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
+        private bool CheckErrorMessages(object? newValue)
+        {
+            if (_targetObject == null || _propertyName == null) return false;
 
-                // convert the string to the correct type
+            var prop = _targetObject.GetType().GetProperty(_propertyName);
+            if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
 
-                bool isNullable = IsNullable(prop);
+            var attributeErrors = GetErrorMessagesByValidationAttributes(newValue);
+            if (!string.IsNullOrWhiteSpace(attributeErrors))
+            {
+                ErrorMessagesJoined = attributeErrors;
+                return false;
+            }
 
-                if (string.IsNullOrWhiteSpace(newValue))
-                {
-                    if (isNullable)
-                        prop.SetValue(_targetObject, null);
-                    else
-                        ErrorMessagesJoined = "Value is empty";
-                    return;
-                }
+            var typeValueErrors = GetErrorMessagesByType(prop, newValue);
+            if (!string.IsNullOrWhiteSpace(typeValueErrors))
+            {
+                // validate the property value using DataAnnotations (e.g. Range, Required, etc.)
+                ErrorMessagesJoined = typeValueErrors;
+                return false;
+            }
 
-                var attributeErrors = GetErrorMessagesByValidationAttributes(newValue);
+            return true;
+        }
 
-                if (!string.IsNullOrWhiteSpace(attributeErrors))
-                {
-                    ErrorMessagesJoined = attributeErrors;
-                    return;
-                }
+        private string? GetErrorMessagesByType(PropertyInfo? prop, object? newValue)
+        {
+            bool isNullable = IsNullable(prop);
 
+            if ((newValue == null) || (newValue is string && string.IsNullOrWhiteSpace(newValue as string)))
+            {
+                if (isNullable)
+                    prop.SetValue(_targetObject, null);
+                else
+                    return "Value is empty";
+            }
+
+            if (newValue is string newStringValue)
+            {
                 var propertyType = prop.PropertyType;
 
                 if (propertyType == typeof(int) || propertyType == typeof(int?))
                 {
-                    if (int.TryParse(newValue, out var intValue))
+                    if (int.TryParse(newStringValue, out var intValue))
                     {
                         prop.SetValue(_targetObject, intValue);
                     }
                     else
                     {
-                        ErrorMessagesJoined = "Value is not a valid integer";
+                        return "Value is not a valid integer";
                     }
                 }
                 else if (propertyType == typeof(uint) || propertyType == typeof(uint?))
                 {
-                    if (uint.TryParse(newValue, out var uintValue))
+                    if (uint.TryParse(newStringValue, out var uintValue))
                     {
                         prop.SetValue(_targetObject, uintValue);
                     }
                     else
                     {
-                        ErrorMessagesJoined = "Value is not a valid unsigned integer";
+                        return "Value is not a valid unsigned integer";
                     }
                 }
                 else if (propertyType == typeof(string))
@@ -222,20 +241,18 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 {
                     throw new Exception($"Unsupported property type '{propertyType}'");
                 }
-
-                if (ErrorMessagesJoined == string.Empty)
-                {
-                    // validate the property value using DataAnnotations (e.g. Range, Required, etc.)
-                    ErrorMessagesJoined = attributeErrors;
-                }
             }
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
+
+            return null;
+
         }
 
-        private static bool IsNullable(PropertyInfo property)
+        private static bool IsNullable(PropertyInfo? property)
         {
+            if (property == null) return false;
+
             //if (property.PropertyType == typeof(string) &&
-              if  (property.GetMethod?.CustomAttributes.Any(x => x.AttributeType.Name == "NullableContextAttribute") == true)
+            if (property.GetMethod?.CustomAttributes.Any(x => x.AttributeType.Name == "NullableContextAttribute") == true)
                 return true;
 
             // first check if the value is null or empty
@@ -257,7 +274,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
         }
 
-        private string GetErrorMessagesByValidationAttributes(object value)
+        private string GetErrorMessagesByValidationAttributes(object? value)
         {
             if (_targetObject != null && _propertyName != null)
             {
