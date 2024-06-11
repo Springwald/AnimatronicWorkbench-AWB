@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Project;
 using Awb.Core.Tools.Validation;
 using System;
 using System.ComponentModel;
@@ -41,7 +42,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private string? _errorMessagesJoined;
         public string? ErrorMessagesJoined
         {
-            get { return _errorMessagesJoined; }
+            get {
+                return _errorMessagesJoined; 
+            }
             set
             {
                 if (_errorMessagesJoined != value)
@@ -160,6 +163,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (_propertyValidator == null) throw new NullReferenceException(nameof(_propertyValidator));
             ErrorMessagesJoined = string.Empty;
 
             // set the value of the property to the value of the textbox,
@@ -168,6 +172,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             {
                 var newValue = TextPropertyContentTextEditor.Text;
 
+                // check the new value for type compatibility
                 var validationAttributeErrors = _propertyValidator.GetErrorMessagesByValidationAttributes(newValue);
                 if (validationAttributeErrors != null)
                 {
@@ -175,6 +180,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     return;
                 }
 
+                // try to set the new value and check for errors by the validation attributes
                 var typeValidationErrors = _propertyValidator.SetValueAndGetErrorMessagesByType(newValue);
                 if (typeValidationErrors != null)
                 {

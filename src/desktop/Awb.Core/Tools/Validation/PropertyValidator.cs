@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace Awb.Core.Tools.Validation
@@ -64,7 +65,7 @@ namespace Awb.Core.Tools.Validation
             if (_targetObject != null && _propertyName != null)
             {
                 var objType = _targetObject.GetType();
-                var errors = NonGenericValidator.ValidateProperty(objType, value, _propertyName);
+                var errors = ValidateProperty(objType, value, _propertyName);
                 if (errors.Any())   return string.Join("; ", errors);
             }
             return null;
@@ -124,6 +125,16 @@ namespace Awb.Core.Tools.Validation
             return null;
         }
 
-       
+
+        // This loop into all DataAnnotations and return all errors strings
+        private static IEnumerable<string> ValidateProperty(Type type, object? propertyValue, string propertyName)
+        {
+            var info = type.GetProperty(propertyName);
+            if (info == null) yield break;
+            foreach (var va in info.GetCustomAttributes(true).OfType<ValidationAttribute>())
+                if (!va.IsValid(propertyValue))
+                    yield return va.FormatErrorMessage(string.Empty);
+        }
+
     }
 }
