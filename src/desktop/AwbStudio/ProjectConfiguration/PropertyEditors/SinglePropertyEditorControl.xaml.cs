@@ -5,10 +5,10 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core;
 using Awb.Core.Tools;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
@@ -153,7 +153,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
             }
 
-            UpdateErrorMessagesByValidationAttributes();
+            ErrorMessagesJoined = GetErrorMessagesByValidationAttributes(value);
         }
 
         private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)
@@ -170,10 +170,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
 
                 // convert the string to the correct type
-                var propertyType = prop.PropertyType;
 
-                // first check if the value is null or empty
-                var isNullable = Nullable.GetUnderlyingType(propertyType) != null;
+                bool isNullable = IsNullable(prop);
 
                 if (string.IsNullOrWhiteSpace(newValue))
                 {
@@ -183,6 +181,16 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                         ErrorMessagesJoined = "Value is empty";
                     return;
                 }
+
+                var attributeErrors = GetErrorMessagesByValidationAttributes(newValue);
+
+                if (!string.IsNullOrWhiteSpace(attributeErrors))
+                {
+                    ErrorMessagesJoined = attributeErrors;
+                    return;
+                }
+
+                var propertyType = prop.PropertyType;
 
                 if (propertyType == typeof(int) || propertyType == typeof(int?))
                 {
@@ -218,10 +226,20 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 if (ErrorMessagesJoined == string.Empty)
                 {
                     // validate the property value using DataAnnotations (e.g. Range, Required, etc.)
-                    UpdateErrorMessagesByValidationAttributes();
+                    ErrorMessagesJoined = attributeErrors;
                 }
             }
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
+        }
+
+        private static bool IsNullable(PropertyInfo property)
+        {
+            //if (property.PropertyType == typeof(string) &&
+              if  (property.GetMethod?.CustomAttributes.Any(x => x.AttributeType.Name == "NullableContextAttribute") == true)
+                return true;
+
+            // first check if the value is null or empty
+            return Nullable.GetUnderlyingType(property.PropertyType) != null;
         }
 
         private void CheckBoxPropertyContentBoolEditor_Checked(object sender, System.Windows.RoutedEventArgs e)
@@ -239,20 +257,20 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
         }
 
-        private void UpdateErrorMessagesByValidationAttributes()
+        private string GetErrorMessagesByValidationAttributes(object value)
         {
-            ErrorMessagesJoined = string.Empty;
-
             if (_targetObject != null && _propertyName != null)
             {
                 var objType = _targetObject.GetType();
                 var prop = objType.GetProperty(_propertyName);
                 if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
 
-                var value = prop.GetValue(_targetObject);
-
                 var errors = NonGenericValidator.ValidateProperty(objType, value, _propertyName);
-                ErrorMessagesJoined = string.Join("; ", errors);
+                return string.Join("; ", errors);
+            }
+            else
+            {
+                return string.Empty;
             }
         }
 

@@ -28,11 +28,27 @@ namespace Awb.Core.Project.Servos
         [DisplayName("Title")]
         [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
         public required string Title { get; set; }
-   
+
+        /// <summary>
+        /// The companion property for the RelaxRangesAsString property.
+        /// Needed for json serialization.
+        /// </summary>
+        public ServoRelaxRange[] RelaxRanges { get; set; } = Array.Empty<ServoRelaxRange>();
+
+        [Display]
+        [Description("When the servo is some seconds unchanged and inside this ranges, the servo power will turned off.\r\nFormat:2000-2200\r\n Use commas to list multiple ranges.")]
+        [RegularExpression(@"(\d{1,4}[-]\d{1,4},?)*")]
+        [JsonIgnore]
+        public string? RelaxRangesAsString
+        {
+            get => ServoRelaxRange.ToString(RelaxRanges);
+            set => RelaxRanges = ServoRelaxRange.FromString(value);
+        }
+
         [DisplayName("Global fault")]
         [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
+        
         public bool GlobalFault { get; set; }
-
 
         [DisplayName("Lowest value")]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
