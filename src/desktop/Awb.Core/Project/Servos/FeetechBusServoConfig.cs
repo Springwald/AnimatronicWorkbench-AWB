@@ -33,6 +33,23 @@ namespace Awb.Core.Project.Servos
         [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
         public bool GlobalFault { get; set; }
 
+
+        [DisplayName("Lowest value")]
+        [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
+        public abstract int MinValue { get; set; }
+
+        [DisplayName("Highest value")]
+        [Description("The value when the servo curve is at its highest point. Possibly confusing: Can be greater than the value for 'low'.")]
+        public abstract int MaxValue { get; set; }
+
+        [DisplayName("Default value")]
+        [Description("Must be between the highest and lowest value.")]
+        public abstract int? DefaultValue { get; set; }
+
+        [DisplayName("Speed")]
+        public abstract int? Speed { get; set; }
+
+
         public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
         {
             yield break;

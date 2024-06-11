@@ -90,32 +90,27 @@ namespace Awb.Core.Actuators
 
         public bool IsControllerTuneable => true;
 
-        public StsScsServo(StsFeetechServoConfig config)
+        public StsScsServo(FeetechBusServoConfig config)
         {
-            StsScsType = StsScsTypes.Sts;
-            MinValue = config.MinValue;
-            MaxValue = config.MaxValue;
-            FillBaseValues(config, config.DefaultValue);
-        }
+            // find out the StsScsType by the config type using the switch expression
+            StsScsTypes type = config switch
+            {
+                StsFeetechServoConfig => StsScsTypes.Sts,
+                ScsFeetechServoConfig => StsScsTypes.Scs,
+                _ => throw new ArgumentException("Unknown servo config type")
+            };
 
-        public StsScsServo(ScsFeetechServoConfig config)
-        {
-            StsScsType = StsScsTypes.Scs;
-            MinValue = config.MinValue;
-            MaxValue = config.MaxValue;
-            FillBaseValues(config, config.DefaultValue);
-        }
-
-        private void FillBaseValues(FeetechBusServoConfig config, int? defaultValue)
-        {
-            defaultValue = defaultValue ?? MinValue + (MaxValue - MinValue) / 2;
+            var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
 
             Id = config.Id;
+            StsScsType = type;
+            MaxValue = config.MaxValue;
+            MinValue = config.MinValue;
             ClientId = config.ClientId;
             Channel = config.Channel;
             Title = config.Title;
-            DefaultValue = defaultValue!.Value;
-            TargetValue = defaultValue!.Value;
+            DefaultValue = defaultValue;
+            TargetValue = defaultValue;
             IsDirty = true;
             PercentCalculator = new PercentCalculator(MinValue, MaxValue);
         }

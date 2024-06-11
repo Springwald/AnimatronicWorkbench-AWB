@@ -88,6 +88,5 @@ namespace Awb.Core.Project
             foreach (var item in ScsServos) yield return item.Id;
             foreach (var item in Mp3PlayersYX5300) yield return item.Id;
         }
-
     }
 }
