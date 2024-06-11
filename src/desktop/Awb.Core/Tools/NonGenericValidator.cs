@@ -11,6 +11,12 @@ namespace Awb.Core.Tools
 {
     public class NonGenericValidator
     {
+
+        public NonGenericValidator()
+        {
+                
+        }
+
         // This loop into all DataAnnotations and return all errors strings
         public static IEnumerable<string> ValidateProperty(Type type, object? propertyValue, string propertyName)
         {

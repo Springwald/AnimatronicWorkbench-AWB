@@ -5,10 +5,9 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Tools;
+using Awb.Core.Tools.Validation;
 using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
@@ -22,6 +21,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     {
         private object? _targetObject;
         private string? _propertyName;
+        private PropertyValidator? _propertyValidator;
+        private PropertyInfo? _propertyInfo;
 
         private string? _propertyTitle;
         public string? PropertyTitle
@@ -123,6 +124,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         {
             _targetObject = target;
             _propertyName = propertyName;
+            _propertyValidator = new PropertyValidator(target, propertyName);
 
             var prop = target.GetType().GetProperty(propertyName);
             if (prop == null) throw new Exception($"Property '{propertyName}' not found");
@@ -153,7 +155,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
             }
 
-            _ = CheckErrorMessages(value);
+            ErrorMessagesJoined = _propertyValidator.GetAllErrorMessages(value) ?? string.Empty;
         }
 
         private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)
@@ -165,98 +167,24 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             if (_targetObject != null && _propertyName != null)
             {
                 var newValue = TextPropertyContentTextEditor.Text;
-                if (CheckErrorMessages(newValue) == false) return;
+
+                var validationAttributeErrors = _propertyValidator.GetErrorMessagesByValidationAttributes(newValue);
+                if (validationAttributeErrors != null)
+                {
+                    ErrorMessagesJoined = validationAttributeErrors;
+                    return;
+                }
+
+                var typeValidationErrors = _propertyValidator.SetValueAndGetErrorMessagesByType(newValue);
+                if (typeValidationErrors != null)
+                {
+                    ErrorMessagesJoined = typeValidationErrors;
+                    return;
+                }
+
+                ErrorMessagesJoined = string.Empty;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
             }
-        }
-
-        private bool CheckErrorMessages(object? newValue)
-        {
-            if (_targetObject == null || _propertyName == null) return false;
-
-            var prop = _targetObject.GetType().GetProperty(_propertyName);
-            if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
-
-            var attributeErrors = GetErrorMessagesByValidationAttributes(newValue);
-            if (!string.IsNullOrWhiteSpace(attributeErrors))
-            {
-                ErrorMessagesJoined = attributeErrors;
-                return false;
-            }
-
-            var typeValueErrors = GetErrorMessagesByType(prop, newValue);
-            if (!string.IsNullOrWhiteSpace(typeValueErrors))
-            {
-                // validate the property value using DataAnnotations (e.g. Range, Required, etc.)
-                ErrorMessagesJoined = typeValueErrors;
-                return false;
-            }
-
-            return true;
-        }
-
-        private string? GetErrorMessagesByType(PropertyInfo? prop, object? newValue)
-        {
-            bool isNullable = IsNullable(prop);
-
-            if ((newValue == null) || (newValue is string && string.IsNullOrWhiteSpace(newValue as string)))
-            {
-                if (isNullable)
-                    prop.SetValue(_targetObject, null);
-                else
-                    return "Value is empty";
-            }
-
-            if (newValue is string newStringValue)
-            {
-                var propertyType = prop.PropertyType;
-
-                if (propertyType == typeof(int) || propertyType == typeof(int?))
-                {
-                    if (int.TryParse(newStringValue, out var intValue))
-                    {
-                        prop.SetValue(_targetObject, intValue);
-                    }
-                    else
-                    {
-                        return "Value is not a valid integer";
-                    }
-                }
-                else if (propertyType == typeof(uint) || propertyType == typeof(uint?))
-                {
-                    if (uint.TryParse(newStringValue, out var uintValue))
-                    {
-                        prop.SetValue(_targetObject, uintValue);
-                    }
-                    else
-                    {
-                        return "Value is not a valid unsigned integer";
-                    }
-                }
-                else if (propertyType == typeof(string))
-                {
-                    prop.SetValue(_targetObject, newValue);
-                }
-                else
-                {
-                    throw new Exception($"Unsupported property type '{propertyType}'");
-                }
-            }
-
-            return null;
-
-        }
-
-        private static bool IsNullable(PropertyInfo? property)
-        {
-            if (property == null) return false;
-
-            //if (property.PropertyType == typeof(string) &&
-            if (property.GetMethod?.CustomAttributes.Any(x => x.AttributeType.Name == "NullableContextAttribute") == true)
-                return true;
-
-            // first check if the value is null or empty
-            return Nullable.GetUnderlyingType(property.PropertyType) != null;
         }
 
         private void CheckBoxPropertyContentBoolEditor_Checked(object sender, System.Windows.RoutedEventArgs e)
@@ -272,23 +200,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
-        }
-
-        private string GetErrorMessagesByValidationAttributes(object? value)
-        {
-            if (_targetObject != null && _propertyName != null)
-            {
-                var objType = _targetObject.GetType();
-                var prop = objType.GetProperty(_propertyName);
-                if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
-
-                var errors = NonGenericValidator.ValidateProperty(objType, value, _propertyName);
-                return string.Join("; ", errors);
-            }
-            else
-            {
-                return string.Empty;
-            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
