@@ -15,12 +15,18 @@ namespace Awb.Core.Project
         /// a displayable short title e.g to list in the project configuration window
         /// </summary>
         [JsonIgnore]
-        public string TitleShort { get; }
+        string TitleShort { get; }
 
         /// <summary>
         /// a displayable long title e.g to show details or log problems
         /// </summary>
         [JsonIgnore]
-        public string TitleDetailled { get; }
+        string TitleDetailled { get; }
+
+        /// <summary>
+        /// Gets all problems of this project object
+        /// </summary>
+        /// <param name="project">The parent project as reference to check e.g. if an referenced ID exists</param>
+        IEnumerable<ProjectProblem> GetProblems(AwbProject project);
     }
 }

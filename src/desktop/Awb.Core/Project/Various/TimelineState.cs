@@ -33,10 +33,17 @@ namespace Awb.Core.Project.Various
         [Description("The state is NOT available when one of this inputs is on")]
         public int[] NegativeInputs { get;  set; } = Array.Empty<int>();
 
+        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        {
+            yield break;
+        }
+
         [JsonIgnore]
         public string TitleShort => Title ?? $"TimelineState has no title set '{Id}'";
 
         [JsonIgnore]
         public string TitleDetailled => $"TimelineState {TitleShort}";
+
+
     }
 }

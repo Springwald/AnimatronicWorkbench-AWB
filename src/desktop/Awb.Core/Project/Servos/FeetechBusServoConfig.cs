@@ -33,6 +33,11 @@ namespace Awb.Core.Project.Servos
         [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
         public bool GlobalFault { get; set; }
 
+        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        {
+            yield break;
+        }
+
         [JsonIgnore]
         public string TitleShort => Title ?? $"StsServo has no title set '{Id}'";
 

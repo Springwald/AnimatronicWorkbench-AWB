@@ -34,6 +34,11 @@ namespace Awb.Core.Project.Various
         [Range(1, 64)]
         public required uint TxPin { get; set; } = 14;
 
+        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        {
+            yield break;
+        }
+
         [JsonIgnore]
         public string TitleShort => Title ?? $"No Title for Mp3PlayerYX5300 '{Id}'";
 

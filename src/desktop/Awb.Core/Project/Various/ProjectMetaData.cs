@@ -34,11 +34,19 @@ namespace Awb.Core.Project.Various
         [Length(8, 32)]
         public string WifiPassword { get; set; } = "awb12345";
 
+        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        {
+            yield break;
+        }
+
+
         [JsonIgnore]
         public string TitleShort => "AWB project meta data";
 
         [JsonIgnore]
         public string TitleDetailled => TitleShort;
+
+
 
     }
 }

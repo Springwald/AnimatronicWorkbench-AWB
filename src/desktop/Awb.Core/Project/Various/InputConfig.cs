@@ -34,6 +34,11 @@ namespace Awb.Core.Project.Various
         [JsonIgnore]
         public string TitleDetailled => $"Input {TitleShort}";
 
+        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        {
+            yield break;
+        }
+
         public InputConfig(int id, string title)
         {
             Id = id;

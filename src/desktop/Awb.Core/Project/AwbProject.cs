@@ -48,13 +48,17 @@ namespace Awb.Core.Project
             _timelineDataService = new TimelineDataServiceByJsonFiles(_projectFolder);
         }
 
-        private IEnumerable<string> GetAllIds()
+        public IEnumerable<IProjectObjectListable> GetAllListableObjects()
         {
-            foreach (var item in Pca9685PwmServos) yield return item.Id;
-            foreach (var item in StsServos) yield return item.Id;
-            foreach (var item in ScsServos) yield return item.Id;
-            foreach (var item in Mp3PlayersYX5300) yield return item.Id;
-        }   
+            yield return ProjectMetaData;
+            yield return Esp32ClientHardware;
+            foreach (var item in Pca9685PwmServos) yield return item;
+            foreach (var item in StsServos) yield return item;
+            foreach (var item in ScsServos) yield return item;
+            foreach (var item in Mp3PlayersYX5300) yield return item;
+            foreach (var item in TimelinesStates) yield return item;
+            foreach (var item in Inputs) yield return item;
+        }
 
         public int GetNewInputId()
         {
@@ -77,6 +81,13 @@ namespace Awb.Core.Project
             }
         }
 
+        private IEnumerable<string> GetAllIds()
+        {
+            foreach (var item in Pca9685PwmServos) yield return item.Id;
+            foreach (var item in StsServos) yield return item.Id;
+            foreach (var item in ScsServos) yield return item.Id;
+            foreach (var item in Mp3PlayersYX5300) yield return item.Id;
+        }
 
     }
 }
