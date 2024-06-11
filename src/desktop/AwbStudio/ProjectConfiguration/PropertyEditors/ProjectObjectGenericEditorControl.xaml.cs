@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Tools.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +30,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         {
             get
             {
-                ReadDataFromEditor(_projectObject);
                 return _projectObject;
             }
             set
@@ -84,10 +84,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         {
             var problemsText = new StringBuilder();
 
+            var nativeErrors = ObjectValidator.ValidateObjectGetErrors(_projectObject);
+            foreach (var error in nativeErrors)
+                problemsText.AppendLine("Native error:" + error.PlaintTextDescription);
+
             foreach (var problem in _projectObject.GetProblems(null))
-            {
-                problemsText.AppendLine(problem.Message);
-            }
+                problemsText.AppendLine(problem.PlaintTextDescription);
 
             if (problemsText.Length == 0)
             {
@@ -98,15 +100,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 TextProblems.Text = problemsText.ToString();
                 TextProblems.Visibility = System.Windows.Visibility.Visible;
             }
-
-
         }
-
-        private void ReadDataFromEditor(IProjectObjectListable scsServoConfig)
-        {
-
-        }
-
-
     }
 }

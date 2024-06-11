@@ -72,7 +72,7 @@ namespace Awb.Core.Project.Servos
             yield return new ProjectProblem
             {
                 ProblemType = ProjectProblem.ProblemTypes.Hint,
-                Category = ProjectProblem.Categoroies.Servo,
+                Category = ProjectProblem.Categories.Servo,
                 Source = TitleShort,
                 Message = $"Servo '{Id}' has no problems."
             };

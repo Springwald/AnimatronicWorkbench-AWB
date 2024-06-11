@@ -9,7 +9,7 @@ namespace Awb.Core.Project
 {
     public class ProjectProblem
     {
-        public enum Categoroies
+        public enum Categories
         {
             Input,
             Servo,
@@ -34,7 +34,7 @@ namespace Awb.Core.Project
         /// <summary>
         /// thematic category like "Servo" or "Timeline"
         /// </summary>
-        public Categoroies Category { get; init; } = Categoroies.Various;
+        public Categories Category { get; init; } = Categories.Various;
 
         /// <summary>
         /// The name of the object that has the problem
