@@ -15,7 +15,6 @@ namespace Awb.Core.Project.Various
     {
         public required int Id { get; set; }
 
-
         [DisplayName("Client ID")]
         [Description("The ID of the AWB client device that controls this servo.")]
         [Range(1, 254)]
@@ -32,7 +31,7 @@ namespace Awb.Core.Project.Various
         public string TitleShort => Title ?? $"no title for input '{Id}'";
 
         [JsonIgnore]
-        public string TitleDetailled => $"Input {TitleShort}";
+        public string TitleDetailed => $"Input {TitleShort}";
 
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {

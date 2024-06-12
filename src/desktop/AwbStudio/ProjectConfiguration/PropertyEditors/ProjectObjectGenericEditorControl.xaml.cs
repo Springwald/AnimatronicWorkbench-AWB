@@ -67,7 +67,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 editor.SetPropertyToEditByName(target: stsServoConfig, propertyName: property.Name);
                 editor.PropertyChanged += (s, e) =>
                 {
-                    LabelObjectTypeTitle.Content = stsServoConfig.TitleDetailled;
+                    LabelObjectTypeTitle.Content = stsServoConfig.TitleDetailed;
                     this.UpdateProblems();
                     this.OnUpdatedData?.Invoke(this, EventArgs.Empty);
                 };
@@ -97,7 +97,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 #pragma warning restore CS0162 // Unreachable code detected
             }
 
-            foreach (var problem in _projectObject.GetContentProblems(null))
+            foreach (var problem in _projectObject.GetContentProblems(_awbProject))
                 problemsText.AppendLine(problem.PlaintTextDescription);
 
             foreach (var editor in _editors)

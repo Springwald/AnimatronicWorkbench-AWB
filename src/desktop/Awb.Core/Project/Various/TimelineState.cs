@@ -61,14 +61,28 @@ namespace Awb.Core.Project.Various
 
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
-            yield break;
+            // check if the positive and negative inputs are existing in the project
+            foreach (var inputId in PositiveInputs.Concat(NegativeInputs))
+            {
+                if (project.Inputs.All(x => x.Id != inputId))
+                {
+                    yield return new ProjectProblem
+                    {
+                        ProblemType = ProjectProblem.ProblemTypes.Error,
+                        Message = $"Input with ID {inputId} not found in project.",
+                        Source = Title,
+                        Category = ProjectProblem.Categories.TimelineState
+                    };
+
+                }
+            }
         }
 
         [JsonIgnore]
         public string TitleShort => Title ?? $"TimelineState has no title set '{Id}'";
 
         [JsonIgnore]
-        public string TitleDetailled => $"TimelineState {TitleShort}";
+        public string TitleDetailed => $"TimelineState {TitleShort}";
 
         private string StringFromIntArray(int[] value)
             => string.Join(",", value.Select(x => x.ToString()));

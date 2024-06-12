@@ -5,8 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Servos
@@ -47,7 +47,7 @@ namespace Awb.Core.Project.Servos
 
         [DisplayName("Global fault")]
         [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
-        
+
         public bool GlobalFault { get; set; }
 
         [DisplayName("Lowest value")]
@@ -69,6 +69,29 @@ namespace Awb.Core.Project.Servos
 
         protected IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project)
         {
+            // check if the default value is between the min and max value
+            if (DefaultValue < Math.Min(MinValue,MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
+                yield return new ProjectProblem
+                {
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Message = $"The default value '{DefaultValue}' is not between the lowest value '{MinValue}' and the highest value '{MaxValue}' for servo '{TitleShort}'",
+                    Source = TitleDetailed,
+                    Category = ProjectProblem.Categories.Servo
+                };
+
+            // check if the relax ranges are valid
+            foreach (var relaxRange in RelaxRanges)
+            {
+                if (relaxRange.MinValue > relaxRange.MaxValue)
+                    yield return new ProjectProblem
+                    {
+                        ProblemType = ProjectProblem.ProblemTypes.Error,
+                        Message = $"The relax range '{relaxRange}' first value is lower than second value for servo '{TitleShort}'",
+                        Source = TitleDetailed,
+                        Category = ProjectProblem.Categories.Servo
+                    };
+            }
+
             yield break;
         }
 
@@ -76,6 +99,6 @@ namespace Awb.Core.Project.Servos
         public string TitleShort => Title ?? $"StsServo has no title set '{Id}'";
 
         [JsonIgnore]
-        public string TitleDetailled => $"StsServo '{TitleShort}' (Id: {Id}, ClientId: {ClientId}, Channel: {Channel})";
+        public string TitleDetailed => $"StsServo '{TitleShort}' (Id: {Id}, ClientId: {ClientId}, Channel: {Channel})";
     }
 }

@@ -21,7 +21,7 @@ namespace Awb.Core.Project
         /// a displayable long title e.g to show details or log problems
         /// </summary>
         [JsonIgnore]
-        string TitleDetailled { get; }
+        string TitleDetailed { get; }
 
         /// <summary>
         /// Gets all problems of this project object

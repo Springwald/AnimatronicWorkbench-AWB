@@ -51,7 +51,15 @@ namespace Awb.Core.Project.Servos
 
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
-            yield break;
+            // check if the default value is between the min and max value
+            if (DefaultValue < Math.Min(MinValue, MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
+                yield return new ProjectProblem
+                {
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Message = $"The default value '{DefaultValue}' is not between the lowest value '{MinValue}' and the highest value '{MaxValue}' for servo '{TitleShort}'",
+                    Source = TitleDetailed,
+                    Category = ProjectProblem.Categories.Servo
+                };
         }
 
         [JsonIgnore]
@@ -59,7 +67,7 @@ namespace Awb.Core.Project.Servos
 
 
         [JsonIgnore]
-        public string TitleDetailled => "Pca9685PwmServo " + TitleShort;
+        public string TitleDetailed => "Pca9685PwmServo " + TitleShort;
 
       
     }

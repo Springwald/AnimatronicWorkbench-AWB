@@ -27,6 +27,6 @@ namespace Awb.Core.Project.Various
         public string TitleShort => "ESP32 client hardware";
 
         [JsonIgnore]
-        public string TitleDetailled => TitleShort;
+        public string TitleDetailed => TitleShort;
     }
 }

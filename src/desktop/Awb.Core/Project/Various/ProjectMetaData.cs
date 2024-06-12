@@ -46,7 +46,7 @@ namespace Awb.Core.Project.Various
         public string TitleShort => "AWB project meta data";
 
         [JsonIgnore]
-        public string TitleDetailled => TitleShort;
+        public string TitleDetailed => TitleShort;
 
 
 

@@ -43,7 +43,7 @@ namespace Awb.Core.Project.Various
         public string TitleShort => Title ?? $"No Title for Mp3PlayerYX5300 '{Id}'";
 
         [JsonIgnore]
-        public string TitleDetailled => $"{TitleShort} (ClientId: {ClientId}, SoundPlayerId: {Id})";
+        public string TitleDetailed => $"{TitleShort} (ClientId: {ClientId}, SoundPlayerId: {Id})";
 
 
     }
