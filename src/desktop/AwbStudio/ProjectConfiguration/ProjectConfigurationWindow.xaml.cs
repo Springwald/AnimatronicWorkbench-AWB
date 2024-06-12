@@ -178,7 +178,7 @@ namespace AwbStudio
 
         private void SetObjectToEdit(IProjectObjectListable? projectObject)
         {
-            if (!PropertyEditor.TrySetProjectObject(projectObject, _awbProject))
+            if (!PropertyEditor.TrySetProjectObject(projectObject, _awbProject, Timelines))
             {
                 projectObject = PropertyEditor.ProjectObject; // reject new project object fall back to the actual project object
                 MessageBox.Show("Please fix property errors before changing active object.");

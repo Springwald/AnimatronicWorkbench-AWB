@@ -6,6 +6,11 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Project.Servos;
+using Awb.Core.Timelines;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
@@ -38,7 +43,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             get => _projectObject;
         }
 
-        public bool TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject)
+        public bool TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject, TimelineData[] timelines)
         {
             if (_projectObject != projectObject)
             {
@@ -49,24 +54,42 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 else
                 {
                     // Check if there are problems with the object in the editor
-                    if (ActualEditor!= null && ActualEditor.ActualProblems != null) return false;
+                    if (ActualEditor != null && ActualEditor.ActualProblems != null) return false;
 
                     // instanciate the suiting editor control for the object type using switch
                     // e.g. ScsServoEditorControl for ScsServoConfig
-                    switch (_projectObject)
+                    var objectsUsingThisObject = new List<string>();
+                    switch (projectObject)
                     {
-                        // case ScsFeetechServoConfig scsServoConfig:
-                        //     break;
+                        case FeetechBusServoConfig feetechServoConfig:
+                            objectsUsingThisObject.AddRange(
+                                timelines.Where(t => t.ServoPoints.Any(p => p.ServoId == feetechServoConfig.Id)).Select(t => $"Timeline '{t.Title}'"));
+                            break;
+
                         default:
-                            var editor = new ProjectObjectGenericEditorControl();
-                            editor.SetProjectAndObject(projectObject, awbProject);
-                            ActualEditor = editor;
                             break;
                     }
+
+
+
+                    var editor = new ProjectObjectGenericEditorControl();
+                    editor.SetProjectAndObject(projectObject, awbProject, objectsUsingThisObject.ToArray());
+                    ActualEditor = editor;
+                    ActualEditor.OnDeleteObject += OnObjectDelete_Fired;
+                    ActualEditor.OnUpdatedData += UpdatedData_Fired;
                 }
                 _projectObject = projectObject;
             }
             return true;
+        }
+
+        private void UpdatedData_Fired(object? sender, EventArgs e)
+        {
+        }
+
+        private void OnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public PropertyEditorControl()

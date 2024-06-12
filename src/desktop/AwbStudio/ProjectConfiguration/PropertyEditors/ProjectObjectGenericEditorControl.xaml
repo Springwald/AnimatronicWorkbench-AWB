@@ -14,9 +14,16 @@
         <ScrollViewer Grid.Row="0">
             <StackPanel x:Name="EditorStackPanel">
                 <Label x:Name="LabelObjectTypeTitle" FontWeight="Bold">Object title loading...</Label>
-                <TextBlock x:Name="TextUsageIn" Grid.Row="1" Margin="5" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top">
+                <Grid Grid.Row="1" Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="TextUsageIn"  Grid.Column="0" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top">
 Used in: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-                </TextBlock>
+                    </TextBlock>
+                    <Button x:Name="ButtonDelete" HorizontalAlignment="Right" Click="ButtonDelete_Click">❌ Delete</Button>
+                </Grid>
             </StackPanel>
         </ScrollViewer>
         <TextBlock x:Name="TextProblems" Grid.Row="1" Foreground="White" Background="Red" Padding="5" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top">

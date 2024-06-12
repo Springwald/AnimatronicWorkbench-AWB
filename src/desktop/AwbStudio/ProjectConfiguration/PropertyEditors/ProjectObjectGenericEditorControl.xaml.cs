@@ -10,8 +10,10 @@ using Awb.Core.Tools.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
@@ -21,18 +23,31 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     /// </summary>
     public partial class ProjectObjectGenericEditorControl : UserControl
     {
+        public class DeleteObjectEventArgs : EventArgs
+        {
+            public IProjectObjectListable ObjectToDelete { get; private set; }
+
+            public DeleteObjectEventArgs(IProjectObjectListable objectToDelete)
+            {
+                ObjectToDelete = objectToDelete;
+            }
+        }
+
         private List<SinglePropertyEditorControl> _editors;
         private IProjectObjectListable _projectObject;
         private AwbProject _awbProject;
+        private string[] _objectsUsingThisObject;
 
-        public EventHandler OnUpdatedData { get; private set; }
+        public EventHandler OnUpdatedData { get;  set; }
+        public EventHandler<DeleteObjectEventArgs> OnDeleteObject { get;  set; }
 
-        public string? ActualProblems { get; private set; }
+        public string? ActualProblems { get;  set; }
 
-        public void SetProjectAndObject(IProjectObjectListable projectObject, AwbProject awbProject)
+        public void SetProjectAndObject(IProjectObjectListable projectObject, AwbProject awbProject, string[] objectsUsingThisObject)
         {
             _projectObject = projectObject;
             _awbProject = awbProject;
+            _objectsUsingThisObject = objectsUsingThisObject;
             WriteDataToEditor(projectObject);
             UpdateProblems();
         }
@@ -75,11 +90,15 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 this.EditorStackPanel.Children.Add(editor);
             }
 
-            //editor.SetPropertyToEditByExpression(() => stsServoConfig.ClientId);
-            //editor.SetPropertyToEditByName(stsServoConfig, "ClientId");
-            //_editors.Add(editor);
-            //this.EditorStackPanel.Children.Add(editor);
-
+            // find objects using this object
+            if (_objectsUsingThisObject.Any())
+            {
+                TextUsageIn.Text = $"Used {_objectsUsingThisObject.Length} times (mouse over for details)"; 
+                TextUsageIn.ToolTip = string.Join(",\r\n", _objectsUsingThisObject);
+                TextUsageIn.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+                TextUsageIn.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void UpdateProblems()
@@ -118,6 +137,22 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 TextProblems.Text = ActualProblems ?? string.Empty;
                 TextProblems.Visibility = System.Windows.Visibility.Visible;
             }
+        }
+
+        private void ButtonDelete_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (_objectsUsingThisObject.Any())
+            {
+                MessageBox.Show($"This object is used in the following objects:\r\n{string.Join(",\r\n", _objectsUsingThisObject)}\r\n\r\nPlease remove the object from these usages first.", "Object is used", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // throw delete event
+            if (MessageBox.Show($"Do you really want to delete the object '{_projectObject.TitleDetailed}'?", "Delete object", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                this.OnDeleteObject?.Invoke(this,new DeleteObjectEventArgs(_projectObject));
+            }
+
         }
     }
 }
