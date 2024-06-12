@@ -144,7 +144,8 @@ namespace Awb.Core.Timelines
         /// <returns></returns>
         public IEnumerable<ProjectProblem> GetProblems(AwbProject awbProject)
         {
-           throw new NotImplementedException();
+            yield break;
+            //throw new NotImplementedException();
         }
     }
 }

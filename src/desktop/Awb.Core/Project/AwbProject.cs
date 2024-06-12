@@ -10,6 +10,7 @@ using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
+using Awb.Core.Tools.Validation;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
@@ -54,8 +55,12 @@ namespace Awb.Core.Project
         /// </summary>
         public IEnumerable<ProjectProblem> GetProjectProblems(IEnumerable<TimelineData> timelines)
         {
-            var projectProblems = GetAllListableObjects().SelectMany(x => x.GetProblems(this));
-            foreach (var item in projectProblems) yield return item;
+            var nativeAttributeProblems = GetAllListableObjects().SelectMany(
+                x => ObjectValidator.ValidateObjectGetErrors(x));
+            foreach (var item in nativeAttributeProblems) yield return item;
+
+            var contentProblems = GetAllListableObjects().SelectMany(x => x.GetContentProblems(this));
+            foreach (var item in contentProblems) yield return item;
 
             var timelineProblems = timelines.SelectMany(x => x.GetProblems(this));
             foreach (var item in timelineProblems) yield return item;

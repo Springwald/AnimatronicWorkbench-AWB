@@ -34,7 +34,7 @@ namespace Awb.Core.Project.Various
         [JsonIgnore]
         public string TitleDetailled => $"Input {TitleShort}";
 
-        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             yield break;
         }

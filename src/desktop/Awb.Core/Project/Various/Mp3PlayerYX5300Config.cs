@@ -34,7 +34,7 @@ namespace Awb.Core.Project.Various
         [Range(1, 64)]
         public required uint TxPin { get; set; } = 14;
 
-        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             yield break;
         }

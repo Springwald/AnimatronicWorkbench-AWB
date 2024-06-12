@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Tools.Validation;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
@@ -34,8 +35,9 @@ namespace Awb.Core.Project.Various
         [Length(8, 32)]
         public string WifiPassword { get; set; } = "awb12345";
 
-        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
+            // content specific problems if needed
             yield break;
         }
 

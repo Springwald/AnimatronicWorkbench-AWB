@@ -59,7 +59,7 @@ namespace Awb.Core.Project.Various
         }
 
 
-        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             yield break;
         }

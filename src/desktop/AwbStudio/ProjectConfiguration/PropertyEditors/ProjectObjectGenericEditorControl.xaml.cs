@@ -23,23 +23,23 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     {
         private List<SinglePropertyEditorControl> _editors;
         private IProjectObjectListable _projectObject;
+        private AwbProject _awbProject;
 
         public EventHandler OnUpdatedData { get; private set; }
 
         public string? ActualProblems { get; private set; }
 
+        public void SetProjectAndObject(IProjectObjectListable projectObject, AwbProject awbProject)
+        {
+            _projectObject = projectObject;
+            _awbProject = awbProject;
+            WriteDataToEditor(projectObject);
+            UpdateProblems();
+        }
+        
         public IProjectObjectListable ProjectObjectToEdit
         {
-            get
-            {
-                return _projectObject;
-            }
-            set
-            {
-                _projectObject = value;
-                WriteDataToEditor(value);
-                UpdateProblems();
-            }
+            get => _projectObject;
         }
 
         public ProjectObjectGenericEditorControl()
@@ -97,7 +97,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 #pragma warning restore CS0162 // Unreachable code detected
             }
 
-            foreach (var problem in _projectObject.GetProblems(null))
+            foreach (var problem in _projectObject.GetContentProblems(null))
                 problemsText.AppendLine(problem.PlaintTextDescription);
 
             foreach (var editor in _editors)

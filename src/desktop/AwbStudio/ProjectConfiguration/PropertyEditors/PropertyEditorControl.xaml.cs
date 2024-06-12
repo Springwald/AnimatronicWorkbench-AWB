@@ -38,7 +38,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             get => _projectObject;
         }
 
-        public bool TrySetProjectObject(IProjectObjectListable? projectObject)
+        public bool TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject)
         {
             if (_projectObject != projectObject)
             {
@@ -58,7 +58,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                         // case ScsFeetechServoConfig scsServoConfig:
                         //     break;
                         default:
-                            ActualEditor = new ProjectObjectGenericEditorControl() { ProjectObjectToEdit = projectObject };
+                            var editor = new ProjectObjectGenericEditorControl();
+                            editor.SetProjectAndObject(projectObject, awbProject);
+                            ActualEditor = editor;
                             break;
                     }
                 }

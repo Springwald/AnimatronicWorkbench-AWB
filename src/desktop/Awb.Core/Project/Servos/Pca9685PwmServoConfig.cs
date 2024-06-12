@@ -49,7 +49,7 @@ namespace Awb.Core.Project.Servos
         [Range(0, 4095)]
         public int? DefaultValue { get; set; }
 
-        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             yield break;
         }

@@ -27,6 +27,6 @@ namespace Awb.Core.Project
         /// Gets all problems of this project object
         /// </summary>
         /// <param name="project">The parent project as reference to check e.g. if an referenced ID exists</param>
-        IEnumerable<ProjectProblem> GetProblems(AwbProject project);
+        IEnumerable<ProjectProblem> GetContentProblems(AwbProject project);
     }
 }

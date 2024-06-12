@@ -31,7 +31,7 @@ namespace Awb.Core.Project.Servos
         [Range(0, 150)]
         public int? Acceleration { get; set; }
 
-        public override IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        public override IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             foreach (var item in GetBaseProblems(project)) yield return item;
 

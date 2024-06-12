@@ -18,7 +18,7 @@ namespace Awb.Core.Project.Various
         [Range(1, 254)]
         public required uint ClientId { get; set; } = 1;
 
-        public IEnumerable<ProjectProblem> GetProblems(AwbProject project)
+        public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             yield break;
         }
