@@ -12,6 +12,7 @@ using AwbStudio.ProjectConfiguration;
 using AwbStudio.Projects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -26,6 +27,22 @@ namespace AwbStudio
         private ProjectConfigViewModel _viewModel;
         private readonly IProjectManagerService _projectManagerService;
         private readonly AwbProject _awbProject;
+
+        private TimelineData[] _timelines;
+        private TimelineData[] Timelines
+        {
+            get
+            {
+                if (_timelines == null)
+                {
+                    var ids = _awbProject.TimelineDataService.TimelineIds.ToArray();
+                    var timelines = ids.Select(id => _awbProject.TimelineDataService.GetTimelineData(id))
+                        .ToArray();
+                    _timelines = timelines; 
+                }
+                return _timelines;
+            }
+        }
 
         public ProjectConfigurationWindow(IProjectManagerService projectManagerService)
         {
@@ -60,6 +77,16 @@ namespace AwbStudio
         private async Task<bool> SaveProjectConfigAsync()
         {
             _viewModel.WriteToProject(_awbProject);
+
+            // check if project has errors
+            var errors = _awbProject.GetProjectProblems(Timelines).Where(p => p.ProblemType == ProjectProblem.ProblemTypes.Error);
+            if (errors.Any())
+            {
+                MessageBox.Show("Please fix all errors before saving the project configuration.\r\n\r\n"+
+                    string.Join("\r\n", errors.Select(p => p.PlaintTextDescription)));
+                return false;
+            }
+
             var ok = await _projectManagerService.SaveProjectAsync(_awbProject, _awbProject.ProjectFolder);
             if (ok) _viewModel.UnsavedChanges = false; else MessageBox.Show("Error saving project configuration!");
             return ok;

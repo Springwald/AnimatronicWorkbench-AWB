@@ -8,6 +8,7 @@
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -45,8 +46,8 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        private ProjectMetaData? _projectMetaData { get; set; }
-        public ProjectMetaData? ProjectMetaData
+        private ProjectMetaData _projectMetaData { get; set; }
+        public ProjectMetaData ProjectMetaData
         {
 
             get => _projectMetaData;
@@ -57,8 +58,8 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        private Esp32ClientHardwareConfig? _esp32ClientHardwareConfig {  get; set; }
-        public Esp32ClientHardwareConfig? Esp32ClientHardwareConfig
+        private Esp32ClientHardwareConfig _esp32ClientHardwareConfig {  get; set; }
+        public Esp32ClientHardwareConfig Esp32ClientHardwareConfig
         {
 
             get => _esp32ClientHardwareConfig;
@@ -138,33 +139,15 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-
-
-
         #endregion
 
         public ProjectConfigViewModel(AwbProject awbProject)
         {
-            FillFromProject(awbProject);
-        }
+            if (awbProject == null) throw new ArgumentNullException(nameof(awbProject));
 
-        public void WriteToProject(AwbProject awbProject)
-        {
-            awbProject.ScsServos = this.ScsServos.Cast<ScsFeetechServoConfig>().ToArray();
-            awbProject.StsServos = this.StsServos.Cast<StsFeetechServoConfig>().ToArray();
-            awbProject.Pca9685PwmServos = this.Pca9685PwmServos.Cast<Pca9685PwmServoConfig>().ToArray();
-            awbProject.Mp3PlayersYX5300 = this.Mp3PlayerYX5300.Cast<Mp3PlayerYX5300Config>().ToArray();
-            awbProject.Inputs = this.Inputs.Cast<InputConfig>().ToArray();
-            awbProject.TimelinesStates = this.TimelineStates.Cast<TimelineState>().ToArray();
-        }
-
-        private void FillFromProject(AwbProject awbProject)
-        {
-            if (awbProject == null) return;
-
-            this.ProjectFolder = awbProject.ProjectFolder;
-            this.ProjectMetaData = awbProject.ProjectMetaData;
-            this.Esp32ClientHardwareConfig = awbProject.Esp32ClientHardware;
+            _projectFolder = awbProject.ProjectFolder;
+            _projectMetaData = awbProject.ProjectMetaData;
+            _esp32ClientHardwareConfig = awbProject.Esp32ClientHardware;
 
             if (awbProject?.ScsServos != null)
                 foreach (var scsServo in awbProject.ScsServos)
@@ -190,5 +173,18 @@ namespace AwbStudio.ProjectConfiguration
                 foreach (var timelineState in awbProject.TimelinesStates)
                     this.TimelineStates.Add(timelineState);
         }
+
+        public void WriteToProject(AwbProject awbProject)
+        {
+            awbProject.ScsServos = this.ScsServos.Cast<ScsFeetechServoConfig>().ToArray();
+            awbProject.StsServos = this.StsServos.Cast<StsFeetechServoConfig>().ToArray();
+            awbProject.Pca9685PwmServos = this.Pca9685PwmServos.Cast<Pca9685PwmServoConfig>().ToArray();
+            awbProject.Mp3PlayersYX5300 = this.Mp3PlayerYX5300.Cast<Mp3PlayerYX5300Config>().ToArray();
+            awbProject.Inputs = this.Inputs.Cast<InputConfig>().ToArray();
+            awbProject.TimelinesStates = this.TimelineStates.Cast<TimelineState>().ToArray();
+            awbProject.Esp32ClientHardware = this.Esp32ClientHardwareConfig;
+            awbProject.ProjectMetaData = this.ProjectMetaData!;
+        }
+
     }
 }
