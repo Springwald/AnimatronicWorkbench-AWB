@@ -22,7 +22,7 @@ namespace Awb.Core.Project
 
         public ProjectMetaData ProjectMetaData { get; set; } = new ProjectMetaData();
 
-        public Esp32ClientHardwareConfig Esp32ClientHardware { get; set; } = new Esp32ClientHardwareConfig();
+        public Esp32ClientHardwareConfig Esp32ClientHardware { get; set; } = new Esp32ClientHardwareConfig { ClientId = 1 };
 
         public Pca9685PwmServoConfig[] Pca9685PwmServos { get; set; }
         public StsFeetechServoConfig[] StsServos { get; set; }

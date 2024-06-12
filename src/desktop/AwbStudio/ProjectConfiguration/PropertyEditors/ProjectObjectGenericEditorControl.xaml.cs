@@ -104,7 +104,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             {
                 var errors = editor.ErrorMessagesJoined;
                 if (!string.IsNullOrWhiteSpace(errors))
-                    problemsText.AppendLine(errors);
+                    problemsText.AppendLine($"{editor.PropertyTitle}:{errors}");
             }
 
             if (problemsText.Length == 0)

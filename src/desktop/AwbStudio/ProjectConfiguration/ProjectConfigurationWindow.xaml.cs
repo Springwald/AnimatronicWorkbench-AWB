@@ -141,19 +141,13 @@ namespace AwbStudio
         #endregion
 
         private void ProjectObjectSelected(object sender, ProjectObjectListControl.ProjectObjectSelectedEventArgs e)
-        {
-            SetObjectToEdit(e.ProjectObject);
-        }
+        => SetObjectToEdit(e.ProjectObject);
 
         private void EditProjectMetaDataButton_Click(object sender, RoutedEventArgs e)
-        {
-            SetObjectToEdit(_viewModel.ProjectMetaData);
-        }
+         => SetObjectToEdit(_viewModel.ProjectMetaData);
 
         private void EditEsp32HardwareButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+        => SetObjectToEdit(_viewModel.Esp32ClientHardwareConfig);
 
         private void SetObjectToEdit(IProjectObjectListable? projectObject)
         {

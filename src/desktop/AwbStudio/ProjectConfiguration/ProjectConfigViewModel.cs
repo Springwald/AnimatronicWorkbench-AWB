@@ -57,6 +57,19 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
+        private Esp32ClientHardwareConfig? _esp32ClientHardwareConfig {  get; set; }
+        public Esp32ClientHardwareConfig? Esp32ClientHardwareConfig
+        {
+
+            get => _esp32ClientHardwareConfig;
+            set
+            {
+                _esp32ClientHardwareConfig = value;
+                OnPropertyChanged();
+            }
+        }
+
+
 
         private ObservableCollection<IProjectObjectListable> _scsServos = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> ScsServos
@@ -151,6 +164,7 @@ namespace AwbStudio.ProjectConfiguration
 
             this.ProjectFolder = awbProject.ProjectFolder;
             this.ProjectMetaData = awbProject.ProjectMetaData;
+            this.Esp32ClientHardwareConfig = awbProject.Esp32ClientHardware;
 
             if (awbProject?.ScsServos != null)
                 foreach (var scsServo in awbProject.ScsServos)
