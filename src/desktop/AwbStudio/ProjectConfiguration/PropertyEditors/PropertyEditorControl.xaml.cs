@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
+using static AwbStudio.ProjectConfiguration.PropertyEditors.ProjectObjectGenericEditorControl;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
@@ -22,6 +23,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     {
         private ProjectObjectGenericEditorControl? _actualEditor;
         private IProjectObjectListable? _projectObject;
+
+        public EventHandler OnUpdatedData { get; set; }
+        public EventHandler<DeleteObjectEventArgs> OnDeleteObject { get; set; }
 
         private ProjectObjectGenericEditorControl? ActualEditor
         {
@@ -83,18 +87,17 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             return true;
         }
 
-        private void UpdatedData_Fired(object? sender, EventArgs e)
-        {
-        }
 
-        private void OnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         public PropertyEditorControl()
         {
             InitializeComponent();
         }
+
+        private void UpdatedData_Fired(object? sender, EventArgs e)
+            => OnUpdatedData?.Invoke(this, new EventArgs());
+
+        private void OnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
+            => OnDeleteObject?.Invoke(this, e);
     }
 }

@@ -9,6 +9,7 @@ using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Timelines;
 using AwbStudio.ProjectConfiguration;
+using AwbStudio.ProjectConfiguration.PropertyEditors;
 using AwbStudio.Projects;
 using System;
 using System.Collections.Generic;
@@ -197,6 +198,33 @@ namespace AwbStudio
             {
 
             }
+        }
+
+        private void PropertyEditorUpdatedData_Fired(object? sender, EventArgs e)
+        {
+            _viewModel.UnsavedChanges = true;
+        }
+
+        private void PropertyEditorOnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
+        {
+            if (e.ObjectToDelete == _viewModel.ProjectMetaData   )
+            {
+                MessageBox.Show("You can not delete the project meta data object!");
+                return;
+            }
+
+            if (e.ObjectToDelete == _viewModel.Esp32ClientHardwareConfig)
+            {
+                MessageBox.Show("You can not delete the ESP32 hardware configuration object!");
+                return;
+            }
+
+            _viewModel.Inputs.Remove(e.ObjectToDelete);
+            _viewModel.ScsServos.Remove(e.ObjectToDelete);
+            _viewModel.StsServos.Remove(e.ObjectToDelete);
+            _viewModel.Mp3PlayerYX5300.Remove(e.ObjectToDelete);
+            _viewModel.Pca9685PwmServos.Remove(e.ObjectToDelete);
+            _viewModel.UnsavedChanges = true;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace AwbStudio.ProjectConfiguration
                 handler(this, e);
         }
 
-        public bool UnsavedChanges { get; set; } = true;
+        public bool UnsavedChanges { get; set; } 
 
         #region project objects
 
