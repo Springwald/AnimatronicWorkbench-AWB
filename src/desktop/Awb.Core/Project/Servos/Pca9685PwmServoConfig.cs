@@ -63,7 +63,7 @@ namespace Awb.Core.Project.Servos
         }
 
         [JsonIgnore]
-        public string TitleShort => Title ?? $"no title for Pca9685PwmServo '{Id}'";
+        public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"Pca9685PwmServo has no title set '{Id}'" : Title;
 
 
         [JsonIgnore]

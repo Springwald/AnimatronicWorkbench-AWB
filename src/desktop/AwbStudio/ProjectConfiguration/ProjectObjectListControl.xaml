@@ -14,7 +14,7 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" x:Name="LabelTitle" HorizontalAlignment="Center"  Content="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}" FontWeight="Bold"/>
-                <Button Grid.Column="1" Content="➕" HorizontalAlignment="Right" />
+                <Button Grid.Column="1" x:Name="ButtonAddNew" Content="➕ add new" HorizontalAlignment="Right" Click="ButtonAddNew_Click" />
             </Grid>
              <ListBox x:Name="ListProjectObjects" ItemsSource="{Binding ProjectObjects,
          RelativeSource={RelativeSource AncestorType=UserControl}}" SelectionChanged="ListProjectObjects_SelectionChanged" >

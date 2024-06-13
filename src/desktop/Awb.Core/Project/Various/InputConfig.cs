@@ -28,7 +28,8 @@ namespace Awb.Core.Project.Various
         public int? IoPin { get; set; }
 
         [JsonIgnore]
-        public string TitleShort => Title ?? $"no title for input '{Id}'";
+        public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"Input has no title set '{Id}'" : Title;
+
 
         [JsonIgnore]
         public string TitleDetailed => $"Input {TitleShort}";
@@ -36,12 +37,6 @@ namespace Awb.Core.Project.Various
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             yield break;
-        }
-
-        public InputConfig(int id, string title)
-        {
-            Id = id;
-            Title = title;
         }
     }
 }

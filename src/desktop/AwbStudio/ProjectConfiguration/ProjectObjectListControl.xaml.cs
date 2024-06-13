@@ -71,5 +71,10 @@ namespace AwbStudio.ProjectConfiguration
             ProjectObjectSelected?.Invoke(this,
                 new ProjectObjectSelectedEventArgs { ProjectObject = this.SelectedProjectObject });
         }
+
+        private void ButtonAddNew_Click(object sender, RoutedEventArgs e)
+        {
+            NewProjectObjectRequested?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

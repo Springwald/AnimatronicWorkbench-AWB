@@ -88,6 +88,16 @@ namespace Awb.Core.Project
             }
         }
 
+        public int GetNewTimelineStateId()
+        {
+            int id = 1;
+            while (true)
+            {
+                if (!TimelinesStates.Any(x => x.Id == id)) return id;
+                id++;
+            }
+        }
+
         public string CreateNewObjectId(string prefix)
         {
             int idCount = 1;

@@ -96,7 +96,7 @@ namespace Awb.Core.Project.Servos
         }
 
         [JsonIgnore]
-        public string TitleShort => Title ?? $"StsServo has no title set '{Id}'";
+        public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"StsServo has no title set '{Id}'": Title;
 
         [JsonIgnore]
         public string TitleDetailed => $"StsServo '{TitleShort}' (Id: {Id}, ClientId: {ClientId}, Channel: {Channel})";

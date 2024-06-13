@@ -40,7 +40,8 @@ namespace Awb.Core.Project.Various
         }
 
         [JsonIgnore]
-        public string TitleShort => Title ?? $"No Title for Mp3PlayerYX5300 '{Id}'";
+        public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"Mp3PlayerYX5300 has no title set '{Id}'" : Title;
+
 
         [JsonIgnore]
         public string TitleDetailed => $"{TitleShort} (ClientId: {ClientId}, SoundPlayerId: {Id})";

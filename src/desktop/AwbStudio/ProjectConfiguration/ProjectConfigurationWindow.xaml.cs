@@ -5,8 +5,10 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
+using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using AwbStudio.ProjectConfiguration;
 using AwbStudio.ProjectConfiguration.PropertyEditors;
@@ -220,11 +222,80 @@ namespace AwbStudio
             }
 
             _viewModel.Inputs.Remove(e.ObjectToDelete);
+            _viewModel.TimelineStates.Remove(e.ObjectToDelete);
             _viewModel.ScsServos.Remove(e.ObjectToDelete);
             _viewModel.StsServos.Remove(e.ObjectToDelete);
             _viewModel.Mp3PlayerYX5300.Remove(e.ObjectToDelete);
             _viewModel.Pca9685PwmServos.Remove(e.ObjectToDelete);
             _viewModel.UnsavedChanges = true;
+        }
+
+        private void ScsServosList_NewProjectObjectRequested(object sender, EventArgs e)
+        {
+            _viewModel.ScsServos.Add(new ScsFeetechServoConfig
+            {
+                Id = _awbProject.CreateNewObjectId("ScsServo"),
+                Title = "",
+                ClientId = 1,
+                Channel = 1
+            });
+        }
+
+        private void StsServosList_NewProjectObjectRequested(object sender, EventArgs e)
+        {
+            _viewModel.StsServos.Add(new StsFeetechServoConfig
+            {
+                Id = _awbProject.CreateNewObjectId("StsServo"),
+                Title = "",
+                ClientId = 1,
+                Channel = 1
+            });
+        }
+
+        private void Pca9685PWMServosList_NewProjectObjectRequested(object sender, EventArgs e)
+        {
+            _viewModel.Pca9685PwmServos.Add(new Pca9685PwmServoConfig
+            {
+                Id = _awbProject.CreateNewObjectId("Pca9685PwmServo"),
+                I2cAdress = 0x40,
+                Title = "",
+                ClientId = 1,
+                Channel = 1
+            });
+        }
+
+        private void Mp3PlayerYX5300List_NewProjectObjectRequested(object sender, EventArgs e)
+        {
+            _viewModel.Mp3PlayerYX5300.Add(new Mp3PlayerYX5300Config
+            {
+                Id = _awbProject.CreateNewObjectId("Mp3PlayerYX5300"),
+                Title = "",
+                ClientId = 1,
+                RxPin = 13,
+                TxPin = 14
+            });
+        }
+
+        private void InputsList_NewProjectObjectRequested(object sender, EventArgs e)
+        {
+            _viewModel.Inputs.Add(new InputConfig
+            {
+                Id = _awbProject.GetNewInputId(),
+                Title = "",
+                ClientId = 1,
+            });
+        }
+
+        private void TimelineStates_NewProjectObjectRequested(object sender, EventArgs e)
+        {
+            _viewModel.TimelineStates.Add(new TimelineState
+            {
+                Id = _awbProject.GetNewTimelineStateId(),
+                Title = "",
+                PositiveInputs = Array.Empty<int>(),
+                NegativeInputs = Array.Empty<int>()
+            });
+
         }
     }
 }
