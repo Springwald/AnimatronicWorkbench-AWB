@@ -2,7 +2,6 @@
 #include <vector>
 #include "hardware.h"
 #include "AutoPlayer.h"
-#include "AutoPlayData.h"
 #include "../ProjectData/Timeline.h"
 #include "../ProjectData/TimelineStateReference.h"
 #include "../ProjectData/StsServoPoint.h"

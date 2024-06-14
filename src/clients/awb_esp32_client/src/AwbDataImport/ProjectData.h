@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <String.h>
 #include "../ProjectData/Timeline.h"
+#include "../ProjectData/TimelineState.h"
 #include "../ProjectData/TimelineStateReference.h"
 #include "../ProjectData/StsServoPoint.h"
 #include "../ProjectData/Pca9685PwmServoPoint.h"
@@ -26,6 +27,7 @@ public:
 	std::vector<StsScsServo> *stsServos;
 	std::vector<Pca9685PwmServo> *pca9685PwmServos;
 	std::vector<Timeline> *timelines;
+	std::vector<TimelineState> *timelineStates;
 
 	int mp3PlayerYX5300Count = 1;
 	int mp3PlayerYX5300RxPin[1] = {13};

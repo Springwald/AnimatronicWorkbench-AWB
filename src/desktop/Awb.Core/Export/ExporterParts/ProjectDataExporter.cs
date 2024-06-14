@@ -30,6 +30,7 @@ namespace Awb.Core.Export.ExporterParts
                 #include <Arduino.h>
                 #include <String.h>
                 #include "../ProjectData/Timeline.h"
+                #include "../ProjectData/TimelineState.h"
                 #include "../ProjectData/TimelineStateReference.h"
                 #include "../ProjectData/StsServoPoint.h"
                 #include "../ProjectData/Pca9685PwmServoPoint.h"
@@ -48,6 +49,7 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine($"   std::vector<StsScsServo> *stsServos;");
             content.AppendLine($"   std::vector<Pca9685PwmServo> *pca9685PwmServos;");
             content.AppendLine($"   std::vector<Timeline>* timelines;");
+            content.AppendLine($"   std::vector<TimelineState>* timelineStates;");
 
             content.AppendLine();
         
@@ -106,7 +108,7 @@ namespace Awb.Core.Export.ExporterParts
 
         private static void ExportTimelineStates(IEnumerable<TimelineState> timelineStates, StringBuilder result)
         {
-            // export the states
+            // OLD export the states
             var exportStates = timelineStates?.Where(s => s.Export).ToArray() ?? Array.Empty<TimelineState>();
             var stateIds = exportStates.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
             result.AppendLine($"\tint timelineStateIds[{exportStates.Length}] = {{{string.Join(", ", stateIds)}}};");
@@ -116,6 +118,16 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine($"\tint timelineStateNegativeInput[{exportStates.Length}] =  {{{string.Join(", ", exportStates.Select(s => (s.NegativeInputs.FirstOrDefault()).ToString()))}}};");
             result.AppendLine($"\tint timelineStateCount = {stateIds.Length};");
             result.AppendLine();
+
+            // NEW export the states
+            result.AppendLine($"\tstd::vector<TimelineState>* timelineStates = new std::vector<TimelineState>();");
+            foreach (var state in exportStates)
+            {
+                //todo: export to the correct class parameter
+                //result.AppendLine($"\t\tauto state{state.Id} = new TimelineState({state.Id}, String(\"{state.Title}\"), {state.AutoPlay.ToString().ToLower()}, {state.PositiveInputs.FirstOrDefault()}, {state.NegativeInputs.FirstOrDefault()});");
+                //result.AppendLine($"\t\ttimelineStates->push_back(*state{state.Id});");
+            }
+
         }
 
         private static void ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos, StringBuilder result)
