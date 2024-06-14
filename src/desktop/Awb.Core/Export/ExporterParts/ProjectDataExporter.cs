@@ -30,7 +30,7 @@ namespace Awb.Core.Export.ExporterParts
                 #include <Arduino.h>
                 #include <String.h>
                 #include "../ProjectData/Timeline.h"
-                #include "../ProjectData/TimelineState.h"
+                #include "../ProjectData/TimelineStateReference.h"
                 #include "../ProjectData/StsServoPoint.h"
                 #include "../ProjectData/Pca9685PwmServoPoint.h"
                 #include "../ProjectData/Mp3PlayerYX5300Point.h"
@@ -249,7 +249,7 @@ namespace Awb.Core.Export.ExporterParts
                     return $"Soundplayer id '{soundPoint.SoundPlayerId}' not found in project config!";
                 }
 
-                result.AppendLine($"\t\tauto state{timelineNo} = new TimelineState({state.Id}, String(\"{state.Title}\"));");
+                result.AppendLine($"\t\tauto state{timelineNo} = new TimelineStateReference({state.Id}, String(\"{state.Title}\"));");
                 result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 

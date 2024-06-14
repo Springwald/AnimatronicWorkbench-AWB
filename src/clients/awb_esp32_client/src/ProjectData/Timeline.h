@@ -8,7 +8,7 @@
 #include "StsServoPoint.h"
 #include "Pca9685PwmServoPoint.h"
 #include "Mp3PlayerYX5300Point.h"
-#include "TimelineState.h"
+#include "TimelineStateReference.h"
 
 using byte = unsigned char;
 
@@ -18,7 +18,7 @@ class Timeline
 protected:
 public:
     String name;                                              /// the name of the timeline
-    TimelineState *state;                                     /// the state of the timeline
+    TimelineStateReference *state;                            /// the state of the timeline
     std::vector<StsServoPoint> *stsServoPoints;               /// the sts servo points of the timeline
     std::vector<StsServoPoint> *scsServoPoints;               /// the scs servo points of the timeline
     std::vector<Pca9685PwmServoPoint> *pca9685PwmPoints;      /// the Pca9685 Pwm servo points of the timeline
@@ -26,7 +26,7 @@ public:
     int durationMs;                                           /// the duration of the timeline in milliseconds
 
 public:
-    Timeline(TimelineState *state, String name, std::vector<StsServoPoint> *p_stsPoints, std::vector<StsServoPoint> *p_scsPoints, std::vector<Pca9685PwmServoPoint> *p_pca9685PwmPoints, std::vector<Mp3PlayerYX5300Point> *p_mp3PlayerYX5300Points) : stsServoPoints(p_stsPoints), scsServoPoints(p_scsPoints), pca9685PwmPoints(p_pca9685PwmPoints), mp3PlayerYX5300Points(p_mp3PlayerYX5300Points), name(name), state(state)
+    Timeline(TimelineStateReference *state, String name, std::vector<StsServoPoint> *p_stsPoints, std::vector<StsServoPoint> *p_scsPoints, std::vector<Pca9685PwmServoPoint> *p_pca9685PwmPoints, std::vector<Mp3PlayerYX5300Point> *p_mp3PlayerYX5300Points) : stsServoPoints(p_stsPoints), scsServoPoints(p_scsPoints), pca9685PwmPoints(p_pca9685PwmPoints), mp3PlayerYX5300Points(p_mp3PlayerYX5300Points), name(name), state(state)
     {
         durationMs = 0;
 

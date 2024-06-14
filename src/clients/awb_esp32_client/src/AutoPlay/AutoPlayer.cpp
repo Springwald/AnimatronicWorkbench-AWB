@@ -4,7 +4,7 @@
 #include "AutoPlayer.h"
 #include "AutoPlayData.h"
 #include "../ProjectData/Timeline.h"
-#include "../ProjectData/TimelineState.h"
+#include "../ProjectData/TimelineStateReference.h"
 #include "../ProjectData/StsServoPoint.h"
 #include "../ProjectData/Pca9685PwmServoPoint.h"
 
