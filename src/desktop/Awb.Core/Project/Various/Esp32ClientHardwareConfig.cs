@@ -5,8 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
-using Awb.Core.Project.Servos;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
@@ -68,80 +66,6 @@ namespace Awb.Core.Project.Various
         // #define USE_NEOPIXEL_STATUS_CONTROL
         //#define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.
         //#define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO
-
-        /* STS serial servo settings */
-        
-        [DisplayName("STS servos")]
-        [Description("Check if you use STS bus servos e.g. from feetech or waveshare")]
-        public bool Use_Sts_Servo { get; set; } = false;
-
-        [DisplayName("STS servo default speed")]
-        [Description(StsFeetechServoConfig.SpeedDescriptionConst)]
-        [Range(-1, StsFeetechServoConfig.MaxSpeedConst)]
-        public int? StsServoSpeed { get; set; } = 1500;
-
-        [DisplayName("STS servo default acceleration")]
-        [Description(StsFeetechServoConfig.AccDescriptionConst)]
-        [Range(-1, StsFeetechServoConfig.MaxAccConst)]
-        public int? StsServoAcceleration { get; set; } = 100;
-
-        [DisplayName("STS servo RXD pin")]
-        [Description("eg. GPIO 18 for waveshare servo driver")]
-        [Range(1, Esp32.MaxGpIoPortNumber)]
-        public int? StsServoRxd { get; set; } = 18;
-
-        [DisplayName("STS servo TXD pin")]
-        [Description("eg. GPIO 19 for waveshare servo driver")]
-        [Range(1, Esp32.MaxGpIoPortNumber)]
-        public int? StsServoTxd { get; set; } = 19;
-
-        [DisplayName("STS servo max temperature")]
-        [Description("max temperature (celsius) before servo is disabled")]
-        [Range(20, 70)]
-        public int? StsServoMaxTemp{ get; set; } = 55;
-
-        [DisplayName("STS servo max load")]
-        [Description("max load before servo is disabled")]
-        [Range(0, 4096)]
-        public int? StsServoMaxLoad { get; set; } = 400;
-
-        /* autoplay state selector */
-        // if a servo position feedback is used as a state selector, define the servo channel here.
-        // if you don't use a servo as state selector, set this to -1 or undefine it
-        // #define AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL 9
-        // if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)
-        //#define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457
-
-        /* SCS serial servo settings */
-
-        [DisplayName("SCS servos")]
-        [Description("Check if you use SCS bus servos e.g. from feetech or waveshare")]
-        public bool Use_Scs_Servo { get; set; } = false;
-
-        [DisplayName("SCS servo default speed")]
-        [Description(ScsFeetechServoConfig.SpeedDescriptionConst)]
-        [Range(-1, ScsFeetechServoConfig.MaxSpeedConst)]
-        public int? ScsServoSpeed { get; set; } = 500;
-
-        [DisplayName("SCS servo RXD pin")]
-        [Description("eg. GPIO 18 for waveshare servo driver")]
-        [Range(1, Esp32.MaxGpIoPortNumber)]
-        public int? ScsServoRxd { get; set; } = 18;
-
-        [DisplayName("SCS servo TXD pin")]
-        [Description("eg. GPIO 19 for waveshare servo driver")]
-        [Range(1, Esp32.MaxGpIoPortNumber)]
-        public int? ScsServoTxd { get; set; } = 19;
-
-        [DisplayName("STS servo max temperature")]
-        [Description("max temperature (celsius) before servo is disabled")]
-        [Range(20, 70)]
-        public int? ScsServoMaxTemp { get; set; } = 55;
-
-        [DisplayName("STS servo max load")]
-        [Description("max load before servo is disabled")]
-        [Range(0, 4096)]
-        public int? ScsServoMaxLoad { get; set; } = 600;
 
         /* PCA9685 PWM servo settings */
         // #define USE_PCA9685_PWM_SERVO // uncomment this line if you want to use PCA9685 PWM servos
