@@ -13,6 +13,8 @@ namespace Awb.Core.Project.Servos
 {
     public class Pca9685PwmServoConfig : IDeviceConfig, IProjectObjectListable
     {
+        private const int maxValConst = 4095;
+
         public required string Id { get; set; }
 
         [DisplayName("Client ID")]
@@ -36,17 +38,17 @@ namespace Awb.Core.Project.Servos
 
         [DisplayName("Lowest value")]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
-        [Range(0, 4095)]
+        [Range(0, maxValConst)]
         public int MinValue { get; set; }
 
         [DisplayName("Highest value")]
         [Description("The value when the servo curve is at its highest point. Possibly confusing: Can be greater than the value for 'low'.")]
-        [Range(0, 4095)]
+        [Range(0, maxValConst)]
         public int MaxValue { get; set; }
 
         [DisplayName("Default value")]
         [Description("Must be between the highest and lowest value.")]
-        [Range(0, 4095)]
+        [Range(0, maxValConst)]
         public int? DefaultValue { get; set; }
 
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
@@ -64,7 +66,6 @@ namespace Awb.Core.Project.Servos
 
         [JsonIgnore]
         public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"Pca9685PwmServo has no title set '{Id}'" : Title;
-
 
         [JsonIgnore]
         public string TitleDetailed => "Pca9685PwmServo " + TitleShort;

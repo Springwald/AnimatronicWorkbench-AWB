@@ -26,12 +26,12 @@ namespace Awb.Core.Project.Various
 
         [DisplayName("RX Pin")]
         [Description("The RX pin of the serial connection to the YX5300 MP3 player.")]
-        [Range(1,64)]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
         public required uint RxPin { get; set; } = 13;
 
         [DisplayName("TX Pin")]
         [Description("The TX pin of the serial connection to the YX5300 MP3 player.")]
-        [Range(1, 64)]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
         public required uint TxPin { get; set; } = 14;
 
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)

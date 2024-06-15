@@ -58,7 +58,6 @@ namespace Awb.Core.Project.Various
             set => NegativeInputs = IntArrayFromString(value);
         }
 
-
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             // check if the positive and negative inputs are existing in the project
@@ -80,7 +79,6 @@ namespace Awb.Core.Project.Various
 
         [JsonIgnore]
         public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"TimelineState has no title set '{Id}'" : Title;
-
 
         [JsonIgnore]
         public string TitleDetailed => $"TimelineState {TitleShort}";

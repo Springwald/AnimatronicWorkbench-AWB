@@ -25,6 +25,7 @@ namespace Awb.Core.Project.Various
         public required string Title { get; set; }
 
         [DisplayName("IO hardware pin if input is GPIO input")]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
         public int? IoPin { get; set; }
 
         [JsonIgnore]
