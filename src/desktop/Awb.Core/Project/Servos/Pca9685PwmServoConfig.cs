@@ -60,7 +60,6 @@ namespace Awb.Core.Project.Servos
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Message = $"The default value '{DefaultValue}' is not between the lowest value '{MinValue}' and the highest value '{MaxValue}' for servo '{TitleShort}'",
                     Source = TitleDetailed,
-                    Category = ProjectProblem.Categories.Servo
                 };
         }
 

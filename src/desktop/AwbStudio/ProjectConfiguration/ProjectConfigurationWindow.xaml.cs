@@ -31,7 +31,7 @@ namespace AwbStudio
         private readonly IProjectManagerService _projectManagerService;
         private readonly AwbProject _awbProject;
 
-        private TimelineData[] _timelines;
+        private TimelineData[]? _timelines;
         private TimelineData[] Timelines
         {
             get
@@ -39,8 +39,7 @@ namespace AwbStudio
                 if (_timelines == null)
                 {
                     var ids = _awbProject.TimelineDataService.TimelineIds.ToArray();
-                    var timelines = ids.Select(id => _awbProject.TimelineDataService.GetTimelineData(id))
-                        .ToArray();
+                    var timelines = ids.Select(id => _awbProject.TimelineDataService.GetTimelineData(id)).ToArray() ?? Array.Empty<TimelineData>();
                     _timelines = timelines; 
                 }
                 return _timelines;

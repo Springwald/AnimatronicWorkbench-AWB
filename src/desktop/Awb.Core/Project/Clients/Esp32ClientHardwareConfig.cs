@@ -88,28 +88,24 @@ namespace Awb.Core.Project.Clients
                 if (string.IsNullOrWhiteSpace(Ssd1306I2cAddress)) yield return new ProjectProblem
                 {
                     Message = "SSD1306 I2C address has to be set",
-                    Category = ProjectProblem.Categories.Various,
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };
                 if (string.IsNullOrWhiteSpace(Ssd1306ComPins)) yield return new ProjectProblem
                 {
                     Message = "SSD1306 COM pins have to be set",
-                    Category = ProjectProblem.Categories.Various,
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };
                 if (Ssd1306ScreenHeight == null) yield return new ProjectProblem
                 {
                     Message = "SSD1306 screen height has to be set",
-                    Category = ProjectProblem.Categories.Various,
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };
                 if (Ssd1306ScreenWidth == null) yield return new ProjectProblem
                 {
                     Message = "SSD1306 screen width has to be set",
-                    Category = ProjectProblem.Categories.Various,
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };

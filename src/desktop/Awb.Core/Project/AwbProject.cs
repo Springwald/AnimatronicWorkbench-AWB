@@ -26,12 +26,15 @@ namespace Awb.Core.Project
 
         public Esp32ClientHardwareConfig Esp32ClientHardware { get; set; } = new Esp32ClientHardwareConfig { ClientId = 1 };
 
-        public Pca9685PwmServoConfig[] Pca9685PwmServos { get; set; }
-        public StsFeetechServoConfig[] StsServos { get; set; }
-        public ScsFeetechServoConfig[] ScsServos { get; set; }
-        public Mp3PlayerYX5300Config[] Mp3PlayersYX5300 { get; set; }
-        public TimelineState[] TimelinesStates { get; set; }
-        public InputConfig[] Inputs { get; set; }
+        public IProjectObjectListable[] AdditionalClients { get; set; } = new IProjectObjectListable[] { }; 
+
+        public Pca9685PwmServoConfig[] Pca9685PwmServos { get; set; } = new Pca9685PwmServoConfig[] { };
+        public StsFeetechServoConfig[] StsServos { get; set; } = new StsFeetechServoConfig[] { };
+        public ScsFeetechServoConfig[] ScsServos { get; set; } = new ScsFeetechServoConfig[] { };
+        public Mp3PlayerYX5300Config[] Mp3PlayersYX5300 { get; set; } = new Mp3PlayerYX5300Config[] { };
+        public TimelineState[] TimelinesStates { get; set; } = new TimelineState[] { };
+        public InputConfig[] Inputs { get; set; } = new InputConfig[] { };
+
         public int ItemsPerBank { get; set; } = 8;
 
         [JsonIgnore]
@@ -66,6 +69,8 @@ namespace Awb.Core.Project
             var timelineProblems = timelines.SelectMany(x => x.GetProblems(this));
             foreach (var item in timelineProblems) yield return item;
         }
+
+      
 
         public IEnumerable<IProjectObjectListable> GetAllListableObjects()
         {

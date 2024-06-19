@@ -6,12 +6,15 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Project.Clients;
+using Awb.Core.Project.Servos;
+using Awb.Core.Project.Various;
 
 namespace Awb.Core.Tools.Validation
 {
     public class ObjectValidator
     {
-        public static IEnumerable<ProjectProblem> ValidateObjectGetErrors(object obj)
+        public static IEnumerable<ProjectProblem> ValidateObjectGetErrors(IProjectObjectListable obj)
         {
             var type = obj.GetType();
             var properties = type.GetProperties();
@@ -31,9 +34,8 @@ namespace Awb.Core.Tools.Validation
                     yield return new ProjectProblem
                     {
                         ProblemType = ProjectProblem.ProblemTypes.Error,
-                        Category = ProjectProblem.Categories.Various,
                         Message = errorMessagesForProperty,
-                        Source = property.Name,
+                        Source = $"{obj.TitleShort}: {property.Name}",
                     };
                 }
             }

@@ -70,7 +70,6 @@ namespace Awb.Core.Project.Various
                         ProblemType = ProjectProblem.ProblemTypes.Error,
                         Message = $"Input with ID {inputId} not found in project.",
                         Source = Title,
-                        Category = ProjectProblem.Categories.TimelineState
                     };
 
                 }
@@ -82,7 +81,6 @@ namespace Awb.Core.Project.Various
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Message = $"TimelineState [{Id}] {Title} has more than 1 positive input. Actually only 1 is supported.",
                     Source = Title,
-                    Category = ProjectProblem.Categories.TimelineState
                 };
 
             if (NegativeInputs?.Length > 1)
@@ -91,7 +89,6 @@ namespace Awb.Core.Project.Various
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Message = $"TimelineState [{Id}] {Title} has more than 1 negative input. Actually only 1 is supported.",
                     Source = Title,
-                    Category = ProjectProblem.Categories.TimelineState
                 };
         }
 

@@ -76,7 +76,6 @@ namespace Awb.Core.Project.Servos
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Message = $"The default value '{DefaultValue}' is not between the lowest value '{MinValue}' and the highest value '{MaxValue}' for servo '{TitleShort}'",
                     Source = TitleDetailed,
-                    Category = ProjectProblem.Categories.Servo
                 };
 
             // check if the relax ranges are valid
@@ -88,7 +87,6 @@ namespace Awb.Core.Project.Servos
                         ProblemType = ProjectProblem.ProblemTypes.Error,
                         Message = $"The relax range '{relaxRange}' first value is lower than second value for servo '{TitleShort}'",
                         Source = TitleDetailed,
-                        Category = ProjectProblem.Categories.Servo
                     };
             }
 
