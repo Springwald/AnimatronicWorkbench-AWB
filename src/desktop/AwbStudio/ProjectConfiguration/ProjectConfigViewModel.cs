@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project;
+using Awb.Core.Project.Clients;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using System;

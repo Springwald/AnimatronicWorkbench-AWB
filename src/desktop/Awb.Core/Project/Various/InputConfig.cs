@@ -8,6 +8,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Awb.Core.Project.Clients;
 
 namespace Awb.Core.Project.Various
 {

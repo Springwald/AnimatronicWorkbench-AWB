@@ -8,6 +8,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using Awb.Core.Project.Clients;
 
 namespace Awb.Core.Project.Servos
 {

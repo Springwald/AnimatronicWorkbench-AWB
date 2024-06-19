@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Awb.Core.Project
+namespace Awb.Core.Project.Clients
 {
     internal static class Esp32
     {

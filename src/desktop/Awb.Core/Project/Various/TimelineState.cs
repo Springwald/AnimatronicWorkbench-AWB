@@ -42,7 +42,7 @@ namespace Awb.Core.Project.Various
         [Description("The state is only available when one of this inputs is on.\r\nFormat: Use commas to list multiple IDs.")]
         [RegularExpression(@"(\d{1,4}(,\d{1,4})*)?", ErrorMessage = "Please enter a comma separated list of integer input IDs.")]
         [JsonIgnore]
-        public string? PositiveInputsAsString 
+        public string? PositiveInputsAsString
         {
             get => StringFromIntArray(PositiveInputs);
             set => PositiveInputs = IntArrayFromString(value);
@@ -75,6 +75,24 @@ namespace Awb.Core.Project.Various
 
                 }
             }
+
+            if (PositiveInputs?.Length > 1)
+                yield return new ProjectProblem
+                {
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Message = $"TimelineState [{Id}] {Title} has more than 1 positive input. Actually only 1 is supported.",
+                    Source = Title,
+                    Category = ProjectProblem.Categories.TimelineState
+                };
+
+            if (NegativeInputs?.Length > 1)
+                yield return new ProjectProblem
+                {
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Message = $"TimelineState [{Id}] {Title} has more than 1 negative input. Actually only 1 is supported.",
+                    Source = Title,
+                    Category = ProjectProblem.Categories.TimelineState
+                };
         }
 
         [JsonIgnore]
