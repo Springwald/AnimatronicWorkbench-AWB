@@ -22,7 +22,7 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine(includes);
             content.AppendLine();
             content.AppendLine("// Created with Animatronic Workbench Studio");
-            content.AppendLine("// https://daniel.springwald.de/post/AnimatronicWorkbench");
+            content.AppendLine("// https://daniel.springwald.de/post/AnimatronicWorkbench-EN");
             content.AppendLine();
             content.AppendLine($"// Created on {DateTime.Now}");
             content.AppendLine();

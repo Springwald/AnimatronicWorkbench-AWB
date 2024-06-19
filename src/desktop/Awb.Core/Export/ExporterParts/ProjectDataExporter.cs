@@ -49,7 +49,6 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine($"   std::vector<StsScsServo> *stsServos;");
             content.AppendLine($"   std::vector<Pca9685PwmServo> *pca9685PwmServos;");
             content.AppendLine($"   std::vector<Timeline>* timelines;");
-            content.AppendLine($"   std::vector<TimelineState>* timelineStates;");
 
             content.AppendLine();
         
@@ -61,12 +60,18 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("ProjectData()");
             content.AppendLine("{");
             content.AppendLine();
-
-
             ExportScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs, content);
             ExportStsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs, content);
             ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs, content);
             content.AppendLine();
+            content.AppendLine("    addTimelines();");
+            content.AppendLine();
+            content.AppendLine("}");
+
+            // Add timelines
+
+            content.AppendLine();
+            content.AppendLine("void addTimelines() {");
 
             content.AppendLine("   timelines = new std::vector<Timeline>();");
             content.AppendLine();
@@ -76,7 +81,6 @@ namespace Awb.Core.Export.ExporterParts
                 return new IExporter.ExportResult { ErrorMessage = errMsg };
 
             content.AppendLine();
-
             content.AppendLine("}");
 
             content.AppendLine(GetFooter("ProjectData"));
@@ -170,7 +174,7 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine($"\tint mp3PlayerYX5300Count = {players.Count()};");
             result.AppendLine($"\tint mp3PlayerYX5300RxPin[{players.Count()}] = {{{string.Join(", ", players.Select(s => s.RxPin.ToString()))}}};");
             result.AppendLine($"\tint mp3PlayerYX5300TxPin[{players!.Count()}] = {{{string.Join(", ", players.Select(s => s.TxPin.ToString()))}}};");
-            result.AppendLine($"\tString mp3PlayerYX5300Name[{players!.Count()}] = {{{string.Join(", ", mp3PlayerYX5300Titles)}}};");
+            result.AppendLine($"\tString mp3PlayerYX5300Name[{players!.Count()}] = {{{string.Join(", ", mp3PlayerYX5300Titles.Select(s => $"\"{s}\""))}}};");
             result.AppendLine();
         }
 
