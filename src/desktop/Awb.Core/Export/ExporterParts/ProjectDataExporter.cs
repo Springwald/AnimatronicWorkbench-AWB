@@ -48,12 +48,12 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine($"   std::vector<StsScsServo> *scsServos;");
             content.AppendLine($"   std::vector<StsScsServo> *stsServos;");
             content.AppendLine($"   std::vector<Pca9685PwmServo> *pca9685PwmServos;");
+            content.AppendLine($"   std::vector<TimelineState>* timelineStates;");
             content.AppendLine($"   std::vector<Timeline>* timelines;");
 
             content.AppendLine();
         
             ExportMp3PlayerYX5300Informations(_projectData.Mp3PlayerYX5300Configs, content);
-            ExportTimelineStates(timelineStates: _projectData.TimelineStates, content);
             ExportInputs(inputConfigs: _projectData.InputConfigs, content);
             content.AppendLine();
 
@@ -63,6 +63,7 @@ namespace Awb.Core.Export.ExporterParts
             ExportScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs, content);
             ExportStsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs, content);
             ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs, content);
+            ExportTimelineStates(_projectData.TimelineStates, content);
             content.AppendLine();
             content.AppendLine("    addTimelines();");
             content.AppendLine();
@@ -112,26 +113,13 @@ namespace Awb.Core.Export.ExporterParts
 
         private static void ExportTimelineStates(IEnumerable<TimelineState> timelineStates, StringBuilder result)
         {
-            // OLD export the states
             var exportStates = timelineStates?.Where(s => s.Export).ToArray() ?? Array.Empty<TimelineState>();
-            var stateIds = exportStates.OrderBy(s => s.Id).Select(s => s.Id).ToArray() ?? Array.Empty<int>();
-            result.AppendLine($"\tint timelineStateIds[{exportStates.Length}] = {{{string.Join(", ", stateIds)}}};");
-            result.AppendLine($"\tString timelineStateNames[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"\"{s.Title}\""))}}};");
-            result.AppendLine($"\tbool timelineStateAutoPlay[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => $"{s.AutoPlay.ToString().ToLower()}"))}}};");
-            result.AppendLine($"\tint timelineStatePositiveInput[{exportStates.Length}] = {{{string.Join(", ", exportStates.Select(s => (s.PositiveInputs.FirstOrDefault()).ToString()))}}};");
-            result.AppendLine($"\tint timelineStateNegativeInput[{exportStates.Length}] =  {{{string.Join(", ", exportStates.Select(s => (s.NegativeInputs.FirstOrDefault()).ToString()))}}};");
-            result.AppendLine($"\tint timelineStateCount = {stateIds.Length};");
-            result.AppendLine();
-
-            // NEW export the states
-            result.AppendLine($"\tstd::vector<TimelineState>* timelineStates = new std::vector<TimelineState>();");
+            result.AppendLine($"\ttimelineStates = new std::vector<TimelineState>();");
             foreach (var state in exportStates)
             {
-                //todo: export to the correct class parameter
-                //result.AppendLine($"\t\tauto state{state.Id} = new TimelineState({state.Id}, String(\"{state.Title}\"), {state.AutoPlay.ToString().ToLower()}, {state.PositiveInputs.FirstOrDefault()}, {state.NegativeInputs.FirstOrDefault()});");
-                //result.AppendLine($"\t\ttimelineStates->push_back(*state{state.Id});");
+                // add line in using this format:  timelineStates->push_back(TimelineState(1, String("InBag"), true, new std::vector<int>({1}), new std::vector<int>({0}))); 
+                result.AppendLine($"\ttimelineStates->push_back(TimelineState({state.Id}, String(\"{state.Title}\"), {state.AutoPlay.ToString().ToLower()}, new std::vector<int>({{ {string.Join(", ", state.PositiveInputs)} }}), new std::vector<int>({{ {string.Join(", ", state.NegativeInputs)} }})));");
             }
-
         }
 
         private static void ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos, StringBuilder result)

@@ -84,7 +84,7 @@ public:
     /**
      * Check, if the selected state is active by inputs
      */
-    std::vector<int> getActiveStateIdsByInputs();
+    std::vector<TimelineState> getActiveStatesByInputs();
 
     /**
      * starts the timeline with the given index

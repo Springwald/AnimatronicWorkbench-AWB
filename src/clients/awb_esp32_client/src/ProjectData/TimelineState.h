@@ -10,11 +10,11 @@ class TimelineState
 public:
     int id;
     String name;
-    bool autplay;
+    bool autoplay;
     std::vector<int> *positiveInputIds;
     std::vector<int> *negativeInputIds;
 
-    TimelineState(int _id, String _name, bool _autoplay, std::vector<int> *_positiveInputIds, std::vector<int> *_negativeInputIds) : id(_id), name(_name), autplay(_autoplay), positiveInputIds(_positiveInputIds), negativeInputIds(_negativeInputIds)
+    TimelineState(int _id, String const _name, bool _autoplay, std::vector<int> *_positiveInputIds, std::vector<int> *_negativeInputIds) : id(_id), name(_name), autoplay(_autoplay), positiveInputIds(_positiveInputIds), negativeInputIds(_negativeInputIds)
     {
         // find out the negative input ids count preventing null devision
     }
