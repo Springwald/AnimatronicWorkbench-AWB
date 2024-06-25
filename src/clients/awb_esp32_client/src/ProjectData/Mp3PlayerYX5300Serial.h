@@ -10,17 +10,15 @@
 class Mp3PlayerYX5300Serial
 {
     using TCallBackErrorOccured = std::function<void(String)>;
-    using TCallBackMessageToShow = std::function<void(String)>;
 
 private:
-    TCallBackErrorOccured _errorOccured;
-    TCallBackMessageToShow _messageToShow;
     SoftwareSerial _mp3Stream; // MP3 player serial stream for comms
     MD_YX5300 _mp3;
 
 public:
     String id;
     String name;
+    TCallBackErrorOccured _errorOccured;
 
     // the constructor
     Mp3PlayerYX5300Serial(int rxPin, int txPin, String id, String name) : _mp3Stream(rxPin, txPin), _mp3(MD_YX5300(_mp3Stream)), id(id), name(name)
