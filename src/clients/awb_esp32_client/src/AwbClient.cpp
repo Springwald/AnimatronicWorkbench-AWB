@@ -118,7 +118,7 @@ void AwbClient::setup()
 
 #ifdef USE_MP3_PLAYER_YX5300
     showSetupMsg("setup mp3 player YX5300");
-    this->_mp3Player = new Mp3PlayerYX5300Manager(MP3_PLAYER_YX5300_RXD, MP3_PLAYER_YX5300_TXD, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
+    this->_mp3Player = new Mp3PlayerYX5300Manager(_projectData->mp3Players, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
 #endif
 
 #ifdef AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL
@@ -234,13 +234,13 @@ void AwbClient::loop()
     if (false)
     {
         // set true to test the mp3 player
-        if (_mp3Player->playSound(10) == true)
+        if (_mp3Player->playSound(0, 10) == true)
         {
         }
         else
         {
             delay(1000);
-            _mp3Player->playSound(1);
+            _mp3Player->playSound(0, 1);
         }
         delay(1000);
         return;

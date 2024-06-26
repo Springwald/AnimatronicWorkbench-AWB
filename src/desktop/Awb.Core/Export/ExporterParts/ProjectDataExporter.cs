@@ -45,15 +45,16 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine($"   const char *ProjectName = \"{_projectData.ProjectName}\";");
 
             content.AppendLine();
-            content.AppendLine($"   std::vector<StsScsServo> *scsServos;");
-            content.AppendLine($"   std::vector<StsScsServo> *stsServos;");
-            content.AppendLine($"   std::vector<Pca9685PwmServo> *pca9685PwmServos;");
-            content.AppendLine($"   std::vector<TimelineState>* timelineStates;");
-            content.AppendLine($"   std::vector<Timeline>* timelines;");
+            content.AppendLine($"\tstd::vector<StsScsServo> *scsServos;");
+            content.AppendLine($"\tstd::vector<StsScsServo> *stsServos;");
+            content.AppendLine($"\tstd::vector<Pca9685PwmServo> *pca9685PwmServos;");
+            content.AppendLine($"\tstd::vector<TimelineState>* timelineStates;");
+            content.AppendLine($"\tstd::vector<Timeline>* timelines;");
+            content.AppendLine($"\tstd::vector<Mp3PlayerYX5300Serial> *mp3Players;");
 
             content.AppendLine();
         
-            ExportMp3PlayerYX5300Informations(_projectData.Mp3PlayerYX5300Configs, content);
+          
             ExportInputs(inputConfigs: _projectData.InputConfigs, content);
             content.AppendLine();
 
@@ -63,9 +64,10 @@ namespace Awb.Core.Export.ExporterParts
             ExportScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs, content);
             ExportStsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs, content);
             ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs, content);
+            ExportMp3PlayerYX5300Informations(_projectData.Mp3PlayerYX5300Configs, content);
             ExportTimelineStates(_projectData.TimelineStates, content);
             content.AppendLine();
-            content.AppendLine("    addTimelines();");
+            content.AppendLine("\taddTimelines();");
             content.AppendLine();
             content.AppendLine("}");
 
@@ -74,7 +76,7 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine();
             content.AppendLine("void addTimelines() {");
 
-            content.AppendLine("   timelines = new std::vector<Timeline>();");
+            content.AppendLine("\ttimelines = new std::vector<Timeline>();");
             content.AppendLine();
 
             var errMsg = ExportTimelineData(_projectData, content);
@@ -158,11 +160,11 @@ namespace Awb.Core.Export.ExporterParts
         private static void ExportMp3PlayerYX5300Informations(IEnumerable<Mp3PlayerYX5300Config>? mp3PlayerYX5300Configs, StringBuilder result)
         {
             var players = mp3PlayerYX5300Configs ?? Array.Empty<Mp3PlayerYX5300Config>();
-            var mp3PlayerYX5300Titles = players?.Select(s => s.Title ?? s.Id).ToArray() ?? Array.Empty<string>();
-            result.AppendLine($"\tint mp3PlayerYX5300Count = {players.Count()};");
-            result.AppendLine($"\tint mp3PlayerYX5300RxPin[{players.Count()}] = {{{string.Join(", ", players.Select(s => s.RxPin.ToString()))}}};");
-            result.AppendLine($"\tint mp3PlayerYX5300TxPin[{players!.Count()}] = {{{string.Join(", ", players.Select(s => s.TxPin.ToString()))}}};");
-            result.AppendLine($"\tString mp3PlayerYX5300Name[{players!.Count()}] = {{{string.Join(", ", mp3PlayerYX5300Titles.Select(s => $"\"{s}\""))}}};");
+            // add all mp3 players using the constructor:  Mp3PlayerYX5300Serial(int rxPin, int txPin, String name) 
+            result.AppendLine($"\tmp3Players = new std::vector<Mp3PlayerYX5300Serial>();");
+            foreach (var player in players)
+                result.AppendLine($"\tmp3Players->push_back(Mp3PlayerYX5300Serial({player.RxPin}, {player.TxPin}, \"{player.Title}\"));");
+
             result.AppendLine();
         }
 

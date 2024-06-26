@@ -11,11 +11,12 @@
 #include "../ProjectData/Mp3PlayerYX5300Point.h"
 #include "../ProjectData/StsScsServo.h"
 #include "../ProjectData/Pca9685PwmServo.h"
+#include <ProjectData/Mp3PlayerYX5300Serial.h>
 
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench-EN
 
-// Created on 25.06.2024 20:58:44
+// Created on 26.06.2024 23:30:32
 
 class ProjectData
 {
@@ -28,11 +29,7 @@ public:
 	std::vector<Pca9685PwmServo> *pca9685PwmServos;
 	std::vector<TimelineState> *timelineStates;
 	std::vector<Timeline> *timelines;
-
-	int mp3PlayerYX5300Count = 1;
-	int mp3PlayerYX5300RxPin[1] = {13};
-	int mp3PlayerYX5300TxPin[1] = {14};
-	String mp3PlayerYX5300Name[1] = {"Mp3Player"};
+	std::vector<Mp3PlayerYX5300Serial> *mp3Players;
 
 	int inputIds[1] = {1};
 	String inputNames[1] = {"InBag"};
@@ -59,6 +56,9 @@ public:
 		stsServos->push_back(StsScsServo(11, "Arm left", 2342, 3712, 3549, 150, 3000, false));
 
 		pca9685PwmServos = new std::vector<Pca9685PwmServo>();
+
+		mp3Players = new std::vector<Mp3PlayerYX5300Serial>();
+		mp3Players->push_back(Mp3PlayerYX5300Serial(13, 14, "Mp3Player"));
 
 		timelineStates = new std::vector<TimelineState>();
 		timelineStates->push_back(TimelineState(1, String("InBag"), true, new std::vector<int>({1}), new std::vector<int>({})));

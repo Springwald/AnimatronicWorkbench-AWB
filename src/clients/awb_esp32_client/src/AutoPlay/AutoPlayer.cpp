@@ -213,26 +213,23 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     // Play MP3
     if (_mp3PlayerYX5300Manager != NULL)
     {
-        for (int soundPlayerIndex = 0; soundPlayerIndex < _data->mp3PlayerYX5300Count; soundPlayerIndex++)
+        for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
         {
-            for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
+            Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
+            if (point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
             {
-                Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
-                if (point->soundPlayerIndex == soundPlayerIndex && point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
+                for (int trys = 0; trys < 3; trys++)
                 {
-                    for (int trys = 0; trys < 3; trys++)
+                    if (_mp3PlayerYX5300Manager->playSound(point->soundPlayerIndex, point->soundId) == true)
                     {
-                        if (_mp3PlayerYX5300Manager->playSound(point->soundId) == true)
-                        {
-                            _lastSoundPlayed = point->soundId;
-                            break;
-                        }
-                        else
-                        {
-                            _mp3PlayerYX5300Manager->stopSound();
-                            _lastSoundPlayed = -100;
-                            delay(50);
-                        }
+                        _lastSoundPlayed = point->soundId;
+                        break;
+                    }
+                    else
+                    {
+                        _mp3PlayerYX5300Manager->stopSound(point->soundPlayerIndex);
+                        _lastSoundPlayed = -100;
+                        delay(50);
                     }
                 }
             }
