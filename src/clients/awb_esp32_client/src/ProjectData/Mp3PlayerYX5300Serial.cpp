@@ -4,8 +4,8 @@
 
 bool Mp3PlayerYX5300Serial::playSound(int trackNo)
 {
-    _mp3.playTrack(trackNo);
-    auto status = _mp3.getStatus();
+    _mp3->playTrack(trackNo);
+    auto status = _mp3->getStatus();
 
     switch (status->code)
     {
@@ -73,5 +73,5 @@ bool Mp3PlayerYX5300Serial::playSound(int trackNo)
 
 bool Mp3PlayerYX5300Serial::stopSound()
 {
-    return _mp3.playStop();
+    return _mp3->playStop();
 }
