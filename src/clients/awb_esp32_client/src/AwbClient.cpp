@@ -231,7 +231,7 @@ void AwbClient::loop()
 {
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 0);
 
-    if (true) // set true to test the mp3 player contineously
+    if (false) // set true to test the mp3 player contineously
     {
         _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 1);
         // set true to test the mp3 player
