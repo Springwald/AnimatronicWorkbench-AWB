@@ -37,6 +37,7 @@ namespace Awb.Core.Export.ExporterParts
                 #include "../ProjectData/Mp3PlayerYX5300Point.h"
                 #include "../ProjectData/StsScsServo.h"
                 #include "../ProjectData/Pca9685PwmServo.h"
+                #include "../ProjectData/Mp3PlayerYX5300Serial.h"
                 """;
 
             content.AppendLine(GetHeader(className: "ProjectData", includes: includes));
