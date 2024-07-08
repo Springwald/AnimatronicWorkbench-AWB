@@ -24,6 +24,32 @@ namespace Awb.Core.Export.ExporterParts
 
         public override async Task<IExporter.ExportResult> ExportAsync(string targetSrcFolder)
         {
+            // check the target folder
+            if (!Directory.Exists(targetSrcFolder)) return new IExporter.ExportResult { ErrorMessage = $"Target folder '{targetSrcFolder}' not found" };
+            var folder = Path.Combine(targetSrcFolder, "src", "AwbDataImport");
+            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+
+            // export project data
+            var result = await WriteProjectDataHAsync(folder);
+            if (result.Success == false) return result;
+
+            // export hardware.h
+            result = await WriteHardwareHAsync(folder);
+            if (result.Success == false) return result;
+
+            return result;
+        }
+
+        private async Task<IExporter.ExportResult> WriteHardwareHAsync(string folder)
+        {
+            var content = new StringBuilder();
+
+            await File.WriteAllTextAsync(Path.Combine(folder, "ProjectData.h"), content.ToString());
+            return IExporter.ExportResult.SuccessResult;
+        }
+
+        private async Task<IExporter.ExportResult> WriteProjectDataHAsync(string folder)
+        {
             var content = new StringBuilder();
 
             var includes = """
@@ -54,8 +80,7 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine($"\tstd::vector<Mp3PlayerYX5300Serial> *mp3Players;");
 
             content.AppendLine();
-        
-          
+
             ExportInputs(inputConfigs: _projectData.InputConfigs, content);
             content.AppendLine();
 
@@ -89,21 +114,11 @@ namespace Awb.Core.Export.ExporterParts
 
             content.AppendLine(GetFooter("ProjectData"));
 
-
-            if (!Directory.Exists(targetSrcFolder))
-                return new IExporter.ExportResult { ErrorMessage = $"Target folder '{targetSrcFolder}' not found" };
-
-            var folder = Path.Combine(targetSrcFolder, "src", "AwbDataImport");
-
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
-
             await File.WriteAllTextAsync(Path.Combine(folder, "ProjectData.h"), content.ToString());
-
             return IExporter.ExportResult.SuccessResult;
         }
 
-        private static void ExportInputs( IEnumerable<InputConfig> inputConfigs, StringBuilder result)
+        private static void ExportInputs(IEnumerable<InputConfig> inputConfigs, StringBuilder result)
         {
             // export the inputs
             var exportInputs = inputConfigs ?? Array.Empty<InputConfig>();
@@ -150,9 +165,9 @@ namespace Awb.Core.Export.ExporterParts
             var propertyName = "pca9685PwmServos";
             result.AppendLine($"   {propertyName} = new std::vector<Pca9685PwmServo>();");
 
-                foreach (var servo in pca9685PwmServos)
-                    // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                    result.AppendLine($"   {propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.DefaultValue}));");
+            foreach (var servo in pca9685PwmServos)
+                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
+                result.AppendLine($"   {propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.DefaultValue}));");
 
             result.AppendLine();
         }
