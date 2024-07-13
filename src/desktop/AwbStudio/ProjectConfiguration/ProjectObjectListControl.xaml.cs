@@ -67,6 +67,10 @@ namespace AwbStudio.ProjectConfiguration
         }
         private void ListProjectObjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // force binding update on listbox item label names of the listbox ListProjectObjects 
+            ListProjectObjects.Items.Refresh();
+
+            // select the new item
             if (SelectedProjectObject == null) return;
             ProjectObjectSelected?.Invoke(this,
                 new ProjectObjectSelectedEventArgs { ProjectObject = this.SelectedProjectObject });
