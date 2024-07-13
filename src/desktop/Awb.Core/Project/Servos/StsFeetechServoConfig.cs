@@ -14,7 +14,7 @@ namespace Awb.Core.Project.Servos
     {
         const int maxValueConst = 4095;
 
-        public const int MaxSpeedConst = 3073;
+        public const int MaxSpeedConst = 4000;
         public const string SpeedDescriptionConst = "The speed is the number of steps per second, 50 steps/sec≈0.732RPM. 0=Max speed";
 
         public const int MaxAccConst = 150;
@@ -32,12 +32,12 @@ namespace Awb.Core.Project.Servos
 
         [Description(SpeedDescriptionConst)]
         [Range(-1, MaxSpeedConst)]
-        public override int? Speed { get; set; }
+        public override int? Speed { get; set; } = 2000;
 
         [DisplayName("Acceleration")]
         [Description(AccDescriptionConst + "\r\n-1 to use STS servo default acceleration.")]
         [Range(0, MaxAccConst)]
-        public int? Acceleration { get; set; }
+        public int? Acceleration { get; set; } = 100;
 
         public override IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {

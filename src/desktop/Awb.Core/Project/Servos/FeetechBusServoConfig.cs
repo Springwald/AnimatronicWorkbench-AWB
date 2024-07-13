@@ -50,6 +50,17 @@ namespace Awb.Core.Project.Servos
 
         public bool GlobalFault { get; set; }
 
+
+        [DisplayName("Max Temperature")]
+        [Description("If the servo temperature is above this value, the servo will be deactivated.")]
+        [Range(20, 60)]
+        public required uint MaxTemp { get; set; }
+
+        [DisplayName("Max Torque")]
+        [Description("If the servo torque is above this value, the servo will be deactivated. Negative torque values are treated as positive.")]
+        [Range(100, 1000)]
+        public required uint MaxTorque { get; set; } = 400;
+
         [DisplayName("Lowest value")]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
         public abstract int MinValue { get; set; }

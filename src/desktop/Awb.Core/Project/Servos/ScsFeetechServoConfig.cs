@@ -7,15 +7,13 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Dynamic;
 
 namespace Awb.Core.Project.Servos
 {
     public class ScsFeetechServoConfig : FeetechBusServoConfig
     {
         private const int maxValConst = 1023;
-
-        public const int MaxSpeedConst = 3073;
+        public const int MaxSpeedConst = 1500;
         public const string SpeedDescriptionConst = "The speed is the number of steps per second.\r\n50 steps/sec≈2.928RPM. 0=Max speed";
 
 
@@ -28,7 +26,7 @@ namespace Awb.Core.Project.Servos
         [Range(0, maxValConst)]
         public override int? DefaultValue { get; set; }
 
-        [Description(SpeedDescriptionConst + "\r\n-1 to use SCS servo default value.")] 
+        [Description(SpeedDescriptionConst + "\r\n-1 to use SCS servo default value.")]
         [Range(-1, MaxSpeedConst)]
         public override int? Speed { get; set; }
 
