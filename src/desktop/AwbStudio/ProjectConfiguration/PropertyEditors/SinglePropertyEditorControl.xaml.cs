@@ -193,7 +193,10 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
         }
 
-        private void CheckBoxPropertyContentBoolEditor_Checked(object sender, System.Windows.RoutedEventArgs e)
+        private void CheckBoxPropertyContentBoolEditor_Unchecked(object sender, System.Windows.RoutedEventArgs e) =>    SetCheckboxValue(false);
+        private void CheckBoxPropertyContentBoolEditor_Checked(object sender, System.Windows.RoutedEventArgs e) => SetCheckboxValue(true);
+
+        private void SetCheckboxValue(bool value)
         {
             ErrorMessagesJoined = string.Empty;
 
@@ -202,11 +205,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             {
                 var prop = _targetObject.GetType().GetProperty(_propertyName);
                 if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
-                prop.SetValue(_targetObject, true);
+                prop.SetValue(_targetObject, value);
             }
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
         }
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -214,5 +218,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+       
     }
 }

@@ -110,6 +110,17 @@ namespace Awb.Core.Project.Clients
                     Source = TitleShort
                 };
             }
+
+            if (Display_M5Stack == true && Display_Ssd1306 == true)
+                {
+                yield return new ProjectProblem
+                {
+                    Message = "Only one display can be used at a time",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+            }
+
             yield break;
         }
 

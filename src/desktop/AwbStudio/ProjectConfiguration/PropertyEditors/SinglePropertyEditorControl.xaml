@@ -35,6 +35,7 @@
                     x:Name="CheckBoxPropertyContentBoolEditor"
                     Grid.Column="0"
                     Checked="CheckBoxPropertyContentBoolEditor_Checked"
+                    Unchecked="CheckBoxPropertyContentBoolEditor_Unchecked"
                     IsChecked="{Binding PropertyContentBool, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 </CheckBox>
                 <TextBlock Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" 
