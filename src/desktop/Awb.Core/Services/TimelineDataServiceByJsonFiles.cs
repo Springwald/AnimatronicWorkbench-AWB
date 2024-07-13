@@ -50,7 +50,7 @@ namespace Awb.Core.Services
         public TimelineData? GetTimelineData(string timelineId)
         {
             var filename = GetTimelineFilenameById(timelineId);
-            return LoadTimelineDataByFilename(filename);
+            return LoadTimelineDataByFilename(filename, timelineId);
         }
 
         public bool SaveTimelineData(TimelineData data)
@@ -72,13 +72,13 @@ namespace Awb.Core.Services
 
         private string GetTimelineFilenameById(string timelineId) => Path.Combine(_jsonFilesPath, $"{timelineId}.awbt");
 
-        private TimelineData? LoadTimelineDataByFilename(string filename)
+        private TimelineData? LoadTimelineDataByFilename(string filename, string timelineId)
         {
             if (!File.Exists(filename)) return null;
             var jsonString = System.IO.File.ReadAllText(filename);
             var saveFormat = JsonSerializer.Deserialize<TimelineSaveFormat>(jsonString, _jsonOptions);
             if (saveFormat == null) return null;
-            var timelineData = TimelineSaveFormat.ToTimelineData(saveFormat);
+            var timelineData = TimelineSaveFormat.ToTimelineData(saveFormat, timelineId);
             return timelineData;
         }
 
@@ -92,11 +92,11 @@ namespace Awb.Core.Services
                 var oldFileNames = TimelineFilenamesOld.ToArray();
                 foreach (var oldFileName in oldFileNames)
                 {
-                    var data = LoadTimelineDataByFilename(oldFileName);
-                    if (data != null && data.Id == null)
+                    var newId = System.Guid.NewGuid().ToString();
+                    var data = LoadTimelineDataByFilename(oldFileName, newId);
+                    if (data != null)
                     {
                         data.Title = Path.GetFileNameWithoutExtension(oldFileName);
-                        data.Id = System.Guid.NewGuid().ToString();
                         SaveTimelineData(data);
                         if (deleteOldFiles)
                             File.Delete(oldFileName);

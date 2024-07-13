@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System.Drawing;
+using System.Text.Json.Serialization;
 using Awb.Core.Project;
 using Awb.Core.Timelines.NestedTimelines;
 

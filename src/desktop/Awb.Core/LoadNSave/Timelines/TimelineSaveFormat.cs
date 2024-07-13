@@ -13,8 +13,6 @@ namespace Awb.Core.LoadNSave.TimelineLoadNSave
 {
     public class TimelineSaveFormat
     {
-        public string Id { get; set; }
-
         public string Title { get; set; }
 
         public int TimelineStateId { get; set; }
@@ -28,7 +26,6 @@ namespace Awb.Core.LoadNSave.TimelineLoadNSave
         {
             return new TimelineSaveFormat
             {
-                Id = timelineData.Id,
                 Title = timelineData.Title,
                 TimelineStateId = timelineData.TimelineStateId,
                 ServoPoints = timelineData.ServoPoints.Select(p => ServoPointSaveFormat.FromServoPoint(p)).OrderBy(p => p.TimeMs).ToArray(),
@@ -37,10 +34,10 @@ namespace Awb.Core.LoadNSave.TimelineLoadNSave
             };
         }
 
-        public static TimelineData ToTimelineData(TimelineSaveFormat saveFormat)
+        public static TimelineData ToTimelineData(TimelineSaveFormat saveFormat, string timelineId)
         {
             return new TimelineData(
-                id: saveFormat.Id,
+                id: timelineId.ToString(),
                 timelineStateId: saveFormat.TimelineStateId,
                 servoPoints: saveFormat.ServoPoints?.Select(p => ServoPointSaveFormat.ToServoPoint(p)).ToList() ?? new List<ServoPoint>(),
                 soundPoints: saveFormat.SoundPoints?.Select(p => SoundPointSaveFormat.ToSoundPoint(p)).ToList() ?? new List<SoundPoint>(),
