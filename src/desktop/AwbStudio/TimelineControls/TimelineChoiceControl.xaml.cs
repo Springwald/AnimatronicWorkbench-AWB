@@ -6,8 +6,11 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Services;
+using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 
 namespace AwbStudio.TimelineControls
@@ -55,13 +58,18 @@ namespace AwbStudio.TimelineControls
             else
             {
                 this.LabelTitle.Content = $"{_projectTitle ?? "No project title"} Timelines";
+                var timelines = new List<TimelineData>();
                 foreach (var timelineId in _timelineDataService.TimelineIds)
                 {
                     var timelineMetaData = _timelineDataService.GetTimelineData(timelineId);
                     if (timelineMetaData == null) continue;
+                    timelines.Add(timelineMetaData);
+                }
+                foreach (var timelineMetaData in timelines.OrderBy(t => t.TimelineStateId).ThenBy(t => t.Title))
+                { 
                     var stateName = timelineMetaData.TimelineStateId; // todo: get state name from the project  states instead
-                    var button = new Button { Content = $"[{stateName}] {timelineMetaData.Title}", Tag = timelineId };
-                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs( timelineId: timelineId)); };
+                    var button = new Button { Content = $"[{stateName}] {timelineMetaData.Title}", Tag = timelineMetaData.Id };
+                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs( timelineId: timelineMetaData.Id)); };
                     this.PanelNames.Children.Add(button);
                 }
             }

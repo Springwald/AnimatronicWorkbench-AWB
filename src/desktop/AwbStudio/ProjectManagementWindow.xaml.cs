@@ -28,8 +28,6 @@ namespace AwbStudio
     /// </summary>
     public partial class ProjectManagementWindow : Window
     {
-        private static bool editConfigAvailable = MainConfig.ProjectConfigEditorAvailable; // planned for future release
-
         private readonly IProjectManagerService _projectManagerService;
         private readonly IServiceProvider _serviceProvider;
         private readonly IAwbStudioSettingsService _awbStudioSettingsService;
@@ -74,12 +72,8 @@ namespace AwbStudio
             ShowLatestProjects();
 
             BringIntoView();
-            if (editConfigAvailable == false)
-            {
-                ButtonEditConfigurationExisting.Visibility = Visibility.Collapsed;
-            }
 
-            if (MainConfig.TestMode)
+            if (false && MainConfig.TestMode)
             {
                 var lastProjectFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.FirstOrDefault();
                 if (lastProjectFolder != null)
@@ -159,14 +153,7 @@ namespace AwbStudio
                         if (openResult.Success)
                         {
                             // ok, project created and opened
-                            if (editConfigAvailable == true)
-                            {
-                                ShowProjectConfigEditor();
-                            }
-                            else
-                            {
-                                await LoadProjectAsync();
-                            }
+                            ShowProjectConfigEditor();
                         }
                         else
                         {
@@ -230,7 +217,7 @@ namespace AwbStudio
             if (openResult.Success)
             {
                 // ok, project opened
-                if (editConfigAvailable == true && editConfig == true)
+                if (editConfig == true)
                     ShowProjectConfigEditor();
                 else
                     await LoadProjectAsync();
