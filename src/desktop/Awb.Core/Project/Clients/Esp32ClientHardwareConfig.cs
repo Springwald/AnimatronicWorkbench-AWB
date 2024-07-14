@@ -151,6 +151,38 @@ namespace Awb.Core.Project.Clients
                 };
             }
 
+            if (UseScsServos == true)
+            {
+                if (ScsTXPin == null) yield return new ProjectProblem
+                {
+                    Message = "SCS servo TX IO pin has to be set",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+                if (ScsRXPin == null) yield return new ProjectProblem
+                {
+                    Message = "SCS servo RX IO pin has to be set",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+            }
+
+            if (UseStsServos == true)
+            {
+                if (StsTXPin == null) yield return new ProjectProblem
+                {
+                    Message = "STS servo TX IO pin has to be set",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+                if (StsRXPin == null) yield return new ProjectProblem
+                {
+                    Message = "STS servo RX IO pin has to be set",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+            }
+
             yield break;
         }
 

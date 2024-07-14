@@ -111,10 +111,12 @@ void AwbClient::setup()
     showMsg("Found " + String(this->_stSerialServoManager == NULL ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == NULL ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
     delay(_debugging->isDebugging() ? 1000 : 100);
 
-#ifdef USE_PCA9685_PWM_SERVO
-    showSetupMsg("setup PCA9685 PWM servos");
-    this->_pca9685pwmManager = new Pca9685PwmManager(_projectData->pca9685PwmServos, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_OSC_FREQUENCY);
-#endif
+    if (this->_projectData->pca9685PwmServos->size() > 0)
+    {
+        showSetupMsg("setup PCA9685 PWM servos");
+        uint32_t osc_frequency = 25000000; // todo: get this from the project data
+        this->_pca9685pwmManager = new Pca9685PwmManager(_projectData->pca9685PwmServos, pca9685PwmErrorOccured, pca9685PwmMessageToShow, this->_projectData->pca9685PwmServos->at(0).i2cAdress, osc_frequency);
+    }
 
     showSetupMsg("setup mp3 player YX5300");
     this->_mp3Player = new Mp3PlayerYX5300Manager(_projectData->mp3Players, mp3PlayerErrorOccured, mp3PlayerMessageToShow);

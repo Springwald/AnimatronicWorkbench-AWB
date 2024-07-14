@@ -96,8 +96,10 @@ namespace Awb.Core.Export.ExporterParts
             }
             if (_projectData.Pca9685PwmServoConfigs.Any())
             {
-               content.AppendLine("/* PCA9685 PWM servo settings */");
-                WEITER HIER
+                content.AppendLine("/* PCA9685 PWM servo settings */");
+                content.AppendLine("#define USE_PCA9685_PWM_SERVO");
+                content.AppendLine("#define PCA9685_OSC_FREQUENCY 25000000");
+                content.AppendLine();
             }
 
             // Autoplay state selector settings

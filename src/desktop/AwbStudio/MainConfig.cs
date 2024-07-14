@@ -20,14 +20,11 @@ namespace AwbStudio
     /// </remarks>
     internal static class MainConfig
     {
-        public const string Version = "0.5.0";
-        public static DateTime VersionReleaseDate = new DateTime(2029, 1, 1);
-        
+        public const string Version = "0.6.0";
+        public static DateTime VersionReleaseDate = new DateTime(2024, 7, 14);
 
-        public static bool ProjectConfigEditorAvailable = true; // todo: set to true when the project config editor is available, planned for future releases
-
-        //public static bool TestMode = false; // set to false for production before pull request for release
-        public static bool TestMode = Debugger.IsAttached; // remove this line for production 
+        public static bool TestMode = false; // set to false for production before pull request for release
+        //public static bool TestMode = Debugger.IsAttached; // remove this line for production 
 
     }
 }
