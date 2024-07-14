@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <vector>
-#include "hardware.h"
+#include "AwbDataImport/HardwareConfig.h"
 #include "AutoPlayer.h"
 #include "../ProjectData/Timeline.h"
 #include "../ProjectData/TimelineStateReference.h"

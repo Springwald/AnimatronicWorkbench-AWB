@@ -5,7 +5,7 @@
 #include "AutoPlay/AutoPlayer.h"
 #include "AwbDataImport/ProjectData.h"
 #include "AwbDataImport/WifiConfig.h"
-#include "hardware.h"
+#include "AwbDataImport/HardwareConfig.h"
 #include <WiFi.h>
 #include <WebServer.h>
 #include "Actuators/ActuatorValue.h"

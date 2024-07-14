@@ -44,7 +44,61 @@ namespace Awb.Core.Export.ExporterParts
         {
             var content = new StringBuilder();
 
-            await File.WriteAllTextAsync(Path.Combine(folder, "ProjectData.h"), content.ToString());
+            content.AppendLine("#ifndef hardware_config_h");
+            content.AppendLine("#define hardware_config_h");
+            content.AppendLine();
+            content.AppendLine("/* Debugging settings */");
+            content.AppendLine("#define DEBUGGING_IO_PIN 25          // the GPIO pin to use for debugging");
+            content.AppendLine("#define DEBUGGING_IO_PIN_ACTIVE HIGH // if the debugging pin is active low, set this to true");
+            content.AppendLine();
+
+
+            // Display settings
+            content.AppendLine("/* Display settings */");
+            content.AppendLine("");
+
+            if (_projectData.Esp32ClientHardwareConfig.Display_M5Stack)
+            {
+                content.AppendLine("// -- M5 Stack Displays --");
+                content.AppendLine("#define DISPLAY_M5STACK // if you use a M5Stack, uncomment this line. Uses GPIO 14+18 for display communication");
+            }
+            if (_projectData.Esp32ClientHardwareConfig.Display_Ssd1306)
+            {
+                content.AppendLine("// -- SSD1306 Displays  --");
+                content.AppendLine("// e.g. for Waveshare Servo Driver with ESP32: 128x32, 0x02, 0x3C");
+                content.AppendLine("#define DISPLAY_SSD1306");
+                content.AppendLine($"#define DISPLAY_SSD1306_I2C_ADDRESS {_projectData.Esp32ClientHardwareConfig.Ssd1306I2cAddress} // 0x3C or 0x3D, See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32");
+                content.AppendLine($"#define DISPLAY_SSD1306_WIDTH {_projectData.Esp32ClientHardwareConfig.Ssd1306ScreenWidth}");
+                content.AppendLine($"#define DISPLAY_SSD1306_HEIGHT {_projectData.Esp32ClientHardwareConfig.Ssd1306ScreenHeight}");
+                content.AppendLine($"#define DISPLAY_SSD1306_COM_PINS {_projectData.Esp32ClientHardwareConfig.Ssd1306ComPins} // 0x02, 0x12, 0x22 or 0x32");
+            }
+            content.AppendLine();
+
+            // Autoplay state selector settings
+            content.AppendLine("/* autoplay state selector */");
+            content.AppendLine("// if a servo position feedback is used as a state selector, define the servo channel here.");
+            content.AppendLine("// if you don't use a servo as state selector, set this to -1 or undefine it");
+            content.AppendLine("// #define AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL 9");
+            content.AppendLine("// if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)");
+            content.AppendLine("// if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)");
+            content.AppendLine("#define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457");
+            content.AppendLine();
+
+            // DAC speaker settings
+            content.AppendLine("/* DAC speaker */");
+            content.AppendLine("// #define USE_DAC_SPEAKER");
+
+            // Status neopixel
+            content.AppendLine("/* Neopixel status LEDs */");
+            content.AppendLine("// #define USE_NEOPIXEL_STATUS_CONTROL");
+            content.AppendLine("#define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.");
+            content.AppendLine("#define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO");
+            content.AppendLine();
+
+            content.AppendLine();
+            content.AppendLine("#endif");
+
+            await File.WriteAllTextAsync(Path.Combine(folder, "HardwareConfig.h"), content.ToString());
             return IExporter.ExportResult.SuccessResult;
         }
 
@@ -145,7 +199,7 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
             foreach (var servo in servos)
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.DefaultValue}, 0, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {servo.DefaultValue}, 0, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
             result.AppendLine();
         }
 
@@ -154,7 +208,7 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
             foreach (var servo in servos)
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.DefaultValue}, {servo.Acceleration}, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {servo.DefaultValue}, {servo.Acceleration}, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
             result.AppendLine();
         }
 

@@ -105,7 +105,7 @@ String StatusManagement::updateStsScsServoStatuses(StSerialServoManager *serialS
             servo->isFault = false;
 
             servo->temperature = serialServoManager->readTemperature(servo->channel);
-            if (servo->temperature > (isScsServo ? SCS_SERVO_MAX_TEMPERATURE : STS_SERVO_MAX_TEMPERATURE))
+            if (servo->temperature > servo->maxTemp)
             {
                 servo->isFault = true;
                 if (servo->globalFault == true)
@@ -117,7 +117,7 @@ String StatusManagement::updateStsScsServoStatuses(StSerialServoManager *serialS
             }
 
             servo->load = serialServoManager->readLoad(servo->channel);
-            if (abs(servo->load) > (isScsServo ? SCS_SERVO_MAX_LOAD : STS_SERVO_MAX_LOAD))
+            if (abs(servo->load) > servo->maxTorque)
             {
                 servo->isFault = true;
                 if (servo->globalFault == true)

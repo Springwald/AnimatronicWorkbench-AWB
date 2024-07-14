@@ -1,7 +1,7 @@
 
 #include <Arduino.h>
 #include "StSerialServoManager.h"
-#include "hardware.h"
+#include "AwbDataImport/HardwareConfig.h"
 #include "ActualStatusInformation.h"
 #include "ActuatorValue.h"
 
@@ -68,32 +68,24 @@ void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCir
                 int acc = servo->targetAcc;
                 if (speed == -1 && acc == -1)
                 {
-                    // use default values for speed and acc
-                    if (this->_servoTypeIsScs)
-                    {
-                        _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, SCS_SERVO_SPEED, SCS_SERVO_ACC);
-                    }
-                    else
-                    {
-                        _serialServo_STS.WritePosEx(servo->channel, servo->targetValue, STS_SERVO_SPEED, STS_SERVO_ACC);
-                    }
+                    _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
                 }
                 else
                 {
                     if (this->_servoTypeIsScs)
                     {
                         if (speed == -1)
-                            speed = SCS_SERVO_SPEED;
+                            speed = servo->defaultSpeed;
                         if (acc == -1)
-                            acc = SCS_SERVO_ACC;
+                            acc = servo->defaultAcceleration;
                         _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, speed, acc);
                     }
                     else
                     {
                         if (speed == -1)
-                            speed = STS_SERVO_SPEED;
+                            speed = servo->defaultSpeed;
                         if (acc == -1)
-                            acc = STS_SERVO_ACC;
+                            acc = servo->defaultAcceleration;
                         _serialServo_STS.WritePosEx(servo->channel, servo->targetValue, speed, acc);
                     }
                 }

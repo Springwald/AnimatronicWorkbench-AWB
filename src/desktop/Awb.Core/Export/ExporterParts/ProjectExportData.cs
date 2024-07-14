@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Project.Clients;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 
@@ -21,5 +22,6 @@ namespace Awb.Core.Export.ExporterParts
         public required IEnumerable<Pca9685PwmServoConfig> Pca9685PwmServoConfigs { get; init; }
         public required IEnumerable<Mp3PlayerYX5300Config> Mp3PlayerYX5300Configs { get; init; }
         public required IEnumerable<InputConfig> InputConfigs { get; init; }
+        public required Esp32ClientHardwareConfig Esp32ClientHardwareConfig { get; init; }
     }
 }

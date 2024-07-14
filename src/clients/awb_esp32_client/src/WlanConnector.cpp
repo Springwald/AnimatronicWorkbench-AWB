@@ -185,8 +185,8 @@ String WlanConnector::GetHtml()
         {
             auto servo = this->_projectData->stsServos->at(i);
             ptr += "<tr><td>STS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
-                   this->getTdVal(String(servo.temperature), STS_SERVO_MAX_TEMPERATURE, 25, servo.temperature) +
-                   this->getTd(String(servo.load), abs(servo.load) > STS_SERVO_MAX_LOAD) +
+                   this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
+                   this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
                    this->getTd(String(servo.isFault ? "!!!" : ""), servo.isFault) + "</tr>\n";
         }
 
@@ -196,8 +196,8 @@ String WlanConnector::GetHtml()
         {
             auto servo = this->_projectData->scsServos->at(i);
             ptr += "<tr><td>SCS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
-                   this->getTdVal(String(servo.temperature), SCS_SERVO_MAX_TEMPERATURE, 25, servo.temperature) +
-                   this->getTd(String(servo.load), abs(servo.load) > SCS_SERVO_MAX_LOAD) +
+                   this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
+                   this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
                    this->getTd(String(servo.isFault ? "!!!" : ""), servo.isFault) + "</tr>\n";
         }
 

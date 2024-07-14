@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "Hardware.h"
+#include "AwbDataImport/HardwareConfig.h"
 #include "AwbDisplay.h"
 #include <vector>
 

@@ -68,6 +68,7 @@ namespace AwbStudio.Exports
                     ScsServoConfigs = _project.ScsServos,
                     Pca9685PwmServoConfigs = _project.Pca9685PwmServos,
                     Mp3PlayerYX5300Configs = _project.Mp3PlayersYX5300,
+                    Esp32ClientHardwareConfig = _project.Esp32ClientHardware,
                     InputConfigs = _project.Inputs,
                     TimelineData = timelines.ToArray()
                 };
