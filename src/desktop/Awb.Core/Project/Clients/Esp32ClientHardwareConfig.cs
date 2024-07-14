@@ -62,6 +62,36 @@ namespace Awb.Core.Project.Clients
         [RegularExpression("(0x02|0x12|0x22|0x32)")]
         public string? Ssd1306ComPins { get; set; } = "0x12";
 
+        /* Servo settings */
+        [DisplayName("SCS servo bus")]
+        [Description("Use a feetech/waveshare servo SCS bus adapter")]
+        public bool UseScsServos { get; set; }
+
+        [DisplayName("SCS servo TX IO pin")]
+        [Description("Define the SCS servo GPIO pin for TX, eg. GPIO 19 for waveshare servo driver")]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
+        public uint? ScsTXPin { get; set; } = 19;
+
+        [DisplayName("SCS servo RX IO pin")]
+        [Description("Define the SCS servo GPIO pin for RX, eg. GPIO 18 for waveshare servo driver")]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
+        public uint? ScsRXPin { get; set; } = 18;
+
+
+        [DisplayName("STS servo bus")]
+        [Description("Use a feetech/waveshare servo STS bus adapter")]
+        public bool UseStsServos { get; set; }
+
+        [DisplayName("STS servo TX IO pin")]
+        [Description("Define the STS servo GPIO pin for TX, eg. GPIO 19 for waveshare servo driver")]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
+        public uint? StsTXPin { get; set; } = 17;
+
+        [DisplayName("STS servo RX IO pin")]
+        [Description("Define the STS servo GPIO pin for RX, eg. GPIO 18 for waveshare servo driver")]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
+        public uint? StsRXPin { get; set; } = 16;
+
         /* Neopixel status LEDs */
         // #define USE_NEOPIXEL_STATUS_CONTROL
         //#define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.

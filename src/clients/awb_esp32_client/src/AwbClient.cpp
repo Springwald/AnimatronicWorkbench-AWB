@@ -96,14 +96,14 @@ void AwbClient::setup()
 #endif
 
     showSetupMsg("setup STS servos");
-    this->_stSerialServoManager = new StSerialServoManager(_projectData->stsServos, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD, STS_SERVO_SPEED, STS_SERVO_ACC);
+    this->_stSerialServoManager = new StSerialServoManager(_projectData->stsServos, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD);
     this->_stSerialServoManager->setup();
     showSetupMsg("setup STS servos done");
 #endif
 
 #ifdef USE_SCS_SERVO
     showSetupMsg("setup SCS servos");
-    this->_scSerialServoManager = new StSerialServoManager(_projectData->scsServos, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD, SCS_SERVO_SPEED, SCS_SERVO_ACC);
+    this->_scSerialServoManager = new StSerialServoManager(_projectData->scsServos, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD);
     this->_scSerialServoManager->setup();
     showSetupMsg("setup STS servos done");
 #endif
@@ -116,10 +116,8 @@ void AwbClient::setup()
     this->_pca9685pwmManager = new Pca9685PwmManager(_projectData->pca9685PwmServos, pca9685PwmErrorOccured, pca9685PwmMessageToShow, PCA9685_I2C_ADDRESS, PCA9685_OSC_FREQUENCY);
 #endif
 
-#ifdef USE_MP3_PLAYER_YX5300
     showSetupMsg("setup mp3 player YX5300");
     this->_mp3Player = new Mp3PlayerYX5300Manager(_projectData->mp3Players, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
-#endif
 
 #ifdef AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL
     auto autoPlayerStateSelectorStsServoChannel = AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL;

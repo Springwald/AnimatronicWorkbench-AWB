@@ -47,11 +47,14 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("#ifndef hardware_config_h");
             content.AppendLine("#define hardware_config_h");
             content.AppendLine();
-            content.AppendLine("/* Debugging settings */");
-            content.AppendLine("#define DEBUGGING_IO_PIN 25          // the GPIO pin to use for debugging");
-            content.AppendLine("#define DEBUGGING_IO_PIN_ACTIVE HIGH // if the debugging pin is active low, set this to true");
-            content.AppendLine();
 
+            if (_projectData.Esp32ClientHardwareConfig.DebuggingIoPin != null)
+            {
+                content.AppendLine("/* Debugging settings */");
+                content.AppendLine($"#define DEBUGGING_IO_PIN {_projectData.Esp32ClientHardwareConfig.DebuggingIoPin} // the GPIO pin to use for debugging");
+                content.AppendLine($"#define DEBUGGING_IO_PIN_ACTIVE {_projectData.Esp32ClientHardwareConfig.DebuggingIoPinActiveState} // if the debugging pin is active low, set this to true");
+                content.AppendLine();
+            }
 
             // Display settings
             content.AppendLine("/* Display settings */");
@@ -74,6 +77,25 @@ namespace Awb.Core.Export.ExporterParts
             }
             content.AppendLine();
 
+            // Servos
+            if (_projectData.Esp32ClientHardwareConfig.UseStsServos)
+            {
+                content.AppendLine("/* STS serial servo settings */");
+                content.AppendLine($"#define USE_STS_SERVO");
+                content.AppendLine($"#define STS_SERVO_RXD {_projectData.Esp32ClientHardwareConfig.StsRXPin}");
+                content.AppendLine($"#define STS_SERVO_TXD {_projectData.Esp32ClientHardwareConfig.StsTXPin}");
+                content.AppendLine();
+            }
+
+            if (_projectData.Esp32ClientHardwareConfig.UseScsServos)
+            {
+                content.AppendLine("/* SCS serial servo settings */");
+                content.AppendLine($"#define USE_SCS_SERVO");
+                content.AppendLine($"#define SCS_SERVO_RXD {_projectData.Esp32ClientHardwareConfig.ScsRXPin}");
+                content.AppendLine($"#define SCS_SERVO_TXD {_projectData.Esp32ClientHardwareConfig.ScsTXPin}");
+                content.AppendLine();
+            }
+
             // Autoplay state selector settings
             content.AppendLine("/* autoplay state selector */");
             content.AppendLine("// if a servo position feedback is used as a state selector, define the servo channel here.");
@@ -83,6 +105,7 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("// if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)");
             content.AppendLine("#define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457");
             content.AppendLine();
+
 
             // DAC speaker settings
             content.AppendLine("/* DAC speaker */");
