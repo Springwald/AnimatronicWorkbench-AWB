@@ -86,7 +86,6 @@ namespace Awb.Core.Export.ExporterParts
                 content.AppendLine($"#define STS_SERVO_TXD {_projectData.Esp32ClientHardwareConfig.StsTXPin}");
                 content.AppendLine();
             }
-
             if (_projectData.Esp32ClientHardwareConfig.UseScsServos)
             {
                 content.AppendLine("/* SCS serial servo settings */");
@@ -94,6 +93,11 @@ namespace Awb.Core.Export.ExporterParts
                 content.AppendLine($"#define SCS_SERVO_RXD {_projectData.Esp32ClientHardwareConfig.ScsRXPin}");
                 content.AppendLine($"#define SCS_SERVO_TXD {_projectData.Esp32ClientHardwareConfig.ScsTXPin}");
                 content.AppendLine();
+            }
+            if (_projectData.Pca9685PwmServoConfigs.Any())
+            {
+               content.AppendLine("/* PCA9685 PWM servo settings */");
+                WEITER HIER
             }
 
             // Autoplay state selector settings

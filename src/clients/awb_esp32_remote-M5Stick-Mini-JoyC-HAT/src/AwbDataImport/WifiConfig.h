@@ -1,16 +1,18 @@
 #ifndef _WIFICONFIG_H_
 #define _WIFICONFIG_H_
 
-// Created with Animatronic Workbench Studio
-// https://daniel.springwald.de/post/AnimatronicWorkbench
 
-// Created on 25.04.2024 22:30:53
+
+// Created with Animatronic Workbench Studio
+// https://daniel.springwald.de/post/AnimatronicWorkbench-EN
+
+// Created on 14.07.2024 14:46:41
 
 class WifiConfig
 {
 
 public:
-   const char *WlanSSID = "AWB-Grogu 2";
+   const char *WlanSSID = "AWB-Grogu2";
    const char *WlanPassword = "awb12345";
 
 };

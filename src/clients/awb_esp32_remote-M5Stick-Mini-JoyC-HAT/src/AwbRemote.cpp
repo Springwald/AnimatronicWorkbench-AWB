@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <AwbRemote.h>
 #include <WiFi.h>
-#include "WifiConfig.h"
+#include "AwbDataImport/WifiConfig.h"
 #include "../lib/M5Unit-MiniJoyC/UNIT_MiniJoyC.h"
 #include <HTTPClient.h>
 
@@ -11,6 +11,7 @@
 #define POS_Y 1    // Joystick
 #define BUTTON 2   // Joystick press
 #define BUTTON2 37 // M5Stick middle button
+#define BUTTON3 39 // M5Stick top button
 
 /**
  * initialize the AWB remote control
@@ -50,6 +51,7 @@ void AwbRemote::setup()
     _axp192.begin();
 
     pinMode(BUTTON2, INPUT);
+    pinMode(BUTTON3, INPUT);
 }
 
 /**
@@ -74,6 +76,9 @@ void AwbRemote::loop()
 
     if (digitalRead(BUTTON2) == LOW)
         this->sendCommand("/remote/play/?timeline=Stand+-+Dance");
+
+    if (digitalRead(BUTTON3) == LOW)
+        this->sendCommand("/remote/play/?timeline=The+Force+raw");
 
     auto batPower = _axp192.GetBatVoltage();
 
