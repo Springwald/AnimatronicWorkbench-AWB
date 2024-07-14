@@ -1,10 +1,9 @@
 #include <Arduino.h>
 #include <vector>
-#include "hardware.h"
+#include "AwbDataImport/HardwareConfig.h"
 #include "AutoPlayer.h"
-#include "AutoPlayData.h"
 #include "../ProjectData/Timeline.h"
-#include "../ProjectData/TimelineState.h"
+#include "../ProjectData/TimelineStateReference.h"
 #include "../ProjectData/StsServoPoint.h"
 #include "../ProjectData/Pca9685PwmServoPoint.h"
 
@@ -214,26 +213,23 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     // Play MP3
     if (_mp3PlayerYX5300Manager != NULL)
     {
-        for (int soundPlayerIndex = 0; soundPlayerIndex < _data->mp3PlayerYX5300Count; soundPlayerIndex++)
+        for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
         {
-            for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
+            Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
+            if (point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
             {
-                Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
-                if (point->soundPlayerIndex == soundPlayerIndex && point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
+                for (int trys = 0; trys < 3; trys++)
                 {
-                    for (int trys = 0; trys < 3; trys++)
+                    if (_mp3PlayerYX5300Manager->playSound(point->soundPlayerIndex, point->soundId) == true)
                     {
-                        if (_mp3PlayerYX5300Manager->playSound(point->soundId) == true)
-                        {
-                            _lastSoundPlayed = point->soundId;
-                            break;
-                        }
-                        else
-                        {
-                            _mp3PlayerYX5300Manager->stopSound();
-                            _lastSoundPlayed = -100;
-                            delay(50);
-                        }
+                        _lastSoundPlayed = point->soundId;
+                        break;
+                    }
+                    else
+                    {
+                        _mp3PlayerYX5300Manager->stopSound(point->soundPlayerIndex);
+                        _lastSoundPlayed = -100;
+                        delay(50);
                     }
                 }
             }
@@ -294,74 +290,86 @@ int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed,
 String AutoPlayer::getStatesDebugInfo()
 {
     String result = "Active: ";
-    auto stateIds = getActiveStateIdsByInputs();
-    for (auto stateId : stateIds)
+    auto activeStates = getActiveStatesByInputs();
+
+    // iterate over the active states and check if the next timeline is for one of them
+    for (int i = 0; i < activeStates.size(); i++)
     {
-        for (int iState = 0; iState < _data->timelineStateCount; iState++)
-            if (_data->timelineStateIds[iState] == stateId)
-                result += String(_data->timelineStateNames[iState]);
-        result += "[" + String(stateId) + "]";
+        auto state = activeStates.at(i);
+        result += String(state.name) + "[" + String(state.id) + "]";
     }
+
     return result;
 }
 
 // function to return the active states as array
-std::vector<int> AutoPlayer::getActiveStateIdsByInputs()
+std::vector<TimelineState> AutoPlayer::getActiveStatesByInputs()
 {
-    std::vector<int> activeStateIds;
-    bool foundAnyPositive = false;
+    std::vector<TimelineState> activeStates;
+    bool foundAnyActivePositive = false;
 
-    for (int iState = 0; iState < _data->timelineStateCount; iState++)
+    // iterate over _data->timelineStates and check if they are active
+    for (int iState = 0; iState < _data->timelineStates->size(); iState++)
     {
-        if (_data->timelineStateAutoPlay[iState] == false) // is this state only available for remote activation?
+        auto state = _data->timelineStates->at(iState);
+        if (state.autoplay == false) // is this state only available for remote activation?
             continue;
 
-        // check the positive inputs
-        int inputId = _data->timelineStatePositiveInput[iState];
-        if (inputId > 0)
+        // check the positive inputs in the timeline state
+        for (int iInput = 0; iInput < state.positiveInputIds->size(); iInput++)
         {
-            if (_inputManager->isInputPressed(inputId))
+            int inputId = state.positiveInputIds->at(iInput);
+            if (inputId > 0)
             {
-                foundAnyPositive = true;
-                activeStateIds.push_back(_data->timelineStateIds[iState]);
+                if (_inputManager->isInputPressed(inputId))
+                {
+                    foundAnyActivePositive = true;
+                    activeStates.push_back(state);
+                }
             }
         }
     }
 
-    if (activeStateIds.size() > 0) // is any state by positive inputs found, return only them
-        return activeStateIds;
+    if (foundAnyActivePositive == true) // is any state by positive inputs found, return only them
+        return activeStates;
 
     // return all, which are not disabled by negative inputs
-    for (int iState = 0; iState < _data->timelineStateCount; iState++)
+    for (int iState = 0; iState < _data->timelineStates->size(); iState++)
     {
-        if (_data->timelineStateAutoPlay[iState] == false) // is this state only available for remote activation?
+        auto state = _data->timelineStates->at(iState);
+        if (state.autoplay == false) // is this state only available for remote activation?
             continue;
 
         bool hasPositiveInput = false;
-        int inputId = _data->timelineStatePositiveInput[iState];
-        if (inputId > 0)
+        for (int iInput = 0; iInput < state.positiveInputIds->size(); iInput++)
         {
-            hasPositiveInput = true;
+            int inputId = state.positiveInputIds->at(iInput);
+            if (inputId > 0)
+            {
+                hasPositiveInput = true;
+            }
         }
 
         if (hasPositiveInput) // has positive input, but this was not presses
             continue;
 
         bool negativeInputActive = false;
-        inputId = _data->timelineStateNegativeInput[iState];
-        if (inputId > 0)
+        for (int iInput = 0; iInput < state.negativeInputIds->size(); iInput++)
         {
-            if (_inputManager->isInputPressed(inputId))
+            int inputId = state.negativeInputIds->at(iInput);
+            if (inputId > 0 && _inputManager->isInputPressed(inputId))
+            {
                 negativeInputActive = true;
+            }
         }
 
         if (negativeInputActive)
             continue;
 
-        activeStateIds.push_back(_data->timelineStateIds[iState]);
+        activeStates.push_back(state);
     }
 
-    return activeStateIds;
+    return activeStates;
 }
 
 /**
@@ -464,12 +472,12 @@ void AutoPlayer::startNewTimelineForSelectedState()
         else
         {
             // if no state selector is available, we check the inputs
-            auto activeStateIds = getActiveStateIdsByInputs();
+            auto activeStates = getActiveStatesByInputs();
 
             // iterate over the active states and check if the next timeline is for one of them
-            for (int i = 0; i < activeStateIds.size(); i++)
+            for (int i = 0; i < activeStates.size(); i++)
             {
-                if (_data->timelines->at(nextTimelineIndex).state->id == activeStateIds[i])
+                if (_data->timelines->at(nextTimelineIndex).state->id == activeStates.at(i).id)
                 {
                     startNewTimelineByIndex(nextTimelineIndex);
                     return;

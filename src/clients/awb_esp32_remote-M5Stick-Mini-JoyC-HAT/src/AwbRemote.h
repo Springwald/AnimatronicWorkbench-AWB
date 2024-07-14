@@ -5,7 +5,7 @@
 #include "AwbDisplay.h"
 #include "../lib/M5Unit-MiniJoyC/UNIT_MiniJoyC.h"
 #include <AXP192.h>
-#include "WifiConfig.h"
+#include "AwbDataImport/WifiConfig.h"
 
 using byte = unsigned char;
 

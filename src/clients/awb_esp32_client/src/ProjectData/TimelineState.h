@@ -4,25 +4,19 @@
 #include <Arduino.h>
 #include <String.h>
 #include <vector>
-#include <string>
 
-using byte = unsigned char;
-
-/**
- * Represents a timeline state
- * this is kind of category for timelines like "idle", "sleeping" or "talking" to filter timelines for autoplay
- */
 class TimelineState
 {
-
-protected:
 public:
-    int id;      /// the id of the state
-    String name; /// the name of the state
+    int id;
+    String name;
+    bool autoplay;
+    std::vector<int> *positiveInputIds;
+    std::vector<int> *negativeInputIds;
 
-public:
-    TimelineState(int id, String const name) : id(id), name(name)
+    TimelineState(int _id, String const _name, bool _autoplay, std::vector<int> *_positiveInputIds, std::vector<int> *_negativeInputIds) : id(_id), name(_name), autoplay(_autoplay), positiveInputIds(_positiveInputIds), negativeInputIds(_negativeInputIds)
     {
+        // find out the negative input ids count preventing null devision
     }
 
     ~TimelineState()

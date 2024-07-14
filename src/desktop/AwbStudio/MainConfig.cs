@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System;
+using System.Diagnostics;
 
 namespace AwbStudio
 {
@@ -19,11 +20,11 @@ namespace AwbStudio
     /// </remarks>
     internal static class MainConfig
     {
-        public const string Version = "0.4.0";
-        public static DateTime VersionReleaseDate = new DateTime(2024, 5, 6);
-        
+        public const string Version = "0.6.0";
+        public static DateTime VersionReleaseDate = new DateTime(2024, 7, 14);
 
-        public static bool ProjectConfigEditorAvailable = false; // todo: set to true when the project config editor is available, planned for future releases
+        public static bool TestMode = false; // set to false for production before pull request for release
+        //public static bool TestMode = Debugger.IsAttached; // remove this line for production 
 
     }
 }

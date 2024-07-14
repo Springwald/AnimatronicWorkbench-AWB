@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Project;
+using Awb.Core.Project.Servos;
 using Awb.Core.Tools;
 
 namespace Awb.Core.Actuators
@@ -26,42 +26,42 @@ namespace Awb.Core.Actuators
         /// </summary>
         private int _targetValue;
 
-        public StsScsTypes StsScsType { get; }
+        public StsScsTypes StsScsType { get; private set; }
 
         /// <summary>
         /// The unique id of this servo
         /// </summary>
-        public string Id { get; }
+        public string Id { get; private set; }
 
         /// <summary>
         /// The unique id of the client this servo is connected to
         /// </summary>
-        public uint ClientId { get; }
+        public uint ClientId { get; private set; }
 
         /// <summary>
         /// The optional visible name of the servo
         /// </summary>
-        public string Title { get; }
+        public string Title { get; private set; }
 
         /// <summary>
         /// The channel of the servo, mostly starting with 1 instead of 0
         /// </summary>
-        public uint Channel { get; }
+        public uint Channel { get; private set; }
 
         /// <summary>
         /// The maximum value this servo should handle in the constructred animatronic figure
         /// </summary>
-        public int MinValue { get; }
+        public int MinValue { get; private set; }
 
         /// <summary>
         /// The maximum value this servo should handle in the constructred animatronic figure
         /// </summary>
-        public int MaxValue { get; }
+        public int MaxValue { get; private set; }
 
         /// <summary>
         /// The "normal" startup value of this servo
         /// </summary>
-        public int DefaultValue { get; }
+        public int DefaultValue { get; private set; }
 
         /// <summary>
         /// The requested target value of this servo
@@ -86,25 +86,32 @@ namespace Awb.Core.Actuators
 
         public string Label => $"{(ClientId == 1 ? string.Empty : $"C{ClientId}-")}{StsScsType.ToString().ToUpper()}{Channel} {Title ?? string.Empty}";
 
-        public PercentCalculator PercentCalculator { get; }
+        public PercentCalculator PercentCalculator { get; private set; }
 
         public bool IsControllerTuneable => true;
 
-        public StsScsServo(StsServoConfig config, StsScsTypes type)
+        public StsScsServo(FeetechBusServoConfig config)
         {
+            // find out the StsScsType by the config type using the switch expression
+            StsScsTypes type = config switch
+            {
+                StsFeetechServoConfig => StsScsTypes.Sts,
+                ScsFeetechServoConfig => StsScsTypes.Scs,
+                _ => throw new ArgumentException("Unknown servo config type")
+            };
+
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
 
-            StsScsType = type;
             Id = config.Id;
+            StsScsType = type;
+            MaxValue = config.MaxValue;
+            MinValue = config.MinValue;
             ClientId = config.ClientId;
             Channel = config.Channel;
             Title = config.Title;
-            MinValue = config.MinValue;
-            MaxValue = config.MaxValue;
             DefaultValue = defaultValue;
             TargetValue = defaultValue;
             IsDirty = true;
-
             PercentCalculator = new PercentCalculator(MinValue, MaxValue);
         }
 

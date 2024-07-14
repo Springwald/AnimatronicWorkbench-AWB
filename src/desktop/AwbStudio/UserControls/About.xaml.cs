@@ -17,7 +17,7 @@ namespace AwbStudio.UserControls
     /// </summary>
     public partial class About : UserControl
     {
-        public static string VersionLabelInfo => $"Version {MainConfig.Version} ({MainConfig.VersionReleaseDate:yyyy MMMM dd})";
+        public static string VersionLabelInfo => $"Version {MainConfig.Version} ({MainConfig.VersionReleaseDate:D})";
 
         public About()
         {

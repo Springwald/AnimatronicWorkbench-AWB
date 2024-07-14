@@ -13,7 +13,7 @@
 #include "NeoPixel/NeoPixelStatusControl.h"
 #include "AwbDataImport/ProjectData.h"
 #include "WlanConnector.h"
-#include "Hardware.h"
+#include "AwbDataImport/HardwareConfig.h"
 #include "ActualStatusInformation.h"
 #include "Debugging.h"
 

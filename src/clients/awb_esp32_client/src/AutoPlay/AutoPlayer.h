@@ -7,7 +7,7 @@
 #include <string>
 #include "../ProjectData/StsServoPoint.h"
 #include "../ProjectData/Pca9685PwmServoPoint.h"
-#include "../ProjectData/TimelineState.h"
+#include "../ProjectData/TimelineStateReference.h"
 #include "../AwbDataImport/ProjectData.h"
 #include "../Actuators/StSerialServoManager.h"
 #include "../Actuators/Pca9685PwmManager.h"
@@ -84,7 +84,7 @@ public:
     /**
      * Check, if the selected state is active by inputs
      */
-    std::vector<int> getActiveStateIdsByInputs();
+    std::vector<TimelineState> getActiveStatesByInputs();
 
     /**
      * starts the timeline with the given index

@@ -7,6 +7,7 @@
 
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Project;
+using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Tools;
 using AwbStudio.Projects;
@@ -27,8 +28,6 @@ namespace AwbStudio
     /// </summary>
     public partial class ProjectManagementWindow : Window
     {
-        private static bool editConfigAvailable = MainConfig.ProjectConfigEditorAvailable; // planned for future release
-
         private readonly IProjectManagerService _projectManagerService;
         private readonly IServiceProvider _serviceProvider;
         private readonly IAwbStudioSettingsService _awbStudioSettingsService;
@@ -72,6 +71,18 @@ namespace AwbStudio
         {
             ShowLatestProjects();
 
+            BringIntoView();
+
+            if (false && MainConfig.TestMode)
+            {
+                var lastProjectFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.FirstOrDefault();
+                if (lastProjectFolder != null)
+                {
+                    await OpenProjectAsync(lastProjectFolder, editConfig: true);
+                    return;
+                }
+            }
+
             if (_awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart)
             {
                 ReOpenLastProjectCheckbox.IsChecked = true;
@@ -82,11 +93,7 @@ namespace AwbStudio
                 }
             }
 
-            BringIntoView();
-            if (editConfigAvailable == false)
-            {
-                ButtonEditExisting.Visibility = Visibility.Collapsed;
-            }
+
         }
 
         private async void OnKeyDown(object sender, KeyEventArgs e)
@@ -134,7 +141,7 @@ namespace AwbStudio
                     var projectPath = dialog.SelectedPath;
                     if (_projectManagerService.ExistProject(projectPath))
                     {
-                        System.Windows.MessageBox.Show($"Folder '{projectPath}' already contains an Animatronic WorkBench project.");
+                        MessageBox.Show($"Folder '{projectPath}' already contains an Animatronic WorkBench project.");
                         return;
                     }
 
@@ -146,13 +153,7 @@ namespace AwbStudio
                         if (openResult.Success)
                         {
                             // ok, project created and opened
-                            if (editConfigAvailable == true)
-                            {
-                                ShowProjectConfigEditor();
-                            } else
-                            {
-                                await LoadProjectAsync();
-                            }
+                            ShowProjectConfigEditor();
                         }
                         else
                         {
@@ -166,44 +167,18 @@ namespace AwbStudio
 
         private static AwbProject CreateNewProject(string projectPath)
         {
-            var project = new AwbProject(title: "no project title")
+            var project = new AwbProject()
             {
-                Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
-                TimelinesStates = new TimelineState[]
+                ProjectMetaData = new ProjectMetaData
                 {
-                    new TimelineState(1, "sleep", export: true, autoPlay: true),
-                    new TimelineState(2, "action", export: true, autoPlay: true),
-                    new TimelineState(3, "idle", export: true, autoPlay: true),
-                    new TimelineState(4, "talk", export: true, autoPlay: true),
-                    new TimelineState(5, "joint demo", export: true, autoPlay: true, positiveInputs: new[] { 1 }),
-                    new TimelineState(6, "tests", export: false, autoPlay: false),
+                    Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
                 },
-                StsServos = new StsServoConfig[]
-                {
-                    new StsServoConfig(id: "StsServo1", title: "Demo serial Servo 1", clientId: 1, channel: 1)
-                    {
-                        Acceleration = 20,
-                        DefaultValue = 2000,
-                        MaxValue = 4095,
-                        MinValue = 0,
-                        Speed = 1000,
-                    },
-                },
-                Pca9685PwmServos = new Pca9685PwmServoConfig[]
-                {
-                    new Pca9685PwmServoConfig(id: "PwmServo1",  title:"Demo PWM Servo 1" , clientId: 1, i2cAdress: 0x40, channel: 1)
-                    {
-                        DefaultValue = 2000,
-                        MaxValue = 4095,
-                        MinValue = 0,
-                    },
-                },
-                Mp3PlayersYX5300 = new[] { new Mp3PlayerYX5300Config(clientId: 1, id:"mp3player", rxPin: 13, txPin: 14, soundPlayerId: "YX5300_1", title: "Mp3Player") },
-                Inputs = new InputConfig[]
-                {
-                    new InputConfig(id: 1, title:"Sleep") { IoPin = 25 }
-                },
-
+                TimelinesStates = [],
+                StsServos = [],
+                ScsServos = [],
+                Pca9685PwmServos = [],
+                Mp3PlayersYX5300 = [],
+                Inputs = [],
             };
             project.SetProjectFolder(projectPath);
             return project;
@@ -211,28 +186,15 @@ namespace AwbStudio
 
         private async void ButtonOpenExisting_Click(object sender, RoutedEventArgs e)
         {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
-            {
-                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    var folder = dialog.SelectedPath;
-                    var ok = await OpenProjectAsync(folder, editConfig: false);
-                }
-            }
+            var folder = ChooseExistingProjectFolder();
+            if (folder == null) return;
+            var ok = await OpenProjectAsync(folder, editConfig: false);
         }
 
-        private async void ButtonEditExisting_Click(object sender, RoutedEventArgs e)
+        private async void ButtonEditConfigurationExisting_Click(object sender, RoutedEventArgs e)
         {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
-            {
-                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    var folder = dialog.SelectedPath;
-                    var ok = await OpenProjectAsync(folder, editConfig: true);
-                }
-            }
+            var folder = ChooseExistingProjectFolder();
+            if (folder != null) await OpenProjectAsync(folder, editConfig: true);
         }
 
         private async void ListLatestProjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -255,7 +217,7 @@ namespace AwbStudio
             if (openResult.Success)
             {
                 // ok, project opened
-                if (editConfigAvailable == true && editConfig == true)
+                if (editConfig == true)
                     ShowProjectConfigEditor();
                 else
                     await LoadProjectAsync();
@@ -352,6 +314,37 @@ namespace AwbStudio
             await _awbStudioSettingsService.SaveSettingsAsync();
         }
 
+        private string? ChooseExistingProjectFolder()
+        {
+            const string extension = ".awbprj";
+
+            // Create OpenFileDialog
+            Microsoft.Win32.OpenFileDialog openFileDlg = new Microsoft.Win32.OpenFileDialog();
+
+            // Set filter for file extension and default file extension  
+            openFileDlg.DefaultExt = extension;
+            openFileDlg.Filter = $"Animatronic WorkBench project ({extension})|*{extension}";
+
+            // Launch OpenFileDialog by calling ShowDialog method
+            Nullable<bool> result = openFileDlg.ShowDialog();
+            // Get the selected file name and display in a TextBox.
+            // Load content of file in a TextBlock
+            if (result == false) return null;
+
+            var filename = openFileDlg.FileName;
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                MessageBox.Show("No file selected");
+                return null;
+            }
+            var folder = System.IO.Path.GetDirectoryName(filename);
+            if (folder == null)
+            {
+                MessageBox.Show($"No folder found for file '{filename}'");
+                return null;
+            }
+            return folder;
+        }
 
     }
 }

@@ -6,7 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
-using Awb.Core.Project;
+using Awb.Core.Project.Various;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;

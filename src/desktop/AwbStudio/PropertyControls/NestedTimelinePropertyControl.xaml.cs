@@ -7,9 +7,11 @@
 
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
-using Awb.Core.Project;
+using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
+using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -25,6 +27,7 @@ namespace AwbStudio.PropertyControls
         private readonly TimelineViewContext _viewContext;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
         private bool _isUpdatingView;
+        private TimelineMetaData[] _timeslines = Array.Empty<TimelineMetaData>();
 
         public IAwbObject AwbObject => NestedTimelinesFakeObject.Singleton;
 
@@ -92,7 +95,7 @@ namespace AwbStudio.PropertyControls
             }
             else
             {
-                var timeslines = _timelineMetaDataService.GetAllMetaData();
+                var timeslines = _timeslines;
                 if (timeslines.Length < index)
                 {
                     MessageBox.Show("Timelines index " + index + " not found!");
@@ -125,9 +128,9 @@ namespace AwbStudio.PropertyControls
             }
             else
             {
-                for (int index = 0; index < _timelineMetaDataService.GetAllMetaData().Length; index++)
+                for (int index = 0; index < _timeslines.Length; index++)
                 {
-                    if (_timelineMetaDataService.GetAllMetaData()[index]?.Id == timelineId)
+                    if (_timeslines[index]?.Id == timelineId)
                     {
                         ComboBoxTimeline.SelectedIndex = index + 1;
                         break; ;
@@ -141,8 +144,10 @@ namespace AwbStudio.PropertyControls
         {
             this.ComboBoxTimeline.Items.Clear();
             var timelineMetaDatas = _timelineMetaDataService.GetAllMetaData();
+            _timeslines = timelineMetaDatas.OrderBy(t => t.StateId).ThenBy(t => t.Title).ToArray();
+
             ComboBoxTimeline.Items.Add("-- NO TIMELINE --");
-            foreach (var timelineMetaData in timelineMetaDatas)
+            foreach (var timelineMetaData in _timeslines)
             {
                 if (timelineMetaData == null)
                 {

@@ -17,6 +17,8 @@ public:
     String title;            /// the name of the servo
     int minValue;            /// the minimum value of the servo
     int maxValue;            /// the maximum value of the servo
+    int maxTorque;           /// the maximum torque of the servo
+    int maxTemp;             ///  the maximum temperature of the servo in degrees Celsius
     int defaultValue;        /// the default value of the servo
     int defaultAcceleration; /// the acceleration of the servo
     int defaultSpeed;        /// the speed of the servo
@@ -32,7 +34,7 @@ public:
     int currentValue = -1; /// the current value of the actuator (updated in the last update cycle)
     bool isFault = false;  /// if this servo is to hot or overloaded
 
-    StsScsServo(int channel, String const title, int minValue, int maxValue, int defaultValue, int defaultAcceleration, int defaultSpeed, bool globalFault) : channel(channel), title(title), minValue(minValue), maxValue(maxValue), defaultValue(defaultValue), defaultAcceleration(defaultAcceleration), defaultSpeed(defaultSpeed), globalFault(globalFault)
+    StsScsServo(int channel, String const title, int minValue, int maxValue, int maxTemp, int maxTorque, int defaultValue, int defaultAcceleration, int defaultSpeed, bool globalFault) : channel(channel), title(title), minValue(minValue), maxValue(maxValue), maxTemp(maxTemp), maxTorque(maxTorque), defaultValue(defaultValue), defaultAcceleration(defaultAcceleration), defaultSpeed(defaultSpeed), globalFault(globalFault)
     {
         targetValue = defaultValue;
     }

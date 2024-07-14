@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:AwbStudio"
              xmlns:export="clr-namespace:AwbStudio.Exports"
-              Startup="OnStartup"
+             xmlns:projectConfig="clr-namespace:AwbStudio.ProjectConfiguration"
+             Startup="OnStartup"
             >
     <Application.Resources>
         <ResourceDictionary>
@@ -25,6 +26,7 @@
 
             <Style TargetType="export:ExportToClientsWindow" BasedOn="{StaticResource {x:Type Window}}"/>
 
+            <Style TargetType="projectConfig:ProjectObjectListControl" BasedOn="{StaticResource {x:Type UserControl}}"/>
             <Style TargetType="UserControl" BasedOn="{StaticResource {x:Type UserControl}}"/>
             <!--<Style TargetType="local:TimelineControls.TimelineViewer" BasedOn="{StaticResource {x:Type UserControl}}"/>-->
         

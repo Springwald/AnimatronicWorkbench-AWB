@@ -8,6 +8,7 @@
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Player;
 using Awb.Core.Project;
+using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
@@ -135,8 +136,8 @@ namespace AwbStudio
             }
 
             // fill timeline state chooser
-            ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => GetTimelineStateName(ts)).ToList();
-            TimelineChooser.ProjectTitle = _project.Title;
+            ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => $"[{ts.Id}] {GetTimelineStateName(ts)}").ToList();
+            TimelineChooser.ProjectTitle = _project.ProjectMetaData.ProjectTitle;
             TimelineChooser.FileManager = _timelineDataService;
 
             Closing += TimelineEditorWindow_Closing;

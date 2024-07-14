@@ -29,8 +29,8 @@ namespace AwbStudio.Exports
         private readonly AwbProject _project;
 
         private WifiConfigExportData WifiConfigData => new WifiConfigExportData { 
-            WlanSSID = _project.WifiSsid, 
-            WlanPassword = _project.WifiPassword 
+            WlanSSID = _project.ProjectMetaData.WifiSsid, 
+            WlanPassword = _project.ProjectMetaData.WifiPassword 
         };
 
         private ProjectExportData? ProjectData
@@ -62,12 +62,13 @@ namespace AwbStudio.Exports
 
                 return new ProjectExportData
                 {
-                    ProjectName = _project.Title,
+                    ProjectName = _project.ProjectMetaData.ProjectTitle,
                     TimelineStates = _project.TimelinesStates,
                     StsServoConfigs = _project.StsServos,
                     ScsServoConfigs = _project.ScsServos,
                     Pca9685PwmServoConfigs = _project.Pca9685PwmServos,
                     Mp3PlayerYX5300Configs = _project.Mp3PlayersYX5300,
+                    Esp32ClientHardwareConfig = _project.Esp32ClientHardware,
                     InputConfigs = _project.Inputs,
                     TimelineData = timelines.ToArray()
                 };

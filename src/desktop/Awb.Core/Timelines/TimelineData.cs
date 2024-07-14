@@ -6,6 +6,8 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System.Drawing;
+using System.Text.Json.Serialization;
+using Awb.Core.Project;
 using Awb.Core.Timelines.NestedTimelines;
 
 namespace Awb.Core.Timelines
@@ -134,6 +136,17 @@ namespace Awb.Core.Timelines
             }
 
             throw new ArgumentOutOfRangeException($"Point type {typeof(Point)} not supported for content change event.");
+        }
+
+        /// <summary>
+        /// Get problems of this timeline, e.g. no existing servo or sound objects referenced
+        /// </summary>
+        /// <param name="awbProject">the project data as a reference</param>
+        /// <returns></returns>
+        public IEnumerable<ProjectProblem> GetProblems(AwbProject awbProject)
+        {
+            yield break;
+            //throw new NotImplementedException();
         }
     }
 }

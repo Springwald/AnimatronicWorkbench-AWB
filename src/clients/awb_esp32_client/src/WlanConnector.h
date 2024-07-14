@@ -2,11 +2,10 @@
 #define _WLANCONNECTOR_H_
 
 #include <Arduino.h>
-#include "AutoPlay/AutoPlayData.h"
 #include "AutoPlay/AutoPlayer.h"
 #include "AwbDataImport/ProjectData.h"
 #include "AwbDataImport/WifiConfig.h"
-#include "hardware.h"
+#include "AwbDataImport/HardwareConfig.h"
 #include <WiFi.h>
 #include <WebServer.h>
 #include "Actuators/ActuatorValue.h"

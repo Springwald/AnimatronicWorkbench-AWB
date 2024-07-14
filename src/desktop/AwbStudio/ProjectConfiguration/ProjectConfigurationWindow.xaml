@@ -1,50 +1,60 @@
-﻿<Window x:Class="AwbStudio.ProjectConfigurationWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AwbStudio"
+        xmlns:ProjectConfiguration="clr-namespace:AwbStudio.ProjectConfiguration" xmlns:PropertyEditors="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors" x:Class="AwbStudio.ProjectConfigurationWindow"
         mc:Ignorable="d"
         
-        Title="ProjectConfigurationWindow" Height="800" Width="900">
+        Title="ProjectConfigurationWindow" Height="800" Width="900" WindowState="Maximized">
     <Window.Icon>
         <DrawingImage />
     </Window.Icon>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="LabelProjectFolder" x:Name="LabelProjectFolder" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Label Grid.Row="0" Content="{Binding ProjectFolder}" x:Name="LabelProjectFolder" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
-        <Grid Grid.Row="1">
+        <StackPanel Grid.Row="1" x:Name="StackPanelProblems">
+        </StackPanel>
+
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50*"/>
                 <ColumnDefinition Width="50*"/>
             </Grid.ColumnDefinitions>
 
             <ScrollViewer Grid.Column="0">
-                <StackPanel>
+                <StackPanel x:Name="StackPanelProjectObjectLists">
                     <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
+                    <Button x:Name="EditProjectMetaDataButton" Content="Edit meta data" Click="EditProjectMetaDataButton_Click"></Button>
+                    
                     <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />
-                    <Label Content="SCS servos" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add SCS servo"/>
+                    <Button x:Name="EditEsp32HardwareButton" Content="Edit ESP32 hardware" Click="EditEsp32HardwareButton_Click"></Button> 
+                    
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="ScsServosList" 
+                        ProjectObjects="{Binding ScsServos}" Title="SCS servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="ScsServosList_NewProjectObjectRequested"/>
 
-                    <Label Content="STS servos" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add STS servo"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="StsServosList" 
+                        ProjectObjects="{Binding StsServos}" Title="STS servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="StsServosList_NewProjectObjectRequested"/>
 
-                    <Label Content="Pca9685 PWM servos" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add Pca9685 servo"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="Pca9685PWMServosList" 
+                        ProjectObjects="{Binding Pca9685PwmServos}" Title="Pca9685 PWM servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="Pca9685PWMServosList_NewProjectObjectRequested"/>
 
-                    <Label Content="Mp3 player YX5300" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add YX5300 mp3 player"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="Mp3PlayerYX5300List" 
+                        ProjectObjects="{Binding Mp3PlayerYX5300}" Title="Mp3 player YX5300" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="Mp3PlayerYX5300List_NewProjectObjectRequested"/>
 
-                    <Label Content="Inputs" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="Add input"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="InputsList" 
+                        ProjectObjects="{Binding Inputs}" Title="Inputs" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="InputsList_NewProjectObjectRequested"/>
 
-                    <Label Content="Timelines states" FontSize="15" FontWeight="Bold" />
-                    <Button  Content="add timeline state"/>
+                    <ProjectConfiguration:ProjectObjectListControl x:Name="TimelineStates" 
+                        ProjectObjects="{Binding TimelineStates}" Title="Timeline states" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="TimelineStates_NewProjectObjectRequested"/>
+
                 </StackPanel>
             </ScrollViewer>
 
@@ -53,14 +63,15 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Label  Grid.Row="0" Content="Properties" FontSize="15" FontWeight="Bold" />
-                <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" Padding="10 10 10 10" Margin="10 10 10 10"/>
-                <ScrollViewer Grid.Row="1">
-                </ScrollViewer>
+                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" CornerRadius="3" Padding="10">
+                    <PropertyEditors:PropertyEditorControl x:Name="PropertyEditor" Grid.Row="1" 
+                                                           OnDeleteObject="PropertyEditorOnObjectDelete_Fired" 
+                                                           OnUpdatedData="PropertyEditorUpdatedData_Fired"/>
+                </Border>
             </Grid>
-            
+
         </Grid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10 10 10 10">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10 10 10 10">
             <Button Margin="40 0 0 0" Content="Cancel without saving" Click="ButtonCloseWithoutSaving_Click"/>
             <Button Margin="40 0 0 0" Content="Save and close" Click="ButtonSaveAndClose_Click"/>
         </StackPanel>

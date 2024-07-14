@@ -2,7 +2,7 @@
 #define _DEBUGGING_H_
 
 #include "AwbDisplay.h"
-#include "hardware.h"
+#include "AwbDataImport/HardwareConfig.h"
 
 /**
  * the actual hardware- and autoplayer-status
