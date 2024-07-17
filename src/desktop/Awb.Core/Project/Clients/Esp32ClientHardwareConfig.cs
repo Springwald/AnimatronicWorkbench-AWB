@@ -21,7 +21,7 @@ namespace Awb.Core.Project.Clients
         [DisplayName("Debugging IO pin")]
         [Description(" The GPIO pin to use for debugging")]
         [Range(1, Esp32.MaxGpIoPortNumber)]
-        public uint? DebuggingIoPin { get; set; } = 1;
+        public uint? DebuggingIoPin { get; set; } = null;
 
         [DisplayName("Debugging IO pin active state")]
         [Description("Define the active state of the debugging GPIO pin")]
