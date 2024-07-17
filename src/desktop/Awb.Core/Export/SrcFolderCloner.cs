@@ -33,6 +33,17 @@ namespace Awb.Core.Export
             if (!Directory.Exists(_sourceFolder)) return new CloneResult { ErrorMessage = $"Source folder '{_sourceFolder}' does not exist" };
             if (!Directory.Exists(_targetFolder)) return new CloneResult { ErrorMessage = $"Target folder '{_targetFolder}' does not exist" };
 
+
+            // Delete files not existing in source folder
+            foreach (var targetFile in Directory.GetFiles(_targetFolder, "*", SearchOption.AllDirectories))
+            {
+                var relativePath = targetFile.Substring(_targetFolder.Length + 1);
+                var sourceFile = Path.Combine(_sourceFolder, relativePath);
+
+                if (!File.Exists(sourceFile))
+                    File.Delete(targetFile);
+            }
+
             // clone the source folder to the target folder stepping through all files and subfolders
             foreach (var sourceFile in Directory.GetFiles(_sourceFolder, "*", SearchOption.AllDirectories))
             {
@@ -44,6 +55,7 @@ namespace Awb.Core.Export
 
                 File.Copy(sourceFile, targetFile, true);
             }
+          
             
             return new CloneResult();
         }
