@@ -81,7 +81,7 @@ namespace AwbStudio.Exports
             set
             {
                 LabelTargetFolder.Content = value;
-                LabelTargetFolder.Background = Directory.Exists(value) ? null : new SolidColorBrush(Colors.LightSalmon);
+                LabelTargetFolderHint.Content = Directory.Exists(value) ? "" : "Target folder does not exist yet. It will be created during export.";
             }
         }
 
