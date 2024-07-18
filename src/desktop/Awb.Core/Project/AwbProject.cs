@@ -26,7 +26,7 @@ namespace Awb.Core.Project
 
         public Esp32ClientHardwareConfig Esp32ClientHardware { get; set; } = new Esp32ClientHardwareConfig { ClientId = 1 };
 
-        public IProjectObjectListable[] AdditionalClients { get; set; } = new IProjectObjectListable[] { }; 
+        public IProjectObjectListable[] AdditionalClients { get; set; } = new IProjectObjectListable[] { };
 
         public Pca9685PwmServoConfig[] Pca9685PwmServos { get; set; } = new Pca9685PwmServoConfig[] { };
         public StsFeetechServoConfig[] StsServos { get; set; } = new StsFeetechServoConfig[] { };
@@ -68,9 +68,18 @@ namespace Awb.Core.Project
 
             var timelineProblems = timelines.SelectMany(x => x.GetProblems(this));
             foreach (var item in timelineProblems) yield return item;
+
+            // check list problems e.g. double IDs
+            foreach (var item in GetDoubleIdProblems(Pca9685PwmServos.Select(x => $"Client ID {x.ClientId}, Channel {x.Channel}"), "PCA9685 PWM servos")) yield return item;
+            foreach (var item in GetDoubleIdProblems(StsServos.Select(x => $"Client ID {x.ClientId}, Servo ID {x.Channel}"), "STS servos")) yield return item;
+            foreach (var item in GetDoubleIdProblems(ScsServos.Select(x => $"Client ID {x.ClientId}, Servo ID {x.Channel}"), "SCS servos")) yield return item;
+            foreach (var item in GetDoubleIdProblems(TimelinesStates.Select(x => x.Id.ToString()), "Timeline state IDs")) yield return item;
+            foreach (var item in GetDoubleIdProblems(TimelinesStates.Select(x => x.Title), "Timeline state titles")) yield return item;
+            foreach (var item in GetDoubleIdProblems(Inputs.Select(x => x.Id.ToString()), "Input IDs")) yield return item;
+            foreach (var item in GetDoubleIdProblems(Inputs.Select(x => x.Title), "Input titles")) yield return item;
         }
 
-      
+
 
         public IEnumerable<IProjectObjectListable> GetAllListableObjects()
         {
@@ -112,6 +121,23 @@ namespace Awb.Core.Project
                 var id = prefix + "-" + idCount.ToString();
                 if (!GetAllIds().Any(x => x == id)) return id;
                 idCount++;
+            }
+        }
+
+        private IEnumerable<ProjectProblem> GetDoubleIdProblems(IEnumerable<string> list, string listName)
+        {
+            var unique = list.Distinct();
+            foreach (var item in unique)
+            {
+                if (list.Where(x => x==item).Count() > 1)
+                {
+                    yield return new ProjectProblem()
+                    {
+                        Message = $"Item '{item}' in list '{listName} ' is not unique!",
+                        ProblemType = ProjectProblem.ProblemTypes.Error,
+                        Source = listName
+                    };
+                }
             }
         }
 

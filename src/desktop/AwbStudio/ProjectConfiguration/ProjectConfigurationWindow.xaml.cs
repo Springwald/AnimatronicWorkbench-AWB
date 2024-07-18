@@ -16,8 +16,10 @@ using AwbStudio.Projects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace AwbStudio
 {
@@ -59,10 +61,12 @@ namespace AwbStudio
             Loaded += ProjectConfigurationWindow_Loaded;
         }
 
-        private void ProjectConfigurationWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void ProjectConfigurationWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // select the project properties as default
             SetObjectToEdit(_viewModel.ProjectMetaData);
+
+            await ShowProjectProblems();
 
             Loaded -= ProjectConfigurationWindow_Loaded;
             Closing += ProjectConfigurationWindow_Closing;
@@ -74,6 +78,17 @@ namespace AwbStudio
             Unloaded -= ProjectConfigurationWindow_Unloaded;
         }
 
+        private async Task ShowProjectProblems()
+        {
+            this.StackPanelProblems.Children.Clear();
+            var problems = _awbProject.GetProjectProblems(Timelines).ToArray();
+            foreach (var problem in problems)
+            {
+                var control = new System.Windows.Controls.Label { Content = problem.PlaintTextDescription, Foreground = new SolidColorBrush(Colors.Red) };
+                this.StackPanelProblems.Children.Add(control);
+            }
+        }
+
         #region Save Project Configuration
 
         private async Task<bool> SaveProjectConfigAsync()
@@ -81,7 +96,7 @@ namespace AwbStudio
             _viewModel.WriteToProject(_awbProject);
 
             // check if project has errors
-            var errors = _awbProject.GetProjectProblems(Timelines).Where(p => p.ProblemType == ProjectProblem.ProblemTypes.Error);
+            var errors = _awbProject.GetProjectProblems(Timelines).Where(p => p.ProblemType == ProjectProblem.ProblemTypes.Error).ToArray();
             if (errors.Any())
             {
                 MessageBox.Show("Please fix all errors before saving the project configuration.\r\n\r\n"+
@@ -178,8 +193,10 @@ namespace AwbStudio
         private void EditEsp32HardwareButton_Click(object sender, RoutedEventArgs e)
         => SetObjectToEdit(_viewModel.Esp32ClientHardwareConfig);
 
-        private void SetObjectToEdit(IProjectObjectListable? projectObject)
+        private async void SetObjectToEdit(IProjectObjectListable? projectObject)
         {
+            await ShowProjectProblems();
+
             if (!PropertyEditor.TrySetProjectObject(projectObject, _awbProject, Timelines))
             {
                 projectObject = PropertyEditor.ProjectObject; // reject new project object fall back to the actual project object
