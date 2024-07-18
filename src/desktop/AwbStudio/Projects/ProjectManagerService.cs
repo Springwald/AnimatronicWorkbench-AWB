@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using static AwbStudio.Projects.IProjectManagerService;
 
 namespace AwbStudio.Projects
@@ -53,7 +54,9 @@ namespace AwbStudio.Projects
         {
             if (!Directory.Exists(projectFolder)) return false;
 
-            // load project config from folder
+            if (await CreateProjectSubDirectories(projectFolder: projectFolder) == false) return false;
+
+            // save project to folder
             var options = new JsonSerializerOptions()
             {
                 WriteIndented = true,
@@ -63,6 +66,29 @@ namespace AwbStudio.Projects
             project.SetProjectFolder(projectFolder);
             var jsonStr = JsonSerializer.Serialize<AwbProject>(project, options);
             await File.WriteAllTextAsync(ProjectConfigFilename(projectFolder), jsonStr);
+            return true;
+        }
+
+        public async Task<bool> CreateProjectSubDirectories(string projectFolder)
+        {
+            var folders = new[] { @"audio\SDCard\01", @"CustomCode\EspClient1" };
+
+            foreach (var folder in folders)
+            {
+                var path = Path.Combine(projectFolder, folder);
+                if (!Directory.Exists(path))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    catch (Exception ex)
+                    {
+                        return false;
+                    }
+                }
+            }
+
             return true;
         }
 
