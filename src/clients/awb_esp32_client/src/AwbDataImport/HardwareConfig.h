@@ -1,10 +1,6 @@
 #ifndef hardware_config_h
 #define hardware_config_h
 
-/* Debugging settings */
-#define DEBUGGING_IO_PIN 1 // the GPIO pin to use for debugging
-#define DEBUGGING_IO_PIN_ACTIVE HIGH // if the debugging pin is active low, set this to true
-
 /* Display settings */
 
 // -- SSD1306 Displays  --
@@ -14,16 +10,6 @@
 #define DISPLAY_SSD1306_WIDTH 128
 #define DISPLAY_SSD1306_HEIGHT 64
 #define DISPLAY_SSD1306_COM_PINS 0x12 // 0x02, 0x12, 0x22 or 0x32
-
-/* STS serial servo settings */
-#define USE_STS_SERVO
-#define STS_SERVO_RXD 16
-#define STS_SERVO_TXD 17
-
-/* SCS serial servo settings */
-#define USE_SCS_SERVO
-#define SCS_SERVO_RXD 18
-#define SCS_SERVO_TXD 19
 
 /* autoplay state selector */
 // if a servo position feedback is used as a state selector, define the servo channel here.
@@ -35,10 +21,9 @@
 
 /* DAC speaker */
 // #define USE_DAC_SPEAKER
-/* Neopixel status LEDs */
-// #define USE_NEOPIXEL_STATUS_CONTROL
-#define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.
-#define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO
-
+/* Neopixel RGB LEDs */
+#define USE_NEOPIXEL
+#define NEOPIXEL_GPIO 26
+#define NEOPIXEL_COUNT 32
 
 #endif

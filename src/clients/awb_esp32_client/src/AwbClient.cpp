@@ -40,10 +40,13 @@ void AwbClient::setup()
     _wlanConnector->setup();
     showSetupMsg("setup wifi done");
 
-#ifdef USE_NEOPIXEL_STATUS_CONTROL
+#ifdef USE_NEOPIXEL
     showSetupMsg("setup neopixel");
-    this->_neoPixelStatus = new NeoPixelStatusControl();
-    _neoPixelStatus->setStartUpAlert(); // show alarm neopixel on startup to see unexpected restarts
+    this->_neopixelManager = new NeopixelManager(
+        [this](String message)
+        { showError(message); },
+        [this](String message)
+        { showMsg(message); });
     showSetupMsg("setup neopixel done");
 #endif
 
@@ -169,6 +172,12 @@ void AwbClient::setup()
         this->_dacSpeaker->setVolume(DEFAULT_VOLUME);
     }
 
+    // set up the custom code
+    showSetupMsg("setup custom code");
+    //_customCode = new CustomCode(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _autoPlayer, _inputManager, _neopixelManager, _wlanConnector, _statusManagement);
+    _customCode = new CustomCode(_neopixelManager);
+    _customCode->setup();
+
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
     delay(_debugging->isDebugging() ? 1000 : 100);
 
@@ -186,8 +195,8 @@ void AwbClient::showError(String message)
     if (_wlanConnector != NULL)
         _wlanConnector->logError(message);
 
-    if (_neoPixelStatus != NULL)
-        _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
+    // if (_neoPixelStatus != NULL)
+    //     _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
 
     if (_dacSpeaker != NULL)
         _dacSpeaker->beep();
@@ -230,6 +239,8 @@ void AwbClient::showSetupMsg(String message)
 void AwbClient::loop()
 {
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 0);
+
+    _customCode->loop();
 
     if (false) // set true to test the mp3 player contineously
     {
@@ -320,8 +331,8 @@ void AwbClient::loop()
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 50);
 
-    if (_neoPixelStatus != NULL && !packetReceived)
-        _neoPixelStatus->update();
+    // if (_neoPixelStatus != NULL && !packetReceived)
+    //     _neoPixelStatus->update();
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 55);
 

@@ -92,20 +92,22 @@ namespace Awb.Core.Project.Clients
         [Range(1, Esp32.MaxGpIoPortNumber)]
         public uint? StsRXPin { get; set; } = 16;
 
-        /* Neopixel status LEDs */
-        // #define USE_NEOPIXEL_STATUS_CONTROL
-        //#define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.
-        //#define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO
 
-        /* PCA9685 PWM servo settings */
-        // #define USE_PCA9685_PWM_SERVO // uncomment this line if you want to use PCA9685 PWM servos
-        //#define PCA9685_I2C_ADDRESS 0x40
-        //#define PCA9685_OSC_FREQUENCY 25000000
+        /** -- NeoPixel  -- **/
 
-        /* MP3-Player YX5300 */
-        //#define USE_MP3_PLAYER_YX5300
-        //#define MP3_PLAYER_YX5300_RXD 13
-        //#define MP3_PLAYER_YX5300_TXD 14
+        [DisplayName("NeoPixel")]
+        [Description("Use adressable RGB LEDs")]
+        public bool UseNeoPixel { get; set; } = false;
+
+        [DisplayName("NeoPixel data pin")]
+        [Description("the GPIO used to control RGB LEDs. GPIO 26, as default.")]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
+        public uint? NeoPixelPin { get; set; }
+
+        [DisplayName("NeoPixel count")]
+        [Description("How many RGB LEDs are connected to the data pin")]
+        [Range(1, 255)]
+        public uint? NeoPixelCount { get; set; } 
 
         /* DAC speaker */
         // #define USE_DAC_SPEAKER
@@ -178,6 +180,22 @@ namespace Awb.Core.Project.Clients
                 if (StsRXPin == null) yield return new ProjectProblem
                 {
                     Message = "STS servo RX IO pin has to be set",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+            }
+
+            if (UseNeoPixel)
+            {
+                if (NeoPixelPin == null) yield return new ProjectProblem
+                {
+                    Message = "NeoPixel data pin has to be set",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+                if (NeoPixelCount == null) yield return new ProjectProblem
+                {
+                    Message = "NeoPixel count has to be set",
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };

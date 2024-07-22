@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 
+using Awb.Core.Actuators;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
@@ -118,11 +119,14 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("// #define USE_DAC_SPEAKER");
 
             // Status neopixel
-            content.AppendLine("/* Neopixel status LEDs */");
-            content.AppendLine("// #define USE_NEOPIXEL_STATUS_CONTROL");
-            content.AppendLine("#define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.");
-            content.AppendLine("#define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO");
-            content.AppendLine();
+            if (_projectData.Esp32ClientHardwareConfig.UseNeoPixel)
+            {
+                content.AppendLine("/* Neopixel RGB LEDs */");
+                content.AppendLine("#define USE_NEOPIXEL");
+                content.AppendLine($"#define NEOPIXEL_GPIO {_projectData.Esp32ClientHardwareConfig.NeoPixelPin}");
+                content.AppendLine($"#define NEOPIXEL_COUNT {_projectData.Esp32ClientHardwareConfig.NeoPixelCount}");
+                content.AppendLine();
+            }
 
             content.AppendLine();
             content.AppendLine("#endif");
@@ -227,8 +231,13 @@ namespace Awb.Core.Export.ExporterParts
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
             foreach (var servo in servos)
+            {
+                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
+                var speed = servo.Speed ?? 0;
+                var acceleration = 0; // scs servos have no acceleration
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {servo.DefaultValue}, 0, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+            }
             result.AppendLine();
         }
 
@@ -236,8 +245,13 @@ namespace Awb.Core.Export.ExporterParts
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
             foreach (var servo in servos)
+            {
+                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
+                var acceleration = servo.Acceleration ?? 0;
+                var speed = servo.Speed ?? 0;   
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {servo.DefaultValue}, {servo.Acceleration}, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+            }
             result.AppendLine();
         }
 
