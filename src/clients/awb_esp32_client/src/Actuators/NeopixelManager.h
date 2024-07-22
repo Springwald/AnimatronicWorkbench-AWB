@@ -29,7 +29,9 @@ public:
     NeopixelManager(TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow) : _errorOccured(errorOccured), _messageToShow(messageToShow)
     {
         auto brightness = 255;
+#ifdef USE_NEOPIXEL
         FastLED.addLeds<NEOPIXEL, NEOPIXEL_GPIO>(leds, ledsCount);
+#endif
         // strip.begin(); // initialize strip (required!)
         // strip.setBrightness(brightness);
     }

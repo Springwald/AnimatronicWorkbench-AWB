@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include "NeoPixelManager.h"
 
-
-
 void NeopixelManager::setSingleLED(uint16_t LEDnum, byte r, byte g, byte b)
 {
+#ifdef USE_NEOPIXEL
     leds[LEDnum] = CHSV(r, g, b);
     FastLED.show();
+#endif
 }
 
 int NeopixelManager::getRgbVal(int ledIndex, int speed, int base)
