@@ -15,7 +15,7 @@ public:
 
 private:
     AwbDisplay *_display;
-    bool _debugging = true;
+    bool _debugging = false;
     long _lastInputUpdateMillis = -1;
 
 public:
