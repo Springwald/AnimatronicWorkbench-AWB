@@ -43,6 +43,7 @@ namespace AwbStudio.PropertyControls
             LabelName.Content = "Servo " + servo.Title;
             BtnSetToDefault.Content = $"{servo.PercentCalculator.CalculatePercent(servo.DefaultValue).ToString("0.00")}%";
             SliderValueDefault.Value = servo.PercentCalculator.CalculatePercent(servo.DefaultValue);
+           
             Loaded += ServoPropertiesControl_Loaded;
         }
 
@@ -133,6 +134,7 @@ namespace AwbStudio.PropertyControls
             var percentValue = (int)_servo.PercentCalculator.CalculatePercent(_servo.TargetValue);
             _isUpdatingView = true;
             LabelValue.Content = $"{percentValue:0.00}%";
+            LabelActualValue.Content = $"{_servo.TargetValue.ToString("0.00")}";
             SliderValue.Value = percentValue;
             _isUpdatingView = false;
         }

@@ -9,6 +9,7 @@ class CustomCode
 {
 protected:
     NeopixelManager *neopixelManager;
+    void setButtonLightByTouch(uint16_t btnIndex, uint8_t touchPin);
 
 public:
     CustomCode(NeopixelManager *neopixelManager) : neopixelManager(neopixelManager)

@@ -11,7 +11,6 @@
 #include "PacketSenderReceiver.h"
 #include "PacketProcessor.h"
 #include "DacSpeaker.h"
-#include "NeoPixel/NeoPixelStatusControl.h"
 #include "AutoPlay/AutoPlayer.h"
 #include "AwbDataImport/ProjectData.h"
 #include "WlanConnector.h"

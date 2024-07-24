@@ -28,15 +28,16 @@ public:
     // the constructor
     NeopixelManager(TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow) : _errorOccured(errorOccured), _messageToShow(messageToShow)
     {
-        auto brightness = 255;
+#define COLOR_ORDER GRB
+#define CHIPSET WS2811
 #ifdef USE_NEOPIXEL
         FastLED.addLeds<NEOPIXEL, NEOPIXEL_GPIO>(leds, ledsCount);
+        // FastLED.addLeds<CHIPSET, NEOPIXEL_GPIO, COLOR_ORDER>(leds, ledsCount).setCorrection(TypicalLEDStrip);
+        FastLED.setBrightness(255);
 #endif
-        // strip.begin(); // initialize strip (required!)
-        // strip.setBrightness(brightness);
     }
 
-    void setSingleLED(uint16_t LEDnum, byte r, byte g, byte b);
+    void setSingleLED(uint16_t LEDnum, uint8_t r, uint8_t g, uint8_t b);
     int getRgbVal(int ledIndex, int speed, int base);
 };
 

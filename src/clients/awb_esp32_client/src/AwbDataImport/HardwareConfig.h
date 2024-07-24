@@ -21,5 +21,10 @@
 
 /* DAC speaker */
 // #define USE_DAC_SPEAKER
+/* Neopixel RGB LEDs */
+#define USE_NEOPIXEL
+#define NEOPIXEL_GPIO 26
+#define NEOPIXEL_COUNT 32
+
 
 #endif
