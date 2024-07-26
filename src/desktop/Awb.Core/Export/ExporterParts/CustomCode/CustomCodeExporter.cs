@@ -8,12 +8,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using static Awb.Core.Export.IExporter;
 
-namespace Awb.Core.Export.ExporterParts
+namespace Awb.Core.Export.ExporterParts.CustomCode
 {
-    internal class CustomCodeExportData
+    internal class CustomCodeExporter : ExporterPartAbstract
     {
+        public override async Task<ExportResult> ExportAsync(string targetSrcFolder)
+        {
+            return ExportResult.SuccessResult;
+        }
     }
 }

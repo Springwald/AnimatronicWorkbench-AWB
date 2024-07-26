@@ -11,15 +11,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Awb.Core.Export.ExporterParts
+namespace Awb.Core.Export.ExporterParts.CustomCode
 {
-    internal class CustomCodeBackup
+    internal class CustomCodeRegion
     {
-        public bool CustomCodeExists => false;
-
-        public void BackupIfExisting()
-        {
-
-        }
+        public string Filename { get; init; }
+        public string RegionName { get; init; }
+        public string Content { get; init; }
     }
 }
