@@ -1,6 +1,6 @@
 
 #include <Arduino.h>
-#include "StSerialServoManager.h"
+#include "StScsSerialServoManager.h"
 #include "AwbDataImport/HardwareConfig.h"
 #include "ActualStatusInformation.h"
 #include "ActuatorValue.h"
@@ -14,7 +14,7 @@ static SCSCL _serialServo_SCS;
 /**
  * Set up the sts servos
  */
-void StSerialServoManager::setup()
+void StScsSerialServoManager::setup()
 {
     if (this->_servoTypeIsScs)
     {
@@ -40,12 +40,17 @@ void StSerialServoManager::setup()
 /**
  * update the sts servos
  */
-void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState)
+void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState)
 {
+    _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 30);
+
     for (int i = 0; i < this->_servos->size(); i++)
     {
+        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 31);
         // get a pointer to the current servo
         StsScsServo *servo = &this->_servos->at(i);
+
+        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 32);
 
         if (servo->isFault || anyServoWithGlobalFaultHasCiriticalState == true)
         {
@@ -54,26 +59,36 @@ void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCir
             continue;
         }
 
+        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 33);
+
         if (servo->targetValue == -1)
         {
+            _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 34);
             // turn servo off
             setTorque(servo->channel, false);
         }
         else
         {
+            _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 35);
+
             // set new target value if changed
             if (servo->currentValue != servo->targetValue)
             {
+                _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 36);
+
                 int speed = servo->targetSpeed;
                 int acc = servo->targetAcc;
                 if (speed == -1 && acc == -1)
                 {
+                    _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 37);
                     _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
                 }
                 else
                 {
+                    _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 38);
                     if (this->_servoTypeIsScs)
                     {
+                        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 39);
                         if (speed == -1)
                             speed = servo->defaultSpeed;
                         if (acc == -1)
@@ -82,6 +97,7 @@ void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCir
                     }
                     else
                     {
+                        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 40);
                         if (speed == -1)
                             speed = servo->defaultSpeed;
                         if (acc == -1)
@@ -89,16 +105,19 @@ void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCir
                         _serialServo_STS.WritePosEx(servo->channel, servo->targetValue, speed, acc);
                     }
                 }
+                _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 41);
                 servo->currentValue = servo->targetValue;
             }
         }
+        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 48);
     }
+    _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 49);
 }
 
 /**
  * write the position to the servo, including speed and acceleration
  */
-void StSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
+void StScsSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
 {
     if (this->servoAvailable(id))
     {
@@ -121,7 +140,7 @@ void StSerialServoManager::writePositionDetailed(int id, int position, int speed
 /**
  * write the position to the servo, using the default speed and acceleration
  */
-void StSerialServoManager::writePosition(int id, int position)
+void StScsSerialServoManager::writePosition(int id, int position)
 {
     for (int i = 0; i < _servos->size(); i++)
     {
@@ -135,7 +154,7 @@ void StSerialServoManager::writePosition(int id, int position)
 /**
  * read the actual position from the servo
  */
-int StSerialServoManager::readPosition(u8 id)
+int StScsSerialServoManager::readPosition(u8 id)
 {
     if (this->_servoTypeIsScs)
     {
@@ -150,7 +169,7 @@ int StSerialServoManager::readPosition(u8 id)
 /**
  * set the maximum torque of the servo. Set 0 to turn the servo off
  */
-void StSerialServoManager::setTorque(u8 id, bool on)
+void StScsSerialServoManager::setTorque(u8 id, bool on)
 {
     if (this->_servoTypeIsScs)
     {
@@ -165,7 +184,7 @@ void StSerialServoManager::setTorque(u8 id, bool on)
 /**
  * read the actual load of the servo
  */
-int StSerialServoManager::readLoad(int id)
+int StScsSerialServoManager::readLoad(int id)
 {
     if (this->_servoTypeIsScs)
     {
@@ -179,7 +198,7 @@ int StSerialServoManager::readLoad(int id)
 /**
  * read the temperature of the servo in degree celsius
  */
-int StSerialServoManager::readTemperature(int id)
+int StScsSerialServoManager::readTemperature(int id)
 {
     if (this->_servoTypeIsScs)
     {
@@ -194,7 +213,7 @@ int StSerialServoManager::readTemperature(int id)
 /**
  * is the servo available?
  */
-bool StSerialServoManager::servoAvailable(int id)
+bool StScsSerialServoManager::servoAvailable(int id)
 {
     for (int i = 0; i < servoIds->size(); i++)
     {
@@ -219,7 +238,7 @@ bool StSerialServoManager::servoAvailable(int id)
  * scan for all available servo ids.
  * Only inside the given range to prevent long delays.
  */
-void StSerialServoManager::scanIds()
+void StScsSerialServoManager::scanIds()
 {
     servoIds = new std::vector<u8>();
 

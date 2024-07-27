@@ -92,7 +92,7 @@ String StatusManagement::updateActuatorsStatuses()
     return actualActuatorsStateInfo;
 }
 
-String StatusManagement::updateStsScsServoStatuses(StSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo)
+String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo)
 {
     String errors = "";
 

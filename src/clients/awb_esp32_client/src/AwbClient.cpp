@@ -108,7 +108,7 @@ void AwbClient::setup()
     showSetupMsg("setup SCS servos");
     this->_scSerialServoManager = new StSerialServoManager(_projectData->scsServos, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD);
     this->_scSerialServoManager->setup();
-    showSetupMsg("setup STS servos done");
+    showSetupMsg("setup SCS servos done");
 #endif
 
     showMsg("Found " + String(this->_stSerialServoManager == NULL ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == NULL ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");

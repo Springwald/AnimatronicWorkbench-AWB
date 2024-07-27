@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "AwbDisplay.h"
 #include "Adafruit_PWMServoDriver.h"
-#include "Actuators/StSerialServoManager.h"
+#include "Actuators/StScsSerialServoManager.h"
 #include "Actuators/Pca9685PwmManager.h"
 #include "Actuators/Mp3PlayerYX5300Manager.h"
 #include "Actuators/ActuatorValue.h"
@@ -39,8 +39,8 @@ protected:
     PacketSenderReceiver *_packetSenderReceiver;       /// The packet sender receiver to communicate with the Animatronic Workbench Studio
     PacketProcessor *_packetProcessor;                 /// The packet processor to process the received packets from the Animatronic Workbench Studio
     Pca9685PwmManager *_pca9685pwmManager;             /// The pwm manager to control the Pca9685 pwm board
-    StSerialServoManager *_stSerialServoManager;       /// The serial servo manager to control the sts serial servos
-    StSerialServoManager *_scSerialServoManager;       /// The serial servo manager to control the scs serial servos
+    StScsSerialServoManager *_stSerialServoManager;       /// The serial servo manager to control the sts serial servos
+    StScsSerialServoManager *_scSerialServoManager;       /// The serial servo manager to control the scs serial servos
     InputManager *_inputManager;                       // the input manager
     Mp3PlayerYX5300Manager *_mp3Player;                /// The mp3 player to play sounds
     NeopixelManager *_neopixelManager;                 /// The neopixel manager to control the neopixel leds

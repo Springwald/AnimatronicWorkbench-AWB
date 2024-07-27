@@ -13,6 +13,7 @@ public:
     static const int MJ_AWB_CLIENT_LOOP = 1;
     static const int MJ_WLAN = 2;
     static const int MJ_AUTOPLAY = 3;
+    static const int MJ_STS_SCS_SERVO_MANAGER = 4;
 
 private:
     AwbDisplay *_display;
