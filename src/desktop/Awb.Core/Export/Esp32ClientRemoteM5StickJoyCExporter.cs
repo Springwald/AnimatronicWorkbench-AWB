@@ -25,7 +25,8 @@ namespace Awb.Core.Export
             _wifiConfigData = wifiConfigData;
         }
 
-        public async Task<IExporter.ExportResult> ExportAsync(string targetPath)
+
+        public async Task<IExporter.ExportResult> ExportAsync(string targetPath, string projectFolder)
         {
             var remoteSrcFolder = Path.Combine(_esp32ClientsSourceFolder, "awb_esp32_remote-M5Stick-Mini-JoyC-HAT");
 
@@ -59,5 +60,6 @@ namespace Awb.Core.Export
             return IExporter.ExportResult.SuccessResult;
         }
 
+       
     }
 }

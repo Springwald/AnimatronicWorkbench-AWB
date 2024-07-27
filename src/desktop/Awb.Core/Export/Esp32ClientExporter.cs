@@ -7,6 +7,7 @@
 
 
 using Awb.Core.Export.ExporterParts;
+using Awb.Core.Export.ExporterParts.CustomCode;
 
 namespace Awb.Core.Export
 {
@@ -27,15 +28,36 @@ namespace Awb.Core.Export
             _projectExportData = projectExportData;
         }
 
-        public async Task<IExporter.ExportResult> ExportAsync(string targetPath)
+        public async Task<IExporter.ExportResult> ExportAsync(string targetPath, string projectFolder)
         {
             var remoteSrcFolder = Path.Combine(_esp32ClientsSourceFolder, "awb_esp32_client");
-
+            var customCodeTargetFolder = Path.Combine(targetPath, @"src\AwbDataImport\CustomCode");
+;
             if (!Directory.Exists(remoteSrcFolder))
             {
                 return new IExporter.ExportResult { ErrorMessage = $"Source folder '{remoteSrcFolder}' not found" };
             }
 
+            CustomCodeRegionContent? customCodeRegionContent = null;
+            var customCodeBackupRootBolderFolder = Path.Combine(projectFolder, "custom_code_backup");
+            var customCodeBackup = new CustomCodeBackup(customCodeTargetFolder: customCodeTargetFolder, customCodeBackupRootFolder: customCodeBackupRootBolderFolder);
+            if (customCodeBackup.CustomCodeExists)
+            {
+                var customCodeBackupResult = customCodeBackup.Backup();
+                if (!customCodeBackupResult.Success)
+                {
+                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage = customCodeBackupResult.ErrorMsg });
+                    return new IExporter.ExportResult { ErrorMessage = customCodeBackupResult.ErrorMsg };
+                }
+                // take the existing custom code regions
+                customCodeRegionContent = customCodeBackupResult.CustomCodeRegionContent;
+            } else
+            {
+                // seems as if there is no custom code yet, so we create an empty custom code region content
+                customCodeRegionContent = new CustomCodeRegionContent();
+            }
+
+            // copy the template source folder to the target folder
             var cloneResult = await new SrcFolderCloner(remoteSrcFolder, targetPath, removeExtraFilesInTarget: false).Clone();
             if (!cloneResult.Success)
             {
@@ -43,12 +65,16 @@ namespace Awb.Core.Export
                 return new IExporter.ExportResult { ErrorMessage = cloneResult.ErrorMessage };
             }
 
+            // write the exported data to the target folder and overwrite the template files with the exported data
             var dataExporter = new ExporterPartAbstract[]
             {
+                // announce the different exporters
                 new WifiConfigExporter(_wifiConfigData),
-                new ProjectDataExporter(_projectExportData)
+                new ProjectDataExporter(_projectExportData),
+                new CustomCodeExporter()
             };
 
+            // export the data using the exporters
             foreach (var exporter in dataExporter)
             {
                 var result = await exporter.ExportAsync(targetPath);

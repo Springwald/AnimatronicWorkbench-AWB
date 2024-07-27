@@ -99,7 +99,7 @@ namespace AwbStudio.Exports
             }
             _project = projectManagerService.ActualProject;
 
-            ExportFolderGlobal = System.IO.Path.Combine(projectManagerService.ActualProject.ProjectFolder, "Esp32Clients");
+            ExportFolderGlobal = System.IO.Path.Combine(_project.ProjectFolder, "Esp32Clients");
 
             Loaded += ExportToClientCodeWindow_Loaded;
         }
@@ -159,7 +159,7 @@ namespace AwbStudio.Exports
                 return;
             }
 
-            await Export(new Esp32ClientExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData, projectData), targetSubFolder: "awb_esp32_client");
+            await Export(new Esp32ClientExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData, projectData), targetSubFolder: "awb_esp32_client" );
             await Export(new Esp32ClientRemoteM5StickJoyCExporter(esp32ClientsSourceFolder: esp32ClientsSourceFolder, WifiConfigData), targetSubFolder: "awb_esp32_remote-M5Stick-Mini-JoyC-HAT");
         }
 
@@ -167,6 +167,9 @@ namespace AwbStudio.Exports
 
         private async Task Export(IExporter exporter, string targetSubFolder)
         {
+
+            string projectFolder = _project.ProjectFolder;
+
             await LogAsync("-------------------------------");
 
             await LogAsync($"Exporting {exporter.Title}");
@@ -197,7 +200,7 @@ namespace AwbStudio.Exports
 
             exporter.Processing += ExporterProcessing;
 
-            var result = await exporter.ExportAsync(targetPath: targetFolder);
+            var result = await exporter.ExportAsync(targetPath: targetFolder, projectFolder: projectFolder );
 
             exporter.Processing -= ExporterProcessing;
 

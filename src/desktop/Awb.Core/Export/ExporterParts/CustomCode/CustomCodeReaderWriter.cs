@@ -30,7 +30,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
         /// <summary>
         /// Read the content of the regions from a custom code file
         /// </summary>
-        public RegionsReadResult ReadRegions(string content)
+        public RegionsReadResult ReadRegions(string filename, string content)
         {
             var lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             var regionContent = new StringBuilder();
@@ -56,7 +56,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                             if (actualRegionKey != regionKey)
                                 return new RegionsReadResult { ErrorMsg = $"Region '{actualRegionKey}' not closed", Regions = Array.Empty<Region>() };
 
-                            regions.Add(new Region { Name = regionKey, Content = regionContent.ToString() });
+                            regions.Add(new Region { Filename = filename, Key = regionKey, Content = regionContent.ToString() });
                             actualRegionKey = null;
                             regionContent.Clear();
                             break;
@@ -101,7 +101,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
                             actualRegionKey = regionKey;
                             result.AppendLine(line);
-                            var content = regionContent.Regions.Where(r => r.Name == regionKey).Select(r => r.Content).ToArray();
+                            var content = regionContent.Regions.Where(r => r.Key == regionKey).Select(r => r.Content).ToArray();
                             switch (content.Length)
                             {
                                 case 0:

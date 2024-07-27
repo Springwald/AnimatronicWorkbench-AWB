@@ -7,19 +7,20 @@
 
 namespace Awb.Core.Export.ExporterParts.CustomCode
 {
-    internal class CustomCodeRegionContent
+    public class CustomCodeRegionContent
     {
         private List<Region> _regions { get; init; } = new List<Region>();
         public Region[] Regions => _regions.ToArray();
 
-        public void AddRegion(string name, string content)
+        public void AddRegion( string filename, string key, string content)
         {
-            _regions.Add(new Region { Name = name, Content = content });
+            _regions.Add(new Region { Key = key, Content = content, Filename = filename });
         }
 
         public record Region
         {
-            public required string Name { get; init; }
+            public required string Filename { get; init; }
+            public required string Key { get; init; }
             public required string Content { get; init; }
         }
 

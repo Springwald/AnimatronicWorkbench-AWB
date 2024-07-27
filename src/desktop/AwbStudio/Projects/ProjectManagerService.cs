@@ -71,7 +71,7 @@ namespace AwbStudio.Projects
 
         public async Task<bool> CreateProjectSubDirectories(string projectFolder)
         {
-            var folders = new[] { @"audio\SDCard\01", @"CustomCode\EspClient1" };
+            var folders = new[] { @"audio\SDCard\01" };
 
             foreach (var folder in folders)
             {

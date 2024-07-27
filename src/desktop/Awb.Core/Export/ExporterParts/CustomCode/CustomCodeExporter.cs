@@ -5,12 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 using static Awb.Core.Export.IExporter;
 
 namespace Awb.Core.Export.ExporterParts.CustomCode
@@ -19,6 +13,14 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
     {
         public override async Task<ExportResult> ExportAsync(string targetSrcFolder)
         {
+            // backup existing custom code files if existing
+
+            // read the regions from existing custom code files
+
+            // read the template file for custom code
+
+            // write the template file to the target folder stamping the read regions into the template
+
             return ExportResult.SuccessResult;
         }
     }
