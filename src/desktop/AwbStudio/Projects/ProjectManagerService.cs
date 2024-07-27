@@ -11,7 +11,6 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using static AwbStudio.Projects.IProjectManagerService;
 
 namespace AwbStudio.Projects
@@ -71,7 +70,7 @@ namespace AwbStudio.Projects
 
         public async Task<bool> CreateProjectSubDirectories(string projectFolder)
         {
-            var folders = new[] { @"audio\SDCard\01" };
+            var folders = new[] { @"audio\SDCard\01", "custom_code_backup" };
 
             foreach (var folder in folders)
             {
@@ -95,7 +94,7 @@ namespace AwbStudio.Projects
         public async Task<OpenProjectResult> OpenProjectAsync(string projectFolder)
         {
             if (!Directory.Exists(projectFolder))
-                return  OpenProjectResult.ErrorResult([$"Project folder '{projectFolder}' does not exist."]);
+                return OpenProjectResult.ErrorResult([$"Project folder '{projectFolder}' does not exist."]);
 
             var projectFilename = ProjectConfigFilename(projectFolder);
 
@@ -126,6 +125,10 @@ namespace AwbStudio.Projects
 
             projectConfig.SetProjectFolder(projectFolder);
             this.ActualProject = projectConfig;
+
+            var createDirectoriesIfNeeded = await CreateProjectSubDirectories(projectFolder: projectFolder);
+            if (createDirectoriesIfNeeded == false)
+                return OpenProjectResult.ErrorResult([$"Could not create project subdirectories in folder '{projectFolder}'."]);
 
             _awbStudioSettingsService.StudioSettings.AddLastProjectFolder(projectFolder);
             await _awbStudioSettingsService.SaveSettingsAsync();
