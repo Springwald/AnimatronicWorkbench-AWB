@@ -65,10 +65,16 @@ namespace AwbStudio.ProjectConfiguration
             InitializeComponent();
             Title = "Project Objects";
         }
-        private void ListProjectObjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+        public void UpdateListItemTitels()
         {
             // force binding update on listbox item label names of the listbox ListProjectObjects 
             ListProjectObjects.Items.Refresh();
+        }
+
+        private void ListProjectObjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateListItemTitels();
 
             // select the new item
             if (SelectedProjectObject == null) return;

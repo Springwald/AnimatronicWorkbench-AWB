@@ -56,7 +56,7 @@
                         <ProjectConfiguration:ProjectObjectListControl x:Name="InputsList" 
                         ProjectObjects="{Binding Inputs}" Title="Inputs" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="InputsList_NewProjectObjectRequested"/>
 
-                        <ProjectConfiguration:ProjectObjectListControl x:Name="TimelineStates" 
+                        <ProjectConfiguration:ProjectObjectListControl x:Name="TimelineStatesList" 
                         ProjectObjects="{Binding TimelineStates}" Title="Timeline states" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="TimelineStates_NewProjectObjectRequested"/>
                     </StackPanel>
 

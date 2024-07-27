@@ -13,7 +13,6 @@ using AwbStudio.ProjectConfiguration;
 using AwbStudio.ProjectConfiguration.PropertyEditors;
 using AwbStudio.Projects;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -208,19 +207,24 @@ namespace AwbStudio
             foreach (var control in StackPanelProjectObjectLists.Children)
                 if (control is ProjectObjectListControl list)
                     list.SelectedProjectObject = projectObject;
+
+            UpdateProjectObjectsListItemTitels();
         }
 
-        private void UpdateProblemsDisplay()
+
+        // Update the listed item titles in die object lists
+        private void UpdateProjectObjectsListItemTitels()
         {
-            var timelines = new List<TimelineData>();
-            foreach (var projectObject in _awbProject.GetProjectProblems(timelines))
-            {
-
-            }
+            var childControls = StackPanelProjectObjectLists.Children;
+            foreach (var control in childControls)
+                if (control is ProjectObjectListControl list)
+                    list.UpdateListItemTitels();
         }
+
 
         private void PropertyEditorUpdatedData_Fired(object? sender, EventArgs e)
         {
+            UpdateProjectObjectsListItemTitels();
             _viewModel.UnsavedChanges = true;
         }
 
@@ -249,69 +253,83 @@ namespace AwbStudio
 
         private void ScsServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.ScsServos.Add(new ScsFeetechServoConfig
+            var item = new ScsFeetechServoConfig
             {
                 Id = _idCreator.CreateNewObjectId("ScsServo"),
                 Title = "",
                 ClientId = 1,
                 Channel = 1
-            });
+            };
+            _viewModel.ScsServos.Add(item);
+            ScsServosList.SelectedProjectObject = item;
         }
+        
 
         private void StsServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.StsServos.Add(new StsFeetechServoConfig
+            var item =    new StsFeetechServoConfig
             {
                 Id = _idCreator.CreateNewObjectId("StsServo"),
                 Title = "",
                 ClientId = 1,
                 Channel = 1
-            });
+            };
+            _viewModel.StsServos.Add(item);
+            StsServosList.SelectedProjectObject = item;
         }
 
         private void Pca9685PWMServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.Pca9685PwmServos.Add(new Pca9685PwmServoConfig
+            var item = new Pca9685PwmServoConfig
             {
                 Id = _idCreator.CreateNewObjectId("Pca9685PwmServo"),
                 I2cAdress = 0x40,
                 Title = "",
                 ClientId = 1,
                 Channel = 1
-            });
+            };
+            _viewModel.Pca9685PwmServos.Add(item);
+            Pca9685PWMServosList.SelectedProjectObject = item;
         }
 
         private void Mp3PlayerYX5300List_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.Mp3PlayerYX5300.Add(new Mp3PlayerYX5300Config
+            var item = new Mp3PlayerYX5300Config
             {
                 Id = _idCreator.CreateNewObjectId("Mp3PlayerYX5300"),
                 Title = "",
                 ClientId = 1,
                 RxPin = 13,
                 TxPin = 14
-            });
+            };
+            _viewModel.Mp3PlayerYX5300.Add(item);
+            Mp3PlayerYX5300List.SelectedProjectObject = item;
         }
 
         private void InputsList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.Inputs.Add(new InputConfig
+            var item = new InputConfig
             {
                 Id = _idCreator.GetNewInputId(),
                 Title = "",
                 ClientId = 1,
-            });
+            };
+            _viewModel.Inputs.Add(item);
+            InputsList.SelectedProjectObject = item;
         }
 
         private void TimelineStates_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.TimelineStates.Add(new TimelineState
+            var item = new TimelineState
             {
                 Id = _idCreator.GetNewTimelineStateId(),
                 Title = "",
                 PositiveInputs = Array.Empty<int>(),
                 NegativeInputs = Array.Empty<int>()
-            });
+            };
+
+            _viewModel.TimelineStates.Add(item);
+            TimelineStatesList.SelectedProjectObject = item;
 
         }
     }
