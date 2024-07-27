@@ -37,6 +37,8 @@ public:
     StsScsServo(int channel, String const title, int minValue, int maxValue, int maxTemp, int maxTorque, int defaultValue, int defaultAcceleration, int defaultSpeed, bool globalFault) : channel(channel), title(title), minValue(minValue), maxValue(maxValue), maxTemp(maxTemp), maxTorque(maxTorque), defaultValue(defaultValue), defaultAcceleration(defaultAcceleration), defaultSpeed(defaultSpeed), globalFault(globalFault)
     {
         targetValue = defaultValue;
+        targetSpeed = defaultSpeed;
+        targetAcc = defaultAcceleration;
     }
 
     ~StsScsServo()

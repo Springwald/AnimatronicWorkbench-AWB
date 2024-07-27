@@ -81,7 +81,14 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
                 if (speed == -1 && acc == -1)
                 {
                     _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 37);
-                    _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
+                    if (this->_servoTypeIsScs)
+                    {
+                        _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
+                    }
+                    else
+                    {
+                        _serialServo_STS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
+                    }
                 }
                 else
                 {

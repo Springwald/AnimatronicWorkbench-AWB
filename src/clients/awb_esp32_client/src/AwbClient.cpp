@@ -99,14 +99,14 @@ void AwbClient::setup()
 #endif
 
     showSetupMsg("setup STS servos");
-    this->_stSerialServoManager = new StSerialServoManager(_projectData->stsServos, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD);
+    this->_stSerialServoManager = new StScsSerialServoManager(_projectData->stsServos, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD);
     this->_stSerialServoManager->setup();
     showSetupMsg("setup STS servos done");
 #endif
 
 #ifdef USE_SCS_SERVO
     showSetupMsg("setup SCS servos");
-    this->_scSerialServoManager = new StSerialServoManager(_projectData->scsServos, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD);
+    this->_scSerialServoManager = new StScsSerialServoManager(_projectData->scsServos, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD);
     this->_scSerialServoManager->setup();
     showSetupMsg("setup SCS servos done");
 #endif

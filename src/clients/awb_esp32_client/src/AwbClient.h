@@ -36,21 +36,21 @@ protected:
     int _lastAutoPlaySelectedStateId = -1; /// The last selected state id for autoplay timeline filter
     String _lastAutoPlayTimelineName = ""; /// The last selected timeline name for autoplay timeline filter
 
-    PacketSenderReceiver *_packetSenderReceiver;       /// The packet sender receiver to communicate with the Animatronic Workbench Studio
-    PacketProcessor *_packetProcessor;                 /// The packet processor to process the received packets from the Animatronic Workbench Studio
-    Pca9685PwmManager *_pca9685pwmManager;             /// The pwm manager to control the Pca9685 pwm board
-    StScsSerialServoManager *_stSerialServoManager;       /// The serial servo manager to control the sts serial servos
-    StScsSerialServoManager *_scSerialServoManager;       /// The serial servo manager to control the scs serial servos
-    InputManager *_inputManager;                       // the input manager
-    Mp3PlayerYX5300Manager *_mp3Player;                /// The mp3 player to play sounds
-    NeopixelManager *_neopixelManager;                 /// The neopixel manager to control the neopixel leds
-    AutoPlayer *_autoPlayer;                           /// The auto player to play timeline animations
-    WlanConnector *_wlanConnector;                     /// The wlan connector to open a WLAN AP and display status information as a web page
-    ProjectData *_projectData;                         // the project data exported by Animatronic Workbench Studio
-    Debugging *_debugging;                             // the debugging class
-    StatusManagement *_statusManagement;               // the status management for acutator status information and health check
-    ActualStatusInformation *_actualStatusInformation; /// The actual status information
-    CustomCode *_customCode;                           // the custom code
+    PacketSenderReceiver *_packetSenderReceiver = nullptr;       /// The packet sender receiver to communicate with the Animatronic Workbench Studio
+    PacketProcessor *_packetProcessor = nullptr;                 /// The packet processor to process the received packets from the Animatronic Workbench Studio
+    Pca9685PwmManager *_pca9685pwmManager = nullptr;             /// The pwm manager to control the Pca9685 pwm board
+    StScsSerialServoManager *_stSerialServoManager = nullptr;    /// The serial servo manager to control the sts serial servos
+    StScsSerialServoManager *_scSerialServoManager = nullptr;    /// The serial servo manager to control the scs serial servos
+    InputManager *_inputManager = nullptr;                       // the input manager
+    Mp3PlayerYX5300Manager *_mp3Player = nullptr;                /// The mp3 player to play sounds
+    NeopixelManager *_neopixelManager = nullptr;                 /// The neopixel manager to control the neopixel leds
+    AutoPlayer *_autoPlayer = nullptr;                           /// The auto player to play timeline animations
+    WlanConnector *_wlanConnector = nullptr;                     /// The wlan connector to open a WLAN AP and display status information as a web page
+    ProjectData *_projectData = nullptr;                         // the project data exported by Animatronic Workbench Studio
+    Debugging *_debugging = nullptr;                             // the debugging class
+    StatusManagement *_statusManagement = nullptr;               // the status management for acutator status information and health check
+    ActualStatusInformation *_actualStatusInformation = nullptr; /// The actual status information
+    CustomCode *_customCode = nullptr;                           // the custom code
 
     /**
      * Update the actuators

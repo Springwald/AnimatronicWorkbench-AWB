@@ -33,7 +33,8 @@ public:
      */
     std::vector<u8> *servoIds;
 
-    StScsSerialServoManager(std::vector<StsScsServo> *servos, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd) : _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), _servos(servos) {};
+    StScsSerialServoManager(std::vector<StsScsServo> *servos, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd, Debugging *debugging) : 
+    _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), _servos(servos), _debugging(debugging) {};
 
     /**
      * Set up the sts servos

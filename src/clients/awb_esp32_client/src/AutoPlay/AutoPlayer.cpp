@@ -129,7 +129,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     _debugging->setState(Debugging::MJ_AUTOPLAY, 25);
 
     // Play STS Servos
-    if (_stSerialServoManager != NULL)
+    if (_stSerialServoManager != nullptr)
     {
         for (int servoIndex = 0; servoIndex < _data->stsServos->size(); servoIndex++)
         {
@@ -149,7 +149,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     _debugging->setState(Debugging::MJ_AUTOPLAY, 30);
 
     // Play SCS Servos
-    if (_scSerialServoManager != NULL)
+    if (_scSerialServoManager != nullptr)
     {
         for (int servoIndex = 0; servoIndex < _data->scsServos->size(); servoIndex++)
         {
@@ -169,7 +169,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     _debugging->setState(Debugging::MJ_AUTOPLAY, 35);
 
     // Play PWM Servos
-    if (_pca9685PwmManager != NULL)
+    if (_pca9685PwmManager != nullptr)
     {
         for (int servoIndex = 0; servoIndex < _data->pca9685PwmServos->size(); servoIndex++)
         {
@@ -228,7 +228,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     _debugging->setState(Debugging::MJ_AUTOPLAY, 40);
 
     // Play MP3
-    if (_mp3PlayerYX5300Manager != NULL)
+    if (_mp3PlayerYX5300Manager != nullptr)
     {
         for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
         {
