@@ -52,7 +52,7 @@ public:
      */
     String *memoryInfo;
 
-    String *timelineNameToPlay; /// the name of the timeline to play by remote control
+    String *timelineNameToPlay = nullptr; /// the name of the timeline to play by remote control
 
     int scsServoCannelToSet; /// the channel of the scs servo to set by remote control
     int scsServoValueToSet;  /// the value of the scsservo to set by remote control (in percent)

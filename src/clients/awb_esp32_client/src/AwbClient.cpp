@@ -111,7 +111,7 @@ void AwbClient::setup()
     showSetupMsg("setup SCS servos done");
 #endif
 
-    showMsg("Found " + String(this->_stSerialServoManager == NULL ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == NULL ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
+    showMsg("Found " + String(this->_stSerialServoManager == nullptr ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == nullptr ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
     delay(_debugging->isDebugging() ? 1000 : 100);
 
     if (this->_projectData->pca9685PwmServos->size() > 0)
@@ -164,7 +164,7 @@ void AwbClient::setup()
     showSetupMsg("setup status management");
     _statusManagement = new StatusManagement(_projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, statusManagementErrorOccured);
 
-    if (this->_dacSpeaker != NULL)
+    if (this->_dacSpeaker != nullptr)
     {
         showSetupMsg("init dac speaker");
         this->_dacSpeaker->setVolume(1);
@@ -192,13 +192,13 @@ void AwbClient::showError(String message)
     int durationMs = _debugging->isDebugging() ? 3000 : 2000;
     _display.draw_message(message, durationMs, MSG_TYPE_ERROR);
 
-    if (_wlanConnector != NULL)
+    if (_wlanConnector != nullptr)
         _wlanConnector->logError(message);
 
-    // if (_neoPixelStatus != NULL)
+    // if (_neoPixelStatus != nullptr)
     //     _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
 
-    if (_dacSpeaker != NULL)
+    if (_dacSpeaker != nullptr)
         _dacSpeaker->beep();
 }
 
@@ -228,7 +228,7 @@ void AwbClient::showSetupMsg(String message)
 {
     int durationMs = _debugging->isDebugging() ? 200 : 50;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
-    if (_wlanConnector != NULL) // check if wlan connector is instanciated
+    if (_wlanConnector != nullptr) // check if wlan connector is instanciated
         _wlanConnector->logInfo(message);
     delay(durationMs);
 }
@@ -274,11 +274,11 @@ void AwbClient::loop()
     // update autoplay timelines and actuators
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 15);
 
-    if (_wlanConnector->timelineNameToPlay != NULL && _wlanConnector->timelineNameToPlay->length() > 0)
+    if (_wlanConnector->timelineNameToPlay != nullptr && _wlanConnector->timelineNameToPlay->length() > 0)
     {
         // a timeline was received via wifi from a remote control
         _autoPlayer->startNewTimelineByName(_wlanConnector->timelineNameToPlay->c_str());
-        _wlanConnector->timelineNameToPlay = NULL;
+        _wlanConnector->timelineNameToPlay = nullptr;
     }
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 20);
@@ -302,7 +302,7 @@ void AwbClient::loop()
         if (!_autoPlayer->isPlaying())
         {
             // no timeline is playing, so turn off torque for all sts servos
-            if (this->_stSerialServoManager != NULL)
+            if (this->_stSerialServoManager != nullptr)
             {
                 for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
                 {
@@ -311,7 +311,7 @@ void AwbClient::loop()
                     this->_stSerialServoManager->setTorque(id, false);
                 }
             }
-            if (this->_scSerialServoManager != NULL)
+            if (this->_scSerialServoManager != nullptr)
             {
                 for (int i = 0; i < this->_scSerialServoManager->servoIds->size(); i++)
                 {
@@ -331,12 +331,12 @@ void AwbClient::loop()
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 50);
 
-    // if (_neoPixelStatus != NULL && !packetReceived)
+    // if (_neoPixelStatus != nullptr && !packetReceived)
     //     _neoPixelStatus->update();
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 55);
 
-    if (_dacSpeaker != NULL)
+    if (_dacSpeaker != nullptr)
         _dacSpeaker->update();
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 60);

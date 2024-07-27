@@ -64,15 +64,15 @@ String StatusManagement::updateActuatorsStatuses()
     String actualActuatorsStateInfo = "";
 
     // check Sts serial bus servos
-    if (this->_stSerialServoManager != NULL)
+    if (this->_stSerialServoManager != nullptr)
         actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_stSerialServoManager, _projectData->stsServos, false);
 
     // check Scs serial bus servos
-    if (this->_scSerialServoManager != NULL)
+    if (this->_scSerialServoManager != nullptr)
         actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_scSerialServoManager, _projectData->scsServos, true);
 
     // check PWM servos
-    if (this->_pca9685PwmManager != NULL)
+    if (this->_pca9685PwmManager != nullptr)
     {
         for (int i = 0; i < this->_projectData->pca9685PwmServos->size(); i++)
         {
