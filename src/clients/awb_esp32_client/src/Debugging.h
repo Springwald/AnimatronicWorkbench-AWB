@@ -12,6 +12,7 @@ class Debugging
 public:
     static const int MJ_AWB_CLIENT_LOOP = 1;
     static const int MJ_WLAN = 2;
+    static const int MJ_AUTOPLAY = 3;
 
 private:
     AwbDisplay *_display;

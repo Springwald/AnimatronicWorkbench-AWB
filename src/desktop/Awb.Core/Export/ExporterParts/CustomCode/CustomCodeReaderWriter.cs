@@ -5,15 +5,20 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Awb.Core.Export.ExporterParts.CustomCode
 {
-    internal class CustomCodeExportData
+    internal class CustomCodeReaderWriter
     {
+        public CustomCodeRegionContent ReadRegions(string content)
+        {
+            return null;
+        }
+
+        public string WriteRegions(string content, CustomCodeRegionContent regionContent)
+        {
+            return null;
+        }
     }
 }

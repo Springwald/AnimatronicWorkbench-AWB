@@ -3,6 +3,11 @@
 #include "CustomCode.h"
 #include <Actuators/NeopixelManager.h>
 
+/*
+    Enter your custom code in this cpp file and the corresponding header file.
+    Only write code beween the cc-start and cc-end comments, otherwise it will be overwritten and lost.
+*/
+
 void CustomCode::setup()
 {
     /* cc-start-setup - insert your setup code here before the end-setup comment: */

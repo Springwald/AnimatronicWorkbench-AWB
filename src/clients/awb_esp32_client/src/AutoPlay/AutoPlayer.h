@@ -13,6 +13,7 @@
 #include "../Actuators/Pca9685PwmManager.h"
 #include "../Actuators/Mp3PlayerYX5300Manager.h"
 #include "../Actuators/InputManager.h"
+#include "../Debugging.h"
 
 using byte = unsigned char;
 
@@ -29,6 +30,7 @@ protected:
     Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager; // the MP3 player manager
     InputManager *_inputManager;                     // the input manager
     ProjectData *_data;                              // the data exported by Animatronic Workbench Studio
+    Debugging *_debugging;                           /// the debugging class
 
     long _lastMsUpdate;                  // millis() of last update
     long _lastPacketReceivedMillis = -1; // millis() of last received packet
@@ -45,7 +47,8 @@ protected:
     int calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints);
 
 public:
-    AutoPlayer(ProjectData *data, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured) : _data(data), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured)
+    AutoPlayer(ProjectData *data, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured, Debugging *debugging)
+        : _data(data), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured), _debugging(debugging)
     {
         _lastMsUpdate = millis();
     }
