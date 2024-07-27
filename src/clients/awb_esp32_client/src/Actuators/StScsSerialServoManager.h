@@ -6,7 +6,6 @@
 #include <SCServo.h>
 #include "ActuatorValue.h"
 #include "ProjectData/StsScsServo.h"
-#include <Debugging.h>
 class StScsSerialServoManager
 {
 
@@ -20,7 +19,6 @@ private:
     int _gpioRxd;                        /// the gpio pin for the rxd communication to the sts / scs servos
     int _gpioTxd;                        /// the gpio pin for the txd communication to the sts / scsservos
     bool _servoTypeIsScs;                /// is the servo type SCS or STS?
-    Debugging *_debugging;               /// the debugging class
 
     /**
      * Scan for Ids and store in "servoIds"
@@ -33,8 +31,7 @@ public:
      */
     std::vector<u8> *servoIds;
 
-    StScsSerialServoManager(std::vector<StsScsServo> *servos, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd, Debugging *debugging) : 
-    _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), _servos(servos), _debugging(debugging) {};
+    StScsSerialServoManager(std::vector<StsScsServo> *servos, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd) : _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), _servos(servos) {};
 
     /**
      * Set up the sts servos

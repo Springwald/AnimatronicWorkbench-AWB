@@ -5,8 +5,6 @@
 #include "ActualStatusInformation.h"
 #include "ActuatorValue.h"
 
-#define USE_DEBUG
-
 // It's pretty messy and also a bit unclean that the library creates a global object.
 // But it is the only way I found to use the library.
 // Otherwise it seems to crash in various places - I guess because of memory problems.
