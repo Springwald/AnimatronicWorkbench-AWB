@@ -5,12 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Awb.Core.Export.ExporterParts.CustomCode
 {
     internal class CustomCodeBackup
@@ -19,7 +13,6 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
         public void BackupIfExisting()
         {
-
         }
     }
 }
