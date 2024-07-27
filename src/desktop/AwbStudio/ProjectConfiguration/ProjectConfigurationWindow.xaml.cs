@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
@@ -16,7 +15,6 @@ using AwbStudio.Projects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -32,6 +30,7 @@ namespace AwbStudio
         private ProjectConfigViewModel _viewModel;
         private readonly IProjectManagerService _projectManagerService;
         private readonly AwbProject _awbProject;
+        private readonly IdCreator _idCreator;
 
         private TimelineData[]? _timelines;
         private TimelineData[] Timelines
@@ -42,7 +41,7 @@ namespace AwbStudio
                 {
                     var ids = _awbProject.TimelineDataService.TimelineIds.ToArray();
                     var timelines = ids.Select(id => _awbProject.TimelineDataService.GetTimelineData(id)).ToArray() ?? Array.Empty<TimelineData>();
-                    _timelines = timelines; 
+                    _timelines = timelines;
                 }
                 return _timelines;
             }
@@ -53,6 +52,8 @@ namespace AwbStudio
             _projectManagerService = projectManagerService;
             _awbProject = projectManagerService.ActualProject ?? throw new ArgumentNullException(nameof(projectManagerService.ActualProject));
             _viewModel = new ProjectConfigViewModel(_awbProject);
+
+            _idCreator = new IdCreator(_viewModel, _awbProject);
 
             this.DataContext = _viewModel;
 
@@ -99,7 +100,7 @@ namespace AwbStudio
             var errors = _awbProject.GetProjectProblems(Timelines).Where(p => p.ProblemType == ProjectProblem.ProblemTypes.Error).ToArray();
             if (errors.Any())
             {
-                MessageBox.Show("Please fix all errors before saving the project configuration.\r\n\r\n"+
+                MessageBox.Show("Please fix all errors before saving the project configuration.\r\n\r\n" +
                     string.Join("\r\n", errors.Select(p => p.PlaintTextDescription)));
                 return false;
             }
@@ -175,7 +176,7 @@ namespace AwbStudio
         {
             _viewModel.ScsServos.Add(new ScsFeetechServoConfig
             {
-                Id = _awbProject.CreateNewObjectId("ScsServo"),
+                Id = _idCreator.CreateNewObjectId("ScsServo"),
                 Title = "",
                 ClientId = 1,
                 Channel = 1
@@ -225,7 +226,7 @@ namespace AwbStudio
 
         private void PropertyEditorOnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
         {
-            if (e.ObjectToDelete == _viewModel.ProjectMetaData   )
+            if (e.ObjectToDelete == _viewModel.ProjectMetaData)
             {
                 MessageBox.Show("You can not delete the project meta data object!");
                 return;
@@ -250,7 +251,7 @@ namespace AwbStudio
         {
             _viewModel.ScsServos.Add(new ScsFeetechServoConfig
             {
-                Id = _awbProject.CreateNewObjectId("ScsServo"),
+                Id = _idCreator.CreateNewObjectId("ScsServo"),
                 Title = "",
                 ClientId = 1,
                 Channel = 1
@@ -261,7 +262,7 @@ namespace AwbStudio
         {
             _viewModel.StsServos.Add(new StsFeetechServoConfig
             {
-                Id = _awbProject.CreateNewObjectId("StsServo"),
+                Id = _idCreator.CreateNewObjectId("StsServo"),
                 Title = "",
                 ClientId = 1,
                 Channel = 1
@@ -272,7 +273,7 @@ namespace AwbStudio
         {
             _viewModel.Pca9685PwmServos.Add(new Pca9685PwmServoConfig
             {
-                Id = _awbProject.CreateNewObjectId("Pca9685PwmServo"),
+                Id = _idCreator.CreateNewObjectId("Pca9685PwmServo"),
                 I2cAdress = 0x40,
                 Title = "",
                 ClientId = 1,
@@ -284,7 +285,7 @@ namespace AwbStudio
         {
             _viewModel.Mp3PlayerYX5300.Add(new Mp3PlayerYX5300Config
             {
-                Id = _awbProject.CreateNewObjectId("Mp3PlayerYX5300"),
+                Id = _idCreator.CreateNewObjectId("Mp3PlayerYX5300"),
                 Title = "",
                 ClientId = 1,
                 RxPin = 13,
@@ -296,7 +297,7 @@ namespace AwbStudio
         {
             _viewModel.Inputs.Add(new InputConfig
             {
-                Id = _awbProject.GetNewInputId(),
+                Id = _idCreator.GetNewInputId(),
                 Title = "",
                 ClientId = 1,
             });
@@ -306,7 +307,7 @@ namespace AwbStudio
         {
             _viewModel.TimelineStates.Add(new TimelineState
             {
-                Id = _awbProject.GetNewTimelineStateId(),
+                Id = _idCreator.GetNewTimelineStateId(),
                 Title = "",
                 PositiveInputs = Array.Empty<int>(),
                 NegativeInputs = Array.Empty<int>()

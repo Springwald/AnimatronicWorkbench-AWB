@@ -93,36 +93,7 @@ namespace Awb.Core.Project
             foreach (var item in Inputs) yield return item;
         }
 
-        public int GetNewInputId()
-        {
-            int id = 1;
-            while (true)
-            {
-                if (!Inputs.Any(x => x.Id == id)) return id;
-                id++;
-            }
-        }
 
-        public int GetNewTimelineStateId()
-        {
-            int id = 1;
-            while (true)
-            {
-                if (!TimelinesStates.Any(x => x.Id == id)) return id;
-                id++;
-            }
-        }
-
-        public string CreateNewObjectId(string prefix)
-        {
-            int idCount = 1;
-            while (true)
-            {
-                var id = prefix + "-" + idCount.ToString();
-                if (!GetAllIds().Any(x => x == id)) return id;
-                idCount++;
-            }
-        }
 
         private IEnumerable<ProjectProblem> GetDoubleIdProblems(IEnumerable<string> list, string listName)
         {
@@ -141,12 +112,6 @@ namespace Awb.Core.Project
             }
         }
 
-        private IEnumerable<string> GetAllIds()
-        {
-            foreach (var item in Pca9685PwmServos) yield return item.Id;
-            foreach (var item in StsServos) yield return item.Id;
-            foreach (var item in ScsServos) yield return item.Id;
-            foreach (var item in Mp3PlayersYX5300) yield return item.Id;
-        }
+     
     }
 }
