@@ -5,6 +5,8 @@
 #include "ActualStatusInformation.h"
 #include "ActuatorValue.h"
 
+#define USE_DEBUG
+
 // It's pretty messy and also a bit unclean that the library creates a global object.
 // But it is the only way I found to use the library.
 // Otherwise it seems to crash in various places - I guess because of memory problems.
@@ -42,15 +44,10 @@ void StScsSerialServoManager::setup()
  */
 void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState)
 {
-    _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 30);
-
     for (int i = 0; i < this->_servos->size(); i++)
     {
-        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 31);
         // get a pointer to the current servo
         StsScsServo *servo = &this->_servos->at(i);
-
-        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 32);
 
         if (servo->isFault || anyServoWithGlobalFaultHasCiriticalState == true)
         {
@@ -59,28 +56,22 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
             continue;
         }
 
-        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 33);
-
         if (servo->targetValue == -1)
         {
-            _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 34);
             // turn servo off
             setTorque(servo->channel, false);
         }
         else
         {
-            _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 35);
 
             // set new target value if changed
             if (servo->currentValue != servo->targetValue)
             {
-                _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 36);
 
                 int speed = servo->targetSpeed;
                 int acc = servo->targetAcc;
                 if (speed == -1 && acc == -1)
                 {
-                    _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 37);
                     if (this->_servoTypeIsScs)
                     {
                         _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
@@ -92,10 +83,8 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
                 }
                 else
                 {
-                    _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 38);
                     if (this->_servoTypeIsScs)
                     {
-                        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 39);
                         if (speed == -1)
                             speed = servo->defaultSpeed;
                         if (acc == -1)
@@ -104,7 +93,6 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
                     }
                     else
                     {
-                        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 40);
                         if (speed == -1)
                             speed = servo->defaultSpeed;
                         if (acc == -1)
@@ -112,13 +100,10 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
                         _serialServo_STS.WritePosEx(servo->channel, servo->targetValue, speed, acc);
                     }
                 }
-                _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 41);
                 servo->currentValue = servo->targetValue;
             }
         }
-        _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 48);
     }
-    _debugging->setState(Debugging::MJ_STS_SCS_SERVO_MANAGER, 49);
 }
 
 /**
