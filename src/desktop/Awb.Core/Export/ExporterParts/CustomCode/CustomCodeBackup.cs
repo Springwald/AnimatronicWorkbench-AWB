@@ -69,8 +69,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                 File.WriteAllText(backupFilename, fileContent);
             }
 
-
-            return new BackupResult { Success = false, ErrorMsg = "Not implemented" };
+            return new BackupResult { Success = true };
         }
     }
 }
