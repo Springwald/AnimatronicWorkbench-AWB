@@ -69,7 +69,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                 File.WriteAllText(backupFilename, fileContent);
             }
 
-            return new BackupResult { Success = true };
+            return new BackupResult { Success = true, CustomCodeRegionContent = customCodeRegionContent };
         }
     }
 }

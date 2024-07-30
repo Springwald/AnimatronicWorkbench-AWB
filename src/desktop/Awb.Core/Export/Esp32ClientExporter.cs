@@ -44,7 +44,7 @@ namespace Awb.Core.Export
             if (customCodeBackup.CustomCodeExists)
             {
                 var customCodeBackupResult = customCodeBackup.Backup();
-                if (!customCodeBackupResult.Success)
+                if (!customCodeBackupResult.Success || customCodeBackupResult.CustomCodeRegionContent == null)
                 {
                     Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage = customCodeBackupResult.ErrorMsg });
                     return new IExporter.ExportResult { ErrorMessage = customCodeBackupResult.ErrorMsg };
@@ -71,7 +71,7 @@ namespace Awb.Core.Export
                 // announce the different exporters
                 new WifiConfigExporter(_wifiConfigData),
                 new ProjectDataExporter(_projectExportData),
-                new CustomCodeExporter()
+                new CustomCodeExporter(customCodeRegionContent: customCodeRegionContent)
             };
 
             // export the data using the exporters

@@ -11,7 +11,7 @@ using static Awb.Core.Export.ExporterParts.CustomCode.CustomCodeRegionContent;
 
 namespace Awb.Core.Export.ExporterParts.CustomCode
 {
-    internal class CustomCodeReaderWriter
+    public class CustomCodeReaderWriter
     {
         private static readonly Regex _regionsRegex = new Regex(@"\/\*[\s]+cc-(?<regionstartend>[a-z]+)-(?<regionkey>[a-z]+).*?\*\/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -58,12 +58,12 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
                             regions.Add(new Region { Filename = filename, Key = regionKey, Content = regionContent.ToString() });
                             actualRegionKey = null;
-                            regionContent.Clear();
                             break;
 
                         default:
                             return new RegionsReadResult { ErrorMsg = $"Unknown region key '{regionKey}'", Regions = Array.Empty<Region>() };
                     }
+                    regionContent.Clear();
                 }
                 else
                 {

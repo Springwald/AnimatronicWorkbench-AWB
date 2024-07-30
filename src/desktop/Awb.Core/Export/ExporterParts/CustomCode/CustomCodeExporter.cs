@@ -11,13 +11,19 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 {
     internal class CustomCodeExporter : ExporterPartAbstract
     {
+        private readonly CustomCodeRegionContent _customCodeRegionContent;
+
+        public CustomCodeExporter(CustomCodeRegionContent customCodeRegionContent)
+        {
+            _customCodeRegionContent = customCodeRegionContent;
+        }
+
         public override async Task<ExportResult> ExportAsync(string targetSrcFolder)
         {
-            // backup existing custom code files if existing
-
-            // read the regions from existing custom code files
+            var files = _customCodeRegionContent.Regions.GroupBy(r => r.Filename);
 
             // read the template file for custom code
+
 
             // write the template file to the target folder stamping the read regions into the template
 
