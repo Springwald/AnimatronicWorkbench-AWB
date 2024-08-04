@@ -44,13 +44,18 @@ void CustomCode::setButtonLightByTouch(uint16_t btnIndex, uint8_t touchPin)
     auto touchIn = touchRead(touchPin);
     if (touchIn < 40)
     {
-        neopixelManager->setSingleLED(btnIndex * 2, 128, 0, 0);
-        neopixelManager->setSingleLED(btnIndex * 2 + 1, 128, 0, 0);
+        neopixelManager->setSingleLED(btnIndex * 2, 64, 0, 0);
+        neopixelManager->setSingleLED(btnIndex * 2 + 1, 64, 0, 0);
     }
     else
     {
-        neopixelManager->setSingleLED(btnIndex * 2, 0, 0, 128);
-        neopixelManager->setSingleLED(btnIndex * 2 + 1, 0, 0, 128);
+        neopixelManager->setSingleLED(btnIndex * 2, 0, 0, 12);
+        neopixelManager->setSingleLED(btnIndex * 2 + 1, 0, 0, 12);
+    }
+
+    for (int i = 8; i < 17; i++)
+    {
+        neopixelManager->setSingleLED(i, 2, 2, 2);
     }
 }
 
