@@ -17,25 +17,25 @@ namespace Awb.Core.Export.ExporterParts
     internal class ProjectDataExporter : ExporterPartAbstract
     {
         private readonly ProjectExportData _projectData;
+        private readonly string _targetFolder;
 
-        public ProjectDataExporter(ProjectExportData projectData)
+        public ProjectDataExporter(ProjectExportData projectData, string targetFolder)
         {
             _projectData = projectData;
+            _targetFolder = targetFolder;
         }
 
-        public override async Task<IExporter.ExportResult> ExportAsync(string targetSrcFolder)
+        public override async Task<IExporter.ExportResult> ExportAsync()
         {
             // check the target folder
-            if (!Directory.Exists(targetSrcFolder)) return new IExporter.ExportResult { ErrorMessage = $"Target folder '{targetSrcFolder}' not found" };
-            var folder = Path.Combine(targetSrcFolder, "src", "AwbDataImport");
-            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+            if (!Directory.Exists(_targetFolder)) return new IExporter.ExportResult { ErrorMessage = $"Target folder '{_targetFolder}' not found" };
 
             // export project data
-            var result = await WriteProjectDataHAsync(folder);
+            var result = await WriteProjectDataHAsync(_targetFolder);
             if (result.Success == false) return result;
 
             // export hardware.h
-            result = await WriteHardwareHAsync(folder);
+            result = await WriteHardwareHAsync(_targetFolder);
             if (result.Success == false) return result;
 
             return result;

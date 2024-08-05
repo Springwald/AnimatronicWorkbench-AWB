@@ -12,14 +12,19 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
     internal class CustomCodeExporter : ExporterPartAbstract
     {
         private readonly CustomCodeRegionContent _customCodeRegionContent;
+        private readonly string _targetFolder;
 
-        public CustomCodeExporter(CustomCodeRegionContent customCodeRegionContent)
+        public CustomCodeExporter(CustomCodeRegionContent customCodeRegionContent, string targetFolder)
         {
             _customCodeRegionContent = customCodeRegionContent;
+            _targetFolder = targetFolder;
         }
 
-        public override async Task<ExportResult> ExportAsync(string targetSrcFolder)
+        public override async Task<ExportResult> ExportAsync()
         {
+            // check the target folder
+            if (!Directory.Exists(_targetFolder)) return new IExporter.ExportResult { ErrorMessage = $"Target folder '{_targetFolder}' not found" };
+
             var files = _customCodeRegionContent.Regions.GroupBy(r => r.Filename);
 
             // read the template file for custom code

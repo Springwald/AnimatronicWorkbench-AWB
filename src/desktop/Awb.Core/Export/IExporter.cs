@@ -23,6 +23,6 @@ namespace Awb.Core.Export
         event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
         // exports the data to the targetPath
-        Task<ExportResult> ExportAsync(string targetPath, string projectFolder);
+        Task<ExportResult> ExportAsync(string targetPath);
     }
 }

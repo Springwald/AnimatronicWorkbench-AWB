@@ -7,59 +7,27 @@
 
 
 using Awb.Core.Export.ExporterParts;
+using Awb.Core.Export.ExporterParts.CustomCode;
 
 namespace Awb.Core.Export
 {
-    public class Esp32ClientRemoteM5StickJoyCExporter : IExporter
+    public class Esp32ClientRemoteM5StickJoyCExporter : MainExporterAbstract
     {
-        private readonly string _esp32ClientsSourceFolder;
         private readonly WifiConfigExportData _wifiConfigData;
 
-        public string Title { get; } = "ESP32 Remote Controller - M5Stack Mini JoyC HAT";
+        public override string Title { get; } = "ESP32 Remote Controller - M5Stack Mini JoyC HAT";
+        public override string TemplateSourceFolderRelative { get; } = "awb_esp32_remote-M5Stick-Mini-JoyC-HAT";
 
-        public event EventHandler<ExporterProcessStateEventArgs>? Processing;
-
-        public Esp32ClientRemoteM5StickJoyCExporter(string esp32ClientsSourceFolder, WifiConfigExportData wifiConfigData)
+        public Esp32ClientRemoteM5StickJoyCExporter(string esp32ClientsTemplateSourceFolder, WifiConfigExportData wifiConfigData, string projectFolder) :
+            base(projectFolder, esp32ClientsTemplateSourceFolder)
         {
-            _esp32ClientsSourceFolder = esp32ClientsSourceFolder;
             _wifiConfigData = wifiConfigData;
         }
 
-
-        public async Task<IExporter.ExportResult> ExportAsync(string targetPath, string projectFolder)
-        {
-            var remoteSrcFolder = Path.Combine(_esp32ClientsSourceFolder, "awb_esp32_remote-M5Stick-Mini-JoyC-HAT");
-
-            if (!Directory.Exists(remoteSrcFolder))
-            {
-                return new IExporter.ExportResult { ErrorMessage = $"Source folder '{remoteSrcFolder}' not found" };
-            }
-
-            var cloneResult = await new SrcFolderCloner(remoteSrcFolder, targetPath, removeExtraFilesInTarget: false).Clone();
-            if (!cloneResult.Success)
-            {
-                Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage = cloneResult.ErrorMessage });
-                return new IExporter.ExportResult { ErrorMessage = cloneResult.ErrorMessage };
-            }
-
-            var dataExporter = new[]
-            {
-                new WifiConfigExporter(_wifiConfigData),
-            };
-
-            foreach(var exporter in dataExporter)
-            {
-                var result = await exporter.ExportAsync(targetPath);
-                if (result != IExporter.ExportResult.SuccessResult)
-                {
-                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage = result.ErrorMessage });
-                    return result;
-                }
-            }   
-
-            return IExporter.ExportResult.SuccessResult;
-        }
-
-       
+        protected override ExporterPartAbstract[] GetExporterParts(string targetPath) => new ExporterPartAbstract[]
+    {
+            new WifiConfigExporter(_wifiConfigData, targetFolder:  Path.Combine(targetPath, "src", "AwbDataImport")),
+            new CustomCodeExporter(customCodeRegionContent: CustomCodeRegionContent!, targetFolder: CustomCodeTargetFolder)
+    };
     }
 }
