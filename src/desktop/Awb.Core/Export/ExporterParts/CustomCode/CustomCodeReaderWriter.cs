@@ -17,12 +17,14 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
         public record RegionsReadResult
         {
+            public bool Success => string.IsNullOrEmpty(ErrorMsg);
             public required Region[] Regions;
             public required string? ErrorMsg;
         }
 
         public record RegionsWriteResult
         {
+            public bool Success => string.IsNullOrEmpty(ErrorMsg);
             public required string? Content;
             public required string? ErrorMsg;
         }

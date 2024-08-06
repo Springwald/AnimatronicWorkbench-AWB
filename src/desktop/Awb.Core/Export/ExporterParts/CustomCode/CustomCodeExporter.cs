@@ -28,9 +28,22 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
             var files = _customCodeRegionContent.Regions.GroupBy(r => r.Filename);
 
             // read the template file for custom code
+            var customCoderReaderWriter = new CustomCodeReaderWriter();
+            foreach (var file in files)
+            {
+                var templateFile = Path.Combine(_targetFolder, file.Key);
+                if (!File.Exists(templateFile)) return new IExporter.ExportResult { ErrorMessage = $"Custom code template file '{templateFile}' not found" };
 
+                // read the template file
+                var templateContent = await File.ReadAllTextAsync(templateFile);
 
-            // write the template file to the target folder stamping the read regions into the template
+                // replace the custom code regions in the template file
+                var writerResult = customCoderReaderWriter.WriteRegions(templateContent: templateContent, regionContent: _customCodeRegionContent);
+                if (writerResult.Success == false) return new ExportResult { ErrorMessage = writerResult.ErrorMsg };
+
+                // write the custom code back into the file
+                await File.WriteAllTextAsync(templateFile, writerResult.Content);
+            }
 
             return ExportResult.SuccessResult;
         }
