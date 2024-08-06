@@ -10,8 +10,6 @@ using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
-using Awb.Core.Timelines;
-using Awb.Core.Tools.Validation;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
@@ -54,32 +52,6 @@ namespace Awb.Core.Project
             _timelineDataService = new TimelineDataServiceByJsonFiles(_projectFolder);
         }
 
-        /// <summary>
-        /// All problems or hints of this project
-        /// </summary>
-        public IEnumerable<ProjectProblem> GetProjectProblems(IEnumerable<TimelineData> timelines)
-        {
-            var nativeAttributeProblems = GetAllListableObjects().SelectMany(
-                x => ObjectValidator.ValidateObjectGetErrors(x));
-            foreach (var item in nativeAttributeProblems) yield return item;
-
-            var contentProblems = GetAllListableObjects().SelectMany(x => x.GetContentProblems(this));
-            foreach (var item in contentProblems) yield return item;
-
-            var timelineProblems = timelines.SelectMany(x => x.GetProblems(this));
-            foreach (var item in timelineProblems) yield return item;
-
-            // check list problems e.g. double IDs
-            foreach (var item in GetDoubleIdProblems(Pca9685PwmServos.Select(x => $"Client ID {x.ClientId}, Channel {x.Channel}"), "PCA9685 PWM servos")) yield return item;
-            foreach (var item in GetDoubleIdProblems(StsServos.Select(x => $"Client ID {x.ClientId}, Servo ID {x.Channel}"), "STS servos")) yield return item;
-            foreach (var item in GetDoubleIdProblems(ScsServos.Select(x => $"Client ID {x.ClientId}, Servo ID {x.Channel}"), "SCS servos")) yield return item;
-            foreach (var item in GetDoubleIdProblems(TimelinesStates.Select(x => x.Id.ToString()), "Timeline state IDs")) yield return item;
-            foreach (var item in GetDoubleIdProblems(TimelinesStates.Select(x => x.Title), "Timeline state titles")) yield return item;
-            foreach (var item in GetDoubleIdProblems(Inputs.Select(x => x.Id.ToString()), "Input IDs")) yield return item;
-            foreach (var item in GetDoubleIdProblems(Inputs.Select(x => x.Title), "Input titles")) yield return item;
-        }
-
-
 
         public IEnumerable<IProjectObjectListable> GetAllListableObjects()
         {
@@ -95,23 +67,8 @@ namespace Awb.Core.Project
 
 
 
-        private IEnumerable<ProjectProblem> GetDoubleIdProblems(IEnumerable<string> list, string listName)
-        {
-            var unique = list.Distinct();
-            foreach (var item in unique)
-            {
-                if (list.Where(x => x==item).Count() > 1)
-                {
-                    yield return new ProjectProblem()
-                    {
-                        Message = $"Item '{item}' in list '{listName} ' is not unique!",
-                        ProblemType = ProjectProblem.ProblemTypes.Error,
-                        Source = listName
-                    };
-                }
-            }
-        }
 
-     
+
+
     }
 }

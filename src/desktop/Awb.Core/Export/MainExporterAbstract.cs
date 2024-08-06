@@ -15,6 +15,7 @@ namespace Awb.Core.Export
     {
         protected readonly string _projectFolder;
         protected readonly string _esp32ClientsTemplateSourceFolder;
+        protected const string _customCodeFolderName = "CustomCode";
 
         protected string? CustomCodeTargetFolder { get; private set; }
 
@@ -46,7 +47,7 @@ namespace Awb.Core.Export
             if (string.IsNullOrWhiteSpace(targetPath)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(targetPath));
 
             // Read the existing custom code in the target folder and backup it
-            CustomCodeTargetFolder = Path.Combine(targetPath, @"src\AwbDataImport\CustomCode");
+            CustomCodeTargetFolder = Path.Combine(targetPath, @"src\AwbDataImport", _customCodeFolderName);
             var readAndBackupCustomCodeResult = await ReadAndBackupCustomCodeAsync();
             if (readAndBackupCustomCodeResult.Success == false) return readAndBackupCustomCodeResult;
 
@@ -55,7 +56,15 @@ namespace Awb.Core.Export
                 return new IExporter.ExportResult { ErrorMessage = $"Template source folder '{Esp32TemplateSourceFolderAbsolute}' not found" };
 
             // copy the template source folder to the target folder
-            var cloneResult = await new SrcFolderCloner(sourceFolder: Esp32TemplateSourceFolderAbsolute, targetFolder: targetPath, removeExtraFilesInTarget: false).Clone();
+             var cloner = new SrcFolderCloner(
+                sourceFolder: Esp32TemplateSourceFolderAbsolute,
+                targetFolder: targetPath,
+                removeExtraFilesInTarget: true,
+                removeFilesBlockerDirectoryNames: new string[] { _customCodeFolderName , ".pio"}
+                );
+            cloner.Processing += (sender, e) => Processing?.Invoke(this, e);
+            var cloneResult = await cloner.Clone();
+            cloner.Processing -= (sender, e) => Processing?.Invoke(this, e);
             if (!cloneResult.Success)
             {
                 InvokeProcessing(new ExporterProcessStateEventArgs { ErrorMessage = cloneResult.ErrorMessage });

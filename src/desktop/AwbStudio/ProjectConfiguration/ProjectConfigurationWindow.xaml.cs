@@ -81,7 +81,9 @@ namespace AwbStudio
         private async Task ShowProjectProblems()
         {
             this.StackPanelProblems.Children.Clear();
-            var problems = _awbProject.GetProjectProblems(Timelines).ToArray();
+
+            var projectChecker = new CheckProjectIntegrity(_awbProject, Timelines);
+            var problems = projectChecker.GetProblems().ToArray();
             foreach (var problem in problems)
             {
                 var control = new System.Windows.Controls.Label { Content = problem.PlaintTextDescription, Foreground = new SolidColorBrush(Colors.Red) };
@@ -96,7 +98,9 @@ namespace AwbStudio
             _viewModel.WriteToProject(_awbProject);
 
             // check if project has errors
-            var errors = _awbProject.GetProjectProblems(Timelines).Where(p => p.ProblemType == ProjectProblem.ProblemTypes.Error).ToArray();
+            var projectChecker = new CheckProjectIntegrity(_awbProject, Timelines);
+            var problems = projectChecker.GetProblems().ToArray();
+            var errors = problems.Where(p => p.ProblemType == ProjectProblem.ProblemTypes.Error).ToArray();
             if (errors.Any())
             {
                 MessageBox.Show("Please fix all errors before saving the project configuration.\r\n\r\n" +

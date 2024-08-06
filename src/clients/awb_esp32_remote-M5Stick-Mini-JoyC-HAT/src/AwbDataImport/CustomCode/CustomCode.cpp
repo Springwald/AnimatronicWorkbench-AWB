@@ -1,7 +1,6 @@
 
 #include <Arduino.h>
 #include "CustomCode.h"
-#include <Actuators/NeopixelManager.h>
 
 /*
     Enter your custom code in this cpp file and the corresponding header file.

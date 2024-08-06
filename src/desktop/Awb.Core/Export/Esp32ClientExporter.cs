@@ -33,7 +33,7 @@ namespace Awb.Core.Export
         {
             new WifiConfigExporter(_wifiConfigData, targetFolder:  Path.Combine(targetPath , "src", "AwbDataImport")),
             new ProjectDataExporter(_projectExportData, targetFolder:  Path.Combine(targetPath, "src", "AwbDataImport")),
-            new CustomCodeExporter(customCodeRegionContent: CustomCodeRegionContent!, targetFolder:  CustomCodeTargetFolder)
+            new CustomCodeExporter(customCodeRegionContent: CustomCodeRegionContent!, targetFolder:  CustomCodeTargetFolder!)
         };
     }
 }

@@ -27,7 +27,7 @@ namespace Awb.Core.Export
         protected override ExporterPartAbstract[] GetExporterParts(string targetPath) => new ExporterPartAbstract[]
     {
             new WifiConfigExporter(_wifiConfigData, targetFolder:  Path.Combine(targetPath, "src", "AwbDataImport")),
-            new CustomCodeExporter(customCodeRegionContent: CustomCodeRegionContent!, targetFolder: CustomCodeTargetFolder)
+            new CustomCodeExporter(customCodeRegionContent: CustomCodeRegionContent!, targetFolder: CustomCodeTargetFolder!)
     };
     }
 }

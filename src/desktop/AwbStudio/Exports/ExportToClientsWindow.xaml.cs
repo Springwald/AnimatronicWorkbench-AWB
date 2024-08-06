@@ -154,7 +154,7 @@ namespace AwbStudio.Exports
             }
 
             await Export(new Esp32ClientExporter(esp32ClientsTemplateSourceFolder: esp32ClientsSourceFolder, WifiConfigData, projectData, projectFolder: _project._projectFolder!));
-            await Export(new Esp32ClientRemoteM5StickJoyCExporter(esp32ClientsTemplateSourceFolder: esp32ClientsSourceFolder, WifiConfigData, projectFolder: _project._projectFolder));
+            await Export(new Esp32ClientRemoteM5StickJoyCExporter(esp32ClientsTemplateSourceFolder: esp32ClientsSourceFolder, WifiConfigData, projectFolder: _project._projectFolder!));
         }
 
 

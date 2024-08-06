@@ -173,7 +173,10 @@ namespace AwbStudio
                 {
                     Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
                 },
-                TimelinesStates = [],
+                TimelinesStates = new TimelineState[] { 
+                    new TimelineState  { Id=1, Title ="Default", Export = true, AutoPlay = true },
+                    new TimelineState  { Id=2, Title ="Dont export", Export = false, AutoPlay = false },
+                },
                 StsServos = [],
                 ScsServos = [],
                 Pca9685PwmServos = [],
