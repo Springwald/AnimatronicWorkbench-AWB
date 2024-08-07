@@ -80,7 +80,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
         /// <summary>
         /// replace the content of the regions in the custom code template file with the custom code content
         /// </summary>
-        public RegionsWriteResult WriteRegions(string templateContent, CustomCodeRegionContent regionContent)
+        public RegionsWriteResult WriteRegions(string filename, string templateContent, CustomCodeRegionContent regionContent)
         {
             var result = new StringBuilder();
             var lines = templateContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -103,7 +103,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
                             actualRegionKey = regionKey;
                             result.AppendLine(line);
-                            var content = regionContent.Regions.Where(r => r.Key == regionKey).Select(r => r.Content).ToArray();
+                            var content = regionContent.Regions.Where(r => r.Filename == filename && r.Key == regionKey).Select(r => r.Content).ToArray();
                             switch (content.Length)
                             {
                                 case 0:

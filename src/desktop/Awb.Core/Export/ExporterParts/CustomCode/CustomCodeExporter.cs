@@ -31,18 +31,20 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
             var customCoderReaderWriter = new CustomCodeReaderWriter();
             foreach (var file in files)
             {
-                var templateFile = Path.Combine(_targetFolder, file.Key);
-                if (!File.Exists(templateFile)) return new IExporter.ExportResult { ErrorMessage = $"Custom code template file '{templateFile}' not found" };
+                var templateFilename = Path.Combine(_targetFolder, file.Key);
+                if (!File.Exists(templateFilename)) return new IExporter.ExportResult { ErrorMessage = $"Custom code template file '{templateFilename}' not found" };
 
                 // read the template file
-                var templateContent = await File.ReadAllTextAsync(templateFile);
+                var templateContent = await File.ReadAllTextAsync(templateFilename);
+
+                var fileInfo = new FileInfo(templateFilename);
 
                 // replace the custom code regions in the template file
-                var writerResult = customCoderReaderWriter.WriteRegions(templateContent: templateContent, regionContent: _customCodeRegionContent);
+                var writerResult = customCoderReaderWriter.WriteRegions(filename: fileInfo.Name, templateContent: templateContent, regionContent: _customCodeRegionContent);
                 if (writerResult.Success == false) return new ExportResult { ErrorMessage = writerResult.ErrorMsg };
 
                 // write the custom code back into the file
-                await File.WriteAllTextAsync(templateFile, writerResult.Content);
+                await File.WriteAllTextAsync(templateFilename, writerResult.Content);
             }
 
             return ExportResult.SuccessResult;
