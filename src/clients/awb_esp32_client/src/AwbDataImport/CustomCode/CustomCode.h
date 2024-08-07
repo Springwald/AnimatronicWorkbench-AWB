@@ -22,13 +22,13 @@ protected:
 public:
     CustomCode(NeopixelManager *neopixelManager) : neopixelManager(neopixelManager)
     {
-        /* cc-start-constructor - insert your protected code here before the end-constructor comment: */
+        /* cc-start-constructor - insert your constructor code here before the end-constructor comment: */
         /* cc-end-constructor  */
     }
 
     ~CustomCode()
     {
-        /* cc-start-destructor - insert your protected code here before the end-destrucutor comment: */
+        /* cc-start-destructor - insert your destructor code here before the end-destructor comment: */
         /* cc-end-destructor  */
     }
 
