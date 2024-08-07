@@ -5,8 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System.Diagnostics;
-
 namespace Awb.Core.Export
 {
     internal class SrcFolderCloner
@@ -15,6 +13,7 @@ namespace Awb.Core.Export
         private readonly string _targetFolder;
         private readonly bool _removeExtraFilesInTarget;
         private readonly string[] _removeFilesBlockerDirectoryNames;
+        private readonly string[] _copyFilesBlockerDirectoryNames;
         private readonly bool _deepReportLevel;
 
         public class CloneResult
@@ -25,12 +24,13 @@ namespace Awb.Core.Export
 
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
-        public SrcFolderCloner(string sourceFolder, string targetFolder, bool removeExtraFilesInTarget, string[] removeFilesBlockerDirectoryNames, bool deepReportLevel=false)
+        public SrcFolderCloner(string sourceFolder, string targetFolder, bool removeExtraFilesInTarget, string[] removeFilesBlockerDirectoryNames, string[] copyFilesBlockerDirectoryNames, bool deepReportLevel = false)
         {
             _sourceFolder = sourceFolder;
             _targetFolder = targetFolder;
             _removeExtraFilesInTarget = removeExtraFilesInTarget;
             _removeFilesBlockerDirectoryNames = removeFilesBlockerDirectoryNames;
+            _copyFilesBlockerDirectoryNames = copyFilesBlockerDirectoryNames;
             _deepReportLevel = deepReportLevel;
         }
 
@@ -72,17 +72,63 @@ namespace Awb.Core.Export
             // clone the source folder to the target folder stepping through all files and subfolders
             foreach (var sourceFile in Directory.GetFiles(_sourceFolder, "*", SearchOption.AllDirectories))
             {
+                foreach (var blockerDir in _copyFilesBlockerDirectoryNames)
+                {
+                    if (sourceFile.Contains($@"\{blockerDir}\"))
+                    {
+                        if (_deepReportLevel == true)
+                            Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it is located in '{blockerDir}'" });
+                        continue;
+                    }
+                }
+
                 var relativePath = sourceFile.Substring(_sourceFolder.Length + 1);
                 var targetFile = Path.Combine(_targetFolder, relativePath);
 
                 var targetDir = Path.GetDirectoryName(targetFile);
                 if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
 
-                File.Copy(sourceFile, targetFile, true);
+
+                // copy only if the content of sourceFile and targetFile are different
+                var copy = false;
+
+                // check last file writetime
+                if (File.Exists(targetFile))
+                {
+                    var sourceFileTime = File.GetLastWriteTimeUtc(sourceFile);
+                    var targetFileTime = File.GetLastWriteTimeUtc(targetFile);
+                    if (sourceFileTime != targetFileTime)
+                    {
+                        copy = true;
+                    }
+                    else
+                    {
+                        var sourceFileSize = new FileInfo(sourceFile).Length;
+                        var targetFileSize = new FileInfo(targetFile).Length;
+                        if (sourceFileSize != targetFileSize)
+                            copy = true;
+                    }
+                }
+                else
+                {
+                    // target file does not exist
+                    copy = true;
+                }
+
+                if (copy)
+                {
+                    File.Copy(sourceFile, targetFile, true);
+                }
+                else
+                {
+                    if (_deepReportLevel == true)
+                        Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it has the same last write time and size as the target file." });
+                }
+
             }
 
             await Task.CompletedTask;
-            
+
             return new CloneResult();
         }
     }

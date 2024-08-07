@@ -60,7 +60,8 @@ namespace Awb.Core.Export
                 sourceFolder: Esp32TemplateSourceFolderAbsolute,
                 targetFolder: targetPath,
                 removeExtraFilesInTarget: true,
-                removeFilesBlockerDirectoryNames: new string[] { _customCodeFolderName , ".pio"}
+                removeFilesBlockerDirectoryNames: new string[] { _customCodeFolderName , ".pio"},
+                copyFilesBlockerDirectoryNames: new string[] { ".pio" }
                 );
             cloner.Processing += (sender, e) => Processing?.Invoke(this, e);
             var cloneResult = await cloner.Clone();
