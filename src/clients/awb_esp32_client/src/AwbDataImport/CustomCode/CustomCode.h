@@ -28,8 +28,8 @@ public:
 
     ~CustomCode()
     {
-        /* cc-start-destrucutor - insert your protected code here before the end-destrucutor comment: */
-        /* cc-end-destrucutor  */
+        /* cc-start-destructor - insert your protected code here before the end-destrucutor comment: */
+        /* cc-end-destructor  */
     }
 
     void setup();

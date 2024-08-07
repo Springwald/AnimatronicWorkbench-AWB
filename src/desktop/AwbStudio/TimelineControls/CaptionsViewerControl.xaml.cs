@@ -116,10 +116,12 @@ namespace AwbStudio.TimelineControls
 
                     if (caption.ObjectIsControllerTuneable)
                     {
-                        label.Content = no >= _viewContext.FirstBankItemNo && no <= _viewContext.LastBankItemNo ? $"[{no - _viewContext.FirstBankItemNo + 1}] {caption.Label.Trim()}" : caption.Label.Trim();
+                        caption.ControllerChannel = no >= _viewContext.FirstBankItemNo && no <= _viewContext.LastBankItemNo ? no - _viewContext.FirstBankItemNo + 1 : null;
+                        label.Content = caption.Label;
                     }
                     else
                     {
+                        caption.ControllerChannel = null;
                         label.Content = caption.Label.Trim();
                     }
 

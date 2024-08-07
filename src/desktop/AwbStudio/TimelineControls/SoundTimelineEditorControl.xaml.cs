@@ -65,6 +65,7 @@ namespace AwbStudio.TimelineControls
             _soundValuePainter = new SoundValuePainter(soundPlayer, AllValuesGrid, _viewContext, timelineCaptions, projectSounds);
             _caption = timelineCaptions?.GetAktuatorCaption(soundPlayer.Id);
             HeaderControl.TimelineCaption = _caption;
+            HeaderControl.ViewContext = viewContext;
 
             _isInitialized = true;
         }

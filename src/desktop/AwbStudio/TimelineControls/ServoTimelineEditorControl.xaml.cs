@@ -35,9 +35,12 @@ namespace AwbStudio.TimelineControls
         private bool _isInitialized;
         private ServoValuePainter? _servoValuePainter;
 
+        private string _captionText = string.Empty;
+
         public IServo? Servo { get; private set; }
 
         public IAwbObject? AwbObject => Servo;
+
 
         public ServoTimelineEditorControl()
         {
@@ -68,6 +71,7 @@ namespace AwbStudio.TimelineControls
             _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions, timelineDataService, awbLogger, dotRadius: 6);
             _caption = timelineCaptions?.GetAktuatorCaption(servo.Id);
             HeaderControl.TimelineCaption = _caption;
+            HeaderControl.ViewContext = viewContext;
 
             _isInitialized = true;
         }
