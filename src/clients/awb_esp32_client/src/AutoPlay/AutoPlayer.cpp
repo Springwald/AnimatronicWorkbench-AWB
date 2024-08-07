@@ -75,7 +75,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     if (_data == nullptr)
         return;
 
-    int updateInterval = 10; // ms
+    int updateInterval = 30; // ms
 
     if (anyServoWithGlobalFaultHasCiriticalState)
     {
