@@ -15,19 +15,24 @@ namespace Awb.Core.Project.Servos
     {
         public required string Id { get; set; }
 
-        [DisplayName("Client ID")]
+        [Display(Name = "Title", GroupName = "Main", Order = 1)]
+        [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
+        public required string Title { get; set; }
+
+
+        [Display(Name = "Client ID", GroupName = "Main", Order = 2)]
         [Description("The ID of the AWB client device that controls this servo.")]
         [Range(1, 254)]
         public required uint ClientId { get; set; } = 1;
 
-        [DisplayName("Servo ID")]
+        [Display(Name = "Servo ID", GroupName = "Main", Order = 3)]
         [Description("The ID of the servo on the servo bus (1-254).")]
         [Range(1, 254)]
         public required uint Channel { get; set; }
 
-        [DisplayName("Title")]
-        [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
-        public required string Title { get; set; }
+        [Display(Name = "Global fault", GroupName = "Main", Order = 4)]
+        [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
+        public bool GlobalFault { get; set; }
 
         /// <summary>
         /// The companion property for the RelaxRangesAsString property.
@@ -35,7 +40,7 @@ namespace Awb.Core.Project.Servos
         /// </summary>
         public ServoRelaxRange[] RelaxRanges { get; set; } = Array.Empty<ServoRelaxRange>();
 
-        [Display]
+        [Display(Name = "Relax-range", GroupName = "Values", Order = 1)]
         [Description("When the servo is some seconds unchanged and inside this ranges, the servo power will turned off.\r\nFormat:2000-2200\r\n Use commas to list multiple ranges.")]
         [RegularExpression(@"(\d{1,4}[-]\d{1,4},?)*")]
         [JsonIgnore]
@@ -45,35 +50,29 @@ namespace Awb.Core.Project.Servos
             set => RelaxRanges = ServoRelaxRange.FromString(value);
         }
 
-        [DisplayName("Global fault")]
-        [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
-
-        public bool GlobalFault { get; set; }
-
-
-        [DisplayName("Max Temperature")]
+        [Display(Name = "Max Temperature", GroupName = "Values", Order = 2)]
         [Description("If the servo temperature is above this value, the servo will be deactivated.")]
         [Range(20, 60)]
         public uint MaxTemp { get; set; } = 55;
 
-        [DisplayName("Max Torque")]
+        [Display(Name = "Max Torque", GroupName = "Values", Order = 3)]
         [Description("If the servo torque is above this value, the servo will be deactivated. Negative torque values are treated as positive.")]
         [Range(100, 1000)]
         public uint MaxTorque { get; set; } = 400;
 
-        [DisplayName("Lowest value")]
+        [Display(Name = "Lowest value", GroupName = "Values", Order = 4)]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
         public abstract int MinValue { get; set; }
 
-        [DisplayName("Highest value")]
+        [Display(Name = "Highest value", GroupName = "Values", Order = 5)]
         [Description("The value when the servo curve is at its highest point. Possibly confusing: Can be greater than the value for 'low'.")]
         public abstract int MaxValue { get; set; }
 
-        [DisplayName("Default value")]
+        [Display(Name = "Default value", GroupName = "Values", Order = 6)]
         [Description("Must be between the highest and lowest value.")]
         public abstract int? DefaultValue { get; set; }
 
-        [DisplayName("Speed")]
+        [Display(Name = "Speed value", GroupName = "Values", Order = 7)]
         public abstract int? Speed { get; set; }
 
         public abstract IEnumerable<ProjectProblem> GetContentProblems(AwbProject project);
