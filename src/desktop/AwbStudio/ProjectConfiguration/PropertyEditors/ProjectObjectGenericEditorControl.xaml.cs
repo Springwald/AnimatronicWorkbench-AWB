@@ -17,6 +17,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
@@ -115,7 +116,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                         Header = group.GroupName,
                         Margin = new System.Windows.Thickness(left: 5, top: 0, right: 5, bottom: 10),
                         Padding = new System.Windows.Thickness(left: 10, top: 10, right: 5, bottom: 10),
-                        Background = System.Windows.Media.Brushes.Black,
+                        Background = new SolidColorBrush(Color.FromRgb(25, 25, 25))
                     };
                     this.EditorStackPanel.Children.Add(groupControl);
                     groupControl.Content = stackPanel;
