@@ -14,7 +14,7 @@ namespace Awb.Core.Project.Various
 {
     public class ProjectMetaData : IProjectObjectListable
     {
-        [DisplayName("Project title")]
+        [Display(Name = "Project title", GroupName = "General", Order = 1)]
         [Description("The working title of the project, often a figure name.")]
         [Length(1,16)]
         [RegularExpression(pattern:"[A-Za-z0-9_-]+",ErrorMessage ="Only chars A-Z,a-z, 0-9 and '__' or '-' allowed (e.g. no space).")]

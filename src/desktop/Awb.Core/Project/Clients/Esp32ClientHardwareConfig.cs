@@ -15,7 +15,7 @@ namespace Awb.Core.Project.Clients
     {
         #region Main
 
-        [Display(Name = "Client ID", GroupName ="Main", Order = 1)]
+        [Display(Name = "Client ID", GroupName ="General", Order = 1)]
         [Description("The ID of this ESP32 client device.")]
         [Range(1, 254)]
         public required uint ClientId { get; set; } = 1;
@@ -50,7 +50,6 @@ namespace Awb.Core.Project.Clients
         /** -- SSD1306 Displays  -- **/
 
         [Display(Name = "use SSD1306 display", GroupName = "SSD1306 display", Order = 1)]
-        [DisplayName("")]
         [Description("Check e.g. for Waveshare Servo Driver with ESP32 (using 128x32, 0x02, 0x3C)")]
         public bool Display_Ssd1306 { get; set; } = true;
 

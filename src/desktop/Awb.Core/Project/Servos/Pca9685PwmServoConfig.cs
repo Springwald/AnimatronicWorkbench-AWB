@@ -17,7 +17,11 @@ namespace Awb.Core.Project.Servos
 
         public required string Id { get; set; }
 
-        [DisplayName("Client ID")]
+        [Display(Name = "Title", GroupName = "General", Order = 1)]
+        [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
+        public required string Title { get; set; }
+
+        [Display(Name = "Client ID", GroupName = "General", Order = 2)]
         [Description("The ID of the AWB client device that controls this servo.")]
         [Range(1, 254)]
         public required uint ClientId { get; set; } = 1;
@@ -32,9 +36,6 @@ namespace Awb.Core.Project.Servos
         [Range(0, 15)]
         public required uint Channel { get; set; }
 
-        [DisplayName("Title")]
-        [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
-        public required string Title { get; set; }
 
         [DisplayName("Lowest value")]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]

@@ -15,11 +15,11 @@ namespace Awb.Core.Project.Various
     {
         public required int Id { get; set; }
 
-        [DisplayName("Title")]
+        [Display(Name = "Title", GroupName = "General", Order = 1)]
         public required string Title { get; set; }
 
         [DisplayName("Export")]
-        [Description("Export timelines with this state to the client project souurce code")]
+        [Description("Export timelines with this state to the client project source code")]
         public bool Export { get; set; } = true;
 
         [DisplayName("Autoplay")]

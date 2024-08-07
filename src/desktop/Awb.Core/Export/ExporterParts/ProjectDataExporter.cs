@@ -113,10 +113,12 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("#define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457");
             content.AppendLine();
 
-
             // DAC speaker settings
-            content.AppendLine("/* DAC speaker */");
-            content.AppendLine("// #define USE_DAC_SPEAKER");
+            if (false)
+            {
+                content.AppendLine("/* DAC speaker */");
+                content.AppendLine("// #define USE_DAC_SPEAKER");
+            }
 
             // Status neopixel
             if (_projectData.Esp32ClientHardwareConfig.UseNeoPixel)

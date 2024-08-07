@@ -15,22 +15,22 @@ namespace Awb.Core.Project.Servos
     {
         public required string Id { get; set; }
 
-        [Display(Name = "Title", GroupName = "Main", Order = 1)]
+        [Display(Name = "Title", GroupName = "General", Order = 1)]
         [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
         public required string Title { get; set; }
 
 
-        [Display(Name = "Client ID", GroupName = "Main", Order = 2)]
+        [Display(Name = "Client ID", GroupName = "General", Order = 2)]
         [Description("The ID of the AWB client device that controls this servo.")]
         [Range(1, 254)]
         public required uint ClientId { get; set; } = 1;
 
-        [Display(Name = "Servo ID", GroupName = "Main", Order = 3)]
+        [Display(Name = "Servo ID", GroupName = "General", Order = 3)]
         [Description("The ID of the servo on the servo bus (1-254).")]
         [Range(1, 254)]
         public required uint Channel { get; set; }
 
-        [Display(Name = "Global fault", GroupName = "Main", Order = 4)]
+        [Display(Name = "Global fault", GroupName = "General", Order = 4)]
         [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
         public bool GlobalFault { get; set; }
 
