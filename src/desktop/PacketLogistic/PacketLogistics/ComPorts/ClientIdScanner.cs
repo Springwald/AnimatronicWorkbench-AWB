@@ -77,11 +77,14 @@ namespace PacketLogistics.ComPorts
                 serialPort.WriteTimeout = 500;
                 serialPort.Write(new[] { _comPortCommandConfig.SearchForClientByte }, offset: 0, count: 1);
 
+                int bytesReceived = 0;
+
                 while (DateTime.UtcNow < waitUntil && found == null)
                 {
                     if (serialPort.BytesToRead > 0)
                     {
                         var bt = (byte)serialPort.ReadByte();
+                        bytesReceived++;
                         receiveBuffer.Add(bt);
 
                         if (receiveBuffer.EndsWith(_comPortCommandConfig.PacketHeaderBytes))
@@ -139,13 +142,16 @@ namespace PacketLogistics.ComPorts
                         await Task.Delay(10);
                     }
                 }
+                OnLog?.Invoke(this, $"ClientIdScanner port {portName}: received {bytesReceived} bytes.");
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                OnLog?.Invoke(this, $"ClientIdScanner port {portName}: Error {e.Message}");
             }
             finally
             {
                 if (serialPort.IsOpen) serialPort.Close();
+                OnLog?.Invoke(this, $"ClientIdScanner closing port {portName}");
             }
             return found;
         }

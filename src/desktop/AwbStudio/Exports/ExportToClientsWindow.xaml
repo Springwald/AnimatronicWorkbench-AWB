@@ -11,9 +11,10 @@
     </Window.Icon>
     <DockPanel LastChildFill="true">
         <StackPanel DockPanel.Dock="Top">
-            <Button x:Name="ButtonWriteToEsp32RemoteClient" Content="Write ESP32 remote client sourcecode" Click="ButtonWriteToEsp32RemoteClient_Click"  />
             <Label Content="Target folder:" />
-            <Label x:Name="LabelTargetFolder"  Content="LabelTargetFolder" MinHeight="20"/>
+            <Label x:Name="LabelTargetFolder"  Content="LabelTargetFolder" FontWeight="Bold" MinHeight="20"/>
+            <Label x:Name="LabelTargetFolderHint"  Content="LabelTargetFolderHint" MinHeight="20" FontStyle="Italic"/>
+            <Button x:Name="ButtonWriteToEsp32RemoteClient" Width="auto" Content="Write ESP32 remote client sourcecode" Click="ButtonWriteToEsp32RemoteClient_Click"  />
         </StackPanel>
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <Label x:Name="labelOutput">

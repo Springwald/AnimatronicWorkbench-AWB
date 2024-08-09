@@ -40,10 +40,13 @@ void AwbClient::setup()
     _wlanConnector->setup();
     showSetupMsg("setup wifi done");
 
-#ifdef USE_NEOPIXEL_STATUS_CONTROL
+#ifdef USE_NEOPIXEL
     showSetupMsg("setup neopixel");
-    this->_neoPixelStatus = new NeoPixelStatusControl();
-    _neoPixelStatus->setStartUpAlert(); // show alarm neopixel on startup to see unexpected restarts
+    this->_neopixelManager = new NeopixelManager(
+        [this](String message)
+        { showError(message); },
+        [this](String message)
+        { showMsg(message); });
     showSetupMsg("setup neopixel done");
 #endif
 
@@ -96,19 +99,19 @@ void AwbClient::setup()
 #endif
 
     showSetupMsg("setup STS servos");
-    this->_stSerialServoManager = new StSerialServoManager(_projectData->stsServos, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD);
+    this->_stSerialServoManager = new StScsSerialServoManager(_projectData->stsServos, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD);
     this->_stSerialServoManager->setup();
     showSetupMsg("setup STS servos done");
 #endif
 
 #ifdef USE_SCS_SERVO
     showSetupMsg("setup SCS servos");
-    this->_scSerialServoManager = new StSerialServoManager(_projectData->scsServos, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD);
+    this->_scSerialServoManager = new StScsSerialServoManager(_projectData->scsServos, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD);
     this->_scSerialServoManager->setup();
-    showSetupMsg("setup STS servos done");
+    showSetupMsg("setup SCS servos done");
 #endif
 
-    showMsg("Found " + String(this->_stSerialServoManager == NULL ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == NULL ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
+    showMsg("Found " + String(this->_stSerialServoManager == nullptr ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == nullptr ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
     delay(_debugging->isDebugging() ? 1000 : 100);
 
     if (this->_projectData->pca9685PwmServos->size() > 0)
@@ -132,7 +135,7 @@ void AwbClient::setup()
     _inputManager = new InputManager(_projectData, inputManagerErrorOccured);
 
     showSetupMsg("setup autoplay");
-    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured);
+    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured, _debugging);
 
     // setup the packet processor to process packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet processor");
@@ -161,13 +164,19 @@ void AwbClient::setup()
     showSetupMsg("setup status management");
     _statusManagement = new StatusManagement(_projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, statusManagementErrorOccured);
 
-    if (this->_dacSpeaker != NULL)
+    if (this->_dacSpeaker != nullptr)
     {
         showSetupMsg("init dac speaker");
         this->_dacSpeaker->setVolume(1);
         this->_dacSpeaker->playIntro();
         this->_dacSpeaker->setVolume(DEFAULT_VOLUME);
     }
+
+    // set up the custom code
+    showSetupMsg("setup custom code");
+    //_customCode = new CustomCode(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _autoPlayer, _inputManager, _neopixelManager, _wlanConnector, _statusManagement);
+    _customCode = new CustomCode(_neopixelManager);
+    _customCode->setup();
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
     delay(_debugging->isDebugging() ? 1000 : 100);
@@ -183,13 +192,13 @@ void AwbClient::showError(String message)
     int durationMs = _debugging->isDebugging() ? 3000 : 2000;
     _display.draw_message(message, durationMs, MSG_TYPE_ERROR);
 
-    if (_wlanConnector != NULL)
+    if (_wlanConnector != nullptr)
         _wlanConnector->logError(message);
 
-    if (_neoPixelStatus != NULL)
-        _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
+    // if (_neoPixelStatus != nullptr)
+    //     _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);
 
-    if (_dacSpeaker != NULL)
+    if (_dacSpeaker != nullptr)
         _dacSpeaker->beep();
 }
 
@@ -219,7 +228,7 @@ void AwbClient::showSetupMsg(String message)
 {
     int durationMs = _debugging->isDebugging() ? 200 : 50;
     _display.draw_message(message, durationMs, MSG_TYPE_INFO);
-    if (_wlanConnector != NULL) // check if wlan connector is instanciated
+    if (_wlanConnector != nullptr) // check if wlan connector is instanciated
         _wlanConnector->logInfo(message);
     delay(durationMs);
 }
@@ -230,6 +239,8 @@ void AwbClient::showSetupMsg(String message)
 void AwbClient::loop()
 {
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 0);
+
+    _customCode->loop();
 
     if (false) // set true to test the mp3 player contineously
     {
@@ -263,11 +274,11 @@ void AwbClient::loop()
     // update autoplay timelines and actuators
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 15);
 
-    if (_wlanConnector->timelineNameToPlay != NULL && _wlanConnector->timelineNameToPlay->length() > 0)
+    if (_wlanConnector->timelineNameToPlay != nullptr && _wlanConnector->timelineNameToPlay->length() > 0)
     {
         // a timeline was received via wifi from a remote control
         _autoPlayer->startNewTimelineByName(_wlanConnector->timelineNameToPlay->c_str());
-        _wlanConnector->timelineNameToPlay = NULL;
+        _wlanConnector->timelineNameToPlay = nullptr;
     }
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 20);
@@ -291,7 +302,7 @@ void AwbClient::loop()
         if (!_autoPlayer->isPlaying())
         {
             // no timeline is playing, so turn off torque for all sts servos
-            if (this->_stSerialServoManager != NULL)
+            if (this->_stSerialServoManager != nullptr)
             {
                 for (int i = 0; i < this->_stSerialServoManager->servoIds->size(); i++)
                 {
@@ -300,7 +311,7 @@ void AwbClient::loop()
                     this->_stSerialServoManager->setTorque(id, false);
                 }
             }
-            if (this->_scSerialServoManager != NULL)
+            if (this->_scSerialServoManager != nullptr)
             {
                 for (int i = 0; i < this->_scSerialServoManager->servoIds->size(); i++)
                 {
@@ -320,12 +331,12 @@ void AwbClient::loop()
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 50);
 
-    if (_neoPixelStatus != NULL && !packetReceived)
-        _neoPixelStatus->update();
+    // if (_neoPixelStatus != nullptr && !packetReceived)
+    //     _neoPixelStatus->update();
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 55);
 
-    if (_dacSpeaker != NULL)
+    if (_dacSpeaker != nullptr)
         _dacSpeaker->update();
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 60);

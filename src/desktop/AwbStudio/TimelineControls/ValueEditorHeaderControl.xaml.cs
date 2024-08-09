@@ -16,10 +16,23 @@ namespace AwbStudio.TimelineControls
     public partial class ValueEditorHeaderControl : UserControl
     {
         private TimelineCaption? _timelineCaption;
+        private TimelineViewContext? _viewContext;
 
         public ValueEditorHeaderControl()
         {
             InitializeComponent();
+        }
+
+        public TimelineViewContext ViewContext
+        {
+             set
+            {
+                this._viewContext = value;
+                this._viewContext.Changed +=(sender, e) =>
+                {
+                    this.LabelTitle.Content = _timelineCaption?.Label;
+                };
+            }
         }
 
         public TimelineCaption? TimelineCaption

@@ -45,6 +45,7 @@ namespace AwbStudio.TimelineControls
         private void ServoValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
         {
             Unloaded -= ServoValueViewerControl_Unloaded;
+            SizeChanged -= ServoValueViewerControl_SizeChanged;
             if (_nestedTimelineValuePainter != null)
             {
                 _nestedTimelineValuePainter.Dispose();
@@ -58,6 +59,7 @@ namespace AwbStudio.TimelineControls
             _nestedTimelineValuePainter = new NestedTimelineValuePainter(AllValuesGrid, _viewContext, timelineCaptions, timelineMetaDataService);
             _caption = timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id);
             HeaderControl.TimelineCaption = _caption;
+            HeaderControl.ViewContext   = viewContext;
 
             _isInitialized = true;
         }

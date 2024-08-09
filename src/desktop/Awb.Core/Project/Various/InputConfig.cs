@@ -16,14 +16,14 @@ namespace Awb.Core.Project.Various
     {
         public required int Id { get; set; }
 
-        [DisplayName("Client ID")]
+        [Display(Name = "Title", GroupName = "General", Order = 1)]
+        [Description("A descriptive title for this input like 'test-mode'.")]
+        public required string Title { get; set; }
+
+        [Display(Name = "Client ID", GroupName = "General", Order = 2)]
         [Description("The ID of the AWB client device that controls this servo.")]
         [Range(1, 254)]
         public required uint ClientId { get; set; } = 1;
-
-        [DisplayName("Title")]
-        [Description("A descriptive title for this input like 'test-mode'.")]
-        public required string Title { get; set; }
 
         [DisplayName("IO hardware pin if input is GPIO input")]
         [Range(1, Esp32.MaxGpIoPortNumber)]

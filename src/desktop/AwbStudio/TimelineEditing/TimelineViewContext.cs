@@ -71,6 +71,11 @@ namespace AwbStudio.TimelineEditing
         }
 
         /// <summary>
+        /// The duration of the timeline in ms, but extended so that the timeline can grow beyond the duration of the last keaframe
+        /// </summary>
+        public int DurationMsExtended => DurationMs + 5000; // 5000ms extra
+
+        /// <summary>
         /// How many items are grouped in one actuator bank
         /// </summary>
         public int ItemsPerBank { get; } = 8;

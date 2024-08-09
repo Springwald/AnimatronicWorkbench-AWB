@@ -54,6 +54,8 @@
                 <Button x:Name="BtnSetToDefault" Click="BtnSetToDefault_Click">100%</Button>
                 <Label>Toggle point:</Label>
                 <Button x:Name="BtnTooglePoint" Click="BtnTooglePoint_Click" >Toggle</Button>
+                <Label>Value:</Label>
+                <Label x:Name="LabelActualValue" FontWeight="Bold">12345</Label>
             </StackPanel>
 
         </Grid>

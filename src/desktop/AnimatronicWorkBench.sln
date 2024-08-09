@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CenterAllServos", "Demos\Ce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiDeviceScanner", "Demos\MidiDeviceScanner\MidiDeviceScanner.csproj", "{7F9BF8C9-3536-46CB-B425-E6552016DC8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Awb.CoreTests", "Awb.CoreTests\Awb.CoreTests.csproj", "{3CD35D5E-E003-473A-8A6D-D48203ED0E48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{7F9BF8C9-3536-46CB-B425-E6552016DC8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F9BF8C9-3536-46CB-B425-E6552016DC8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F9BF8C9-3536-46CB-B425-E6552016DC8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CD35D5E-E003-473A-8A6D-D48203ED0E48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CD35D5E-E003-473A-8A6D-D48203ED0E48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CD35D5E-E003-473A-8A6D-D48203ED0E48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CD35D5E-E003-473A-8A6D-D48203ED0E48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

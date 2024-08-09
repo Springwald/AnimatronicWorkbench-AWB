@@ -6,14 +6,14 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench-EN
 
-// Created on 14.07.2024 23:02:38
+// Created on 10.08.2024 01:37:33
 
 class WifiConfig
 {
 
 public:
-   const char *WlanSSID = "AWB-Grogu2";
-   const char *WlanPassword = "awb12345";
+   const char *WlanSSID = "AWB-PIP-Animatronic";
+   const char *WlanPassword = "awb050518";
 
 };
 

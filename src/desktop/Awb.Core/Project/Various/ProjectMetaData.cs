@@ -14,9 +14,7 @@ namespace Awb.Core.Project.Various
 {
     public class ProjectMetaData : IProjectObjectListable
     {
-        private string? _wifiSsid;
-
-        [DisplayName("Project title")]
+        [Display(Name = "Project title", GroupName = "General", Order = 1)]
         [Description("The working title of the project, often a figure name.")]
         [Length(1,16)]
         [RegularExpression(pattern:"[A-Za-z0-9_-]+",ErrorMessage ="Only chars A-Z,a-z, 0-9 and '__' or '-' allowed (e.g. no space).")]
@@ -25,11 +23,7 @@ namespace Awb.Core.Project.Various
         [DisplayName("Info description")]
         public string? Info { get; set; }
 
-        public string WifiSsid
-        {
-            get => _wifiSsid ?? $"AWB-{ProjectTitle}"; // todo: remove invalid chars
-            set => _wifiSsid = value;
-        }
+        public string WifiSsid => $"AWB-{ProjectTitle}"; 
 
         [DisplayName("Wifi password")]
         [Length(8, 32)]

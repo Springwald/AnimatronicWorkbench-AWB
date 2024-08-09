@@ -10,8 +10,6 @@ using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
-using Awb.Core.Timelines;
-using Awb.Core.Tools.Validation;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project
@@ -26,7 +24,7 @@ namespace Awb.Core.Project
 
         public Esp32ClientHardwareConfig Esp32ClientHardware { get; set; } = new Esp32ClientHardwareConfig { ClientId = 1 };
 
-        public IProjectObjectListable[] AdditionalClients { get; set; } = new IProjectObjectListable[] { }; 
+        public IProjectObjectListable[] AdditionalClients { get; set; } = new IProjectObjectListable[] { };
 
         public Pca9685PwmServoConfig[] Pca9685PwmServos { get; set; } = new Pca9685PwmServoConfig[] { };
         public StsFeetechServoConfig[] StsServos { get; set; } = new StsFeetechServoConfig[] { };
@@ -54,23 +52,6 @@ namespace Awb.Core.Project
             _timelineDataService = new TimelineDataServiceByJsonFiles(_projectFolder);
         }
 
-        /// <summary>
-        /// All problems or hints of this project
-        /// </summary>
-        public IEnumerable<ProjectProblem> GetProjectProblems(IEnumerable<TimelineData> timelines)
-        {
-            var nativeAttributeProblems = GetAllListableObjects().SelectMany(
-                x => ObjectValidator.ValidateObjectGetErrors(x));
-            foreach (var item in nativeAttributeProblems) yield return item;
-
-            var contentProblems = GetAllListableObjects().SelectMany(x => x.GetContentProblems(this));
-            foreach (var item in contentProblems) yield return item;
-
-            var timelineProblems = timelines.SelectMany(x => x.GetProblems(this));
-            foreach (var item in timelineProblems) yield return item;
-        }
-
-      
 
         public IEnumerable<IProjectObjectListable> GetAllListableObjects()
         {
@@ -84,43 +65,10 @@ namespace Awb.Core.Project
             foreach (var item in Inputs) yield return item;
         }
 
-        public int GetNewInputId()
-        {
-            int id = 1;
-            while (true)
-            {
-                if (!Inputs.Any(x => x.Id == id)) return id;
-                id++;
-            }
-        }
 
-        public int GetNewTimelineStateId()
-        {
-            int id = 1;
-            while (true)
-            {
-                if (!TimelinesStates.Any(x => x.Id == id)) return id;
-                id++;
-            }
-        }
 
-        public string CreateNewObjectId(string prefix)
-        {
-            int idCount = 1;
-            while (true)
-            {
-                var id = prefix + "-" + idCount.ToString();
-                if (!GetAllIds().Any(x => x == id)) return id;
-                idCount++;
-            }
-        }
 
-        private IEnumerable<string> GetAllIds()
-        {
-            foreach (var item in Pca9685PwmServos) yield return item.Id;
-            foreach (var item in StsServos) yield return item.Id;
-            foreach (var item in ScsServos) yield return item.Id;
-            foreach (var item in Mp3PlayersYX5300) yield return item.Id;
-        }
+
+
     }
 }

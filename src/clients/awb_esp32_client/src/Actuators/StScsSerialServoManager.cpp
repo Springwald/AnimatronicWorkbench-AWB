@@ -1,6 +1,6 @@
 
 #include <Arduino.h>
-#include "StSerialServoManager.h"
+#include "StScsSerialServoManager.h"
 #include "AwbDataImport/HardwareConfig.h"
 #include "ActualStatusInformation.h"
 #include "ActuatorValue.h"
@@ -14,7 +14,7 @@ static SCSCL _serialServo_SCS;
 /**
  * Set up the sts servos
  */
-void StSerialServoManager::setup()
+void StScsSerialServoManager::setup()
 {
     if (this->_servoTypeIsScs)
     {
@@ -40,7 +40,7 @@ void StSerialServoManager::setup()
 /**
  * update the sts servos
  */
-void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState)
+void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState)
 {
     for (int i = 0; i < this->_servos->size(); i++)
     {
@@ -61,14 +61,23 @@ void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCir
         }
         else
         {
+
             // set new target value if changed
             if (servo->currentValue != servo->targetValue)
             {
+
                 int speed = servo->targetSpeed;
                 int acc = servo->targetAcc;
                 if (speed == -1 && acc == -1)
                 {
-                    _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
+                    if (this->_servoTypeIsScs)
+                    {
+                        _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
+                    }
+                    else
+                    {
+                        _serialServo_STS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
+                    }
                 }
                 else
                 {
@@ -98,7 +107,7 @@ void StSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHasCir
 /**
  * write the position to the servo, including speed and acceleration
  */
-void StSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
+void StScsSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
 {
     if (this->servoAvailable(id))
     {
@@ -121,7 +130,7 @@ void StSerialServoManager::writePositionDetailed(int id, int position, int speed
 /**
  * write the position to the servo, using the default speed and acceleration
  */
-void StSerialServoManager::writePosition(int id, int position)
+void StScsSerialServoManager::writePosition(int id, int position)
 {
     for (int i = 0; i < _servos->size(); i++)
     {
@@ -135,7 +144,7 @@ void StSerialServoManager::writePosition(int id, int position)
 /**
  * read the actual position from the servo
  */
-int StSerialServoManager::readPosition(u8 id)
+int StScsSerialServoManager::readPosition(u8 id)
 {
     if (this->_servoTypeIsScs)
     {
@@ -150,7 +159,7 @@ int StSerialServoManager::readPosition(u8 id)
 /**
  * set the maximum torque of the servo. Set 0 to turn the servo off
  */
-void StSerialServoManager::setTorque(u8 id, bool on)
+void StScsSerialServoManager::setTorque(u8 id, bool on)
 {
     if (this->_servoTypeIsScs)
     {
@@ -165,7 +174,7 @@ void StSerialServoManager::setTorque(u8 id, bool on)
 /**
  * read the actual load of the servo
  */
-int StSerialServoManager::readLoad(int id)
+int StScsSerialServoManager::readLoad(int id)
 {
     if (this->_servoTypeIsScs)
     {
@@ -179,7 +188,7 @@ int StSerialServoManager::readLoad(int id)
 /**
  * read the temperature of the servo in degree celsius
  */
-int StSerialServoManager::readTemperature(int id)
+int StScsSerialServoManager::readTemperature(int id)
 {
     if (this->_servoTypeIsScs)
     {
@@ -194,7 +203,7 @@ int StSerialServoManager::readTemperature(int id)
 /**
  * is the servo available?
  */
-bool StSerialServoManager::servoAvailable(int id)
+bool StScsSerialServoManager::servoAvailable(int id)
 {
     for (int i = 0; i < servoIds->size(); i++)
     {
@@ -219,7 +228,7 @@ bool StSerialServoManager::servoAvailable(int id)
  * scan for all available servo ids.
  * Only inside the given range to prevent long delays.
  */
-void StSerialServoManager::scanIds()
+void StScsSerialServoManager::scanIds()
 {
     servoIds = new std::vector<u8>();
 

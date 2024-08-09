@@ -74,8 +74,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                             break;
                     }
 
-
-
                     var editor = new ProjectObjectGenericEditorControl();
                     editor.SetProjectAndObject(projectObject, awbProject, objectsUsingThisObject.ToArray());
                     ActualEditor = editor;

@@ -56,8 +56,12 @@ namespace AwbStudio.TimelineValuePainters
                 PaintValues(_timelineData?.AllPoints);
         }
 
+        private DateTime _lastValuesPaintBecauseOfResize = DateTime.MinValue;
+
         private void PaintControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            if (DateTime.UtcNow - _lastValuesPaintBecauseOfResize < TimeSpan.FromMilliseconds(1000)) return;
+            _lastValuesPaintBecauseOfResize = DateTime.UtcNow;
             PaintValues(_timelineData?.AllPoints);
         }
 

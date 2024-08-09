@@ -119,6 +119,8 @@ namespace AwbStudio.TimelineControls
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
+            if (_timelineData != null) _timelineData.OnContentChanged -= OnTimelineDataChanged;
+
             _timelineData = timelineData;
             _playPosPainter!.TimelineDataLoaded(timelineData);
 
@@ -127,6 +129,16 @@ namespace AwbStudio.TimelineControls
 
             foreach (var valuePainter in _timelineValuePainters!)
                 valuePainter.TimelineDataLoaded(timelineData);
+
+            _timelineData.OnContentChanged += OnTimelineDataChanged;
+            OnTimelineDataChanged(null, null);
+        }
+
+        private void OnTimelineDataChanged(object? sender, TimelineDataChangedEventArgs? e)
+        {
+            if (_viewContext == null) return;
+            if (_timelineData == null) return;
+            this._viewContext.DurationMs = Math.Max(20 * 1000, _timelineData.DurationMs + 5000); // 5000ms extra for the timeline to grow beyond the duration of the last keyframe
         }
 
         private void ZoomChanged()
@@ -141,6 +153,7 @@ namespace AwbStudio.TimelineControls
             if (_timelineData == null) return;
             if (_viewContext == null) return;
 
+          
             switch (e.ChangeType)
             {
                 case ViewContextChangedEventArgs.ChangeTypes.Duration:

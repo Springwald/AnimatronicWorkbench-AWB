@@ -72,34 +72,40 @@ namespace AwbStudio.TimelineValuePainters
                 {
                     Shape shape;
 
-                    if (point.IsNestedTimelinePoint)
+                    if (!double.NaN.Equals(point.ValuePercent))
                     {
-                        shape = new Rectangle
-                        {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Fill = Brushes.Transparent,
-                            Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius },
-                        };
 
-                    }
-                    else
-                    {
-                        shape = new Ellipse
+                        if (point.IsNestedTimelinePoint)
                         {
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Top,
-                            Fill = caption.ForegroundColor,
-                            Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius },
-                        };
-                    }
+                            shape = new Rectangle
+                            {
+                                HorizontalAlignment = HorizontalAlignment.Left,
+                                VerticalAlignment = VerticalAlignment.Top,
+                                Fill = Brushes.Transparent,
+                                Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius },
+                            };
 
-                    shape.Height = dotWidth;
-                    shape.Width = dotWidth;
-                    shape.ToolTip = point.Title;
-                    shape.Stroke = caption.ForegroundColor;
-                    this.PaintControl.Children.Add(shape);
-                    _valueControls.Add(shape);
+                        }
+                        else
+                        {
+                            var left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius;
+                            var top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius;
+                            shape = new Ellipse
+                            {
+                                HorizontalAlignment = HorizontalAlignment.Left,
+                                VerticalAlignment = VerticalAlignment.Top,
+                                Fill = caption.ForegroundColor,
+                                Margin = new Thickness { Left = left, Top = top }
+                            };
+                        }
+
+                        shape.Height = dotWidth;
+                        shape.Width = dotWidth;
+                        shape.ToolTip = point.Title;
+                        shape.Stroke = caption.ForegroundColor;
+                        this.PaintControl.Children.Add(shape);
+                        _valueControls.Add(shape);
+                    }
                 }
             }
 

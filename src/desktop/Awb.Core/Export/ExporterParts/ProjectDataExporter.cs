@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 
+using Awb.Core.Actuators;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
@@ -16,25 +17,25 @@ namespace Awb.Core.Export.ExporterParts
     internal class ProjectDataExporter : ExporterPartAbstract
     {
         private readonly ProjectExportData _projectData;
+        private readonly string _targetFolder;
 
-        public ProjectDataExporter(ProjectExportData projectData)
+        public ProjectDataExporter(ProjectExportData projectData, string targetFolder)
         {
             _projectData = projectData;
+            _targetFolder = targetFolder;
         }
 
-        public override async Task<IExporter.ExportResult> ExportAsync(string targetSrcFolder)
+        public override async Task<IExporter.ExportResult> ExportAsync()
         {
             // check the target folder
-            if (!Directory.Exists(targetSrcFolder)) return new IExporter.ExportResult { ErrorMessage = $"Target folder '{targetSrcFolder}' not found" };
-            var folder = Path.Combine(targetSrcFolder, "src", "AwbDataImport");
-            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+            if (!Directory.Exists(_targetFolder)) return new IExporter.ExportResult { ErrorMessage = $"Target folder '{_targetFolder}' not found" };
 
             // export project data
-            var result = await WriteProjectDataHAsync(folder);
+            var result = await WriteProjectDataHAsync(_targetFolder);
             if (result.Success == false) return result;
 
             // export hardware.h
-            result = await WriteHardwareHAsync(folder);
+            result = await WriteHardwareHAsync(_targetFolder);
             if (result.Success == false) return result;
 
             return result;
@@ -112,17 +113,22 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("#define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457");
             content.AppendLine();
 
-
             // DAC speaker settings
-            content.AppendLine("/* DAC speaker */");
-            content.AppendLine("// #define USE_DAC_SPEAKER");
+            if (false)
+            {
+                content.AppendLine("/* DAC speaker */");
+                content.AppendLine("// #define USE_DAC_SPEAKER");
+            }
 
             // Status neopixel
-            content.AppendLine("/* Neopixel status LEDs */");
-            content.AppendLine("// #define USE_NEOPIXEL_STATUS_CONTROL");
-            content.AppendLine("#define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.");
-            content.AppendLine("#define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO");
-            content.AppendLine();
+            if (_projectData.Esp32ClientHardwareConfig.UseNeoPixel)
+            {
+                content.AppendLine("/* Neopixel RGB LEDs */");
+                content.AppendLine("#define USE_NEOPIXEL");
+                content.AppendLine($"#define NEOPIXEL_GPIO {_projectData.Esp32ClientHardwareConfig.NeoPixelPin}");
+                content.AppendLine($"#define NEOPIXEL_COUNT {_projectData.Esp32ClientHardwareConfig.NeoPixelCount}");
+                content.AppendLine();
+            }
 
             content.AppendLine();
             content.AppendLine("#endif");
@@ -227,8 +233,13 @@ namespace Awb.Core.Export.ExporterParts
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
             foreach (var servo in servos)
+            {
+                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
+                var speed = servo.Speed ?? 0;
+                var acceleration = 0; // scs servos have no acceleration
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {servo.DefaultValue}, 0, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+            }
             result.AppendLine();
         }
 
@@ -236,8 +247,13 @@ namespace Awb.Core.Export.ExporterParts
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
             foreach (var servo in servos)
+            {
+                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
+                var acceleration = servo.Acceleration ?? 0;
+                var speed = servo.Speed ?? 0;   
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {servo.DefaultValue}, {servo.Acceleration}, {servo.Speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+            }
             result.AppendLine();
         }
 

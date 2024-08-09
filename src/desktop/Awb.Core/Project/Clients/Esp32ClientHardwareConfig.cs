@@ -13,99 +13,124 @@ namespace Awb.Core.Project.Clients
 {
     public class Esp32ClientHardwareConfig : IProjectObjectListable
     {
-        [DisplayName("Client ID")]
+        #region Main
+
+        [Display(Name = "Client ID", GroupName ="General", Order = 1)]
         [Description("The ID of this ESP32 client device.")]
         [Range(1, 254)]
         public required uint ClientId { get; set; } = 1;
 
-        [DisplayName("Debugging IO pin")]
+        #endregion
+
+
+
+        #region Debugging
+
+        [Display(Name = "Debugging IO pin", GroupName = "Debugging", Order = 1)]
         [Description(" The GPIO pin to use for debugging")]
         [Range(1, Esp32.MaxGpIoPortNumber)]
-        public uint? DebuggingIoPin { get; set; } = 1;
+        public uint? DebuggingIoPin { get; set; } = null;
 
-        [DisplayName("Debugging IO pin active state")]
+        [Display(Name = "Debugging IO pin active state", GroupName = "Debugging", Order = 1)]
         [Description("Define the active state of the debugging GPIO pin")]
         [RegularExpression("HIGH|LOW")]
         public string? DebuggingIoPinActiveState { get; set; } = "HIGH";
 
-        /* Display settings */
+        #endregion
+
+
+        #region Display settings
 
         /**  -- M5 Stack Displays -- **/
 
-        [DisplayName("M5STACK display")]
+        [Display(Name = "M5STACK display", GroupName = "Display M5Stack", Order = 1)]
         [Description("Check to use a M5Stack. Uses GPIO 14+18 for display communication")]
         public bool Display_M5Stack { get; set; }
 
         /** -- SSD1306 Displays  -- **/
 
-        [DisplayName("SSD1306 display")]
+        [Display(Name = "use SSD1306 display", GroupName = "SSD1306 display", Order = 1)]
         [Description("Check e.g. for Waveshare Servo Driver with ESP32 (using 128x32, 0x02, 0x3C)")]
         public bool Display_Ssd1306 { get; set; } = true;
 
-        [DisplayName("SSD1306 I2C address")]
+        [Display(Name = "I2C address", GroupName = "SSD1306 display", Order = 2)]
         [Description("0x3C or 0x3D, See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32")]
         [RegularExpression("(0x3C|0x3D)")]
         public string? Ssd1306I2cAddress { get; set; } = "0x3D";
 
-        [DisplayName("SSD1306 screen width")]
+        [Display(Name = "screen width", GroupName = "SSD1306 display", Order = 3)]
         [Description("Screen width of SDD1306 display")]
         [Range(1, 1024)]
         public int? Ssd1306ScreenWidth { get; set; } = 128;
 
-        [DisplayName("SSD1306 screen height")]
+        [Display(Name = "screen height", GroupName = "SSD1306 display", Order = 4)]
         [Description("Screen height of SDD1306 display")]
         [Range(1, 1024)]
         public int? Ssd1306ScreenHeight { get; set; } = 64;
 
-        [DisplayName("SSD1306 COM pins")]
+        [Display(Name = "COM pins", GroupName = "SSD1306 display", Order = 5)]
         [Description("The SSD1306 may have different connection patterns between the panel and controller depending on the product, and the 0xDA command adjusts for this.\r\nIf it does not display correctly, try the following values: 0x02, 0x12, 0x22 or 0x32")]
         [RegularExpression("(0x02|0x12|0x22|0x32)")]
         public string? Ssd1306ComPins { get; set; } = "0x12";
 
-        /* Servo settings */
-        [DisplayName("SCS servo bus")]
+        #endregion
+
+
+        #region SCS servos
+
+        [Display(Name = "use SCS servo bus", GroupName = "SCS servo bus", Order = 1)]
         [Description("Use a feetech/waveshare servo SCS bus adapter")]
         public bool UseScsServos { get; set; }
 
-        [DisplayName("SCS servo TX IO pin")]
+        [Display(Name = "TX IO pin", GroupName = "SCS servo bus", Order = 2)]
         [Description("Define the SCS servo GPIO pin for TX, eg. GPIO 19 for waveshare servo driver")]
         [Range(1, Esp32.MaxGpIoPortNumber)]
         public uint? ScsTXPin { get; set; } = 19;
 
-        [DisplayName("SCS servo RX IO pin")]
+        [Display(Name = "RX IO pin", GroupName = "SCS servo bus", Order = 3)]
         [Description("Define the SCS servo GPIO pin for RX, eg. GPIO 18 for waveshare servo driver")]
         [Range(1, Esp32.MaxGpIoPortNumber)]
         public uint? ScsRXPin { get; set; } = 18;
 
+        #endregion
 
-        [DisplayName("STS servo bus")]
+
+        #region STS Servos
+
+        [Display(Name = "use STS servo bus", GroupName = "STS servo bus", Order = 1)]
         [Description("Use a feetech/waveshare servo STS bus adapter")]
         public bool UseStsServos { get; set; }
 
-        [DisplayName("STS servo TX IO pin")]
+        [Display(Name = "TX IO pin", GroupName = "STS servo bus", Order = 2)]
         [Description("Define the STS servo GPIO pin for TX, eg. GPIO 19 for waveshare servo driver")]
         [Range(1, Esp32.MaxGpIoPortNumber)]
         public uint? StsTXPin { get; set; } = 17;
 
-        [DisplayName("STS servo RX IO pin")]
+        [Display(Name = "RX IO pin", GroupName = "STS servo bus", Order = 3)]
         [Description("Define the STS servo GPIO pin for RX, eg. GPIO 18 for waveshare servo driver")]
         [Range(1, Esp32.MaxGpIoPortNumber)]
         public uint? StsRXPin { get; set; } = 16;
 
-        /* Neopixel status LEDs */
-        // #define USE_NEOPIXEL_STATUS_CONTROL
-        //#define STATUS_RGB_LED_GPIO 23      // the GPIO used to control RGB LEDs. GPIO 23, as default.
-        //#define STATUS_RGB_LED_NUMPIXELS 13 // how many RGB LEDs are connected to the GPIO
+        #endregion
 
-        /* PCA9685 PWM servo settings */
-        // #define USE_PCA9685_PWM_SERVO // uncomment this line if you want to use PCA9685 PWM servos
-        //#define PCA9685_I2C_ADDRESS 0x40
-        //#define PCA9685_OSC_FREQUENCY 25000000
 
-        /* MP3-Player YX5300 */
-        //#define USE_MP3_PLAYER_YX5300
-        //#define MP3_PLAYER_YX5300_RXD 13
-        //#define MP3_PLAYER_YX5300_TXD 14
+        #region Neopixel
+
+        [Display(Name = "use NeoPixel", GroupName = "Neopixel", Order = 1)]
+        [Description("Use adressable RGB LEDs")]
+        public bool UseNeoPixel { get; set; } = false;
+
+        [Display(Name = "Data pin", GroupName = "Neopixel", Order = 2)]
+        [Description("the GPIO used to control RGB LEDs. GPIO 26, as default.")]
+        [Range(1, Esp32.MaxGpIoPortNumber)]
+        public uint? NeoPixelPin { get; set; }
+
+        [Display(Name = "Count", GroupName = "Neopixel", Order = 3)]
+        [Description("How many RGB LEDs are connected to the data pin")]
+        [Range(1, 255)]
+        public uint? NeoPixelCount { get; set; }
+
+        #endregion
 
         /* DAC speaker */
         // #define USE_DAC_SPEAKER
@@ -178,6 +203,22 @@ namespace Awb.Core.Project.Clients
                 if (StsRXPin == null) yield return new ProjectProblem
                 {
                     Message = "STS servo RX IO pin has to be set",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+            }
+
+            if (UseNeoPixel)
+            {
+                if (NeoPixelPin == null) yield return new ProjectProblem
+                {
+                    Message = "NeoPixel data pin has to be set",
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Source = TitleShort
+                };
+                if (NeoPixelCount == null) yield return new ProjectProblem
+                {
+                    Message = "NeoPixel count has to be set",
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };

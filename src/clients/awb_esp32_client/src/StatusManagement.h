@@ -4,14 +4,13 @@
 #include <Arduino.h>
 #include "AwbDisplay.h"
 #include "Adafruit_PWMServoDriver.h"
-#include "Actuators/StSerialServoManager.h"
+#include "Actuators/StScsSerialServoManager.h"
 #include "Actuators/Pca9685PwmManager.h"
 #include "Actuators/Mp3PlayerYX5300Manager.h"
 #include "Actuators/ActuatorValue.h"
 #include "PacketSenderReceiver.h"
 #include "PacketProcessor.h"
 #include "DacSpeaker.h"
-#include "NeoPixel/NeoPixelStatusControl.h"
 #include "AutoPlay/AutoPlayer.h"
 #include "AwbDataImport/ProjectData.h"
 #include "WlanConnector.h"
@@ -30,8 +29,8 @@ class StatusManagement
 private:
     AwbDisplay *_awbDisplay; /// The display, oled or lcd
     ProjectData *_projectData;
-    StSerialServoManager *_stSerialServoManager;
-    StSerialServoManager *_scSerialServoManager;
+    StScsSerialServoManager *_stSerialServoManager;
+    StScsSerialServoManager *_scSerialServoManager;
     Pca9685PwmManager *_pca9685PwmManager;
     TCallBackErrorOccured _errorOccured;
     TCallBackMessageToShowWithDuration _messageToShow;
@@ -49,14 +48,14 @@ private:
      */
     String updateActuatorsStatuses();
 
-    String updateStsScsServoStatuses(StSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo);
+    String updateStsScsServoStatuses(StScsSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo);
 
     String getDebugInfos();
 
     int getFreeMemory();
 
 public:
-    StatusManagement(ProjectData *projectData, AwbDisplay *awbDisplay, StSerialServoManager *stSerialServoManager, StSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured)
+    StatusManagement(ProjectData *projectData, AwbDisplay *awbDisplay, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured)
         : _projectData(projectData), _awbDisplay(awbDisplay), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured)
     {
         resetDebugInfos();

@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
@@ -14,10 +13,10 @@ using AwbStudio.ProjectConfiguration;
 using AwbStudio.ProjectConfiguration.PropertyEditors;
 using AwbStudio.Projects;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace AwbStudio
 {
@@ -30,6 +29,7 @@ namespace AwbStudio
         private ProjectConfigViewModel _viewModel;
         private readonly IProjectManagerService _projectManagerService;
         private readonly AwbProject _awbProject;
+        private readonly IdCreator _idCreator;
 
         private TimelineData[]? _timelines;
         private TimelineData[] Timelines
@@ -40,7 +40,7 @@ namespace AwbStudio
                 {
                     var ids = _awbProject.TimelineDataService.TimelineIds.ToArray();
                     var timelines = ids.Select(id => _awbProject.TimelineDataService.GetTimelineData(id)).ToArray() ?? Array.Empty<TimelineData>();
-                    _timelines = timelines; 
+                    _timelines = timelines;
                 }
                 return _timelines;
             }
@@ -52,6 +52,8 @@ namespace AwbStudio
             _awbProject = projectManagerService.ActualProject ?? throw new ArgumentNullException(nameof(projectManagerService.ActualProject));
             _viewModel = new ProjectConfigViewModel(_awbProject);
 
+            _idCreator = new IdCreator(_viewModel, _awbProject);
+
             this.DataContext = _viewModel;
 
             InitializeComponent();
@@ -59,10 +61,12 @@ namespace AwbStudio
             Loaded += ProjectConfigurationWindow_Loaded;
         }
 
-        private void ProjectConfigurationWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void ProjectConfigurationWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // select the project properties as default
             SetObjectToEdit(_viewModel.ProjectMetaData);
+
+            await ShowProjectProblems();
 
             Loaded -= ProjectConfigurationWindow_Loaded;
             Closing += ProjectConfigurationWindow_Closing;
@@ -74,6 +78,19 @@ namespace AwbStudio
             Unloaded -= ProjectConfigurationWindow_Unloaded;
         }
 
+        private async Task ShowProjectProblems()
+        {
+            this.StackPanelProblems.Children.Clear();
+
+            var projectChecker = new CheckProjectIntegrity(_awbProject, Timelines);
+            var problems = projectChecker.GetProblems().ToArray();
+            foreach (var problem in problems)
+            {
+                var control = new System.Windows.Controls.Label { Content = problem.PlaintTextDescription, Foreground = new SolidColorBrush(Colors.Red) };
+                this.StackPanelProblems.Children.Add(control);
+            }
+        }
+
         #region Save Project Configuration
 
         private async Task<bool> SaveProjectConfigAsync()
@@ -81,10 +98,12 @@ namespace AwbStudio
             _viewModel.WriteToProject(_awbProject);
 
             // check if project has errors
-            var errors = _awbProject.GetProjectProblems(Timelines).Where(p => p.ProblemType == ProjectProblem.ProblemTypes.Error);
+            var projectChecker = new CheckProjectIntegrity(_awbProject, Timelines);
+            var problems = projectChecker.GetProblems().ToArray();
+            var errors = problems.Where(p => p.ProblemType == ProjectProblem.ProblemTypes.Error).ToArray();
             if (errors.Any())
             {
-                MessageBox.Show("Please fix all errors before saving the project configuration.\r\n\r\n"+
+                MessageBox.Show("Please fix all errors before saving the project configuration.\r\n\r\n" +
                     string.Join("\r\n", errors.Select(p => p.PlaintTextDescription)));
                 return false;
             }
@@ -160,7 +179,7 @@ namespace AwbStudio
         {
             _viewModel.ScsServos.Add(new ScsFeetechServoConfig
             {
-                Id = _awbProject.CreateNewObjectId("ScsServo"),
+                Id = _idCreator.CreateNewObjectId("ScsServo"),
                 Title = "",
                 ClientId = 1,
                 Channel = 1
@@ -178,8 +197,10 @@ namespace AwbStudio
         private void EditEsp32HardwareButton_Click(object sender, RoutedEventArgs e)
         => SetObjectToEdit(_viewModel.Esp32ClientHardwareConfig);
 
-        private void SetObjectToEdit(IProjectObjectListable? projectObject)
+        private async void SetObjectToEdit(IProjectObjectListable? projectObject)
         {
+            await ShowProjectProblems();
+
             if (!PropertyEditor.TrySetProjectObject(projectObject, _awbProject, Timelines))
             {
                 projectObject = PropertyEditor.ProjectObject; // reject new project object fall back to the actual project object
@@ -190,25 +211,30 @@ namespace AwbStudio
             foreach (var control in StackPanelProjectObjectLists.Children)
                 if (control is ProjectObjectListControl list)
                     list.SelectedProjectObject = projectObject;
+
+            UpdateProjectObjectsListItemTitels();
         }
 
-        private void UpdateProblemsDisplay()
+
+        // Update the listed item titles in die object lists
+        private void UpdateProjectObjectsListItemTitels()
         {
-            var timelines = new List<TimelineData>();
-            foreach (var projectObject in _awbProject.GetProjectProblems(timelines))
-            {
-
-            }
+            var childControls = StackPanelProjectObjectLists.Children;
+            foreach (var control in childControls)
+                if (control is ProjectObjectListControl list)
+                    list.UpdateListItemTitels();
         }
+
 
         private void PropertyEditorUpdatedData_Fired(object? sender, EventArgs e)
         {
+            UpdateProjectObjectsListItemTitels();
             _viewModel.UnsavedChanges = true;
         }
 
         private void PropertyEditorOnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
         {
-            if (e.ObjectToDelete == _viewModel.ProjectMetaData   )
+            if (e.ObjectToDelete == _viewModel.ProjectMetaData)
             {
                 MessageBox.Show("You can not delete the project meta data object!");
                 return;
@@ -231,69 +257,83 @@ namespace AwbStudio
 
         private void ScsServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.ScsServos.Add(new ScsFeetechServoConfig
+            var item = new ScsFeetechServoConfig
             {
-                Id = _awbProject.CreateNewObjectId("ScsServo"),
+                Id = _idCreator.CreateNewObjectId("ScsServo"),
                 Title = "",
                 ClientId = 1,
                 Channel = 1
-            });
+            };
+            _viewModel.ScsServos.Add(item);
+            ScsServosList.SelectedProjectObject = item;
         }
+        
 
         private void StsServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.StsServos.Add(new StsFeetechServoConfig
+            var item =    new StsFeetechServoConfig
             {
-                Id = _awbProject.CreateNewObjectId("StsServo"),
+                Id = _idCreator.CreateNewObjectId("StsServo"),
                 Title = "",
                 ClientId = 1,
                 Channel = 1
-            });
+            };
+            _viewModel.StsServos.Add(item);
+            StsServosList.SelectedProjectObject = item;
         }
 
         private void Pca9685PWMServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.Pca9685PwmServos.Add(new Pca9685PwmServoConfig
+            var item = new Pca9685PwmServoConfig
             {
-                Id = _awbProject.CreateNewObjectId("Pca9685PwmServo"),
+                Id = _idCreator.CreateNewObjectId("Pca9685PwmServo"),
                 I2cAdress = 0x40,
                 Title = "",
                 ClientId = 1,
                 Channel = 1
-            });
+            };
+            _viewModel.Pca9685PwmServos.Add(item);
+            Pca9685PWMServosList.SelectedProjectObject = item;
         }
 
         private void Mp3PlayerYX5300List_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.Mp3PlayerYX5300.Add(new Mp3PlayerYX5300Config
+            var item = new Mp3PlayerYX5300Config
             {
-                Id = _awbProject.CreateNewObjectId("Mp3PlayerYX5300"),
+                Id = _idCreator.CreateNewObjectId("Mp3PlayerYX5300"),
                 Title = "",
                 ClientId = 1,
                 RxPin = 13,
                 TxPin = 14
-            });
+            };
+            _viewModel.Mp3PlayerYX5300.Add(item);
+            Mp3PlayerYX5300List.SelectedProjectObject = item;
         }
 
         private void InputsList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.Inputs.Add(new InputConfig
+            var item = new InputConfig
             {
-                Id = _awbProject.GetNewInputId(),
+                Id = _idCreator.GetNewInputId(),
                 Title = "",
                 ClientId = 1,
-            });
+            };
+            _viewModel.Inputs.Add(item);
+            InputsList.SelectedProjectObject = item;
         }
 
         private void TimelineStates_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            _viewModel.TimelineStates.Add(new TimelineState
+            var item = new TimelineState
             {
-                Id = _awbProject.GetNewTimelineStateId(),
+                Id = _idCreator.GetNewTimelineStateId(),
                 Title = "",
                 PositiveInputs = Array.Empty<int>(),
                 NegativeInputs = Array.Empty<int>()
-            });
+            };
+
+            _viewModel.TimelineStates.Add(item);
+            TimelineStatesList.SelectedProjectObject = item;
 
         }
     }

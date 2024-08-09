@@ -53,7 +53,9 @@ namespace AwbStudio.Projects
         {
             if (!Directory.Exists(projectFolder)) return false;
 
-            // load project config from folder
+            if (await CreateProjectSubDirectories(projectFolder: projectFolder) == false) return false;
+
+            // save project to folder
             var options = new JsonSerializerOptions()
             {
                 WriteIndented = true,
@@ -66,10 +68,33 @@ namespace AwbStudio.Projects
             return true;
         }
 
+        public async Task<bool> CreateProjectSubDirectories(string projectFolder)
+        {
+            var folders = new[] { @"audio\SDCard\01", "custom_code_backup" };
+
+            foreach (var folder in folders)
+            {
+                var path = Path.Combine(projectFolder, folder);
+                if (!Directory.Exists(path))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    catch (Exception ex)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public async Task<OpenProjectResult> OpenProjectAsync(string projectFolder)
         {
             if (!Directory.Exists(projectFolder))
-                return  OpenProjectResult.ErrorResult([$"Project folder '{projectFolder}' does not exist."]);
+                return OpenProjectResult.ErrorResult([$"Project folder '{projectFolder}' does not exist."]);
 
             var projectFilename = ProjectConfigFilename(projectFolder);
 
@@ -100,6 +125,10 @@ namespace AwbStudio.Projects
 
             projectConfig.SetProjectFolder(projectFolder);
             this.ActualProject = projectConfig;
+
+            var createDirectoriesIfNeeded = await CreateProjectSubDirectories(projectFolder: projectFolder);
+            if (createDirectoriesIfNeeded == false)
+                return OpenProjectResult.ErrorResult([$"Could not create project subdirectories in folder '{projectFolder}'."]);
 
             _awbStudioSettingsService.StudioSettings.AddLastProjectFolder(projectFolder);
             await _awbStudioSettingsService.SaveSettingsAsync();

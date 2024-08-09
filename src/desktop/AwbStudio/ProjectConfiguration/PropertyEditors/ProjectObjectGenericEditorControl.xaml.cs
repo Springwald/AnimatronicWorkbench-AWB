@@ -10,11 +10,14 @@ using Awb.Core.Tools.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
@@ -31,6 +34,15 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             {
                 ObjectToDelete = objectToDelete;
             }
+        }
+
+        private class PropertyDetails
+        {
+            public string Group { get; set; } = string.Empty;
+            public string TechnicalName { get; set; } = string.Empty;
+            public string Title { get; set; } = string.Empty;
+            public int Order { get; set; } = 999;
+            public PropertyInfo Property { get; internal set; }
         }
 
         private List<SinglePropertyEditorControl> _editors;
@@ -63,6 +75,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             this.DataContext = ProjectObjectToEdit;
         }
 
+        private string GroupOrderKey(string groupname) => groupname switch { 
+            "General" => "0_" +  groupname, 
+            "" => "99_" + groupname, 
+            null => "99_",
+            _ => "1_" + groupname };
+
         private void WriteDataToEditor(IProjectObjectListable stsServoConfig)
         {
             if (_editors != null) throw new System.Exception("Object to edit is already set.");
@@ -70,24 +88,55 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             var type = stsServoConfig.GetType();
             _editors = new List<SinglePropertyEditorControl>();
 
-            // iterate trough all properties  of the object which have a DataAnnotation for "Name" and add an editor for each
-            foreach (var property in type.GetProperties())
-            {
-                // check if the property has a name set via DisplayName Annotation
-                var displayNameAttribute = property.GetCustomAttribute<DisplayNameAttribute>();
-                if (displayNameAttribute == null) continue;
-
-                var editor = new SinglePropertyEditorControl();
-                //editor.SetPropertyToEditByExpression(() => stsServoConfig.GetType().GetProperty(property.Name));
-                editor.SetPropertyToEditByName(target: stsServoConfig, propertyName: property.Name);
-                editor.PropertyChanged += (s, e) =>
+            // Group properties
+            var propertyGroups = type.GetProperties().Select(p =>
+                new { Property = p, Title = p.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? p.GetCustomAttribute<DisplayAttribute>()?.GetName() ?? null })
+                .Where(p => p.Title != null)
+                .Select(p => new PropertyDetails()
                 {
-                    LabelObjectTypeTitle.Content = stsServoConfig.TitleDetailed;
-                    this.UpdateProblems();
-                    this.OnUpdatedData?.Invoke(this, EventArgs.Empty);
-                };
-                _editors.Add(editor);
-                this.EditorStackPanel.Children.Add(editor);
+                    TechnicalName = p.Property.Name,
+                    Title = p.Title!,
+                    Group = p.Property.GetCustomAttribute<DisplayAttribute>()?.GetGroupName() ?? "General",
+                    Order = p.Property.GetCustomAttribute<DisplayAttribute>()?.GetOrder() ?? 999,
+                    Property = p.Property
+                }).GroupBy(p => p.Group, p => p, (key, g) => new { GroupName = key, Properties = g.OrderBy(p => p.Order).ThenBy(p => p.Title).Select(p => p).ToArray() }
+                ).OrderBy(g => GroupOrderKey(g.GroupName)).ToArray();
+
+            foreach (var group in propertyGroups)
+            {
+                StackPanel? stackPanel = new StackPanel();
+                if (string.IsNullOrEmpty(group.GroupName))
+                {
+                    this.EditorStackPanel.Children.Add(stackPanel);
+                }
+                else
+                {
+                    var groupControl = new GroupBox
+                    {
+                        Header = group.GroupName,
+                        Margin = new System.Windows.Thickness(left: 5, top: 0, right: 5, bottom: 10),
+                        Padding = new System.Windows.Thickness(left: 10, top: 10, right: 5, bottom: 10),
+                        Background = new SolidColorBrush(Color.FromRgb(25, 25, 25))
+                    };
+                    this.EditorStackPanel.Children.Add(groupControl);
+                    groupControl.Content = stackPanel;
+                }
+
+                // iterate trough all properties  of the object which have a DataAnnotation for "Name" and add an editor for each
+                foreach (var property in group.Properties)
+                {
+                    var editor = new SinglePropertyEditorControl();
+                    //editor.SetPropertyToEditByExpression(() => stsServoConfig.GetType().GetProperty(property.Name));
+                    editor.SetPropertyToEditByName(target: stsServoConfig, propertyName: property.TechnicalName, title: property.Title);
+                    editor.PropertyChanged += (s, e) =>
+                    {
+                        LabelObjectTypeTitle.Content = stsServoConfig.TitleDetailed;
+                        this.UpdateProblems();
+                        this.OnUpdatedData?.Invoke(this, EventArgs.Empty);
+                    };
+                    _editors.Add(editor);
+                    stackPanel.Children.Add(editor);
+                }
             }
 
             // find objects using this object

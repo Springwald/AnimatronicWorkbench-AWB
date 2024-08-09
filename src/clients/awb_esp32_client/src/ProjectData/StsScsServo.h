@@ -27,7 +27,7 @@ public:
     // actual states of the servo
     int targetSpeed = -1; /// the speed of the actuator (should be updated in the next update cycle)
     int targetAcc = -1;   /// the acceleration of the actuator (should be updated in the next update cycle)
-    int targetValue;      /// the target value of the actuator (should be updated in the next update cycle)
+    int targetValue = -1; /// the target value of the actuator (should be updated in the next update cycle)
 
     int temperature = -1;  /// the temperature of the actuator
     int load = -1;         /// the load of the actuator
@@ -37,6 +37,8 @@ public:
     StsScsServo(int channel, String const title, int minValue, int maxValue, int maxTemp, int maxTorque, int defaultValue, int defaultAcceleration, int defaultSpeed, bool globalFault) : channel(channel), title(title), minValue(minValue), maxValue(maxValue), maxTemp(maxTemp), maxTorque(maxTorque), defaultValue(defaultValue), defaultAcceleration(defaultAcceleration), defaultSpeed(defaultSpeed), globalFault(globalFault)
     {
         targetValue = defaultValue;
+        targetSpeed = defaultSpeed;
+        targetAcc = defaultAcceleration;
     }
 
     ~StsScsServo()

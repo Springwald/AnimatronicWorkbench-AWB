@@ -6,7 +6,7 @@
 #include <SCServo.h>
 #include "ActuatorValue.h"
 #include "ProjectData/StsScsServo.h"
-class StSerialServoManager
+class StScsSerialServoManager
 {
 
 #define MAX_STS_SCS_SERVO_ID_SCAN_RANGE 20
@@ -31,7 +31,7 @@ public:
      */
     std::vector<u8> *servoIds;
 
-    StSerialServoManager(std::vector<StsScsServo> *servos, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd) : _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), _servos(servos){};
+    StScsSerialServoManager(std::vector<StsScsServo> *servos, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd) : _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), _servos(servos) {};
 
     /**
      * Set up the sts servos

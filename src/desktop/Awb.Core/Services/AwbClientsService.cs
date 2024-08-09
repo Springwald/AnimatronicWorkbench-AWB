@@ -56,6 +56,7 @@ namespace Awb.Core.Services
             var foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
             if (foundComPortClients.Any() == false)
             {
+                _logger?.LogAsync("No clients found with cached COM port info, trying live detection...");
                 foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
             }
 

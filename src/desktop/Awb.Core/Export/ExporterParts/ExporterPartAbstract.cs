@@ -9,9 +9,9 @@ using System.Text;
 
 namespace Awb.Core.Export.ExporterParts
 {
-    abstract class ExporterPartAbstract
+    public abstract class ExporterPartAbstract
     {
-        public abstract Task<IExporter.ExportResult> ExportAsync(string targetSrcFolder);
+        public abstract Task<IExporter.ExportResult> ExportAsync();
 
         protected string GetHeader(string className, string includes)
         {

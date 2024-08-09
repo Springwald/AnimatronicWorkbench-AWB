@@ -68,11 +68,14 @@ String AutoPlayer::getLastSoundPlayed()
  */
 void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 {
+
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 1);
+
     // return of no data is set
     if (_data == nullptr)
         return;
 
-    int updateInterval = 50; // ms
+    int updateInterval = 30; // ms
 
     if (anyServoWithGlobalFaultHasCiriticalState)
     {
@@ -88,6 +91,8 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 
     bool forgetLastPacketReceived = false;
 
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 5);
+
     if (forgetLastPacketReceived == true && _lastPacketReceivedMillis != -1 && millis() > _lastPacketReceivedMillis + 60 * 1000) // 60 seconds
         _lastPacketReceivedMillis = -1;                                                                                          // forget the last packet received
 
@@ -99,12 +104,16 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         return;
     }
 
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 10);
+
     if (!isPlaying())
     {
         // start automode
         startNewTimelineForSelectedState();
         return;
     }
+
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 20);
 
     auto actualTimelineData = _data->timelines->at(_actualTimelineIndex);
     long rememberLastPlayPos = _playPosInActualTimeline;
@@ -117,8 +126,10 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         return;
     }
 
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 25);
+
     // Play STS Servos
-    if (_stSerialServoManager != NULL)
+    if (_stSerialServoManager != nullptr)
     {
         for (int servoIndex = 0; servoIndex < _data->stsServos->size(); servoIndex++)
         {
@@ -135,8 +146,10 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         _stSerialServoManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
     }
 
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 30);
+
     // Play SCS Servos
-    if (_scSerialServoManager != NULL)
+    if (_scSerialServoManager != nullptr)
     {
         for (int servoIndex = 0; servoIndex < _data->scsServos->size(); servoIndex++)
         {
@@ -153,8 +166,10 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         _scSerialServoManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
     }
 
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 35);
+
     // Play PWM Servos
-    if (_pca9685PwmManager != NULL)
+    if (_pca9685PwmManager != nullptr)
     {
         for (int servoIndex = 0; servoIndex < _data->pca9685PwmServos->size(); servoIndex++)
         {
@@ -210,8 +225,10 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         _pca9685PwmManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
     }
 
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 40);
+
     // Play MP3
-    if (_mp3PlayerYX5300Manager != NULL)
+    if (_mp3PlayerYX5300Manager != nullptr)
     {
         for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
         {
@@ -235,6 +252,8 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
             }
         }
     }
+
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 99);
 }
 
 int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints)

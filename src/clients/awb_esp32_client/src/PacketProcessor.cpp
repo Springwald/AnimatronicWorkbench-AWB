@@ -24,7 +24,7 @@ void PacketProcessor::processPacket(String payload)
     if (jsondoc.containsKey("DispMsg")) // packat contains a display message
     {
         const char *message = jsondoc["DispMsg"]["Msg"];
-        if (message == NULL)
+        if (message == nullptr)
         {
             // should not happen, instead the whole DispMsg should be missing
             _errorOccured("DispMsg?!? " + payload);
@@ -43,7 +43,7 @@ void PacketProcessor::processPacket(String payload)
         JsonArray servos = jsondoc["Pca9685Pwm"]["Servos"];
         for (size_t i = 0; i < servos.size(); i++)
         {
-            if (this->_pca9685PwmManager == NULL)
+            if (this->_pca9685PwmManager == nullptr)
             {
                 _errorOccured("Pca9685Pwm not configured!");
                 return;
@@ -56,7 +56,7 @@ void PacketProcessor::processPacket(String payload)
             _pca9685PwmManager->setTargetValue(channel, value, name);
         }
     }
-    if (this->_pca9685PwmManager != NULL)
+    if (this->_pca9685PwmManager != nullptr)
         _pca9685PwmManager->updateActuators(false);
 
     if (jsondoc.containsKey("STS")) // package contains STS bus servo data
@@ -65,7 +65,7 @@ void PacketProcessor::processPacket(String payload)
         int stsCount = 0;
         for (size_t i = 0; i < servos.size(); i++)
         {
-            if (this->_stSerialServoManager == NULL)
+            if (this->_stSerialServoManager == nullptr)
             {
                 _errorOccured("STS not configured!");
                 return;
@@ -91,7 +91,7 @@ void PacketProcessor::processPacket(String payload)
                 _errorOccured("STS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
         }
     }
-    if (this->_stSerialServoManager != NULL)
+    if (this->_stSerialServoManager != nullptr)
         _stSerialServoManager->updateActuators(false);
 
     if (jsondoc.containsKey("SCS")) // package contains SCS bus servo data
@@ -100,7 +100,7 @@ void PacketProcessor::processPacket(String payload)
         int stsCount = 0;
         for (size_t i = 0; i < servos.size(); i++)
         {
-            if (this->_scSerialServoManager == NULL)
+            if (this->_scSerialServoManager == nullptr)
             {
                 _errorOccured("SCS not configured!");
                 return;
@@ -124,7 +124,7 @@ void PacketProcessor::processPacket(String payload)
                 _errorOccured("SCS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
         }
     }
-    if (this->_scSerialServoManager != NULL)
+    if (this->_scSerialServoManager != nullptr)
         _scSerialServoManager->updateActuators(false);
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL

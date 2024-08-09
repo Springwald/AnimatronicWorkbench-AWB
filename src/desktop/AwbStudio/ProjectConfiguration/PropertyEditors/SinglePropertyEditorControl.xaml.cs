@@ -123,7 +123,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         /// <summary>
         /// Set property to edit by name
         /// </summary>
-        public void SetPropertyToEditByName(object target, string propertyName)
+        public void SetPropertyToEditByName(object target, string propertyName, string? title)
         {
             _targetObject = target;
             _propertyName = propertyName;
@@ -133,8 +133,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             if (prop == null) throw new Exception($"Property '{propertyName}' not found");
 
             // get the title of the property using the DisplayName annotation
-            var displayNameAttribute = prop.GetCustomAttribute<DisplayNameAttribute>();
-            PropertyTitle = displayNameAttribute?.DisplayName ?? propertyName;
+            PropertyTitle = title ?? propertyName;
 
             // get get description of the property using the Description annotation
             var descriptionAttribute = prop.GetCustomAttribute<DescriptionAttribute>();

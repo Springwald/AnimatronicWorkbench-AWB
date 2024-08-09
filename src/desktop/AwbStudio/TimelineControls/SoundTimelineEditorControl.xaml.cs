@@ -51,6 +51,7 @@ namespace AwbStudio.TimelineControls
         private void ServoValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
         {
             Unloaded -= ServoValueViewerControl_Unloaded;
+            SizeChanged -= ServoValueViewerControl_SizeChanged;
             if (_soundValuePainter != null)
             {
                 _soundValuePainter.Dispose();
@@ -65,6 +66,7 @@ namespace AwbStudio.TimelineControls
             _soundValuePainter = new SoundValuePainter(soundPlayer, AllValuesGrid, _viewContext, timelineCaptions, projectSounds);
             _caption = timelineCaptions?.GetAktuatorCaption(soundPlayer.Id);
             HeaderControl.TimelineCaption = _caption;
+            HeaderControl.ViewContext = viewContext;
 
             _isInitialized = true;
         }

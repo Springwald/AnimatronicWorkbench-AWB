@@ -82,6 +82,7 @@ namespace Awb.Core.Tools.Validation
                 if (isNullable)
                 {
                     if (setTheValue)  _prop.SetValue(_targetObject, null);
+                    return null;
                 }
                 else
                     return "Value is empty";
