@@ -11,6 +11,11 @@
 #define DISPLAY_SSD1306_HEIGHT 64
 #define DISPLAY_SSD1306_COM_PINS 0x12 // 0x02, 0x12, 0x22 or 0x32
 
+/* STS serial servo settings */
+#define USE_STS_SERVO
+#define STS_SERVO_RXD 18
+#define STS_SERVO_TXD 19
+
 /* autoplay state selector */
 // if a servo position feedback is used as a state selector, define the servo channel here.
 // if you don't use a servo as state selector, set this to -1 or undefine it
@@ -19,8 +24,6 @@
 // if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)
 #define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457
 
-/* DAC speaker */
-// #define USE_DAC_SPEAKER
 /* Neopixel RGB LEDs */
 #define USE_NEOPIXEL
 #define NEOPIXEL_GPIO 26

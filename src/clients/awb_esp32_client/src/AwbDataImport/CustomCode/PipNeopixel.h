@@ -1,5 +1,5 @@
-#ifndef _CUSTOM_CODE_H_
-#define _CUSTOM_CODE_H_
+#ifndef _PIP_NEOPIXEL_H_
+#define _PIP_NEOPIXEL_H_
 
 #include <Arduino.h>
 #include <String.h>
@@ -10,20 +10,12 @@
     Only write code beween the cc-start and cc-end comments, otherwise it will be overwritten and lost.
 */
 
-class CustomCode
+class PipNeopixel
 {
 protected:
     NeopixelManager *neopixelManager;
 
     /* cc-start-protected - insert your protected code here before the end-protected comment: */
-
-    void setButtonLightByTouch(uint16_t btnIndex, uint8_t touchPin);
-
-
-
-
-
-
 
 
 
@@ -36,14 +28,9 @@ protected:
     /* cc-end-protected  */
 
 public:
-    CustomCode(NeopixelManager *neopixelManager) : neopixelManager(neopixelManager)
+    PipNeopixel(NeopixelManager *neopixelManager) : neopixelManager(neopixelManager)
     {
-        /* cc-start-constructor - insert your constructor code here before the end-constructor comment: */
-
-
-
-
-
+        /* cc-start-constructor - insert your protected code here before the end-constructor comment: */
 
 
 
@@ -56,11 +43,9 @@ public:
         /* cc-end-constructor  */
     }
 
-    ~CustomCode()
+    ~PipNeopixel()
     {
-        /* cc-start-destructor - insert your destructor code here before the end-destructor comment: */
-
-
+        /* cc-start-destructor - insert your protected code here before the end-destrucutor comment: */
 
 
 
@@ -78,3 +63,11 @@ public:
 };
 
 #endif
+
+
+
+
+
+
+
+
