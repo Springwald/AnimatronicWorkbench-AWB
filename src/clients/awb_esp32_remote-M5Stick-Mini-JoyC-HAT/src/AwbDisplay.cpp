@@ -9,48 +9,7 @@
 #include <LovyanGFX.hpp>
 #include <LGFX_AUTODETECT.hpp>
 
-#ifdef DISPLAY_SSD1306
-
-class LGFX_SSD1306 : public lgfx::LGFX_Device
-{
-    lgfx::Panel_SSD1306 _panel_instance;
-    lgfx::Bus_I2C _bus_instance;
-
-public:
-    LGFX_SSD1306()
-    {
-        {
-            auto cfg = _bus_instance.config();
-            cfg.i2c_port = 1;
-            cfg.freq_write = 400000;
-            cfg.freq_read = 400000;
-            cfg.pin_sda = 21;
-            cfg.pin_scl = 22;
-            cfg.i2c_addr = 0x3C;
-
-            _bus_instance.config(cfg);
-            _panel_instance.setBus(&_bus_instance);
-            _panel_instance.setComPins(DISPLAY_SSD1306_COM_PINS);
-        }
-        {
-            auto cfg = _panel_instance.config();
-            cfg.panel_width = DISPLAY_SSD1306_WIDTH;
-            cfg.panel_height = DISPLAY_SSD1306_HEIGHT;
-            _panel_instance.config(cfg);
-        }
-        setPanel(&_panel_instance);
-    }
-};
-
-static LGFX_SSD1306 lcd; // Create an instance of LGFX_SSD1306 (class LGFX_SSD1306 to do things with lcd)
-#endif
-
-#ifdef DISPLAY_M5STACK
 static LGFX lcd;
-#endif
-
-
-
 static LGFX_Sprite topBarSprite(&lcd);
 static LGFX_Sprite primarySprite(&lcd);
 static LGFX_Sprite statusFooterSprite(&lcd);
@@ -63,22 +22,14 @@ static const lgfx::IFont *font = nullptr;
 void AwbDisplay::setup()
 {
 
-
     resetDebugInfos();
     lcd.init();
     _isSmallScreen = lcd.height() <= 64 || lcd.width() <= 290;
 
     const lgfx::IFont *font = nullptr;
 
-#ifdef DISPLAY_SSD1306
-    int colorDepth = 0;
-    lcd.setRotation(2);
-#endif
-
-#ifdef DISPLAY_M5STACK
     int colorDepth = 8;
     lcd.setRotation(1);
-#endif
 
     if (_isSmallScreen)
     {
