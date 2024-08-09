@@ -51,6 +51,7 @@ namespace AwbStudio.TimelineControls
         private void ServoValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
         {
             Unloaded -= ServoValueViewerControl_Unloaded;
+            SizeChanged -= ServoValueViewerControl_SizeChanged;
             if (_soundValuePainter != null)
             {
                 _soundValuePainter.Dispose();

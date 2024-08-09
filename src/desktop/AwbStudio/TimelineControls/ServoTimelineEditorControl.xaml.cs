@@ -7,12 +7,12 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
-using Awb.Core.Player;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -30,7 +30,7 @@ namespace AwbStudio.TimelineControls
 
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
-        
+
         private TimelineCaption? _caption;
         private bool _isInitialized;
         private ServoValuePainter? _servoValuePainter;
@@ -49,7 +49,7 @@ namespace AwbStudio.TimelineControls
         }
         private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
-            DrawOpticalGrid();
+            DrawOpticalGrid("ServoValueViewerControl_Loaded");
             SizeChanged += ServoValueViewerControl_SizeChanged;
             Unloaded += ServoValueViewerControl_Unloaded;
         }
@@ -57,6 +57,7 @@ namespace AwbStudio.TimelineControls
         private void ServoValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
         {
             Unloaded -= ServoValueViewerControl_Unloaded;
+            SizeChanged -= ServoValueViewerControl_SizeChanged;
             if (_servoValuePainter != null)
             {
                 _servoValuePainter.Dispose();
@@ -83,19 +84,31 @@ namespace AwbStudio.TimelineControls
             _timelineData = timelineData;
         }
 
+        private DateTime _lastOpticalGridPaintBecauseOfResize = DateTime.MinValue;
+
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            DrawOpticalGrid();
+            if (DateTime.UtcNow - _lastOpticalGridPaintBecauseOfResize < TimeSpan.FromMilliseconds(1000)) return;
+            _lastOpticalGridPaintBecauseOfResize = DateTime.UtcNow;
+            DrawOpticalGrid("ServoValueViewerControl_SizeChanged" + e.PreviousSize + " => " + e.NewSize);
         }
 
-        private void DrawOpticalGrid()
+        private volatile bool _isDrawing;
+        private int _paintCounter = 0;
+
+        private void DrawOpticalGrid(string reason)
         {
-            OpticalGrid.Children.Clear();
+            if (_isDrawing)  return;
 
             double height = this.ActualHeight;
             double width = this.ActualWidth;
-
             if (height < 100 || width < 100) return;
+
+            _isDrawing = true;
+
+            Debug.WriteLine("DrawOpticalGrid :" + reason + " " + _paintCounter++);   
+
+            OpticalGrid.Children.Clear();
 
             double diagramHeight = height - _paintMarginTopBottom * 2;
 
@@ -104,6 +117,8 @@ namespace AwbStudio.TimelineControls
                 var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
                 OpticalGrid.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = _gridLineBrush });
             }
+
+            _isDrawing = false;
         }
 
         private void Grid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
