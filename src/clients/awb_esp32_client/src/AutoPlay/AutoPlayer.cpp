@@ -457,8 +457,8 @@ void AutoPlayer::startNewTimelineForSelectedState()
         // There is no special next-state set by remote or custom code,
         // so we check if the actual timeline has a next-state-once set
         auto actualTimelineData = _data->timelines->at(_actualTimelineIndex);
-        if (actualTimelineData.nextStateOnceId != nullptr)
-            nextStateForcedId = *actualTimelineData.nextStateOnceId;
+        if (actualTimelineData.nextStateOnceId != -1)
+            nextStateForcedId = actualTimelineData.nextStateOnceId;
     }
 
     // find the next timeline for the selected state

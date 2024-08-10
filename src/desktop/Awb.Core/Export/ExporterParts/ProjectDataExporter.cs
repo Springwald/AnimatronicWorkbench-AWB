@@ -362,7 +362,7 @@ namespace Awb.Core.Export.ExporterParts
                 }
 
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineStateReference({state.Id}, String(\"{state.Title}\"));");
-                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId?.ToString() ?? "nullptr"}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");
+                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId ?? -1}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 
                 result.AppendLine();
