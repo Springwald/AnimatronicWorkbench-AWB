@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <String.h>
 #include <Actuators/NeopixelManager.h>
+#include "PipButtons.h"
 
 /*
     Enter your custom code in this header file and the corresponding cpp file.
@@ -18,6 +19,7 @@ protected:
     /* cc-start-protected - insert your protected code here before the end-protected comment: */
 
     void setButtonLightByTouch(uint16_t btnIndex, uint8_t touchPin);
+    PipButtons *pipButtons = nullptr;
 
     /* cc-end-protected  */
 
@@ -30,6 +32,8 @@ public:
     CustomCode(NeopixelManager *neopixelManager) : neopixelManager(neopixelManager)
     {
         /* cc-start-constructor - insert your constructor code here before the end-constructor comment: */
+
+        pipButtons = new PipButtons();
 
         /* cc-end-constructor  */
     }

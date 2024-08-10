@@ -12,31 +12,21 @@ void CustomCode::setup()
 {
     /* cc-start-setup - insert your setup code here before the end-setup comment: */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/* cc-end-setup  */
+    /* cc-end-setup  */
 }
 
 void CustomCode::loop()
 {
     /* cc-start-loop - insert your loop code here before the end-loop comment: */
+
+    pipButtons->loop(); // call the loop function of the pipButtons to update the button states
+
+    // check if a button is pressed and set e.g. the action to play a timeline
+
+    if (pipButtons->isButtonPressed(pipButtons->btnSleep))
+    {
+        timelineNameToPlay = new String("Go Sleep");
+    }
 
     /* neopixelManager->setSingleLED(0, 128, 0, 0);
     neopixelManager->setSingleLED(1, 128, 0, 0);
@@ -53,26 +43,6 @@ void CustomCode::loop()
     setButtonLightByTouch(1, 33);
     setButtonLightByTouch(2, 27);
     setButtonLightByTouch(3, 14);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /* cc-end-loop  */
 }
@@ -99,25 +69,4 @@ void CustomCode::setButtonLightByTouch(uint16_t btnIndex, uint8_t touchPin)
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* cc-end-functions  */
-

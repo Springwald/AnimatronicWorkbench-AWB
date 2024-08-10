@@ -16,6 +16,9 @@ void CommandSender::sendCommand(String command)
 {
     if (WiFi.status() == WL_CONNECTED)
     {
+        // url encode command
+        command.replace(" ", "%20");
+
         HTTPClient http;
         String serverPath = "http://192.168.1.1" + command;
 
