@@ -8,7 +8,7 @@
 
 void CommandSender::playTimeline(String timelineName)
 {
-    _display.draw_message("play timeline: " + timelineName, 500, MSG_TYPE_INFO);
+    _display.draw_message("timeline:\r\" + timelineName, 500, MSG_TYPE_INFO);
     this->sendCommand("/remote/play/?timeline=" + timelineName);
 }
 

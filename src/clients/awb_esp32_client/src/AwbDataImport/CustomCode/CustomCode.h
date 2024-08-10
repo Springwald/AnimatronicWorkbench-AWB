@@ -6,6 +6,13 @@
 #include <Actuators/NeopixelManager.h>
 
 /* cc-start-include - insert your include code here before the end-protected comment: */
+#include "PipButtons.h"
+#include "PipNeopixel.h"
+#include <Actuators/StScsSerialServoManager.h>
+#include <Actuators/Pca9685PwmManager.h>
+#include <Actuators/Mp3PlayerYX5300Manager.h>
+#include <Debugging.h>
+
 /* cc-end-include - insert your include code here before the end-protected comment: */
 
 /*
@@ -15,10 +22,24 @@
 
 class CustomCode
 {
+    using TCallBackErrorOccured = std::function<void(String)>;
+
 protected:
+    TCallBackErrorOccured _errorOccured; // the error occured callback
+
+    StScsSerialServoManager *_stSerialServoManager;  // the STS serial servo manager
+    StScsSerialServoManager *_scSerialServoManager;  // the SCS serial servo manager
+    Pca9685PwmManager *_pca9685PwmManager;           // the PCA9685 PWM manager
+    Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager; // the MP3 player manager
+    Debugging *_debugging;                           /// the debugging class
     NeopixelManager *neopixelManager;
 
     /* cc-start-protected - insert your protected code here before the end-protected comment: */
+
+    void setButtonLightByTouch(uint16_t btnIndex, uint8_t touchPin);
+    PipButtons *pipButtons = nullptr;
+    PipNeopixel *pipNeopixel = nullptr;
+
     /* cc-end-protected  */
 
 public:
@@ -27,9 +48,13 @@ public:
     int *timelineStateToForceOnce = nullptr;      /// Here the globale timeline state can be overwritten by custom code a single time. Buttons and other inputs defined in AWB Studio will be ignored.
     int *timelineStateToForcePermanent = nullptr; /// Here the globale timeline state can be overwritten by custom code permanent. Buttons and other inputs defined in AWB Studio will be ignored.
 
-    CustomCode(NeopixelManager *neopixelManager) : neopixelManager(neopixelManager)
+    CustomCode(NeopixelManager *neopixelManager, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, TCallBackErrorOccured errorOccured, Debugging *debugging) : neopixelManager(neopixelManager), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _errorOccured(errorOccured), _debugging(debugging)
     {
         /* cc-start-constructor - insert your constructor code here before the end-constructor comment: */
+
+        pipButtons = new PipButtons();
+        pipNeopixel = new PipNeopixel(neopixelManager);
+
         /* cc-end-constructor  */
     }
 

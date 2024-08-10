@@ -23,6 +23,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace AwbStudio
 {
@@ -42,8 +43,8 @@ namespace AwbStudio
         private readonly IAwbLogger _awbLogger;
         private IActuatorsService? _actuatorsService;
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
-        private TimelineEventHandling _timelineEventHandlingBackingField;
-        private TimelinePlayer? _timelinePlayerBackingField;
+        private TimelineEventHandling? _timelineEventHandling;
+        private TimelinePlayer? _timelinePlayer;
         protected TimelineData? _timelineData;
 
         private int _lastBankIndex = -1;
@@ -51,35 +52,7 @@ namespace AwbStudio
         private bool _switchingPages;
         private bool _ctrlKeyPressed;
         private bool _loading;
-
-        private TimelineEventHandling TimelineEventHandling
-        {
-            get
-            {
-                if (_timelineEventHandlingBackingField == null)
-                {
-                    var timelinePlayer = TimelinePlayer;
-                    _timelineEventHandlingBackingField = new TimelineEventHandling(_timelineData, _timelineControllerPlayViewPos, _actuatorsService, timelinePlayer, _timelineControllers, _viewContext, _playPosSynchronizer, _awbLogger);
-                }
-                return _timelineEventHandlingBackingField;
-            }
-        }
-
-        private TimelinePlayer TimelinePlayer
-        {
-            get
-            {
-                if (_timelinePlayerBackingField == null)
-                {
-                    if (_timelineData == null) throw new Exception("No timeline data to play");
-                    _timelinePlayerBackingField = new TimelinePlayer(timelineData: _timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
-                    _timelinePlayerBackingField.OnPlaySound += SoundPlayer.SoundToPlay;
-                    AllInOnePreviewControl.Timelineplayer = _timelinePlayerBackingField;
-                    FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
-                }
-                return _timelinePlayerBackingField;
-            }
-        }
+        private Brush _buttonForegroundColorBackup;
 
         public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
         {
@@ -131,6 +104,8 @@ namespace AwbStudio
 
             this.IsEnabled = false;
 
+            _buttonForegroundColorBackup = ButtonSave.Foreground;
+
             if (_project.TimelinesStates?.Any() == false)
             {
                 MessageBox.Show("Project file has no timelineStates defined!");
@@ -142,6 +117,21 @@ namespace AwbStudio
             _actuatorsService = new ActuatorsService(_project, _clientsService, _logger);
 
             this._timelineData = null;
+            var timelineId = _project.TimelineDataService.TimelineIds.FirstOrDefault();
+            if (timelineId != null)
+            {
+                this._timelineData = _project.TimelineDataService.GetTimelineData(timelineId);
+            }
+            else
+            {
+                this._timelineData = CreateNewTimelineData("");
+            }
+
+            if (_timelineData == null) throw new Exception("No timeline data to play");
+            _timelinePlayer = new TimelinePlayer(timelineData: _timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
+            _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
+            AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
+            FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
 
 
             var timelineCaptions = new TimelineCaptions();
@@ -150,7 +140,6 @@ namespace AwbStudio
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds);
 
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _awbLogger, _project.Sounds);
-
 
             SoundPlayer.Sounds = _project.Sounds;
 
@@ -189,14 +178,14 @@ namespace AwbStudio
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (_timelineEventHandlingBackingField != null)
+            if (_timelineEventHandling != null)
             {
-                _timelineEventHandlingBackingField.Dispose();
+                _timelineEventHandling.Dispose();
             }
-            if (_timelinePlayerBackingField != null)
+            if (_timelinePlayer != null)
             {
-                _timelinePlayerBackingField.OnPlaySound += SoundPlayer.SoundToPlay;
-                _timelinePlayerBackingField.Dispose();
+                _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
+                _timelinePlayer.Dispose();
             }
             _playPosSynchronizer.Dispose();
         }
@@ -321,7 +310,7 @@ namespace AwbStudio
         }
 
         private void PlayPos_Changed(object? sender, int newPlayPosMs) =>
-            this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {TimelinePlayer.PlaybackSpeed:0.0}X";
+            this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X";
 
         private async Task ScrollPaging(int howManyMs)
         {
@@ -369,7 +358,7 @@ namespace AwbStudio
 
             var changesAfterLoading = false;
 
-            if (data != null) TimelinePlayer.SetTimelineData(data);
+            if (data != null) _timelinePlayer.SetTimelineData(data);
             this.Title = _timelineData == null ? "No Timeline" : $"Timeline '{_timelineData.Title}'";
             ValuesEditorControl.TimelineDataLoaded(data);
             TimelineCaptionsViewer.TimelineDataLoaded(data);
@@ -384,6 +373,22 @@ namespace AwbStudio
             changesAfterLoading = SetupTimelineNextStateOnceChoice(ComboTimelineNextStateOnce, data, changesAfterLoading);
 
             _playPosSynchronizer.SetNewPlayPos(0);
+
+            if (_timelinePlayer != null)
+            {
+                await _timelinePlayer.RequestActuatorUpdate();
+                _timelineEventHandling = new TimelineEventHandling(
+                    timelineData: data,
+                    timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
+                    actuatorsService: _actuatorsService,
+                    timelinePlayer: _timelinePlayer,
+                    timelineControllers: _timelineControllers,
+                    viewContext: _viewContext,
+                    playPosSynchronizer: _playPosSynchronizer,
+                    awbLogger: _awbLogger);
+
+                FocusObjectPropertyEditorControl.Init(_viewContext, data, _playPosSynchronizer, _timelineDataService, _project.Sounds);
+            }
 
             _loading = false;
             _unsavedChanges = changesAfterLoading;
@@ -477,11 +482,10 @@ namespace AwbStudio
                 _unsavedChanges = false;
                 _invokerService.GetInvoker().Invoke(new Action(async () =>
                 {
-                    var backup = ButtonSave.Foreground;
                     ButtonSave.Foreground = System.Windows.Media.Brushes.Red;
                     TimelineChooser.Refresh();
                     await Task.Delay(1000);
-                    ButtonSave.Foreground = backup;
+                    ButtonSave.Foreground = _buttonForegroundColorBackup;
                 }));
                 return true;
             }
@@ -527,9 +531,9 @@ namespace AwbStudio
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e) => SaveTimelineData();
 
-        private void ButtonPlay_Click(object sender, RoutedEventArgs? e) => TimelineEventHandling.Play();
+        private void ButtonPlay_Click(object sender, RoutedEventArgs? e) => _timelineEventHandling?.Play();
 
-        private void ButtonStop_Click(object sender, RoutedEventArgs? e) => TimelineEventHandling.Stop();
+        private void ButtonStop_Click(object sender, RoutedEventArgs? e) => _timelineEventHandling?.Stop();
 
         private async void ButtonClear_Click(object sender, RoutedEventArgs e)
         {

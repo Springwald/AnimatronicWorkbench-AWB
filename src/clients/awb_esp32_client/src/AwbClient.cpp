@@ -83,6 +83,8 @@ void AwbClient::setup()
     { showError(message); };
     const TCallBackErrorOccured statusManagementErrorOccured = [this](String message)
     { showError(message); };
+    const TCallBackErrorOccured customCodeErrorOccured = [this](String message)
+    { showError(message); };
     showSetupMsg("setup callbacks done");
 
     // set up the actuators
@@ -167,8 +169,7 @@ void AwbClient::setup()
 
     // set up the custom code
     showSetupMsg("setup custom code");
-    //_customCode = new CustomCode(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _autoPlayer, _inputManager, _neopixelManager, _wlanConnector, _statusManagement);
-    _customCode = new CustomCode(_neopixelManager);
+    _customCode = new CustomCode(_neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, customCodeErrorOccured, _debugging);
     _customCode->setup();
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
