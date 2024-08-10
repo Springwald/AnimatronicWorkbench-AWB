@@ -30,7 +30,7 @@
                 <ColumnDefinition Width="20*" MinWidth="200" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0" x:Name="ActualTimelineGrid">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
@@ -44,15 +44,24 @@
                     <Label Grid.Row="0" FontWeight="Bold" >Actual Timeline:</Label>
                 </Grid>
 
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
-                    <!-- Actual timeline metadata -->
-                    <Label Content="Title:"/>
-                    <TextBox x:Name="TxtActualTimelineName" Width="auto" MinWidth="150" MaxWidth="300" TextChanged="TxtActualTimelineName_TextChanged" Text="Title"/>
-                    <Label Content="State:"/>
-                    <ComboBox x:Name="ComboTimelineStates" Width="auto" MinWidth="200" MaxHeight="300" SelectionChanged="ComboTimelineStates_SelectionChanged"/>
-                    <Label Content="Next state once:"/>
-                    <ComboBox x:Name="ComboTimelineNextStateOnce" Width="auto" MinWidth="200" MaxHeight="300" SelectionChanged="ComboTimelineNextStateOnce_SelectionChanged"/>
-                </StackPanel>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                        <!-- Actual timeline metadata -->
+                        <Label Content="Title:"/>
+                        <TextBox x:Name="TxtActualTimelineName" Width="auto" MinWidth="150" MaxWidth="300" TextChanged="TxtActualTimelineName_TextChanged" Text="Title"/>
+                        <Label Content="State:"/>
+                        <ComboBox x:Name="ComboTimelineStates" Width="auto" MinWidth="200" MaxHeight="300" SelectionChanged="ComboTimelineStates_SelectionChanged"/>
+                        <Label Content="Next state once:"/>
+                        <ComboBox x:Name="ComboTimelineNextStateOnce" Width="auto" MinWidth="200" MaxHeight="300" SelectionChanged="ComboTimelineNextStateOnce_SelectionChanged"/>
+                    </StackPanel>
+
+                    <Button  Grid.Column="1" x:Name="ButtonSave" Content="💾 Save" HorizontalAlignment="Right"  Click="ButtonSave_Click" />
+                </Grid>
 
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
@@ -94,9 +103,7 @@
                         <Button x:Name="ButtonStop"  Content="⏹ Stop" Click="ButtonStop_Click" />
                     </StackPanel>
 
-                    <StackPanel Grid.Column="3"  Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button x:Name="ButtonSave" Content="💾 Save"  Click="ButtonSave_Click" />
-                    </StackPanel>
+
 
 
                 </Grid>

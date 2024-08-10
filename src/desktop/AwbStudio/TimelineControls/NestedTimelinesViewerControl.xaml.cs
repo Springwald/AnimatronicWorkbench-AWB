@@ -64,10 +64,15 @@ namespace AwbStudio.TimelineControls
             _isInitialized = true;
         }
 
-        public void TimelineDataLoaded(TimelineData timelineData)
+        public void TimelineDataLoaded(TimelineData? timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-            _nestedTimelineValuePainter!.TimelineDataLoaded(timelineData);
+            if (timelineData == null) this.Visibility = Visibility.Hidden;
+            else
+            {
+                this.Visibility = Visibility.Visible;
+                _nestedTimelineValuePainter!.TimelineDataLoaded(timelineData);
+            }
         }
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)

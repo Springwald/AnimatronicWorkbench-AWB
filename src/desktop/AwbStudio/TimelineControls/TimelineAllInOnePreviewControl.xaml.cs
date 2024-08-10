@@ -115,23 +115,29 @@ namespace AwbStudio.TimelineControls
             _gridPainter?.Dispose();
         }
 
-        public void TimelineDataLoaded(TimelineData timelineData)
+        public void TimelineDataLoaded(TimelineData? timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
-            if (_timelineData != null) _timelineData.OnContentChanged -= OnTimelineDataChanged;
+            if (timelineData == null) this.Visibility = Visibility.Hidden;
+            else
+            {
+                this.Visibility = Visibility.Visible;
 
-            _timelineData = timelineData;
-            _playPosPainter!.TimelineDataLoaded(timelineData);
+                if (_timelineData != null) _timelineData.OnContentChanged -= OnTimelineDataChanged;
 
-            foreach (var subTimelineEditorControl in _timelineEditorControls!)
-                subTimelineEditorControl.TimelineDataLoaded(timelineData);
+                _timelineData = timelineData;
+                _playPosPainter!.TimelineDataLoaded(timelineData);
 
-            foreach (var valuePainter in _timelineValuePainters!)
-                valuePainter.TimelineDataLoaded(timelineData);
+                foreach (var subTimelineEditorControl in _timelineEditorControls!)
+                    subTimelineEditorControl.TimelineDataLoaded(timelineData);
 
-            _timelineData.OnContentChanged += OnTimelineDataChanged;
-            OnTimelineDataChanged(null, null);
+                foreach (var valuePainter in _timelineValuePainters!)
+                    valuePainter.TimelineDataLoaded(timelineData);
+
+                _timelineData.OnContentChanged += OnTimelineDataChanged;
+                OnTimelineDataChanged(null, null);
+            }
         }
 
         private void OnTimelineDataChanged(object? sender, TimelineDataChangedEventArgs? e)

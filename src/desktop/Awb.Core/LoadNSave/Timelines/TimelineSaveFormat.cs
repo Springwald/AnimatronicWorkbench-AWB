@@ -16,6 +16,7 @@ namespace Awb.Core.LoadNSave.TimelineLoadNSave
         public string Title { get; set; }
 
         public int TimelineStateId { get; set; }
+        public int? NextTimelineStateIdOnce { get; set; }
 
         public ServoPointSaveFormat[]? ServoPoints { get; set; }
         public SoundPointSaveFormat[]? SoundPoints { get; set; }
@@ -28,6 +29,7 @@ namespace Awb.Core.LoadNSave.TimelineLoadNSave
             {
                 Title = timelineData.Title,
                 TimelineStateId = timelineData.TimelineStateId,
+                NextTimelineStateIdOnce = timelineData.NextTimelineStateIdOnce,
                 ServoPoints = timelineData.ServoPoints.Select(p => ServoPointSaveFormat.FromServoPoint(p)).OrderBy(p => p.TimeMs).ToArray(),
                 SoundPoints = timelineData.SoundPoints.Select(p => SoundPointSaveFormat.FromSoundPoint(p)).OrderBy(p => p.TimeMs).ToArray(),
                 NestedTimelinePoints = timelineData.NestedTimelinePoints.Select(p => NestedTimelinePointSaveFormat.FromNestedTimelinePoint(p)).OrderBy(p => p.TimeMs).ToArray()
@@ -39,6 +41,7 @@ namespace Awb.Core.LoadNSave.TimelineLoadNSave
             return new TimelineData(
                 id: timelineId.ToString(),
                 timelineStateId: saveFormat.TimelineStateId,
+                nextTimelineStateIdOnce: saveFormat.NextTimelineStateIdOnce,
                 servoPoints: saveFormat.ServoPoints?.Select(p => ServoPointSaveFormat.ToServoPoint(p)).ToList() ?? new List<ServoPoint>(),
                 soundPoints: saveFormat.SoundPoints?.Select(p => SoundPointSaveFormat.ToSoundPoint(p)).ToList() ?? new List<SoundPoint>(),
                 nestedTimelinePoints: saveFormat.NestedTimelinePoints?.Select(p => NestedTimelinePointSaveFormat.ToNestedTimelinePoint(p)).ToList() ?? new List<NestedTimelinePoint>()

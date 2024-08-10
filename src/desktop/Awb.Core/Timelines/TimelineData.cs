@@ -58,10 +58,11 @@ namespace Awb.Core.Timelines
 
         public int LatestPointMs => AllPoints.Max(p => p.TimeMs);
 
-        public TimelineData(string id, List<ServoPoint> servoPoints, List<SoundPoint> soundPoints, List<NestedTimelinePoint> nestedTimelinePoints, int timelineStateId)
+        public TimelineData(string id, List<ServoPoint> servoPoints, List<SoundPoint> soundPoints, List<NestedTimelinePoint> nestedTimelinePoints, int timelineStateId, int? nextTimelineStateIdOnce)
         {
             Id = id;
             TimelineStateId = timelineStateId;
+            NextTimelineStateIdOnce = nextTimelineStateIdOnce;
             ServoPoints = servoPoints;
             SoundPoints = soundPoints;
             NestedTimelinePoints = nestedTimelinePoints;

@@ -77,11 +77,16 @@ namespace AwbStudio.TimelineControls
             _isInitialized = true;
         }
 
-        public void TimelineDataLoaded(TimelineData timelineData)
+        public void TimelineDataLoaded(TimelineData? timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-            _servoValuePainter!.TimelineDataLoaded(timelineData);
-            _timelineData = timelineData;
+            if (timelineData == null) this.Visibility = Visibility.Hidden;
+            else
+            {
+                this.Visibility = Visibility.Visible;
+                _servoValuePainter!.TimelineDataLoaded(timelineData);
+                _timelineData = timelineData;
+            }
         }
 
         private DateTime _lastOpticalGridPaintBecauseOfResize = DateTime.MinValue;
