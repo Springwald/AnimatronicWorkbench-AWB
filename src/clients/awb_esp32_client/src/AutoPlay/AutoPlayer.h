@@ -72,7 +72,7 @@ public:
     /**
      * The name of the timeline actually playing
      */
-    String getCurrentTimelineName();
+    String getCurrentTimelineName(bool extendWithTimelineIndex);
 
     /**
      * The name of the actual timeline state

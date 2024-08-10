@@ -54,13 +54,20 @@ void AutoPlayer::forceTimelineState(bool permanent, int *stateId)
 /**
  * If a timeline is playing, this is the name of the timeline
  */
-String AutoPlayer::getCurrentTimelineName()
+String AutoPlayer::getCurrentTimelineName(bool extendWithTimelineIndex)
 {
-    if (_actualTimelineIndex == -1)
+    if (extendWithTimelineIndex == false)
     {
-        return String("Off [-1]");
+        if (_actualTimelineIndex == -1)
+            return String("Off");
+        return _data->timelines->at(_actualTimelineIndex).name;
     }
-    return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
+    else
+    {
+        if (_actualTimelineIndex == -1)
+            return String("Off [-1]");
+        return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
+    }
 }
 /**
  * The name of the actual timeline state

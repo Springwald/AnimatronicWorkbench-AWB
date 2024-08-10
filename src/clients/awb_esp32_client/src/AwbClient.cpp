@@ -234,7 +234,7 @@ void AwbClient::loop()
 {
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 0);
 
-    _customCode->loop(_autoPlayer->getCurrentTimelineName(), _autoPlayer->getCurrentTimelineStateId());
+    _customCode->loop(_autoPlayer->getCurrentTimelineName(false), _autoPlayer->getCurrentTimelineStateId());
 
     if (false) // set true to test the mp3 player contineously
     {
@@ -303,10 +303,10 @@ void AwbClient::loop()
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 25);
 
-    if (!_autoPlayer->getCurrentTimelineName().equals(_lastAutoPlayTimelineName))
+    if (!_autoPlayer->getCurrentTimelineName(true).equals(_lastAutoPlayTimelineName))
     {
         // an other timeline was started
-        _lastAutoPlayTimelineName = _autoPlayer->getCurrentTimelineName();
+        _lastAutoPlayTimelineName = _autoPlayer->getCurrentTimelineName(true);
         if (!_autoPlayer->isPlaying())
         {
             // no timeline is playing, so turn off torque for all sts servos
@@ -357,9 +357,9 @@ void AwbClient::loop()
 
     // collect all status information for lcd display and WLAN status display
     _wlanConnector->memoryInfo = &_display.memoryInfo;
-    _actualStatusInformation->autoPlayerCurrentStateName = _autoPlayer->getCurrentTimelineName();
+    _actualStatusInformation->autoPlayerCurrentStateName = _autoPlayer->getCurrentTimelineName(true);
     _actualStatusInformation->autoPlayerIsPlaying = _autoPlayer->isPlaying();
-    _actualStatusInformation->autoPlayerCurrentTimelineName = _autoPlayer->getCurrentTimelineName();
+    _actualStatusInformation->autoPlayerCurrentTimelineName = _autoPlayer->getCurrentTimelineName(true);
     _actualStatusInformation->activeTimelineStateIdsByInput = _autoPlayer->getStatesDebugInfo();
     _actualStatusInformation->inputStates = _inputManager->getDebugInfo();
     _actualStatusInformation->lastSoundPlayed = _autoPlayer->getLastSoundPlayed();
