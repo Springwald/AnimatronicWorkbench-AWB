@@ -233,7 +233,7 @@ void AwbClient::loop()
 {
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 0);
 
-    _customCode->loop();
+    _customCode->loop(_autoPlayer->getCurrentTimelineName(), _autoPlayer->getCurrentTimelineStateId());
 
     if (false) // set true to test the mp3 player contineously
     {

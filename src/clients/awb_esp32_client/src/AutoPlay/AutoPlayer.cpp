@@ -62,6 +62,15 @@ String AutoPlayer::getCurrentTimelineName()
     }
     return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
 }
+/**
+ * The name of the actual timeline state
+ */
+int AutoPlayer::getCurrentTimelineStateId()
+{
+    if (_actualTimelineIndex == -1)
+        return -1;
+    return _data->timelines->at(_actualTimelineIndex).state->id;
+}
 
 String AutoPlayer::getLastSoundPlayed()
 {

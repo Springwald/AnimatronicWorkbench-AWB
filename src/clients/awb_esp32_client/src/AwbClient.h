@@ -90,6 +90,11 @@ public:
         delete _neopixelManager;
         delete _autoPlayer;
         delete _wlanConnector;
+        delete _projectData;
+        delete _debugging;
+        delete _statusManagement;
+        delete _actualStatusInformation;
+        delete _customCode;
     }
 
     void setup();

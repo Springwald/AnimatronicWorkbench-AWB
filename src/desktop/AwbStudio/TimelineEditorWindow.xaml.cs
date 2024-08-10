@@ -42,7 +42,7 @@ namespace AwbStudio
         private readonly IAwbLogger _awbLogger;
         private IActuatorsService? _actuatorsService;
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
-        private TimelineEventHandling? _timelineEventHandling;
+        private TimelineEventHandling _timelineEventHandlingBackingField;
         private TimelinePlayer? _timelinePlayerBackingField;
         protected TimelineData? _timelineData;
 
@@ -51,6 +51,19 @@ namespace AwbStudio
         private bool _switchingPages;
         private bool _ctrlKeyPressed;
         private bool _loading;
+
+        private TimelineEventHandling TimelineEventHandling
+        {
+            get
+            {
+                if (_timelineEventHandlingBackingField == null)
+                {
+                    var timelinePlayer = TimelinePlayer;
+                    _timelineEventHandlingBackingField = new TimelineEventHandling(_timelineData, _timelineControllerPlayViewPos, _actuatorsService, timelinePlayer, _timelineControllers, _viewContext, _playPosSynchronizer, _awbLogger);
+                }
+                return _timelineEventHandlingBackingField;
+            }
+        }
 
         private TimelinePlayer TimelinePlayer
         {
@@ -62,17 +75,6 @@ namespace AwbStudio
                     _timelinePlayerBackingField = new TimelinePlayer(timelineData: _timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
                     _timelinePlayerBackingField.OnPlaySound += SoundPlayer.SoundToPlay;
                     AllInOnePreviewControl.Timelineplayer = _timelinePlayerBackingField;
-
-                    _timelineEventHandling = new TimelineEventHandling(
-                        timelineData: _timelineData,
-                        timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
-                        actuatorsService: _actuatorsService,
-                        timelinePlayer: _timelinePlayerBackingField,
-                        timelineControllers: _timelineControllers,
-                        viewContext: _viewContext,
-                        playPosSynchronizer: _playPosSynchronizer,
-                        awbLogger: _awbLogger);
-
                     FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
                 }
                 return _timelinePlayerBackingField;
@@ -187,7 +189,10 @@ namespace AwbStudio
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (_timelineEventHandling != null) _timelineEventHandling.Dispose();
+            if (_timelineEventHandlingBackingField != null)
+            {
+                _timelineEventHandlingBackingField.Dispose();
+            }
             if (_timelinePlayerBackingField != null)
             {
                 _timelinePlayerBackingField.OnPlaySound += SoundPlayer.SoundToPlay;
@@ -378,12 +383,6 @@ namespace AwbStudio
             changesAfterLoading = SetupTimelineStateChoice(ComboTimelineStates, data, changesAfterLoading);
             changesAfterLoading = SetupTimelineNextStateOnceChoice(ComboTimelineNextStateOnce, data, changesAfterLoading);
 
-            if (_timelineEventHandling != null)
-            {
-                _timelineEventHandling.Dispose();
-                _timelineEventHandling = null;
-            }
-
             _playPosSynchronizer.SetNewPlayPos(0);
 
             _loading = false;
@@ -528,9 +527,9 @@ namespace AwbStudio
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e) => SaveTimelineData();
 
-        private void ButtonPlay_Click(object sender, RoutedEventArgs? e) => _timelineEventHandling?.Play();
+        private void ButtonPlay_Click(object sender, RoutedEventArgs? e) => TimelineEventHandling.Play();
 
-        private void ButtonStop_Click(object sender, RoutedEventArgs? e) => _timelineEventHandling?.Stop();
+        private void ButtonStop_Click(object sender, RoutedEventArgs? e) => TimelineEventHandling.Stop();
 
         private async void ButtonClear_Click(object sender, RoutedEventArgs e)
         {

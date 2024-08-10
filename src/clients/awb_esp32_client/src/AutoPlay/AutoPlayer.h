@@ -75,6 +75,11 @@ public:
     String getCurrentTimelineName();
 
     /**
+     * The name of the actual timeline state
+     */
+    int getCurrentTimelineStateId();
+
+    /**
      * Check, if the selected state is active by inputs
      */
     std::vector<TimelineState> getActiveStatesByInputs();
