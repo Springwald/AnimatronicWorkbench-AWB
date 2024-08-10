@@ -16,7 +16,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench-EN
 
-// Created on 10.08.2024 01:37:33
+// Created on 10.08.2024 13:53:46
 
 class ProjectData
 {
@@ -79,7 +79,7 @@ void addTimelines() {
 		stsServoPoints1->push_back(StsServoPoint(4,4500,500));
 		mp3PlayerYX5300Points1->push_back(Mp3PlayerYX5300Point(18, 0, 500));
 		auto state1 = new TimelineStateReference(1, String("idle"));
-		Timeline *timeline1 = new Timeline(state1, String("Go Sleep"), stsServoPoints1, scsServoPoints1, pca9685PwmServoPoints1, mp3PlayerYX5300Points1);
+		Timeline *timeline1 = new Timeline(state1, nullptr, String("Go Sleep"), stsServoPoints1, scsServoPoints1, pca9685PwmServoPoints1, mp3PlayerYX5300Points1);
 		timelines->push_back(*timeline1);
 
 		auto *stsServoPoints2 = new std::vector<StsServoPoint>();
@@ -111,7 +111,7 @@ void addTimelines() {
 		stsServoPoints2->push_back(StsServoPoint(1,4500,2150));
 		mp3PlayerYX5300Points2->push_back(Mp3PlayerYX5300Point(12, 0, 750));
 		auto state2 = new TimelineStateReference(1, String("idle"));
-		Timeline *timeline2 = new Timeline(state2, String("Wake up"), stsServoPoints2, scsServoPoints2, pca9685PwmServoPoints2, mp3PlayerYX5300Points2);
+		Timeline *timeline2 = new Timeline(state2, nullptr, String("Wake up"), stsServoPoints2, scsServoPoints2, pca9685PwmServoPoints2, mp3PlayerYX5300Points2);
 		timelines->push_back(*timeline2);
 
 		auto *stsServoPoints3 = new std::vector<StsServoPoint>();
@@ -125,7 +125,7 @@ void addTimelines() {
 		stsServoPoints3->push_back(StsServoPoint(4,4000,500));
 		stsServoPoints3->push_back(StsServoPoint(4,10000,500));
 		auto state3 = new TimelineStateReference(2, String("sleeping"));
-		Timeline *timeline3 = new Timeline(state3, String("Sleeping"), stsServoPoints3, scsServoPoints3, pca9685PwmServoPoints3, mp3PlayerYX5300Points3);
+		Timeline *timeline3 = new Timeline(state3, nullptr, String("Sleeping"), stsServoPoints3, scsServoPoints3, pca9685PwmServoPoints3, mp3PlayerYX5300Points3);
 		timelines->push_back(*timeline3);
 
 

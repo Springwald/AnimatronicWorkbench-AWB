@@ -19,39 +19,17 @@ protected:
 
     void setButtonLightByTouch(uint16_t btnIndex, uint8_t touchPin);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /* cc-end-protected  */
 
 public:
+    String *timelineNameToPlay = nullptr;         /// The name of the timeline to play by custom code. Beware: This is excuted immediately and will overwrite the current timeline and will interrupt the current timeline movements.
+    int *soundNoToPlay = nullptr;                 /// The number of the sound to play by custom code
+    int *timelineStateToForceOnce = nullptr;      /// Here the globale timeline state can be overwritten by custom code a single time. Buttons and other inputs defined in AWB Studio will be ignored.
+    int *timelineStateToForcePermanent = nullptr; /// Here the globale timeline state can be overwritten by custom code permanent. Buttons and other inputs defined in AWB Studio will be ignored.
+
     CustomCode(NeopixelManager *neopixelManager) : neopixelManager(neopixelManager)
     {
         /* cc-start-constructor - insert your constructor code here before the end-constructor comment: */
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         /* cc-end-constructor  */
     }
@@ -59,16 +37,6 @@ public:
     ~CustomCode()
     {
         /* cc-start-destructor - insert your destructor code here before the end-destructor comment: */
-
-
-
-
-
-
-
-
-
-
 
         /* cc-end-destructor  */
     }

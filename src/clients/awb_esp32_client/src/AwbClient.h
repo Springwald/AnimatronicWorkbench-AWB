@@ -33,7 +33,6 @@ protected:
     DacSpeaker *_dacSpeaker; /// The speaker if connected
 
     long _startMillis = millis();          /// The start millis
-    int _lastAutoPlaySelectedStateId = -1; /// The last selected state id for autoplay timeline filter
     String _lastAutoPlayTimelineName = ""; /// The last selected timeline name for autoplay timeline filter
 
     PacketSenderReceiver *_packetSenderReceiver = nullptr;       /// The packet sender receiver to communicate with the Animatronic Workbench Studio

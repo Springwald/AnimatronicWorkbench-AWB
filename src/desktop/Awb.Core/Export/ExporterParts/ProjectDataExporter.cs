@@ -103,15 +103,6 @@ namespace Awb.Core.Export.ExporterParts
                 content.AppendLine();
             }
 
-            // Autoplay state selector settings
-            content.AppendLine("/* autoplay state selector */");
-            content.AppendLine("// if a servo position feedback is used as a state selector, define the servo channel here.");
-            content.AppendLine("// if you don't use a servo as state selector, set this to -1 or undefine it");
-            content.AppendLine("// #define AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL 9");
-            content.AppendLine("// if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)");
-            content.AppendLine("// if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)");
-            content.AppendLine("#define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457");
-            content.AppendLine();
 
             // DAC speaker settings
             if (false)
@@ -371,7 +362,7 @@ namespace Awb.Core.Export.ExporterParts
                 }
 
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineStateReference({state.Id}, String(\"{state.Title}\"));");
-                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");
+                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId?.ToString() ?? "nullptr"}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 
                 result.AppendLine();

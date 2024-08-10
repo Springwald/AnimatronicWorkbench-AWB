@@ -17,6 +17,7 @@ namespace Awb.Core.Timelines
         public string Id { get; set; } = Guid.NewGuid().ToString(); 
 
         public int TimelineStateId { get; set; }
+        public int? NextTimelineStateIdOnce { get; set; }
 
         public string Title { get; set; } = "no name";
 

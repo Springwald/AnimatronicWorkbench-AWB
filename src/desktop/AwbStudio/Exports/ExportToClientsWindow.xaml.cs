@@ -53,6 +53,7 @@ namespace AwbStudio.Exports
                     // convert timelineData to TimelineExportData
                     var exportData = TimelineExportData.FromTimeline(
                         timelineStateId: timelineData.TimelineStateId,
+                        nextTimelineStateIdOnce: timelineData.NextTimelineStateIdOnce,
                         title: timelineData.Title,
                         points: timelineData.AllPoints,
                         timelineDataService: _project.TimelineDataService,

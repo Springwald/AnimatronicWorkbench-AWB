@@ -95,7 +95,6 @@ namespace AwbStudio
         }
 
 
-
         private async void TimelineEditorWindow_Loaded(object sender, RoutedEventArgs e)
         {
             Loaded -= TimelineEditorWindow_Loaded;
@@ -136,9 +135,13 @@ namespace AwbStudio
             }
 
             // fill timeline state chooser
-            ComboTimelineStates.ItemsSource = _project.TimelinesStates?.Select(ts => $"[{ts.Id}] {GetTimelineStateName(ts)}").ToList();
+            var states = _project.TimelinesStates?.Select(ts => $"[{ts.Id}] {GetTimelineStateName(ts)}").ToList();
+            ComboTimelineStates.ItemsSource = states;
+            ComboTimelineNextStateOnce.ItemsSource = states == null ? states : new[] { "" }.Concat(states).ToList(); // the next-tate-once can be empty
+
             TimelineChooser.ProjectTitle = _project.ProjectMetaData.ProjectTitle;
             TimelineChooser.FileManager = _timelineDataService;
+
 
             Closing += TimelineEditorWindow_Closing;
             KeyDown += TimelineEditorWindow_KeyDown;
@@ -339,19 +342,8 @@ namespace AwbStudio
             _unsavedChanges = false;
 
             // fill state choice
-            var stateExists = _project.TimelinesStates?.SingleOrDefault(t => t.Id == data.TimelineStateId) != null;
-            if (!stateExists)
-            {
-                MessageBox.Show($"Timeline {data.Title} has timelineStateID {data.TimelineStateId} not listed in actual project.");
-                var state = _project.TimelinesStates?.FirstOrDefault();
-                if (state != null)
-                {
-                    MessageBox.Show($"Using state {state.Title}[{state.Id}] instead");
-                    data.TimelineStateId = state.Id;
-                    changesAfterLoading = true;
-                }
-            }
-            ComboTimelineStates.SelectedIndex = _project.TimelinesStates?.TakeWhile(t => t.Id != data.TimelineStateId).Count() ?? 0;
+            changesAfterLoading = SetupTimelineStateChoice(ComboTimelineStates, data, changesAfterLoading);
+            changesAfterLoading = SetupTimelineStateChoice(ComboTimelineNextStateOnce, data, changesAfterLoading);
 
             if (_timelineEventHandling != null)
             {
@@ -377,6 +369,24 @@ namespace AwbStudio
                 FocusObjectPropertyEditorControl.Init(_viewContext, data, _playPosSynchronizer, _timelineDataService, _project.Sounds);
             }
             _unsavedChanges = changesAfterLoading;
+        }
+
+        private bool SetupTimelineStateChoice( ComboBox comboBox, TimelineData data, bool changesAfterLoading)
+        {
+            var stateExists = _project.TimelinesStates?.SingleOrDefault(t => t.Id == data.TimelineStateId) != null;
+            if (!stateExists)
+            {
+                MessageBox.Show($"Timeline {data.Title} has timelineStateID {data.TimelineStateId} not listed in actual project.");
+                var state = _project.TimelinesStates?.FirstOrDefault();
+                if (state != null)
+                {
+                    MessageBox.Show($"Using state {state.Title}[{state.Id}] instead");
+                    data.TimelineStateId = state.Id;
+                    changesAfterLoading = true;
+                }
+            }
+            comboBox.SelectedIndex = _project.TimelinesStates?.TakeWhile(t => t.Id != data.TimelineStateId).Count() ?? 0;
+            return changesAfterLoading;
         }
 
         private async Task LoadTimelineData(string timelineId)
@@ -449,6 +459,25 @@ namespace AwbStudio
             _timelineData.TimelineStateId = _project.TimelinesStates[ComboTimelineStates.SelectedIndex].Id;
             _unsavedChanges = true;
         }
+
+        private void ComboTimelineNextStateOnce_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_timelineData == null) return;
+            if (_project == null) return;
+            if (ComboTimelineNextStateOnce.SelectedIndex == 0) {
+                _timelineData.NextTimelineStateIdOnce = null;
+                _unsavedChanges = true;
+                return;
+            }
+            if (ComboTimelineNextStateOnce.SelectedIndex == 0)
+            {
+                _timelineData.NextTimelineStateIdOnce = null; // no next state selected
+                return;
+            }
+            _timelineData.NextTimelineStateIdOnce = _project.TimelinesStates[ComboTimelineNextStateOnce.SelectedIndex+1].Id; // the first item is empty, so we have to add 1
+            _unsavedChanges = true;
+        }
+
 
         #region Button Events
 
