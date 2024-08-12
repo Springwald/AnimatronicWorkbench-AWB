@@ -174,26 +174,6 @@ namespace AwbStudio.TimelineControls
             return null;
         }
 
-        private void HighlightActualObject()
-        {
-            if (_timelineData == null) return;
-            if (_viewContext == null) return;
-            if (_timelineEditorControls == null) return;
-
-            foreach (UserControl editorControl in _timelineEditorControls)
-            {
-                editorControl.BorderThickness = new Thickness(EditorControlsBorderThickness);
-                editorControl.Margin= new Thickness(-EditorControlsBorderThickness);
-                if ((editorControl as IAwbObjectControl)?.AwbObject == _viewContext.ActualFocusObject)
-                {
-                    editorControl.BorderBrush =Brushes.LightBlue;
-                }
-                else
-                {
-                    editorControl.BorderBrush = Brushes.Transparent;
-                }
-            }
-        }
 
         private void OnViewContextChanged(object? sender, ViewContextChangedEventArgs e)
         {
@@ -217,7 +197,6 @@ namespace AwbStudio.TimelineControls
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
-                    HighlightActualObject();
                     break;
 
                 default:

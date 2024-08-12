@@ -58,6 +58,7 @@ namespace AwbStudio.TimelineControls
             _viewContext = viewContext;
             _nestedTimelineValuePainter = new NestedTimelineValuePainter(AllValuesGrid, _viewContext, timelineCaptions, timelineMetaDataService);
             _caption = timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id);
+            HeaderControl.MyObject = NestedTimelinesFakeObject.Singleton;
             HeaderControl.TimelineCaption = _caption;
             HeaderControl.ViewContext   = viewContext;
 
