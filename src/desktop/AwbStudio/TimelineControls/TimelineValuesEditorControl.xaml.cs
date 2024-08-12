@@ -115,6 +115,21 @@ namespace AwbStudio.TimelineControls
 
             UpdateZoom();
 
+            foreach(UserControl editorControl in _timelineEditorControls)
+            {
+                editorControl.PreviewMouseDown += (sender, e) =>
+                {
+                    if (e.ChangedButton == MouseButton.Left)
+                    {
+                        if (_viewContext == null) return;
+                        if (_playPosSynchronizer == null) return;
+                        var mouseX = e.GetPosition(this).X;
+                        var newPlayPosMs = (int)(((mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
+                        _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
+                    }
+                };  
+            }
+
             _isInitialized = true;
         }
 
