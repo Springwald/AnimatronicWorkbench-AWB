@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Player;
 using Awb.Core.Project;
@@ -15,6 +16,7 @@ using Awb.Core.Timelines.NestedTimelines;
 using Awb.Core.Tools;
 using AwbStudio.Exports;
 using AwbStudio.Projects;
+using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using AwbStudio.Tools;
 using System;
@@ -53,6 +55,7 @@ namespace AwbStudio
         private bool _ctrlKeyPressed;
         private bool _loading;
         private Brush _buttonForegroundColorBackup;
+        private bool _isZooming;
 
         public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
         {
@@ -161,6 +164,9 @@ namespace AwbStudio
 
             Closing += TimelineEditorWindow_Closing;
             KeyDown += TimelineEditorWindow_KeyDown;
+
+            // zoomslider not working well - disable for now
+            StackPanelZoom.Visibility = Visibility.Collapsed;
 
             // bring to front
             this.IsEnabled = true;
@@ -278,8 +284,6 @@ namespace AwbStudio
                 timelineController.SetPlayStateAsync(ITimelineController.PlayStates.Editor);
                 timelineController.OnTimelineEvent -= TimelineController_OnTimelineEvent;
             }
-
-
         }
 
         private async void TimelineController_OnTimelineEvent(object? sender, TimelineControllerEventArgs e)
@@ -391,6 +395,7 @@ namespace AwbStudio
             }
 
             ShowTitle(timelineData);
+            ValuesEditorControl.ZoomVerticalHeightPerValueEditor = ZoomSlider.Value;
 
             _loading = false;
             _unsavedChanges = changesAfterLoading;
@@ -602,6 +607,20 @@ namespace AwbStudio
 
             if (!timelineValuesEditorScrollViewer.HorizontalOffset.Equals(e.HorizontalOffset))
                 timelineValuesEditorScrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
+        }
+
+        private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_isZooming) return;
+
+            _isZooming = true;
+
+            if (ValuesEditorControl != null)
+            {
+                ValuesEditorControl.ZoomVerticalHeightPerValueEditor = e.NewValue;
+            }
+
+            _isZooming = false;
         }
     }
 }

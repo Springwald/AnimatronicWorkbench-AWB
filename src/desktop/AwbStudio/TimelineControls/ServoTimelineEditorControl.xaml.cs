@@ -93,8 +93,8 @@ namespace AwbStudio.TimelineControls
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (DateTime.UtcNow - _lastOpticalGridPaintBecauseOfResize < TimeSpan.FromMilliseconds(1000)) return;
-            _lastOpticalGridPaintBecauseOfResize = DateTime.UtcNow;
+         //   if (DateTime.UtcNow - _lastOpticalGridPaintBecauseOfResize < TimeSpan.FromMilliseconds(1000)) return;
+          //  _lastOpticalGridPaintBecauseOfResize = DateTime.UtcNow;
             DrawOpticalGrid("ServoValueViewerControl_SizeChanged" + e.PreviousSize + " => " + e.NewSize);
         }
 

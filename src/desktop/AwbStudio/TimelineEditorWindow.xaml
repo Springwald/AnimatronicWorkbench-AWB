@@ -73,13 +73,11 @@
                 </Grid>
 
                 <!-- global timeline viewer-->
-                <ScrollViewer  Grid.Row="3"
-                     x:Name="timelineAllValuesScrollViewer" 
+                <ScrollViewer  Grid.Row="3" x:Name="timelineAllValuesScrollViewer" 
                      HorizontalScrollBarVisibility="Visible" 
-                     VerticalScrollBarVisibility="Disabled"
+                     VerticalScrollBarVisibility="Hidden"
                      ScrollChanged="timelineScrollValueChanged"
-                     Background="Transparent"
-                             >
+                     Background="Transparent">
                     <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" />
                 </ScrollViewer>
 
@@ -91,10 +89,10 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Center">
+                    <StackPanel x:Name="StackPanelZoom" Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Center">
 
                         <Label Content="🔎"/>
-                        <Slider x:Name="ZoomSlider" Width="120" Value="100" Minimum="50" Maximum="200" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Slider x:Name="ZoomSlider" Width="120" Value="200" Minimum="100" Maximum="350" HorizontalAlignment="Center" VerticalAlignment="Center" ValueChanged="ZoomSlider_ValueChanged" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2"  Orientation="Horizontal" HorizontalAlignment="Right">
@@ -102,13 +100,8 @@
                         <Label x:Name="LabelPlayTime" Width="50" HorizontalAlignment="Center"  Content="0.00s"  />
                         <Button x:Name="ButtonStop"  Content="⏹ Stop" Click="ButtonStop_Click" />
                     </StackPanel>
-
-
-
-
                 </Grid>
             </Grid>
-
 
             <!-- right column: Timeline metadata and file editing -->
             <Grid Grid.Column="1" Margin="5">
@@ -137,8 +130,9 @@
         <Grid Grid.Row="1">
             <!-- the editor controls, one for each actuatator -->
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80*"/>
-                <ColumnDefinition Width="20*" MinWidth="200" MaxWidth="300"/>
+                <ColumnDefinition Width="507*"/>
+                <ColumnDefinition Width="413*"/>
+                <ColumnDefinition Width="230*" MinWidth="200" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
 
             <ScrollViewer 
@@ -146,12 +140,12 @@
                 Grid.Column="0" 
                 HorizontalScrollBarVisibility="Visible" 
                 VerticalScrollBarVisibility="Visible"
-                ScrollChanged="timelineScrollValueChanged"
+                ScrollChanged="timelineScrollValueChanged" Grid.ColumnSpan="2"
                 >
                 <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" />
             </ScrollViewer>
 
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="7*"></RowDefinition>
                     <RowDefinition Height="3*"></RowDefinition>

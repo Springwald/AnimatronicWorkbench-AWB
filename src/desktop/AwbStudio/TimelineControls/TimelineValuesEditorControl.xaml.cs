@@ -15,14 +15,18 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {
     public partial class TimelineValuesEditorControl : UserControl, ITimelineEditorControl
     {
+        private const int EditorControlsBorderThickness = 4;
+
         private bool _isInitialized;
 
         private TimelineData? _timelineData;
@@ -34,7 +38,20 @@ namespace AwbStudio.TimelineControls
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
 
-        public double ZoomVerticalHeightPerValueEditor { get; private set; } = 180; // pixel per value editor
+        private double _zoomVerticalHeightPerValueEditorBackingField = 180; // pixel per value editor
+
+
+
+        public double ZoomVerticalHeightPerValueEditor
+        {
+            get => _zoomVerticalHeightPerValueEditorBackingField;
+            set
+            {          // pixel per value editor
+                _zoomVerticalHeightPerValueEditorBackingField = value;
+                UpdateZoom();
+            }
+        }
+
 
         public TimelineValuesEditorControl()
         {
@@ -56,7 +73,7 @@ namespace AwbStudio.TimelineControls
             _gridPainter = null;
         }
 
-        public void Init(TimelineViewContext viewContext,TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, ITimelineDataService timelineDataService,  IAwbLogger awbLogger,  Sound[] projectSounds)
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, ITimelineDataService timelineDataService, IAwbLogger awbLogger, Sound[] projectSounds)
         {
             _viewContext = viewContext;
             _playPosSynchronizer = playPosSynchronizer;
@@ -97,7 +114,7 @@ namespace AwbStudio.TimelineControls
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
             _gridPainter = new GridTimePainter(OpticalTimeGrid, _viewContext);
 
-            ZoomChanged();
+            UpdateZoom();
 
             _isInitialized = true;
         }
@@ -123,21 +140,21 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        private void ZoomChanged()
+        private void UpdateZoom()
         {
             if (_timelineEditorControls != null)
                 foreach (UserControl editorControl in _timelineEditorControls)
                 {
                     if (editorControl is NestedTimelinesViewerControl || editorControl is SoundTimelineEditorControl)
                     {
-                        editorControl.Height = Math.Max(120, ZoomVerticalHeightPerValueEditor / 4);
+                        editorControl.Height = Math.Max(120, _zoomVerticalHeightPerValueEditorBackingField / 4);
                     }
                     else
                     {
-                        editorControl.Height = ZoomVerticalHeightPerValueEditor;
+                        editorControl.Height = _zoomVerticalHeightPerValueEditorBackingField;
                     }
                 }
-                    
+
         }
 
         public double? GetScrollPosForEditorControl(IAwbObject? awbObject)
@@ -166,14 +183,15 @@ namespace AwbStudio.TimelineControls
 
             foreach (UserControl editorControl in _timelineEditorControls)
             {
+                editorControl.BorderThickness = new Thickness(EditorControlsBorderThickness);
+                editorControl.Margin = new Thickness(-EditorControlsBorderThickness);
                 if ((editorControl as IAwbObjectControl)?.AwbObject == _viewContext.ActualFocusObject)
                 {
                     editorControl.BorderBrush = Brushes.LightSlateGray;
-                    editorControl.BorderThickness = new Thickness(4);
                 }
                 else
                 {
-                    editorControl.BorderBrush = null;
+                    editorControl.BorderBrush = Brushes.Transparent;
                 }
             }
         }
@@ -207,5 +225,6 @@ namespace AwbStudio.TimelineControls
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
         }
+
     }
 }
