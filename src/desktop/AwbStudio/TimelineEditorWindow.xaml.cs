@@ -359,8 +359,7 @@ namespace AwbStudio
 
             var changesAfterLoading = false;
 
-            _timelinePlayer.SetTimelineData(timelineData);
-            this.Title = timelineData == null ? "No Timeline" : $"Timeline '{timelineData.Title}'";
+            _timelinePlayer?.SetTimelineData(timelineData);
             ValuesEditorControl.TimelineDataLoaded(timelineData);
             TimelineCaptionsViewer.TimelineDataLoaded(timelineData);
             AllInOnePreviewControl.TimelineDataLoaded(timelineData);
@@ -391,8 +390,15 @@ namespace AwbStudio
                 FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
             }
 
+            ShowTitle(timelineData);
+
             _loading = false;
             _unsavedChanges = changesAfterLoading;
+        }
+
+        private void ShowTitle(TimelineData? timelineData)
+        {
+            this.Title = timelineData == null ? "No Timeline" : $"Timeline '{timelineData.Title}'";
         }
 
         private bool SetupTimelineStateChoice(ComboBox comboBox, TimelineData? data, bool changesAfterLoading)
@@ -500,6 +506,7 @@ namespace AwbStudio
         {
             if (_timelinedata == null) return;
             _timelinedata.Title = TxtActualTimelineName.Text;
+            ShowTitle(_timelinedata);
             _unsavedChanges = true;
         }
 
