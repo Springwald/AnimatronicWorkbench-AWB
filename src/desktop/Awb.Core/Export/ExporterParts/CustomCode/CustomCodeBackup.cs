@@ -15,14 +15,14 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
         public class BackupResult
         {
             public required bool Success { get; init; }
-            public CustomCodeRegionContent? CustomCodeRegionContent{ get; init; }
+            public CustomCodeRegionContent? CustomCodeRegionContent { get; init; }
             public string? ErrorMsg { get; init; }
         }
 
         public CustomCodeBackup(string customCodeTargetFolder, string customCodeBackupRootFolder)
         {
-            if (string.IsNullOrWhiteSpace(customCodeTargetFolder))              throw new ArgumentException("Value cannot be empty.", nameof(customCodeTargetFolder));
-            if (string.IsNullOrWhiteSpace(customCodeBackupRootFolder))        throw new ArgumentException("Value cannot be empty.", nameof(customCodeBackupRootFolder));
+            if (string.IsNullOrWhiteSpace(customCodeTargetFolder)) throw new ArgumentException("Value cannot be empty.", nameof(customCodeTargetFolder));
+            if (string.IsNullOrWhiteSpace(customCodeBackupRootFolder)) throw new ArgumentException("Value cannot be empty.", nameof(customCodeBackupRootFolder));
 
             if (!Directory.Exists(customCodeBackupRootFolder)) throw new ArgumentException("Folder '" + customCodeBackupRootFolder + "' does not exist", nameof(customCodeBackupRootFolder));
 
@@ -65,7 +65,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                     customCodeRegionContent.AddRegion(filename: fileInfo.Name, key: region.Key, content: region.Content);
 
                 // write the file to the backup folder
-                var backupFilename = Path.Combine(backupFolder, fileInfo.Name); 
+                var backupFilename = Path.Combine(backupFolder, fileInfo.Name);
                 File.WriteAllText(backupFilename, fileContent);
             }
 

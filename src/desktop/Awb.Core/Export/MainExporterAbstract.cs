@@ -47,7 +47,7 @@ namespace Awb.Core.Export
             if (string.IsNullOrWhiteSpace(targetPath)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(targetPath));
 
             // Read the existing custom code in the target folder and backup it
-            CustomCodeTargetFolder = Path.Combine(targetPath, @"src\AwbDataImport", _customCodeFolderName);
+            CustomCodeTargetFolder = Path.Combine(targetPath, @"src", _customCodeFolderName);
             var readAndBackupCustomCodeResult = await ReadAndBackupCustomCodeAsync();
             if (readAndBackupCustomCodeResult.Success == false) return readAndBackupCustomCodeResult;
 
