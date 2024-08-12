@@ -39,7 +39,6 @@ namespace Awb.Core.LoadNSave.Timelines
             timelineId: nestedTimelinePointSaveFormat.TimelineId
             )
             {
-                Title = nestedTimelinePointSaveFormat.Title,
                 Description = nestedTimelinePointSaveFormat.Description,
             };
     }

@@ -12,6 +12,6 @@
         Background="Black">
         <Grid x:Name="OpticalGrid" IsHitTestVisible="False"></Grid>
         <Grid x:Name="AllValuesGrid"></Grid>
-        <Grid x:Name="PlayPosGrid" IsHitTestVisible="False"></Grid>
+        <Grid x:Name="PlayPosGrid"></Grid>
     </Grid>
 </UserControl>

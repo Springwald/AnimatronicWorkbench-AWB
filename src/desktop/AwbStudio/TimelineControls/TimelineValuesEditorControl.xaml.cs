@@ -25,7 +25,7 @@ namespace AwbStudio.TimelineControls
 {
     public partial class TimelineValuesEditorControl : UserControl, ITimelineEditorControl
     {
-        private const int EditorControlsBorderThickness = 4;
+        private const int EditorControlsBorderThickness = 10;
 
         private bool _isInitialized;
 
@@ -39,7 +39,6 @@ namespace AwbStudio.TimelineControls
         private List<AbstractValuePainter>? _timelineValuePainters;
 
         private double _zoomVerticalHeightPerValueEditorBackingField = 180; // pixel per value editor
-
 
 
         public double ZoomVerticalHeightPerValueEditor
@@ -184,10 +183,10 @@ namespace AwbStudio.TimelineControls
             foreach (UserControl editorControl in _timelineEditorControls)
             {
                 editorControl.BorderThickness = new Thickness(EditorControlsBorderThickness);
-                editorControl.Margin = new Thickness(-EditorControlsBorderThickness);
+                editorControl.Margin= new Thickness(-EditorControlsBorderThickness);
                 if ((editorControl as IAwbObjectControl)?.AwbObject == _viewContext.ActualFocusObject)
                 {
-                    editorControl.BorderBrush = Brushes.LightSlateGray;
+                    editorControl.BorderBrush =Brushes.LightBlue;
                 }
                 else
                 {

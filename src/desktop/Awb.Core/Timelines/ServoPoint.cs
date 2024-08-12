@@ -16,7 +16,7 @@ namespace Awb.Core.Timelines
         /// </summary>
         public double ValuePercent { get; set; }
 
-        public override string Title { get; set; }
+        public override string Title { get => $"{ServoId}: {ValuePercent:0.0}% {TimeMs}ms"; }
 
         public override string PainterCheckSum => ServoId + base.TimeMs.ToString() + ValuePercent.ToString();
 
@@ -28,12 +28,11 @@ namespace Awb.Core.Timelines
         {
             ServoId = servoId;
             ValuePercent = valuePercent;
-            Title = $"{ServoId}: {ValuePercent:0.0}% {TimeMs}ms";
         }
 
         public override ServoPoint Clone()
         {
-            return new ServoPoint(servoId: ServoId, valuePercent: ValuePercent, timeMs: TimeMs) { Title = Title };
+            return new ServoPoint(servoId: ServoId, valuePercent: ValuePercent, timeMs: TimeMs);
         }
     }
 }

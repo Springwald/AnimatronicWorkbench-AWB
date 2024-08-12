@@ -19,7 +19,7 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// The title of this point
         /// </summary>
-        public abstract string Title { get; set; }
+        public abstract string Title { get;  }
 
         /// <summary>
         /// A description of this point, e.g. for documentation 
