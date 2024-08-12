@@ -34,7 +34,7 @@ namespace Awb.Core.Project.Various
 
 
         [JsonIgnore]
-        public string TitleDetailed => $"Input {TitleShort}";
+        public string TitleDetailed => $"Input \"{TitleShort}\" (ID {Id})";
 
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
