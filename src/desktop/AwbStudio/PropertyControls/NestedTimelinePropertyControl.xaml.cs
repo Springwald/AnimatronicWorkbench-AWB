@@ -28,6 +28,7 @@ namespace AwbStudio.PropertyControls
         private readonly PlayPosSynchronizer _playPosSynchronizer;
         private bool _isUpdatingView;
         private TimelineMetaData[] _timeslines = Array.Empty<TimelineMetaData>();
+        private bool _isSettingNewValue;
 
         public IAwbObject AwbObject => NestedTimelinesFakeObject.Singleton;
 
@@ -108,16 +109,20 @@ namespace AwbStudio.PropertyControls
 
         private void SetNewValue(string? timelineId)
         {
+            _isSettingNewValue = true;
             if (NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId != timelineId)
             {
                 NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = timelineId;
                 _viewContext.FocusObjectValueChanged(this);
             }
+            _isSettingNewValue = false;
             ShowActualValue();
         }
 
         private void ShowActualValue()
         {
+            if (_isSettingNewValue) return;
+
             var timelineId = NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId;
 
             _isUpdatingView = true;
