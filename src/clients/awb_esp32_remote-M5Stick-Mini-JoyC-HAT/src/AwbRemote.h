@@ -6,7 +6,7 @@
 #include "../lib/M5Unit-MiniJoyC/UNIT_MiniJoyC.h"
 #include <AXP192.h>
 #include "AwbDataImport/WifiConfig.h"
-#include "AwbDataImport/CustomCode/CustomCode.h"
+#include "CustomCode/CustomCode.h"
 #include "CommandSender.h"
 
 using byte = unsigned char;

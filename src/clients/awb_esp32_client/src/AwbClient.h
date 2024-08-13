@@ -19,7 +19,7 @@
 #include "StatusManagement.h"
 #include "Debugging.h"
 #include "Actuators/NeopixelManager.h"
-#include "AwbDataImport/CustomCode/CustomCode.h"
+#include "CustomCode/CustomCode.h"
 
 using byte = unsigned char;
 
