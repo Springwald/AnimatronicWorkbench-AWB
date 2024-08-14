@@ -113,12 +113,13 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 
     _lastMsUpdate = millis();
 
-    bool forgetLastPacketReceived = false;
-
     _debugging->setState(Debugging::MJ_AUTOPLAY, 5);
 
-    if (forgetLastPacketReceived == true && _lastPacketReceivedMillis != -1 && millis() > _lastPacketReceivedMillis + 60 * 1000) // 60 seconds
-        _lastPacketReceivedMillis = -1;                                                                                          // forget the last packet received
+    if (_data->returnToAutoModeAfterMinutes != -1)
+    {
+        if (_lastPacketReceivedMillis != -1 && millis() > _lastPacketReceivedMillis + _data->returnToAutoModeAfterMinutes * 60 * 1000) // x minutes (=60*1000ms) after the last packet received, we return to auto mode
+            _lastPacketReceivedMillis = -1;                                                                                            // forget the last packet received
+    }
 
     bool packedReceivedLately = _lastPacketReceivedMillis != -1;
     if (packedReceivedLately == true)

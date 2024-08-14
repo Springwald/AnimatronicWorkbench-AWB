@@ -137,6 +137,7 @@ namespace Awb.Core.Export.ExporterParts
                 #include <String.h>
                 #include "../ProjectData/Timeline.h"
                 #include "../ProjectData/TimelineState.h"
+                #include "../ProjectData/TimelineState.h"
                 #include "../ProjectData/TimelineStateReference.h"
                 #include "../ProjectData/StsServoPoint.h"
                 #include "../ProjectData/Pca9685PwmServoPoint.h"
@@ -150,6 +151,9 @@ namespace Awb.Core.Export.ExporterParts
 
             content.AppendLine("public:");
             content.AppendLine($"   const char *ProjectName = \"{_projectData.ProjectName}\";");
+            content.AppendLine();
+
+            content.AppendLine($"   const int returnToAutoModeAfterMinutes  = {_projectData.Esp32ClientHardwareConfig.AutoPlayAfter ?? -1} ;");
 
             content.AppendLine();
             content.AppendLine($"\tstd::vector<StsScsServo> *scsServos;");

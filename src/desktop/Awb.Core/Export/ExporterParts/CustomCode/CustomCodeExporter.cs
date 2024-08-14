@@ -25,19 +25,23 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
             // check the target folder
             if (!Directory.Exists(_targetFolder)) return new IExporter.ExportResult { ErrorMessage = $"Target folder '{_targetFolder}' not found" };
 
-            var files = _customCodeRegionContent.Regions.GroupBy(r => r.Filename);
+            var filesReadBefore = _customCodeRegionContent.Regions.Select(r => r.Filename).Distinct();
+
+            // read all files in the target folder that are .h or .cpp files
+            var filesInTargetDir = Directory.GetFiles(_targetFolder, "*.h").Concat(Directory.GetFiles(_targetFolder, "*.cpp")).ToList();
 
             // read the template file for custom code
             var customCoderReaderWriter = new CustomCodeReaderWriter();
-            foreach (var file in files)
+            foreach (var file in filesInTargetDir)
             {
-                var templateFilename = Path.Combine(_targetFolder, file.Key);
-                if (!File.Exists(templateFilename)) return new IExporter.ExportResult { ErrorMessage = $"Custom code template file '{templateFilename}' not found" };
+                var fileInfo = new FileInfo(file);
 
                 // read the template file
+                var templateFilename = Path.Combine(_targetFolder, fileInfo.Name);
                 var templateContent = await File.ReadAllTextAsync(templateFilename);
 
-                var fileInfo = new FileInfo(templateFilename);
+                // remove the file from the list of files read before
+                filesReadBefore = filesReadBefore.Where(f => f != fileInfo.Name); 
 
                 // replace the custom code regions in the template file
                 var writerResult = customCoderReaderWriter.WriteRegions(filename: fileInfo.Name, templateContent: templateContent, regionContent: _customCodeRegionContent);
@@ -46,6 +50,10 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                 // write the custom code back into the file
                 await File.WriteAllTextAsync(templateFilename, writerResult.Content);
             }
+
+            if (filesReadBefore.Any())
+                return new IExporter.ExportResult { ErrorMessage = $"Custom code template files {string.Join(", ", filesReadBefore.Select(f => $"'{f}'"))}" };
+
 
             return ExportResult.SuccessResult;
         }

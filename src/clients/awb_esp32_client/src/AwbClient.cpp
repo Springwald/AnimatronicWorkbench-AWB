@@ -263,8 +263,6 @@ void AwbClient::loop()
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 10);
 
-    //_mp3Player->playSound(1);
-
     // update autoplay timelines and actuators
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 15);
 
@@ -338,9 +336,6 @@ void AwbClient::loop()
         _statusManagement->update();
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 50);
-
-    // if (_neoPixelStatus != nullptr && !packetReceived)
-    //     _neoPixelStatus->update();
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 55);
 
