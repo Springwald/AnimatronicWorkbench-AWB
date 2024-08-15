@@ -30,15 +30,40 @@
                 <ColumnDefinition Width="20*" MinWidth="200" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0" x:Name="ActualTimelineGrid">
 
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
+                <Grid  Margin="0 5 0 0">
+                    <Label Grid.Row="0" FontWeight="Bold" >Actual Timeline:</Label>
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                        <!-- Actual timeline metadata -->
+                        <Label Content="Title:"/>
+                        <TextBox x:Name="TxtActualTimelineName" Width="auto" MinWidth="150" MaxWidth="300" TextChanged="TxtActualTimelineName_TextChanged" Text="Title"/>
+                        <Label Content="State:"/>
+                        <ComboBox x:Name="ComboTimelineStates" Width="auto" MinWidth="200" MaxHeight="300" SelectionChanged="ComboTimelineStates_SelectionChanged"/>
+                        <Label Content="Next state once:"/>
+                        <ComboBox x:Name="ComboTimelineNextStateOnce" Width="auto" MinWidth="200" MaxHeight="300" SelectionChanged="ComboTimelineNextStateOnce_SelectionChanged"/>
+                    </StackPanel>
+
+                    <Button  Grid.Column="1" x:Name="ButtonSave" Content="💾 Save" HorizontalAlignment="Right"  Click="ButtonSave_Click" />
+                </Grid>
+
+                <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="auto"/>
@@ -48,17 +73,15 @@
                 </Grid>
 
                 <!-- global timeline viewer-->
-                <ScrollViewer  Grid.Row="1"
-                     x:Name="timelineAllValuesScrollViewer" 
+                <ScrollViewer  Grid.Row="3" x:Name="timelineAllValuesScrollViewer" 
                      HorizontalScrollBarVisibility="Visible" 
-                     VerticalScrollBarVisibility="Disabled"
+                     VerticalScrollBarVisibility="Hidden"
                      ScrollChanged="timelineScrollValueChanged"
-                     Background="Transparent"
-                             >
+                     Background="Transparent">
                     <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" />
                 </ScrollViewer>
 
-                <Grid Grid.Row="2" Margin="0 6 0 6">
+                <Grid Grid.Row="4" Margin="0 6 0 6">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="5*"/>
                         <ColumnDefinition Width="3*"/>
@@ -66,18 +89,10 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
-                        <!-- Actual timeline metadata -->
-                        <Label Content="Title:"/>
-                        <TextBox x:Name="TxtActualTimelineName" Width="auto" MinWidth="150" MaxWidth="300" TextChanged="TxtActualTimelineName_TextChanged" Text="Title"/>
-                        <Label Content="Type:"/>
-                        <ComboBox x:Name="ComboTimelineStates" Width="auto" MinWidth="200" MaxHeight="300" SelectionChanged="ComboTimelineStates_SelectionChanged"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Center">
+                    <StackPanel x:Name="StackPanelZoom" Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Center">
 
                         <Label Content="🔎"/>
-                        <Slider x:Name="ZoomSlider" Width="120" Value="100" Minimum="50" Maximum="200" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Slider x:Name="ZoomSlider" Width="120" Value="200" Minimum="100" Maximum="350" HorizontalAlignment="Center" VerticalAlignment="Center" ValueChanged="ZoomSlider_ValueChanged" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2"  Orientation="Horizontal" HorizontalAlignment="Right">
@@ -85,15 +100,8 @@
                         <Label x:Name="LabelPlayTime" Width="50" HorizontalAlignment="Center"  Content="0.00s"  />
                         <Button x:Name="ButtonStop"  Content="⏹ Stop" Click="ButtonStop_Click" />
                     </StackPanel>
-
-                    <StackPanel Grid.Column="3"  Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button x:Name="ButtonSave" Content="💾 Save"  Click="ButtonSave_Click" />
-                    </StackPanel>
-
-
                 </Grid>
             </Grid>
-
 
             <!-- right column: Timeline metadata and file editing -->
             <Grid Grid.Column="1" Margin="5">
@@ -103,12 +111,12 @@
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0">
                     <!-- project data and export -->
-                    <Label Content="Project:"/>
+                    <Label FontWeight="Bold" Content="Project:"/>
                     <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 clients" Click="ButtonExportEsp32_Click" />
                     <Button x:Name="ButtonClear" Content="New Timeline" Click="ButtonClear_Click" />
                     <Label Content="Load existing timeline:" />
                 </StackPanel>
-                
+
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <!-- timeline chooser for the actual project -->
                     <TimelineControls:TimelineChoiceControl x:Name="TimelineChooser" Height="Auto" />
@@ -122,8 +130,9 @@
         <Grid Grid.Row="1">
             <!-- the editor controls, one for each actuatator -->
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80*"/>
-                <ColumnDefinition Width="20*" MinWidth="200" MaxWidth="300"/>
+                <ColumnDefinition Width="507*"/>
+                <ColumnDefinition Width="413*"/>
+                <ColumnDefinition Width="230*" MinWidth="200" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
 
             <ScrollViewer 
@@ -131,12 +140,12 @@
                 Grid.Column="0" 
                 HorizontalScrollBarVisibility="Visible" 
                 VerticalScrollBarVisibility="Visible"
-                ScrollChanged="timelineScrollValueChanged"
+                ScrollChanged="timelineScrollValueChanged" Grid.ColumnSpan="2"
                 >
                 <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" />
             </ScrollViewer>
 
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="7*"></RowDefinition>
                     <RowDefinition Height="3*"></RowDefinition>

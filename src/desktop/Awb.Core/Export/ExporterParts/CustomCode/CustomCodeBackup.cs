@@ -12,17 +12,19 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
         private readonly string _customCodeFolder;
         private readonly string _customCodeBackupRootFolder;
 
+        public event EventHandler<ExporterProcessStateEventArgs>? Processing;
+
         public class BackupResult
         {
             public required bool Success { get; init; }
-            public CustomCodeRegionContent? CustomCodeRegionContent{ get; init; }
+            public CustomCodeRegionContent? CustomCodeRegionContent { get; init; }
             public string? ErrorMsg { get; init; }
         }
 
         public CustomCodeBackup(string customCodeTargetFolder, string customCodeBackupRootFolder)
         {
-            if (string.IsNullOrWhiteSpace(customCodeTargetFolder))              throw new ArgumentException("Value cannot be empty.", nameof(customCodeTargetFolder));
-            if (string.IsNullOrWhiteSpace(customCodeBackupRootFolder))        throw new ArgumentException("Value cannot be empty.", nameof(customCodeBackupRootFolder));
+            if (string.IsNullOrWhiteSpace(customCodeTargetFolder)) throw new ArgumentException("Value cannot be empty.", nameof(customCodeTargetFolder));
+            if (string.IsNullOrWhiteSpace(customCodeBackupRootFolder)) throw new ArgumentException("Value cannot be empty.", nameof(customCodeBackupRootFolder));
 
             if (!Directory.Exists(customCodeBackupRootFolder)) throw new ArgumentException("Folder '" + customCodeBackupRootFolder + "' does not exist", nameof(customCodeBackupRootFolder));
 
@@ -42,6 +44,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
             // find all files in the custom code folder
             var customCodeReaderWriter = new CustomCodeReaderWriter();
+            customCodeReaderWriter.Processing += CustomCodeReaderWriter_Processing;
             var files = Directory.GetFiles(_customCodeFolder, "*.*", SearchOption.TopDirectoryOnly);
             foreach (var file in files)
             {
@@ -57,6 +60,8 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
                 // read the regions from the file
                 var fileContent = File.ReadAllText(file);
+                Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n----------------------------------------------------" });
+                Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Opening file '{file}'" });
                 var regionsReadResult = customCodeReaderWriter.ReadRegions(filename: fileInfo.Name, content: fileContent);
                 if (regionsReadResult.ErrorMsg != null) return new BackupResult { Success = false, ErrorMsg = regionsReadResult.ErrorMsg };
 
@@ -65,11 +70,13 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                     customCodeRegionContent.AddRegion(filename: fileInfo.Name, key: region.Key, content: region.Content);
 
                 // write the file to the backup folder
-                var backupFilename = Path.Combine(backupFolder, fileInfo.Name); 
+                var backupFilename = Path.Combine(backupFolder, fileInfo.Name);
                 File.WriteAllText(backupFilename, fileContent);
             }
 
             return new BackupResult { Success = true, CustomCodeRegionContent = customCodeRegionContent };
         }
+
+        private void CustomCodeReaderWriter_Processing(object? sender, ExporterProcessStateEventArgs e) => Processing?.Invoke(this, e);
     }
 }

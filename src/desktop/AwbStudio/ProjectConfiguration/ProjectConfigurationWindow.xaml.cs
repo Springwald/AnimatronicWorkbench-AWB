@@ -252,6 +252,9 @@ namespace AwbStudio
             _viewModel.StsServos.Remove(e.ObjectToDelete);
             _viewModel.Mp3PlayerYX5300.Remove(e.ObjectToDelete);
             _viewModel.Pca9685PwmServos.Remove(e.ObjectToDelete);
+
+            PropertyEditor.TrySetProjectObject(projectObject: null, _awbProject, Timelines);
+
             _viewModel.UnsavedChanges = true;
         }
 

@@ -58,16 +58,22 @@ namespace AwbStudio.TimelineControls
             _viewContext = viewContext;
             _nestedTimelineValuePainter = new NestedTimelineValuePainter(AllValuesGrid, _viewContext, timelineCaptions, timelineMetaDataService);
             _caption = timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id);
+            HeaderControl.MyObject = NestedTimelinesFakeObject.Singleton;
             HeaderControl.TimelineCaption = _caption;
             HeaderControl.ViewContext   = viewContext;
 
             _isInitialized = true;
         }
 
-        public void TimelineDataLoaded(TimelineData timelineData)
+        public void TimelineDataLoaded(TimelineData? timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-            _nestedTimelineValuePainter!.TimelineDataLoaded(timelineData);
+            if (timelineData == null) this.Visibility = Visibility.Hidden;
+            else
+            {
+                this.Visibility = Visibility.Visible;
+                _nestedTimelineValuePainter!.TimelineDataLoaded(timelineData);
+            }
         }
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)

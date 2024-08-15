@@ -12,6 +12,11 @@
     Only write code beween the cc-start and cc-end comments, otherwise it will be overwritten and lost.
 */
 
+
+/* cc-start-include - insert your include code here before the end-protected comment: */
+
+/* cc-end-include - insert your include code here before the end-protected comment: */
+
 class CustomCode
 {
 protected:

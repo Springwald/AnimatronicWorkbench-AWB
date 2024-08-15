@@ -39,16 +39,16 @@ protected:
 
     int _lastSoundPlayed = -1;
 
-    int _currentStateId = -1;             // the actual selected state id
-    int _stateSelectorStsServoChannel;    // the channel of the sts servo which is used to select the state
-    bool _stateSelectorAvailable = false; // is a state selector available?
-    long _lastStateCheckMillis = -1;      // millis() of last state check
+    // int _currentStateId = -1; // the actual selected state id
+
+    int *_timeLineStateForcedOnceByRemoteOrCustomCodeId = nullptr;      // Here the globale timeline state can be overwritten by custom code a single time. Buttons and other inputs defined in AWB Studio will be ignored.
+    int *_timeLineStateForcedPermanentByRemoteOrCustomCodeId = nullptr; // Here the globale timeline state can be overwritten by custom code permanent. Buttons and other inputs defined in AWB Studio will be ignored.
 
     int calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints);
 
 public:
-    AutoPlayer(ProjectData *data, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, int stateSelectorStsServoChannel, TCallBackErrorOccured errorOccured, Debugging *debugging)
-        : _data(data), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _stateSelectorStsServoChannel(stateSelectorStsServoChannel), _errorOccured(errorOccured), _debugging(debugging)
+    AutoPlayer(ProjectData *data, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, TCallBackErrorOccured errorOccured, Debugging *debugging)
+        : _data(data), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _errorOccured(errorOccured), _debugging(debugging)
     {
         _lastMsUpdate = millis();
     }
@@ -62,27 +62,22 @@ public:
      */
     bool isPlaying();
 
-    /**
-     * The name of the timeline actually playing
-     */
-    String getCurrentTimelineName();
-
-    /**
-     * Returns true if a state selector is available
-     */
-    bool getStateSelectorAvailable();
-
     String getLastSoundPlayed();
 
     /**
-     * Returns the channel of the sts servo which is used to select the state
+     * Force the globale timeline state by custom code a single time. Buttons and other inputs defined in AWB Studio will be ignored for state selection.
      */
-    int getStateSelectorStsServoChannel();
+    void forceTimelineState(bool permanent, int *stateId);
 
     /**
-     * Returns the actual selected state id based on the rotation of a sts servo
+     * The name of the timeline actually playing
      */
-    int selectedStateIdFromStsServoSelector();
+    String getCurrentTimelineName(bool extendWithTimelineIndex);
+
+    /**
+     * The name of the actual timeline state
+     */
+    int getCurrentTimelineStateId();
 
     /**
      * Check, if the selected state is active by inputs

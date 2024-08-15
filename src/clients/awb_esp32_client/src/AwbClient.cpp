@@ -83,6 +83,8 @@ void AwbClient::setup()
     { showError(message); };
     const TCallBackErrorOccured statusManagementErrorOccured = [this](String message)
     { showError(message); };
+    const TCallBackErrorOccured customCodeErrorOccured = [this](String message)
+    { showError(message); };
     showSetupMsg("setup callbacks done");
 
     // set up the actuators
@@ -124,18 +126,11 @@ void AwbClient::setup()
     showSetupMsg("setup mp3 player YX5300");
     this->_mp3Player = new Mp3PlayerYX5300Manager(_projectData->mp3Players, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
 
-#ifdef AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL
-    auto autoPlayerStateSelectorStsServoChannel = AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL;
-    showSetupMsg("AutoPlayer StateSelector StsServoChannel: " + String(autoPlayerStateSelectorStsServoChannel));
-#else
-    auto autoPlayerStateSelectorStsServoChannel = -1;
-#endif
-
     showSetupMsg("setup input manager");
     _inputManager = new InputManager(_projectData, inputManagerErrorOccured);
 
     showSetupMsg("setup autoplay");
-    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerStateSelectorStsServoChannel, autoPlayerErrorOccured, _debugging);
+    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerErrorOccured, _debugging);
 
     // setup the packet processor to process packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet processor");
@@ -174,8 +169,7 @@ void AwbClient::setup()
 
     // set up the custom code
     showSetupMsg("setup custom code");
-    //_customCode = new CustomCode(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _autoPlayer, _inputManager, _neopixelManager, _wlanConnector, _statusManagement);
-    _customCode = new CustomCode(_neopixelManager);
+    _customCode = new CustomCode(_neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, customCodeErrorOccured, _debugging);
     _customCode->setup();
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
@@ -240,7 +234,7 @@ void AwbClient::loop()
 {
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 0);
 
-    _customCode->loop();
+    _customCode->loop(_autoPlayer->getCurrentTimelineName(false), _autoPlayer->getCurrentTimelineStateId());
 
     if (false) // set true to test the mp3 player contineously
     {
@@ -269,11 +263,10 @@ void AwbClient::loop()
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 10);
 
-    //_mp3Player->playSound(1);
-
     // update autoplay timelines and actuators
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 15);
 
+    // check if there are timelines to play by the wlan connector
     if (_wlanConnector->timelineNameToPlay != nullptr && _wlanConnector->timelineNameToPlay->length() > 0)
     {
         // a timeline was received via wifi from a remote control
@@ -281,24 +274,37 @@ void AwbClient::loop()
         _wlanConnector->timelineNameToPlay = nullptr;
     }
 
+    // check if there are timline states to force or timelines to play by the custom code
+    if (_customCode->timelineNameToPlay != nullptr && _customCode->timelineNameToPlay->length() > 0)
+    {
+        // a timeline was received via custom code
+        _autoPlayer->startNewTimelineByName(_customCode->timelineNameToPlay->c_str());
+        _customCode->timelineNameToPlay = nullptr;
+    }
+    if (_customCode->timelineStateToForceOnce != nullptr)
+    {
+        // a timeline state was received via custom code
+        _autoPlayer->forceTimelineState(false, _customCode->timelineStateToForceOnce);
+        _customCode->timelineStateToForceOnce = nullptr;
+    }
+
+    // set permanent timeline state when was received via custom code
+    if (_customCode->timelineStateToForcePermanent != nullptr)
+    {
+        // a permanent timeline state was received via custom code
+        _autoPlayer->forceTimelineState(true, _customCode->timelineStateToForcePermanent);
+        _customCode->timelineStateToForcePermanent = nullptr;
+    }
+
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 20);
     _autoPlayer->update(_statusManagement->getIsAnyGlobalFaultActuatorInCriticalState());
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 25);
 
-    if (_autoPlayer->getStateSelectorStsServoChannel() != _lastAutoPlaySelectedStateId)
-    {
-        // an other timeline filter state was selected
-        _lastAutoPlaySelectedStateId = _autoPlayer->getStateSelectorStsServoChannel();
-        _statusManagement->setDebugStatus("StateId:" + String(_lastAutoPlaySelectedStateId));
-    }
-
-    _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 30);
-
-    if (!_autoPlayer->getCurrentTimelineName().equals(_lastAutoPlayTimelineName))
+    if (!_autoPlayer->getCurrentTimelineName(true).equals(_lastAutoPlayTimelineName))
     {
         // an other timeline was started
-        _lastAutoPlayTimelineName = _autoPlayer->getCurrentTimelineName();
+        _lastAutoPlayTimelineName = _autoPlayer->getCurrentTimelineName(true);
         if (!_autoPlayer->isPlaying())
         {
             // no timeline is playing, so turn off torque for all sts servos
@@ -331,9 +337,6 @@ void AwbClient::loop()
 
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 50);
 
-    // if (_neoPixelStatus != nullptr && !packetReceived)
-    //     _neoPixelStatus->update();
-
     _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 55);
 
     if (_dacSpeaker != nullptr)
@@ -349,12 +352,9 @@ void AwbClient::loop()
 
     // collect all status information for lcd display and WLAN status display
     _wlanConnector->memoryInfo = &_display.memoryInfo;
-    _actualStatusInformation->autoPlayerCurrentStateName = _autoPlayer->getCurrentTimelineName();
-    _actualStatusInformation->autoPlayerSelectedStateId = _autoPlayer->selectedStateIdFromStsServoSelector();
+    _actualStatusInformation->autoPlayerCurrentStateName = _autoPlayer->getCurrentTimelineName(true);
     _actualStatusInformation->autoPlayerIsPlaying = _autoPlayer->isPlaying();
-    _actualStatusInformation->autoPlayerStateSelectorAvailable = _autoPlayer->getStateSelectorAvailable();
-    _actualStatusInformation->autoPlayerCurrentTimelineName = _autoPlayer->getCurrentTimelineName();
-    _actualStatusInformation->autoPlayerStateSelectorStsServoChannel = _autoPlayer->getStateSelectorStsServoChannel();
+    _actualStatusInformation->autoPlayerCurrentTimelineName = _autoPlayer->getCurrentTimelineName(true);
     _actualStatusInformation->activeTimelineStateIdsByInput = _autoPlayer->getStatesDebugInfo();
     _actualStatusInformation->inputStates = _inputManager->getDebugInfo();
     _actualStatusInformation->lastSoundPlayed = _autoPlayer->getLastSoundPlayed();

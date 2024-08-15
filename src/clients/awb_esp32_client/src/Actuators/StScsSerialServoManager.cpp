@@ -157,7 +157,7 @@ int StScsSerialServoManager::readPosition(u8 id)
 }
 
 /**
- * set the maximum torque of the servo. Set 0 to turn the servo off
+ * set the  torque of the servo on or off. Set 0 to turn the servo off
  */
 void StScsSerialServoManager::setTorque(u8 id, bool on)
 {

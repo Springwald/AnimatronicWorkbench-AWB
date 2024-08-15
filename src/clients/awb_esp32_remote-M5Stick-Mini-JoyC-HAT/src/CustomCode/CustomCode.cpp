@@ -19,22 +19,6 @@ void CustomCode::loop(int8_t joyPosX, int8_t joyPosY, bool joyButton, bool butto
 {
     /* cc-start-loop - insert your loop code here before the end-loop comment: */
 
-    if (joyPosY > 50)
-        this->_commandSender->playTimeline("YES");
-    if (joyPosY < -50)
-        this->_commandSender->playTimeline("NO");
-    if (joyPosX > 50)
-        this->_commandSender->playTimeline("LookUpRight");
-    if (joyPosX < -50)
-        this->_commandSender->playTimeline("LookUpMiddle");
-
-    if (joyButton == true)
-        this->_commandSender->playTimeline("Wink");
-    if (button2 == true)
-        this->_commandSender->playTimeline("The+Force+raw");
-    if (button3 == true)
-        this->_commandSender->playTimeline("Stand+-+Dance");
-
     /* cc-end-loop  */
 }
 

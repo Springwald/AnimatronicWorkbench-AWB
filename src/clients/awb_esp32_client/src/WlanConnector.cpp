@@ -224,9 +224,6 @@ String WlanConnector::GetHtml()
         ptr += "<tr><td>current state</td><td> " + String(this->_actualStatusInformation->autoPlayerCurrentStateName) + "</td></tr>\n";
         ptr += "<tr><td>current timeline</td><td> " + String(_actualStatusInformation->autoPlayerCurrentTimelineName) + "</td></tr>\n";
         ptr += "<tr><td>is playing</td><td> " + String(_actualStatusInformation->autoPlayerIsPlaying == true ? "yes" : "no") + "</td></tr>\n";
-        ptr += "<tr><td>selected state id</td><td> " + String(_actualStatusInformation->autoPlayerSelectedStateId) + "</td></tr>\n";
-        ptr += "<tr><td>state selector available</td><td> " + String(_actualStatusInformation->autoPlayerStateSelectorAvailable == true ? "yes" : "no") + "</td></tr>\n";
-        ptr += "<tr><td>state selector STS servo channel</td><td> " + String(_actualStatusInformation->autoPlayerStateSelectorStsServoChannel) + "</td></tr>\n";
         ptr += "<tr><td>states active by inputs</td><td> " + _actualStatusInformation->activeTimelineStateIdsByInput + "</td></tr>\n";
         ptr += "<tr><td>inputs</td><td> " + _actualStatusInformation->inputStates + "</td></tr>\n";
         ptr += "<tr><td>last sound</td><td> " + _actualStatusInformation->lastSoundPlayed + "</td></tr>\n";

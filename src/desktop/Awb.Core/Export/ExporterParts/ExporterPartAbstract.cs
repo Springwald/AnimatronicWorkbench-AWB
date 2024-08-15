@@ -13,6 +13,10 @@ namespace Awb.Core.Export.ExporterParts
     {
         public abstract Task<IExporter.ExportResult> ExportAsync();
 
+        public event EventHandler<ExporterProcessStateEventArgs>? Processing;
+
+        public void InvokeProcessing(ExporterProcessStateEventArgs e) => Processing?.Invoke(this, e);
+
         protected string GetHeader(string className, string includes)
         {
             var content = new StringBuilder();
@@ -28,7 +32,7 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine();
             content.AppendLine($"class {className}");
             content.AppendLine("{");
-            
+
             return content.ToString();
         }
 

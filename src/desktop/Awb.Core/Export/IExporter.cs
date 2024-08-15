@@ -20,7 +20,7 @@ namespace Awb.Core.Export
         string Title { get; }
 
         // reports the current state as event
-        event EventHandler<ExporterProcessStateEventArgs>? Processing;
+        event EventHandler<ExporterProcessStateEventArgs>? ProcessingState;
 
         // exports the data to the targetPath
         Task<ExportResult> ExportAsync(string targetPath);

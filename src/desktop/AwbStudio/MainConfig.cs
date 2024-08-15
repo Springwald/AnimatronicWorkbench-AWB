@@ -20,8 +20,8 @@ namespace AwbStudio
     /// </remarks>
     internal static class MainConfig
     {
-        public const string Version = "0.7.0";
-        public static DateTime VersionReleaseDate = new DateTime(2024, 8, 10);
+        public const string Version = "0.7.1";
+        public static DateTime VersionReleaseDate = new DateTime(2024, 8, 16);
 
         public static bool TestMode = false; // set to false for production before pull request for release
         //public static bool TestMode = Debugger.IsAttached; // remove this line for production 

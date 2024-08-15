@@ -8,7 +8,7 @@
 
 void CommandSender::playTimeline(String timelineName)
 {
-    _display.draw_message("play timeline: " + timelineName, 500, MSG_TYPE_INFO);
+    _display.draw_message("timeline:\r\n" + timelineName, 500, MSG_TYPE_INFO);
     this->sendCommand("/remote/play/?timeline=" + timelineName);
 }
 
@@ -16,6 +16,9 @@ void CommandSender::sendCommand(String command)
 {
     if (WiFi.status() == WL_CONNECTED)
     {
+        // url encode command
+        command.replace(" ", "%20");
+
         HTTPClient http;
         String serverPath = "http://192.168.1.1" + command;
 

@@ -23,6 +23,14 @@ namespace Awb.Core.Project.Clients
         #endregion
 
 
+        #region Autoplay
+
+        [Display(Name = "Return to automode", GroupName = "AutoPlay", Order = 1)]
+        [Description("Number of minutes after the last signal from Animatronic WorkBench Studio before returning to AutoPlay")]
+        [Range(1, 5)]
+        public int? AutoPlayAfter { get; set; } = null;
+
+        #endregion
 
         #region Debugging
 

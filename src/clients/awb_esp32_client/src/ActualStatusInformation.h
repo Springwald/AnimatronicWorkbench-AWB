@@ -16,22 +16,13 @@ public:
     String autoPlayerCurrentStateName;          /// the name of the current auto player timeline filter state
     String autoPlayerCurrentTimelineName;       /// the name of the current timeline played in auto player
     bool autoPlayerIsPlaying;                   /// true if auto player is playing
-    int autoPlayerSelectedStateId;              /// the id of the current auto player timeline filter state
-    bool autoPlayerStateSelectorAvailable;      /// true if a hardware auto player timeline filter state selector is available
-    int autoPlayerStateSelectorStsServoChannel; /// the channel of the sts servo for the hardware auto player timeline filter state selector
 
-    // std::vector<ActuatorValue> *stsServoValues; /// the current sts servo status
-    // std::vector<ActuatorValue> *scsServoValues; /// the current scs servo status
-    // std::vector<ActuatorValue> *pwmServoValues; /// the current pwm servo status
     String activeTimelineStateIdsByInput; /// the active timeline states by input
     String inputStates;                   /// the active timeline states by input
     String lastSoundPlayed;               /// the last sound played
 
     ActualStatusInformation()
     {
-        // stsServoValues = new std::vector<ActuatorValue>();
-        // scsServoValues = new std::vector<ActuatorValue>();
-        // pwmServoValues = new std::vector<ActuatorValue>();
     }
 
     ~ActualStatusInformation()

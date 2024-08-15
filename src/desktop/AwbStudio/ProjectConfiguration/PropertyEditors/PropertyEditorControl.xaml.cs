@@ -38,7 +38,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     PropertyEditorGrid.Children.Clear();
                 }
                 _actualEditor = value;
-                PropertyEditorGrid.Children.Add(_actualEditor);
+                if (_actualEditor != null)
+                    PropertyEditorGrid.Children.Add(_actualEditor);
             }
         }
 
@@ -72,6 +73,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
                         default:
                             break;
+                    }
+
+                    if (ActualEditor != null)
+                    {
+                        ActualEditor.OnDeleteObject -= OnObjectDelete_Fired;
+                        ActualEditor.OnUpdatedData -= UpdatedData_Fired;
                     }
 
                     var editor = new ProjectObjectGenericEditorControl();

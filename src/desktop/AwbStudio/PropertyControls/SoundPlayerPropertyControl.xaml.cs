@@ -28,6 +28,7 @@ namespace AwbStudio.PropertyControls
         private readonly TimelineViewContext _viewContext;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
         private bool _isUpdatingView;
+        private bool _isSettingNewValue;
 
         public IAwbObject AwbObject => _soundPlayer;
 
@@ -58,13 +59,9 @@ namespace AwbStudio.PropertyControls
 
             ComboBoxSoundToPlay.Items.Add("-- NO SOUND --");
             foreach (var sound in _projectSounds)
-            {
-
                 ComboBoxSoundToPlay.Items.Add(sound.Title);
-            }
 
             ShowActualValue();
-
         }
 
         private void SoundPlayerPropertiesControl_Unloaded(object sender, RoutedEventArgs e)
@@ -113,13 +110,14 @@ namespace AwbStudio.PropertyControls
                     MessageBox.Show("Sound index " + index + " not found!");
                     return;
                 }
-                var newSoundId = _projectSounds[index-1];
+                var newSoundId = _projectSounds[index - 1];
                 SetNewValue(newSoundId);
             }
         }
 
         private void SetNewValue(Sound? sound)
         {
+            _isSettingNewValue = true;
             if (_soundPlayer.ActualSoundId != sound?.Id)
             {
                 if (sound == null)
@@ -132,14 +130,18 @@ namespace AwbStudio.PropertyControls
                 }
                 _viewContext.FocusObjectValueChanged(this);
             }
+            _isSettingNewValue = false;
             ShowActualValue();
+
         }
 
         private void ShowActualValue()
         {
-            var soundId = _soundPlayer.ActualSoundId;
+            if (_isSettingNewValue) return;
 
             _isUpdatingView = true;
+
+            var soundId = _soundPlayer.ActualSoundId;
 
             if (soundId == null)
             {
@@ -151,7 +153,7 @@ namespace AwbStudio.PropertyControls
                 {
                     if (_projectSounds[index].Id == soundId)
                     {
-                        ComboBoxSoundToPlay.SelectedIndex = index+1;
+                        ComboBoxSoundToPlay.SelectedIndex = index + 1;
                         break; ;
                     }
                 }

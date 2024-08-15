@@ -24,7 +24,7 @@ namespace Awb.Core.Timelines.NestedTimelines
         /// </summary>
         public string TimelineId { get; set; }
 
-        public override string Title { get; set; }
+        public override string Title => "Nested Timelines";
 
         public override string PainterCheckSum => TimelineId.ToString() + TimeMs.ToString();
 
@@ -33,12 +33,11 @@ namespace Awb.Core.Timelines.NestedTimelines
         {
             TimeMs = timeMs;
             TimelineId = timelineId;
-            Title = "Nested Timelines";
         }
 
         public override NestedTimelinePoint Clone()
         {
-            return new NestedTimelinePoint(timeMs: TimeMs, timelineId: TimelineId) {  Title = Title };
+            return new NestedTimelinePoint(timeMs: TimeMs, timelineId: TimelineId) ;
         }
     }
 }

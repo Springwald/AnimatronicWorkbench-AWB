@@ -96,7 +96,7 @@ namespace Awb.Core.Project.Various
         public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"TimelineState has no title set '{Id}'" : Title;
 
         [JsonIgnore]
-        public string TitleDetailed => $"TimelineState {TitleShort}";
+        public string TitleDetailed => $"TimelineState \"{TitleShort}\" (ID {Id})";
 
         private string StringFromIntArray(int[] value)
             => string.Join(",", value.Select(x => x.ToString()));

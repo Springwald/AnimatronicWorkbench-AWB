@@ -34,6 +34,11 @@ public:
         FastLED.addLeds<NEOPIXEL, NEOPIXEL_GPIO>(leds, ledsCount);
         // FastLED.addLeds<CHIPSET, NEOPIXEL_GPIO, COLOR_ORDER>(leds, ledsCount).setCorrection(TypicalLEDStrip);
         FastLED.setBrightness(255);
+		
+		for (int i=0; i < ledsCount; i++)
+		leds[i] = CRGB(0, 0, 0);
+		FastLED.show();
+
 #endif
     }
 

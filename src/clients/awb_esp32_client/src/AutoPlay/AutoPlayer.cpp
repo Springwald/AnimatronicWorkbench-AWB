@@ -27,31 +27,56 @@ bool AutoPlayer::isPlaying()
 }
 
 /**
- * Is a hardware state selector available?
+ * Force the globale timeline state by custom code a single time. Buttons and other inputs defined in AWB Studio will be ignored for state selection.
  */
-bool AutoPlayer::getStateSelectorAvailable()
+void AutoPlayer::forceTimelineState(bool permanent, int *stateId)
 {
-    return _stateSelectorAvailable;
-}
+    // check if this is a set back to "not set" if the stateId value is -1
+    if (*stateId == -1)
+    {
+        _timeLineStateForcedPermanentByRemoteOrCustomCodeId = nullptr;
+        _timeLineStateForcedOnceByRemoteOrCustomCodeId = nullptr;
+        return;
+    }
 
-/**
- * If a sts servo is used to select the state, this is the channel
- */
-int AutoPlayer::getStateSelectorStsServoChannel()
-{
-    return _stateSelectorStsServoChannel;
+    if (permanent)
+    {
+        _timeLineStateForcedPermanentByRemoteOrCustomCodeId = stateId;
+        if (_timeLineStateForcedPermanentByRemoteOrCustomCodeId != nullptr)
+            delete _timeLineStateForcedOnceByRemoteOrCustomCodeId;
+    }
+    else
+    {
+        _timeLineStateForcedOnceByRemoteOrCustomCodeId = stateId;
+    }
 }
 
 /**
  * If a timeline is playing, this is the name of the timeline
  */
-String AutoPlayer::getCurrentTimelineName()
+String AutoPlayer::getCurrentTimelineName(bool extendWithTimelineIndex)
+{
+    if (extendWithTimelineIndex == false)
+    {
+        if (_actualTimelineIndex == -1)
+            return String("Off");
+        return _data->timelines->at(_actualTimelineIndex).name;
+    }
+    else
+    {
+        if (_actualTimelineIndex == -1)
+            return String("Off [-1]");
+        return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
+    }
+}
+/**
+ * The name of the actual timeline state
+ */
+int AutoPlayer::getCurrentTimelineStateId()
 {
     if (_actualTimelineIndex == -1)
-    {
-        return String("Off [-1]");
-    }
-    return _data->timelines->at(_actualTimelineIndex).name + " [" + String(_actualTimelineIndex) + "]";
+        return -1;
+    return _data->timelines->at(_actualTimelineIndex).state->id;
 }
 
 String AutoPlayer::getLastSoundPlayed()
@@ -68,7 +93,6 @@ String AutoPlayer::getLastSoundPlayed()
  */
 void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 {
-
     _debugging->setState(Debugging::MJ_AUTOPLAY, 1);
 
     // return of no data is set
@@ -89,12 +113,13 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 
     _lastMsUpdate = millis();
 
-    bool forgetLastPacketReceived = false;
-
     _debugging->setState(Debugging::MJ_AUTOPLAY, 5);
 
-    if (forgetLastPacketReceived == true && _lastPacketReceivedMillis != -1 && millis() > _lastPacketReceivedMillis + 60 * 1000) // 60 seconds
-        _lastPacketReceivedMillis = -1;                                                                                          // forget the last packet received
+    if (_data->returnToAutoModeAfterMinutes != -1)
+    {
+        if (_lastPacketReceivedMillis != -1 && millis() > _lastPacketReceivedMillis + _data->returnToAutoModeAfterMinutes * 60 * 1000) // x minutes (=60*1000ms) after the last packet received, we return to auto mode
+            _lastPacketReceivedMillis = -1;                                                                                            // forget the last packet received
+    }
 
     bool packedReceivedLately = _lastPacketReceivedMillis != -1;
     if (packedReceivedLately == true)
@@ -392,42 +417,6 @@ std::vector<TimelineState> AutoPlayer::getActiveStatesByInputs()
 }
 
 /**
- * If a state selector is used, this is the selected state id
- */
-int AutoPlayer::selectedStateIdFromStsServoSelector()
-{
-    if (_stateSelectorStsServoChannel == -1)
-        return -1;
-
-    if (millis() < _lastStateCheckMillis + 500) // update interval
-        return _currentStateId;
-
-    _lastStateCheckMillis = millis();
-
-    if (_stateSelectorAvailable == false)
-    {
-        _stateSelectorAvailable = _stSerialServoManager->servoAvailable(_stateSelectorStsServoChannel);
-        if (_stateSelectorAvailable == false)
-            return -1;
-    }
-
-    int pos = _stSerialServoManager->readPosition(_stateSelectorStsServoChannel);
-
-    if (pos == -1)
-    {
-        return -1;
-    }
-
-    int statesPerRound = 6;
-    int segment = 4096 / statesPerRound;
-    int stateId = (pos + AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET) / segment;
-    if (stateId >= statesPerRound)
-        stateId = 0;
-    _currentStateId = stateId;
-    return _currentStateId;
-}
-
-/**
  * Starts the auto player with the given timeline
  */
 void AutoPlayer::startNewTimelineByIndex(int timelineIndex)
@@ -456,9 +445,7 @@ void AutoPlayer::startNewTimelineByName(String name)
  */
 void AutoPlayer::startNewTimelineForSelectedState()
 {
-    auto stateIdFromStsServoSelector = selectedStateIdFromStsServoSelector();
-
-    if (stateIdFromStsServoSelector == 0 || _data == nullptr || _data->timelines->size() == 0)
+    if (_data == nullptr || _data->timelines->size() == 0)
     {
         _actualTimelineIndex = -1;
         return;
@@ -466,6 +453,30 @@ void AutoPlayer::startNewTimelineForSelectedState()
 
     // print timeline size
     int size = _data->timelines->size();
+
+    // check if the actual timeline had a next state once set
+    int nextStateForcedId = -1;
+    if (_timeLineStateForcedOnceByRemoteOrCustomCodeId != nullptr)
+    {
+        // There is a special next-state-once set by remote or custom code.
+        // This is the highest priority
+        nextStateForcedId = *_timeLineStateForcedOnceByRemoteOrCustomCodeId;
+        _timeLineStateForcedOnceByRemoteOrCustomCodeId = nullptr;
+    }
+    else if (_timeLineStateForcedPermanentByRemoteOrCustomCodeId != nullptr)
+    {
+        // There is a special next-state-permanent set by remote or custom code.
+        // This is the second highest priority
+        nextStateForcedId = *_timeLineStateForcedPermanentByRemoteOrCustomCodeId;
+    }
+    else if (_actualTimelineIndex != -1)
+    {
+        // There is no special next-state set by remote or custom code,
+        // so we check if the actual timeline has a next-state-once set
+        auto actualTimelineData = _data->timelines->at(_actualTimelineIndex);
+        if (actualTimelineData.nextStateOnceId != -1)
+            nextStateForcedId = actualTimelineData.nextStateOnceId;
+    }
 
     // find the next timeline for the selected state
     int nextTimelineIndex = _actualTimelineIndex;
@@ -478,19 +489,16 @@ void AutoPlayer::startNewTimelineForSelectedState()
             nextTimelineIndex = 0; // last timeline reached, start from the beginning
         }
 
-        if (_stateSelectorAvailable == true) // state selector is the most important selector
+        if (nextStateForcedId != -1) // there is a next state forced by remote, custom code or the actual ending timeline
         {
-            // check if the next timeline is for the selected state
-            if (_data->timelines->at(nextTimelineIndex).state->id == stateIdFromStsServoSelector)
+            if (_data->timelines->at(nextTimelineIndex).state->id == nextStateForcedId)
             {
-                // found the next timeline for the selected state
                 startNewTimelineByIndex(nextTimelineIndex);
                 return;
             }
         }
         else
         {
-            // if no state selector is available, we check the inputs
             auto activeStates = getActiveStatesByInputs();
 
             // iterate over the active states and check if the next timeline is for one of them

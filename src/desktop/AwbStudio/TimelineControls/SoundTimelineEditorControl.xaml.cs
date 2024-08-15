@@ -66,15 +66,21 @@ namespace AwbStudio.TimelineControls
             _soundValuePainter = new SoundValuePainter(soundPlayer, AllValuesGrid, _viewContext, timelineCaptions, projectSounds);
             _caption = timelineCaptions?.GetAktuatorCaption(soundPlayer.Id);
             HeaderControl.TimelineCaption = _caption;
+            HeaderControl.MyObject = soundPlayer;
             HeaderControl.ViewContext = viewContext;
 
             _isInitialized = true;
         }
 
-        public void TimelineDataLoaded(TimelineData timelineData)
+        public void TimelineDataLoaded(TimelineData? timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-            _soundValuePainter!.TimelineDataLoaded(timelineData);
+            if (timelineData == null) this.Visibility = Visibility.Hidden;
+            else
+            {
+                this.Visibility = Visibility.Visible;
+                _soundValuePainter!.TimelineDataLoaded(timelineData);
+            }
         }
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)

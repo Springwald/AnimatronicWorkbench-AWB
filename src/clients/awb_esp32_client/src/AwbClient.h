@@ -19,7 +19,7 @@
 #include "StatusManagement.h"
 #include "Debugging.h"
 #include "Actuators/NeopixelManager.h"
-#include "AwbDataImport/CustomCode/CustomCode.h"
+#include "CustomCode/CustomCode.h"
 
 using byte = unsigned char;
 
@@ -33,7 +33,6 @@ protected:
     DacSpeaker *_dacSpeaker; /// The speaker if connected
 
     long _startMillis = millis();          /// The start millis
-    int _lastAutoPlaySelectedStateId = -1; /// The last selected state id for autoplay timeline filter
     String _lastAutoPlayTimelineName = ""; /// The last selected timeline name for autoplay timeline filter
 
     PacketSenderReceiver *_packetSenderReceiver = nullptr;       /// The packet sender receiver to communicate with the Animatronic Workbench Studio
@@ -91,6 +90,11 @@ public:
         delete _neopixelManager;
         delete _autoPlayer;
         delete _wlanConnector;
+        delete _projectData;
+        delete _debugging;
+        delete _statusManagement;
+        delete _actualStatusInformation;
+        delete _customCode;
     }
 
     void setup();

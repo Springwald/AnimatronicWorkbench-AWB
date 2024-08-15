@@ -9,6 +9,7 @@ using Awb.Core.Actuators;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
+using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,12 @@ namespace AwbStudio.TimelineValuePainters
 {
     class ServoValuePainter : AbstractValuePainter
     {
-        private const double _paintMarginTopBottom = 0;
         private readonly double _dotRadius;
         private readonly IServo _servo;
         private readonly TimelineCaptions _timelineCaptions;
         private readonly ITimelineDataService _timelineDataService;
         private readonly IAwbLogger _awbLogger;
+        private readonly OpticalGridCalculator _opticalGridCalculator;
 
         public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineDataService timelineDataService, IAwbLogger awbLogger, double dotRadius = 3)
             : base(paintControl, viewContext, timelineCaptions)
@@ -36,6 +37,8 @@ namespace AwbStudio.TimelineValuePainters
             _timelineCaptions = timelineCaptions;
             _timelineDataService = timelineDataService;
             _awbLogger = awbLogger;
+
+            _opticalGridCalculator = new OpticalGridCalculator(paintControl);
         }
 
         protected override void TimelineDataLoadedInternal()
@@ -48,12 +51,7 @@ namespace AwbStudio.TimelineValuePainters
 
             if (timelinePoints == null || timelinePoints.Any() == false) return;
 
-            double height = PaintControl.ActualHeight;
-            double width = PaintControl.ActualWidth;
-
-            if (height < _paintMarginTopBottom * 2 || width < 100) return;
-
-            double diagramHeight = height - _paintMarginTopBottom * 2;
+            if (PaintControl.ActualHeight < 50 || PaintControl.ActualWidth < 100) return;
 
             // Update the content points and lines
             // ToDo: cache and only update on changes; or: use model binding and auto update
@@ -82,14 +80,18 @@ namespace AwbStudio.TimelineValuePainters
                                 HorizontalAlignment = HorizontalAlignment.Left,
                                 VerticalAlignment = VerticalAlignment.Top,
                                 Fill = Brushes.Transparent,
-                                Margin = new Thickness { Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius, Top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius },
+                                Margin = new Thickness
+                                {
+                                    Left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius,
+                                    Top = _opticalGridCalculator.GetYForPercentValue(point.ValuePercent) - _dotRadius
+                                }
                             };
 
                         }
                         else
                         {
                             var left = _viewContext.GetXPos(timeMs: (int)point.TimeMs, timelineData: _timelineData) - _dotRadius;
-                            var top = height - _paintMarginTopBottom - point.ValuePercent / 100.0 * diagramHeight - _dotRadius;
+                            var top = _opticalGridCalculator.GetYForPercentValue(point.ValuePercent) - _dotRadius;
                             shape = new Ellipse
                             {
                                 HorizontalAlignment = HorizontalAlignment.Left,
@@ -113,7 +115,7 @@ namespace AwbStudio.TimelineValuePainters
             new Point
             {
                 X = _viewContext!.GetXPos((int)(p.TimeMs), timelineData: _timelineData),
-                Y = height - _paintMarginTopBottom - p.ValuePercent / 100.0 * diagramHeight
+                Y = _opticalGridCalculator.GetYForPercentValue(p.ValuePercent),
             }));
             var line = new Polyline { Tag = ServoTag(_servo.Id), Stroke = caption.ForegroundColor, StrokeThickness = 1, Points = points };
             this.PaintControl.Children.Add(line);

@@ -6,7 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 
-using Awb.Core.Actuators;
+using Awb.Core.Export.ExporterParts.ExportData;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
@@ -103,15 +103,6 @@ namespace Awb.Core.Export.ExporterParts
                 content.AppendLine();
             }
 
-            // Autoplay state selector settings
-            content.AppendLine("/* autoplay state selector */");
-            content.AppendLine("// if a servo position feedback is used as a state selector, define the servo channel here.");
-            content.AppendLine("// if you don't use a servo as state selector, set this to -1 or undefine it");
-            content.AppendLine("// #define AUTOPLAY_STATE_SELECTOR_STS_SERVO_CHANNEL 9");
-            content.AppendLine("// if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)");
-            content.AppendLine("// if the servo position feedback is not exatly 0 at the first state, define the offset here (-4096 to 4096)");
-            content.AppendLine("#define AUTOPLAY_STATE_SELECTOR_STS_SERVO_POS_OFFSET 457");
-            content.AppendLine();
 
             // DAC speaker settings
             if (false)
@@ -146,6 +137,7 @@ namespace Awb.Core.Export.ExporterParts
                 #include <String.h>
                 #include "../ProjectData/Timeline.h"
                 #include "../ProjectData/TimelineState.h"
+                #include "../ProjectData/TimelineState.h"
                 #include "../ProjectData/TimelineStateReference.h"
                 #include "../ProjectData/StsServoPoint.h"
                 #include "../ProjectData/Pca9685PwmServoPoint.h"
@@ -159,6 +151,9 @@ namespace Awb.Core.Export.ExporterParts
 
             content.AppendLine("public:");
             content.AppendLine($"   const char *ProjectName = \"{_projectData.ProjectName}\";");
+            content.AppendLine();
+
+            content.AppendLine($"   const int returnToAutoModeAfterMinutes  = {_projectData.Esp32ClientHardwareConfig.AutoPlayAfter ?? -1} ;");
 
             content.AppendLine();
             content.AppendLine($"\tstd::vector<StsScsServo> *scsServos;");
@@ -250,7 +245,7 @@ namespace Awb.Core.Export.ExporterParts
             {
                 var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
                 var acceleration = servo.Acceleration ?? 0;
-                var speed = servo.Speed ?? 0;   
+                var speed = servo.Speed ?? 0;
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
                 result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));");
             }
@@ -371,7 +366,7 @@ namespace Awb.Core.Export.ExporterParts
                 }
 
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineStateReference({state.Id}, String(\"{state.Title}\"));");
-                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");
+                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId ?? -1}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 
                 result.AppendLine();

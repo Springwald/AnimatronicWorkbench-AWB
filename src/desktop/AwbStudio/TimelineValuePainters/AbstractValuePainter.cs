@@ -36,7 +36,7 @@ namespace AwbStudio.TimelineValuePainters
             this.PaintControl.SizeChanged += PaintControl_SizeChanged;
         }
 
-        public void TimelineDataLoaded(TimelineData timelineData)
+        public void TimelineDataLoaded(TimelineData? timelineData)
         {
             _timelineData = timelineData ?? throw new ArgumentNullException(nameof(timelineData));
             _timelineData.OnContentChanged += TimelineData_OnContentChanged;
@@ -56,12 +56,9 @@ namespace AwbStudio.TimelineValuePainters
                 PaintValues(_timelineData?.AllPoints);
         }
 
-        private DateTime _lastValuesPaintBecauseOfResize = DateTime.MinValue;
 
         private void PaintControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (DateTime.UtcNow - _lastValuesPaintBecauseOfResize < TimeSpan.FromMilliseconds(1000)) return;
-            _lastValuesPaintBecauseOfResize = DateTime.UtcNow;
             PaintValues(_timelineData?.AllPoints);
         }
 

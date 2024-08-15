@@ -14,7 +14,8 @@ namespace Awb.Core.Export
         private readonly bool _removeExtraFilesInTarget;
         private readonly string[] _removeFilesBlockerDirectoryNames;
         private readonly string[] _copyFilesBlockerDirectoryNames;
-        private readonly bool _deepReportLevel;
+
+        private readonly bool _deepLog = false;
 
         public class CloneResult
         {
@@ -24,14 +25,13 @@ namespace Awb.Core.Export
 
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
-        public SrcFolderCloner(string sourceFolder, string targetFolder, bool removeExtraFilesInTarget, string[] removeFilesBlockerDirectoryNames, string[] copyFilesBlockerDirectoryNames, bool deepReportLevel = false)
+        public SrcFolderCloner(string sourceFolder, string targetFolder, bool removeExtraFilesInTarget, string[] removeFilesBlockerDirectoryNames, string[] copyFilesBlockerDirectoryNames)
         {
             _sourceFolder = sourceFolder;
             _targetFolder = targetFolder;
             _removeExtraFilesInTarget = removeExtraFilesInTarget;
             _removeFilesBlockerDirectoryNames = removeFilesBlockerDirectoryNames;
             _copyFilesBlockerDirectoryNames = copyFilesBlockerDirectoryNames;
-            _deepReportLevel = deepReportLevel;
         }
 
         public async Task<CloneResult> Clone()
@@ -39,9 +39,14 @@ namespace Awb.Core.Export
             if (!Directory.Exists(_sourceFolder)) return new CloneResult { ErrorMessage = $"Source folder '{_sourceFolder}' does not exist" };
             if (!Directory.Exists(_targetFolder)) return new CloneResult { ErrorMessage = $"Target folder '{_targetFolder}' does not exist" };
 
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n-------------------------------------" }); 
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Clone folder '{_sourceFolder}' to '{_targetFolder}'" });
+
+
             // remove files in target folder that are not in source folder
             if (_removeExtraFilesInTarget)
             {
+                Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Remove extra files in target folder '{_targetFolder}'" });
                 foreach (var targetFile in Directory.GetFiles(_targetFolder, "*", SearchOption.AllDirectories))
                 {
                     var relativePath = targetFile.Substring(_targetFolder.Length + 1);
@@ -54,8 +59,7 @@ namespace Awb.Core.Export
                         {
                             if (sourceFile.Contains($@"\{blockerDir}\"))
                             {
-                                if (_deepReportLevel == true)
-                                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping deleting file '{targetFile}' because it is located in '{blockerDir}'" });
+                                if (_deepLog) Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping deleting file '{targetFile}' because it is located in '{blockerDir}'", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                                 delete = false;
                                 break;
                             }
@@ -63,7 +67,7 @@ namespace Awb.Core.Export
                         if (delete)
                         {
                             File.Delete(targetFile);
-                            Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Deleted file '{targetFile}' because it is not in source folder." });
+                            Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Deleted file '{targetFile}' because it is not in source folder.", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                         }
                     }
                 }
@@ -76,8 +80,7 @@ namespace Awb.Core.Export
                 {
                     if (sourceFile.Contains($@"\{blockerDir}\"))
                     {
-                        if (_deepReportLevel == true)
-                            Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it is located in '{blockerDir}'" });
+                        if (_deepLog) Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it is located in '{blockerDir}'", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                         continue;
                     }
                 }
@@ -121,14 +124,13 @@ namespace Awb.Core.Export
                 }
                 else
                 {
-                    if (_deepReportLevel == true)
-                        Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it has the same last write time and size as the target file." });
+                    if (_deepLog)  Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it has the same last write time and size as the target file.", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                 }
-
+             
             }
 
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Clone folder '{_sourceFolder}' to '{_targetFolder}' done." });
             await Task.CompletedTask;
-
             return new CloneResult();
         }
     }

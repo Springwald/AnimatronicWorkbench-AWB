@@ -71,10 +71,15 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public void TimelineDataLoaded(TimelineData timelineData)
+        public void TimelineDataLoaded(TimelineData? timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-            UpdateCaptionView();
+            if (timelineData == null) this.Visibility = Visibility.Hidden;
+            else
+            {
+                this.Visibility = Visibility.Visible;
+                UpdateCaptionView();
+            }
         }
 
 

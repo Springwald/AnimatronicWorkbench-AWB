@@ -20,7 +20,7 @@ namespace Awb.Core.Timelines
         /// </summary>
         public string SoundPlayerId { get; set; }
 
-        public override string Title { get; set; }
+        public override string Title { get; }
 
 
         public override string PainterCheckSum => SoundId.ToString() + base.TimeMs.ToString() + SoundPlayerId.ToString();

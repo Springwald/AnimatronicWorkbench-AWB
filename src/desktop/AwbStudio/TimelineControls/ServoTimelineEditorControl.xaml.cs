@@ -13,6 +13,7 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -25,8 +26,11 @@ namespace AwbStudio.TimelineControls
     /// </summary>
     public partial class ServoTimelineEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
-        private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
-        private const double _paintMarginTopBottom = 30;
+      
+
+        private readonly Brush _gridLineBrushPrimary = new SolidColorBrush(Color.FromRgb(100, 100, 200));
+        private readonly Brush _gridLineBrushSecondary = new SolidColorBrush(Color.FromRgb(60, 60, 100));
+
 
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
@@ -72,37 +76,42 @@ namespace AwbStudio.TimelineControls
             _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions, timelineDataService, awbLogger, dotRadius: 6);
             _caption = timelineCaptions?.GetAktuatorCaption(servo.Id);
             HeaderControl.TimelineCaption = _caption;
+            HeaderControl.MyObject = servo;
             HeaderControl.ViewContext = viewContext;
 
             _isInitialized = true;
         }
 
-        public void TimelineDataLoaded(TimelineData timelineData)
+        public void TimelineDataLoaded(TimelineData? timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
-            _servoValuePainter!.TimelineDataLoaded(timelineData);
-            _timelineData = timelineData;
+
+            _opticalGridCalculator = new OpticalGridCalculator(OpticalGrid);
+
+            if (timelineData == null) this.Visibility = Visibility.Hidden;
+            else
+            {
+                this.Visibility = Visibility.Visible;
+                _servoValuePainter!.TimelineDataLoaded(timelineData);
+                _timelineData = timelineData;
+            }
         }
 
         private DateTime _lastOpticalGridPaintBecauseOfResize = DateTime.MinValue;
 
         private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (DateTime.UtcNow - _lastOpticalGridPaintBecauseOfResize < TimeSpan.FromMilliseconds(1000)) return;
-            _lastOpticalGridPaintBecauseOfResize = DateTime.UtcNow;
             DrawOpticalGrid("ServoValueViewerControl_SizeChanged" + e.PreviousSize + " => " + e.NewSize);
         }
 
         private volatile bool _isDrawing;
         private int _paintCounter = 0;
+        private OpticalGridCalculator _opticalGridCalculator;
 
         private void DrawOpticalGrid(string reason)
         {
             if (_isDrawing)  return;
-
-            double height = this.ActualHeight;
-            double width = this.ActualWidth;
-            if (height < 100 || width < 100) return;
+            if (OpticalGrid.Width < 100 || OpticalGrid.Height < 50)     return;
 
             _isDrawing = true;
 
@@ -110,12 +119,17 @@ namespace AwbStudio.TimelineControls
 
             OpticalGrid.Children.Clear();
 
-            double diagramHeight = height - _paintMarginTopBottom * 2;
-
+            //foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
             foreach (var valuePercent in new[] { 0, 25, 50, 75, 100 })
             {
-                var y = height - _paintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
-                OpticalGrid.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = _gridLineBrush });
+                //var y = height - PaintMarginTopBottom - valuePercent / 100.0 * diagramHeight;
+                var y = _opticalGridCalculator.GetYForPercentValue(valuePercent);
+                OpticalGrid.Children.Add(new Line { 
+                    X1 = _opticalGridCalculator.PaintGridAreaLeft,
+                    X2 = _opticalGridCalculator.PaintGridAreaWidth, 
+                    Y1 = y, 
+                    Y2 = y, 
+                    Stroke = new [] { 0, 50, 100 }.Contains(valuePercent) ? _gridLineBrushPrimary : _gridLineBrushSecondary });
             }
 
             _isDrawing = false;

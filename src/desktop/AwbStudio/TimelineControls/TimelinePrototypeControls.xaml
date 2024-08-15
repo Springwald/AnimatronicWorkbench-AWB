@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
         <Grid>
             <Line x:Name="LinePlayPos" Stroke="DarkOrange" StrokeThickness="1" X1="10" X2="10" Y1="10" Y2="20" ></Line>
-            <Label x:Name="LabelPlayPosAbsolute" Content="🔺 02:20" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Background="Black" Foreground="#FF8DA2FA"/>
+            <Label x:Name="LabelPlayPosAbsolute" Content="🔺 02:20" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Foreground="#FF8DA2FA" Background="#7F000000"/>
         </Grid>
     </Grid>
 </UserControl>
