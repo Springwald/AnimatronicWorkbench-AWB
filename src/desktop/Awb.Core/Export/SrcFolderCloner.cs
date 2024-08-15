@@ -39,9 +39,14 @@ namespace Awb.Core.Export
             if (!Directory.Exists(_sourceFolder)) return new CloneResult { ErrorMessage = $"Source folder '{_sourceFolder}' does not exist" };
             if (!Directory.Exists(_targetFolder)) return new CloneResult { ErrorMessage = $"Target folder '{_targetFolder}' does not exist" };
 
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n-------------------------------------" }); 
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Clone folder '{_sourceFolder}' to '{_targetFolder}'" });
+
+
             // remove files in target folder that are not in source folder
             if (_removeExtraFilesInTarget)
             {
+                Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Remove extra files in target folder '{_targetFolder}'" });
                 foreach (var targetFile in Directory.GetFiles(_targetFolder, "*", SearchOption.AllDirectories))
                 {
                     var relativePath = targetFile.Substring(_targetFolder.Length + 1);
@@ -121,11 +126,11 @@ namespace Awb.Core.Export
                 {
                     if (_deepLog)  Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it has the same last write time and size as the target file.", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                 }
-
+             
             }
 
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Clone folder '{_sourceFolder}' to '{_targetFolder}' done." });
             await Task.CompletedTask;
-
             return new CloneResult();
         }
     }

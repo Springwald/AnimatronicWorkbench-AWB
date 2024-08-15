@@ -106,6 +106,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
             var lines = templateContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             var regions = new List<Region>();
             string? actualRegionKey = null;
+            int regionCount = 0;
             foreach (var line in lines)
             {
                 var match = _regionsRegex.Match(line);
@@ -146,6 +147,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                         case "end":
                             actualRegionKey = null;
                             Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"End region '{regionKey}' from '{filename}'" });
+                            regionCount++;
                             break;
 
                         default:
@@ -155,6 +157,11 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                 if (actualRegionKey == null)
                     result.AppendLine(line);
             }
+
+            if (actualRegionKey != null)
+                return new RegionsWriteResult { ErrorMsg = $"Region '{actualRegionKey}' in file '{filename}' not closed", Content = null };
+
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Written {regionCount} regions to '{filename}'" });
 
             return new RegionsWriteResult { Content = result.ToString(), ErrorMsg = null };
         }
