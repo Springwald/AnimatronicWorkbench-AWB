@@ -9,7 +9,7 @@ using Awb.Core.Project.Clients;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 
-namespace Awb.Core.Export.ExporterParts
+namespace Awb.Core.Export.ExporterParts.ExportData
 {
     public class ProjectExportData
     {

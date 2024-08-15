@@ -32,6 +32,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
             // read the template file for custom code
             var customCoderReaderWriter = new CustomCodeReaderWriter();
+            customCoderReaderWriter.Processing += CustomCoderReaderWriter_Processing;
             foreach (var file in filesInTargetDir)
             {
                 var fileInfo = new FileInfo(file);
@@ -57,5 +58,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
             return ExportResult.SuccessResult;
         }
+
+        private void CustomCoderReaderWriter_Processing(object? sender, ExporterProcessStateEventArgs e) => ReportProcessingState(e);
     }
 }

@@ -12,6 +12,8 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
         private readonly string _customCodeFolder;
         private readonly string _customCodeBackupRootFolder;
 
+        public event EventHandler<ExporterProcessStateEventArgs>? Processing;
+
         public class BackupResult
         {
             public required bool Success { get; init; }
@@ -42,6 +44,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
             // find all files in the custom code folder
             var customCodeReaderWriter = new CustomCodeReaderWriter();
+            customCodeReaderWriter.Processing += CustomCodeReaderWriter_Processing;
             var files = Directory.GetFiles(_customCodeFolder, "*.*", SearchOption.TopDirectoryOnly);
             foreach (var file in files)
             {
@@ -71,5 +74,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
             return new BackupResult { Success = true, CustomCodeRegionContent = customCodeRegionContent };
         }
+
+        private void CustomCodeReaderWriter_Processing(object? sender, ExporterProcessStateEventArgs e) => Processing?.Invoke(this, e);
     }
 }

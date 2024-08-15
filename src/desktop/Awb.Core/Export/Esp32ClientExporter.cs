@@ -8,6 +8,7 @@
 
 using Awb.Core.Export.ExporterParts;
 using Awb.Core.Export.ExporterParts.CustomCode;
+using Awb.Core.Export.ExporterParts.ExportData;
 
 namespace Awb.Core.Export
 {
@@ -18,8 +19,6 @@ namespace Awb.Core.Export
 
         public override string Title { get; } = "ESP32 Client";
         public override string TemplateSourceFolderRelative { get; } = "awb_esp32_client";
-
-
 
         public Esp32ClientExporter(string esp32ClientsTemplateSourceFolder, WifiConfigExportData wifiConfigData, ProjectExportData projectExportData, string projectFolder) :
             base(projectFolder, esp32ClientsTemplateSourceFolder)

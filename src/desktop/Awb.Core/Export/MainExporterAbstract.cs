@@ -8,11 +8,15 @@
 
 using Awb.Core.Export.ExporterParts;
 using Awb.Core.Export.ExporterParts.CustomCode;
+using System.Text;
 
 namespace Awb.Core.Export
 {
     public abstract class MainExporterAbstract : IExporter
     {
+        
+        private StringBuilder _logContent = new StringBuilder();
+
         protected readonly string _projectFolder;
         protected readonly string _esp32ClientsTemplateSourceFolder;
         protected const string _customCodeFolderName = "CustomCode";
@@ -25,7 +29,27 @@ namespace Awb.Core.Export
 
         protected string Esp32TemplateSourceFolderAbsolute => Path.Combine(_esp32ClientsTemplateSourceFolder, TemplateSourceFolderRelative);
 
-        public event EventHandler<ExporterProcessStateEventArgs>? Processing;
+        public event EventHandler<ExporterProcessStateEventArgs>? ProcessingState;
+
+        public void InvokeProcessing(ExporterProcessStateEventArgs eventArgs)
+        {
+            ProcessingState?.Invoke(this, eventArgs);
+            switch (eventArgs.State)
+            {
+                case ExporterProcessStateEventArgs.ProcessStates.Error:
+                    _logContent.AppendLine($"Error: {eventArgs.Message}");
+                    break;
+                case ExporterProcessStateEventArgs.ProcessStates.OnlyLog:
+                    _logContent.AppendLine(eventArgs.Message);
+                    break;
+                case ExporterProcessStateEventArgs.ProcessStates.Message:
+                    _logContent.AppendLine(eventArgs.Message);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(Title, "Unknown ExporterProcessStateEventArgs.ProcessStates: " + eventArgs.State.ToString());
+            }
+        }
+
 
         public abstract string Title { get; }
 
@@ -39,8 +63,6 @@ namespace Awb.Core.Export
         }
 
         protected abstract ExporterPartAbstract[] GetExporterParts(string targetPath);
-
-        protected void InvokeProcessing(ExporterProcessStateEventArgs eventArgs) => Processing?.Invoke(this, eventArgs);
 
         public async Task<IExporter.ExportResult> ExportAsync(string targetPath)
         {
@@ -56,32 +78,39 @@ namespace Awb.Core.Export
                 return new IExporter.ExportResult { ErrorMessage = $"Template source folder '{Esp32TemplateSourceFolderAbsolute}' not found" };
 
             // copy the template source folder to the target folder
-             var cloner = new SrcFolderCloner(
-                sourceFolder: Esp32TemplateSourceFolderAbsolute,
-                targetFolder: targetPath,
-                removeExtraFilesInTarget: true,
-                removeFilesBlockerDirectoryNames: new string[] { _customCodeFolderName , ".pio" , ".vscode"},
-                copyFilesBlockerDirectoryNames: new string[] { ".pio", ".vscode" }
-                );
-            cloner.Processing += (sender, e) => Processing?.Invoke(this, e);
+            var cloner = new SrcFolderCloner(
+               sourceFolder: Esp32TemplateSourceFolderAbsolute,
+               targetFolder: targetPath,
+               removeExtraFilesInTarget: true,
+               removeFilesBlockerDirectoryNames: new string[] { _customCodeFolderName, ".pio", ".vscode" },
+               copyFilesBlockerDirectoryNames: new string[] { ".pio", ".vscode" }
+               );
+            cloner.Processing += (sender, e) => InvokeProcessing(e);
             var cloneResult = await cloner.Clone();
-            cloner.Processing -= (sender, e) => Processing?.Invoke(this, e);
+            cloner.Processing -= (sender, e) => InvokeProcessing( e);
             if (!cloneResult.Success)
             {
-                InvokeProcessing(new ExporterProcessStateEventArgs { ErrorMessage = cloneResult.ErrorMessage });
+                InvokeProcessing(new ExporterProcessStateEventArgs { Message = cloneResult.ErrorMessage, State = ExporterProcessStateEventArgs.ProcessStates.Error });
                 return new IExporter.ExportResult { ErrorMessage = cloneResult.ErrorMessage };
             }
 
             // export the data using the exporters
             foreach (var exporter in GetExporterParts(targetPath))
             {
+                exporter.Processing+= (sender, e) => InvokeProcessing(e);
                 var result = await exporter.ExportAsync();
+                exporter.Processing -= (sender, e) => InvokeProcessing(e);
                 if (!result.Success)
                 {
-                    InvokeProcessing(new ExporterProcessStateEventArgs { ErrorMessage = result.ErrorMessage });
+                    InvokeProcessing(new ExporterProcessStateEventArgs {Message = result.ErrorMessage!, State = ExporterProcessStateEventArgs.ProcessStates.Error });
                     return result;
                 }
             }
+
+            // Write exporter log
+            InvokeProcessing(new ExporterProcessStateEventArgs { Message = "Export done.", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
+            var logFilename = Path.Combine(targetPath, "export.log");
+            await File.WriteAllTextAsync(logFilename, _logContent.ToString());
 
             return IExporter.ExportResult.SuccessResult;
         }
@@ -99,29 +128,32 @@ namespace Awb.Core.Export
             {
                 if (!Directory.Exists(_projectFolder))
                 {
-                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage = "Project folder not found: " + _projectFolder });
+                    InvokeProcessing( new ExporterProcessStateEventArgs { Message = "Project folder not found: " + _projectFolder, State = ExporterProcessStateEventArgs.ProcessStates.Error });
                     return new IExporter.ExportResult { ErrorMessage = "Project folder not found: " + _projectFolder };
                 }
 
                 try
                 {
                     Directory.CreateDirectory(customCodeBackupRootBolderFolder);
+                    InvokeProcessing( new ExporterProcessStateEventArgs { Message = "Project folder created: " + _projectFolder, State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                 }
                 catch (Exception ex)
                 {
-                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage = "Error creating custom code backup folder: " + ex.Message });
+                    InvokeProcessing( new ExporterProcessStateEventArgs { Message = "Error creating custom code backup folder: " + ex.Message, State = ExporterProcessStateEventArgs.ProcessStates.Error });
                     return new IExporter.ExportResult { ErrorMessage = "Error creating custom code backup folder: " + ex.Message };
                 }
             }
 
             // Check if custom code exists and backup it and read the existing custom code regions into CustomCodeRegionContent
             var customCodeBackup = new CustomCodeBackup(customCodeTargetFolder: CustomCodeTargetFolder, customCodeBackupRootFolder: customCodeBackupRootBolderFolder);
+            customCodeBackup.Processing += CustomCodeBackup_Processing;
             if (customCodeBackup.CustomCodeExists)
             {
+                InvokeProcessing( new ExporterProcessStateEventArgs { Message = "Custom code already exists.", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                 var customCodeBackupResult = customCodeBackup.Backup();
                 if (!customCodeBackupResult.Success || customCodeBackupResult.CustomCodeRegionContent == null)
                 {
-                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { ErrorMessage = customCodeBackupResult.ErrorMsg });
+                    InvokeProcessing( new ExporterProcessStateEventArgs { Message = customCodeBackupResult.ErrorMsg, State = ExporterProcessStateEventArgs.ProcessStates.Error });
                     return new IExporter.ExportResult { ErrorMessage = customCodeBackupResult.ErrorMsg };
                 }
                 // take the existing custom code regions
@@ -130,11 +162,14 @@ namespace Awb.Core.Export
             else
             {
                 // seems as if there is no custom code yet, so we create an empty custom code region content
+                InvokeProcessing( new ExporterProcessStateEventArgs { Message = "no custom code yet", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                 CustomCodeRegionContent = new CustomCodeRegionContent();
             }
 
             await Task.CompletedTask;
             return IExporter.ExportResult.SuccessResult;
         }
+
+        private void CustomCodeBackup_Processing(object? sender, ExporterProcessStateEventArgs e) => InvokeProcessing(e);
     }
 }

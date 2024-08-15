@@ -9,7 +9,7 @@ using Awb.Core.Services;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
 
-namespace Awb.Core.Export.ExporterParts
+namespace Awb.Core.Export.ExporterParts.ExportData
 {
     public class TimelineExportData
     {

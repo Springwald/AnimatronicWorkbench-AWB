@@ -5,7 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-namespace Awb.Core.Export.ExporterParts
+namespace Awb.Core.Export.ExporterParts.ExportData
 {
     public class WifiConfigExportData
     {

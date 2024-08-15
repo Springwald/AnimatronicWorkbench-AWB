@@ -6,18 +6,16 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Export;
-using Awb.Core.Export.ExporterParts;
+using Awb.Core.Export.ExporterParts.ExportData;
 using Awb.Core.Project;
 using Awb.Core.Services;
 using AwbStudio.Projects;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 
 namespace AwbStudio.Exports
 {
@@ -29,9 +27,10 @@ namespace AwbStudio.Exports
         private readonly AwbProject _project;
         private readonly string _exportFolderGlobal;
 
-        private WifiConfigExportData WifiConfigData => new WifiConfigExportData { 
-            WlanSSID = _project.ProjectMetaData.WifiSsid, 
-            WlanPassword = _project.ProjectMetaData.WifiPassword 
+        private WifiConfigExportData WifiConfigData => new WifiConfigExportData
+        {
+            WlanSSID = _project.ProjectMetaData.WifiSsid,
+            WlanPassword = _project.ProjectMetaData.WifiPassword
         };
 
         private ProjectExportData? ProjectData
@@ -193,11 +192,11 @@ namespace AwbStudio.Exports
 
             await LogAsync($"Exporting to '{targetFolder}'");
 
-            exporter.Processing += ExporterProcessing;
+            exporter.ProcessingState += ExporterProcessing;
 
             var result = await exporter.ExportAsync(targetFolder);
 
-            exporter.Processing -= ExporterProcessing;
+            exporter.ProcessingState -= ExporterProcessing;
 
             if (result.Success)
             {
@@ -211,14 +210,18 @@ namespace AwbStudio.Exports
 
         private async void ExporterProcessing(object? sender, ExporterProcessStateEventArgs e)
         {
-            if (e.ErrorMessage != null)
+            switch (e.State)
             {
-                await LogAsync(e.ErrorMessage, error: true);
-            }
-
-            if (e.Message != null)
-            {
-                await LogAsync(e.Message);
+                case ExporterProcessStateEventArgs.ProcessStates.Error:
+                    await LogAsync(e.Message, error: true);
+                    break;
+                case ExporterProcessStateEventArgs.ProcessStates.Message:
+                    await LogAsync(e.Message, error: false);
+                    break;
+                case ExporterProcessStateEventArgs.ProcessStates.OnlyLog:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(new { e.State }.ToString());
             }
         }
 

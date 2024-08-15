@@ -8,6 +8,7 @@
 
 using Awb.Core.Export.ExporterParts;
 using Awb.Core.Export.ExporterParts.CustomCode;
+using Awb.Core.Export.ExporterParts.ExportData;
 
 namespace Awb.Core.Export
 {

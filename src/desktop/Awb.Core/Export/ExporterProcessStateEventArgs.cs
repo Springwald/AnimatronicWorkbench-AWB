@@ -9,7 +9,14 @@ namespace Awb.Core.Export
 {
     public class ExporterProcessStateEventArgs
     {
-        public string? ErrorMessage { get; internal set; }
-        public string? Message { get; internal set; }
+        public enum ProcessStates
+        {
+            Error,
+            Message,
+            OnlyLog
+        }
+
+        public required ProcessStates State { get; init; }
+        public required string Message { get; init; }
     }
 }

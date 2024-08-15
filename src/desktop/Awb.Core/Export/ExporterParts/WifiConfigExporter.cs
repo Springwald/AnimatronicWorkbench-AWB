@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using System.Text;
+using Awb.Core.Export.ExporterParts.ExportData;
 
 namespace Awb.Core.Export.ExporterParts
 {
