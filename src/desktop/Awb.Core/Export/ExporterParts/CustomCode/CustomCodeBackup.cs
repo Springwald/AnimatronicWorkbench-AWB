@@ -60,6 +60,8 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
                 // read the regions from the file
                 var fileContent = File.ReadAllText(file);
+                Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n----------------------------------------------------" });
+                Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Opening file '{file}'" });
                 var regionsReadResult = customCodeReaderWriter.ReadRegions(filename: fileInfo.Name, content: fileContent);
                 if (regionsReadResult.ErrorMsg != null) return new BackupResult { Success = false, ErrorMsg = regionsReadResult.ErrorMsg };
 

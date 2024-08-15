@@ -15,7 +15,7 @@ namespace Awb.Core.Export.ExporterParts
 
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
 
-        public void ReportProcessingState(ExporterProcessStateEventArgs e) => Processing?.Invoke(this, e);
+        public void InvokeProcessing(ExporterProcessStateEventArgs e) => Processing?.Invoke(this, e);
 
         protected string GetHeader(string className, string includes)
         {

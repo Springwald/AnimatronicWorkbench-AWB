@@ -37,7 +37,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
         public RegionsReadResult ReadRegions(string filename, string content)
         {
             Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n----------------------------------------------------" });
-            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Read regions from '{filename}'" });
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Read regions from '{filename}'"});
 
             var lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             var regionContent = new StringBuilder();

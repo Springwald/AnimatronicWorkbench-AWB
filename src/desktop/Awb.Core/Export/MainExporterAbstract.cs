@@ -66,6 +66,8 @@ namespace Awb.Core.Export
 
         public async Task<IExporter.ExportResult> ExportAsync(string targetPath)
         {
+            InvokeProcessing(new ExporterProcessStateEventArgs { Message = $"Exporting '{Title}' to '{targetPath}'", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
+
             if (string.IsNullOrWhiteSpace(targetPath)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(targetPath));
 
             // Read the existing custom code in the target folder and backup it
