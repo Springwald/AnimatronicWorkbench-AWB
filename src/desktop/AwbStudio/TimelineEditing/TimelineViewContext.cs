@@ -42,7 +42,7 @@ namespace AwbStudio.TimelineEditing
             get => _actualFocusObject;
             set
             {
-                if (_actualFocusObject?.Equals(value) == true) return;
+                //if (_actualFocusObject?.Equals(value) == true) return;
                 _actualFocusObject = value;
                 Changed?.Invoke(this, new ViewContextChangedEventArgs(ViewContextChangedEventArgs.ChangeTypes.FocusObject));
             }

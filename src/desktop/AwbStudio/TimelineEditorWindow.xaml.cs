@@ -98,17 +98,6 @@ namespace AwbStudio
             _timelinePlayer = new TimelinePlayer(playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _awbLogger);
             _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
 
-            var timelineId = _project.TimelineDataService.TimelineIds.FirstOrDefault();
-            if (timelineId != null)
-            {
-                // load the first timeline
-                _timelineData = _project.TimelineDataService.GetTimelineData(timelineId) ?? throw new Exception($"Timeline ID '{timelineId}' exists but timeline cant be loaded?!?");
-            }
-            else
-            {
-                // create a new timeline
-                _timelineData = CreateNewTimelineData("");
-            }
 
             Loaded += TimelineEditorWindow_Loaded;
         }
@@ -129,7 +118,6 @@ namespace AwbStudio
             CalculateSizeAndPixelPerMs();
 
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
-           
             SoundPlayer.Sounds = _project.Sounds;
 
             TimelineChooser.OnTimelineChosen += TimelineChosenToLoad;
@@ -156,7 +144,6 @@ namespace AwbStudio
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds);
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _awbLogger, _project.Sounds);
 
-
             // bring to front
             this.IsEnabled = true;
             this.Topmost = true;
@@ -164,6 +151,17 @@ namespace AwbStudio
             this.Topmost = false;
 
             // Load and play the first timeline if existing
+            var timelineId = _project.TimelineDataService.TimelineIds.FirstOrDefault();
+            if (timelineId != null)
+            {
+                // load the first timeline
+                _timelineData = _project.TimelineDataService.GetTimelineData(timelineId) ?? throw new Exception($"Timeline ID '{timelineId}' exists but timeline cant be loaded?!?");
+            }
+            else
+            {
+                // create a new timeline
+                _timelineData = CreateNewTimelineData("");
+            }
             await TimelineDataLoaded(_timelineData);
 
             _unsavedChanges = false;
@@ -187,16 +185,12 @@ namespace AwbStudio
 
         private async Task TimelineDataLoaded(TimelineData timelineData)
         {
-            if (timelineData == null) throw new ArgumentNullException(nameof(timelineData));
-
             _loading = true;
-            _timelineData = timelineData;
-
-            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
+            _timelineData = timelineData ?? throw new ArgumentNullException(nameof(timelineData));
 
             var changesAfterLoading = false;
 
-            _timelinePlayer?.SetTimelineData(timelineData);
+            _timelinePlayer.SetTimelineData(timelineData);
             ValuesEditorControl.TimelineDataLoaded(timelineData);
             TimelineCaptionsViewer.TimelineDataLoaded(timelineData);
             AllInOnePreviewControl.TimelineDataLoaded(timelineData);
@@ -222,7 +216,10 @@ namespace AwbStudio
                 playPosSynchronizer: _playPosSynchronizer,
                 awbLogger: _awbLogger);
 
+
             FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
+
+            _viewContext.ActualFocusObject = null;
 
             ShowTitle(timelineData);
             ValuesEditorControl.ZoomVerticalHeightPerValueEditor = ZoomSlider.Value;
@@ -263,7 +260,7 @@ namespace AwbStudio
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                     _unsavedChanges = true;
                     break;
-                    
+
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }

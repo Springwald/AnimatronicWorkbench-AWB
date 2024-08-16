@@ -64,17 +64,20 @@ namespace AwbStudio.PropertyControls
 
         private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
-            if (e.ChangedObjectId == NestedTimelinesFakeObject.Singleton.Id) ShowActualValue();
+            if (e.ChangedObjectId == NestedTimelinesFakeObject.Singleton.Id) 
+                ShowActualValue(NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId);
         }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
             switch (e.ChangeType)
             {
-                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                     if (_viewContext.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
-                        ShowActualValue();
+                        ShowActualValue(NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId);
+
+                    break;
+                case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
                     break;
             }
         }
@@ -82,7 +85,7 @@ namespace AwbStudio.PropertyControls
         private void PlayPosSynchronizer_OnPlayPosChanged(object? sender, int e)
         {
             if (_viewContext.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
-                ShowActualValue();
+                ShowActualValue(NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId);
         }
 
         private void ComboBoxTimeline_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -113,21 +116,22 @@ namespace AwbStudio.PropertyControls
             if (NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId != timelineId)
             {
                 NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = timelineId;
-                _viewContext.FocusObjectValueChanged(this);
+                
             }
             _isSettingNewValue = false;
-            ShowActualValue();
+            ShowActualValue(timelineId);
+            _viewContext.FocusObjectValueChanged(this);
         }
 
-        private void ShowActualValue()
+        private void ShowActualValue(string? nestedTimelineId)
         {
             if (_isSettingNewValue) return;
 
-            var timelineId = NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId;
+            //var timelineId = NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId;
 
             _isUpdatingView = true;
 
-            if (timelineId == null)
+            if (nestedTimelineId == null)
             {
                 ComboBoxTimeline.SelectedIndex = 0;
             }
@@ -135,7 +139,7 @@ namespace AwbStudio.PropertyControls
             {
                 for (int index = 0; index < _timeslines.Length; index++)
                 {
-                    if (_timeslines[index]?.Id == timelineId)
+                    if (_timeslines[index]?.Id == nestedTimelineId)
                     {
                         ComboBoxTimeline.SelectedIndex = index + 1;
                         break; ;

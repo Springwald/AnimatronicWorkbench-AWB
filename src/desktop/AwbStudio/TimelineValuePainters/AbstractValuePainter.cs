@@ -36,8 +36,10 @@ namespace AwbStudio.TimelineValuePainters
             this.PaintControl.SizeChanged += PaintControl_SizeChanged;
         }
 
-        public void TimelineDataLoaded(TimelineData? timelineData)
+        public void TimelineDataLoaded(TimelineData timelineData)
         {
+            if (_timelineData != null)
+                _timelineData.OnContentChanged -= TimelineData_OnContentChanged;
             _timelineData = timelineData ?? throw new ArgumentNullException(nameof(timelineData));
             _timelineData.OnContentChanged += TimelineData_OnContentChanged;
             TimelineDataLoadedInternal();

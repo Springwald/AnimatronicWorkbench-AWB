@@ -34,18 +34,18 @@ namespace AwbStudio.TimelineControls
         public NestedTimelinesViewerControl()
         {
             InitializeComponent();
-            Loaded += ServoValueViewerControl_Loaded;
+            Loaded += NestedTimlinesViewerControl_Loaded;
         }
-        private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
+        private void NestedTimlinesViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
-            SizeChanged += ServoValueViewerControl_SizeChanged;
-            Unloaded += ServoValueViewerControl_Unloaded;
+            SizeChanged += NestedTimelinesViewerControl_SizeChanged;
+            Unloaded += NestedTimelinesViewerControl_Unloaded;
         }
 
-        private void ServoValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
+        private void NestedTimelinesViewerControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            Unloaded -= ServoValueViewerControl_Unloaded;
-            SizeChanged -= ServoValueViewerControl_SizeChanged;
+            Unloaded -= NestedTimelinesViewerControl_Unloaded;
+            SizeChanged -= NestedTimelinesViewerControl_SizeChanged;
             if (_nestedTimelineValuePainter != null)
             {
                 _nestedTimelineValuePainter.Dispose();
@@ -56,6 +56,11 @@ namespace AwbStudio.TimelineControls
         public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService)
         {
             _viewContext = viewContext;
+            if (_nestedTimelineValuePainter != null)
+            {
+                _nestedTimelineValuePainter.Dispose();
+                _nestedTimelineValuePainter = null;
+            }
             _nestedTimelineValuePainter = new NestedTimelineValuePainter(AllValuesGrid, _viewContext, timelineCaptions, timelineMetaDataService);
             _caption = timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id);
             HeaderControl.MyObject = NestedTimelinesFakeObject.Singleton;
@@ -76,7 +81,7 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void NestedTimelinesViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
         }
 

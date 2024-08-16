@@ -99,12 +99,10 @@ namespace Awb.Core.Player
 
         public void SetTimelineData(TimelineData timelineData)
         {
-            if (_timelineData != null)
-            {
-                _timelineData.OnContentChanged -= TimelineContentChanged;
-            }
-            _timelineData = timelineData;
             _allPointsMerged = null;
+            if (_timelineData != null)
+                _timelineData.OnContentChanged -= TimelineContentChanged;
+            _timelineData = timelineData;
             _timelineData.OnContentChanged += TimelineContentChanged;
         }
 

@@ -53,20 +53,22 @@ namespace AwbStudio.PropertyControls
             _timelineDataService = timelineDataService;
             _timelineData = timelineData;
             _viewContext = timelineViewContext;
-            _viewContext.Changed += ViewContext_Changed;
+            if (!_initialized) _viewContext.Changed += ViewContext_Changed;
             _playPosSynchronizer = playPosSynchronizer;
+            if (_actualPropertyEditor != null)       RemoveEditor();
             _initialized = true;
         }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
-            if (_initialized == false) return;
+            if (_initialized == false) 
+                return;
             if (sender == this) return;
 
             switch (e.ChangeType)
             {
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
-                    if (_viewContext != null && _viewContext.ActualFocusObject != _actualPropertyEditor?.AwbObject)
+                    //if (_viewContext.ActualFocusObject != _actualPropertyEditor?.AwbObject)
                     {
                         RemoveEditor();
                         _focusObject = _viewContext.ActualFocusObject;

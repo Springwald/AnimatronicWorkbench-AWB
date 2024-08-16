@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Timelines;
 using AwbStudio.TimelineControls;
 using System;
 using System.Threading.Tasks;
