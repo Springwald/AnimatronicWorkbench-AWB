@@ -15,11 +15,9 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {
@@ -115,7 +113,7 @@ namespace AwbStudio.TimelineControls
 
             UpdateZoom();
 
-            foreach(UserControl editorControl in _timelineEditorControls)
+            foreach (UserControl editorControl in _timelineEditorControls)
             {
                 editorControl.PreviewMouseDown += (sender, e) =>
                 {
@@ -127,31 +125,25 @@ namespace AwbStudio.TimelineControls
                         var newPlayPosMs = (int)(((mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
                         _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
                     }
-                };  
+                };
             }
 
             _isInitialized = true;
         }
 
-        public void TimelineDataLoaded(TimelineData? timelineData)
+        public void TimelineDataLoaded(TimelineData timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
-            if (timelineData == null) this.Visibility = Visibility.Hidden;
-            else
-            {
-                this.Visibility = Visibility.Visible;
+            _timelineData = timelineData;
 
-                _timelineData = timelineData;
+            foreach (var subTimelineEditorControl in _timelineEditorControls!)
+                subTimelineEditorControl.TimelineDataLoaded(timelineData);
 
-                foreach (var subTimelineEditorControl in _timelineEditorControls!)
-                    subTimelineEditorControl.TimelineDataLoaded(timelineData);
+            foreach (var valuePainter in _timelineValuePainters!)
+                valuePainter.TimelineDataLoaded(timelineData);
 
-                foreach (var valuePainter in _timelineValuePainters!)
-                    valuePainter.TimelineDataLoaded(timelineData);
-
-                _playPosPainter!.TimelineDataLoaded(timelineData);
-            }
+            _playPosPainter!.TimelineDataLoaded(timelineData);
         }
 
         private void UpdateZoom()

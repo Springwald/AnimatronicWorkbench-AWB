@@ -42,9 +42,7 @@ namespace Awb.Core.Player
         private const int _updatePlayPeriodMs = 50;
         private const int _updateActuatorsPeriodMs = 100;
 
-        private TimelineData _timelineData;
-
-        
+        private TimelineData? _timelineData;
         private volatile bool _timerFiring;
         private volatile bool _updating;
         private volatile bool _actuatorUpdateRequested;
@@ -67,7 +65,7 @@ namespace Awb.Core.Player
         /// <summary>
         /// The timeline to play
         /// </summary>
-        public TimelineData TimelineData => _timelineData;
+        public TimelineData? TimelineData => _timelineData;
 
         /// <summary>
         /// 1 = normal Speed
@@ -80,10 +78,8 @@ namespace Awb.Core.Player
         /// to set the actuators to the initial position. Because of the async character of Play 
         /// this is not dont automatically.
         /// </remarks>
-        public TimelinePlayer(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineDataService timelineDataService, IAwbClientsService awbClientsService, IInvokerService invokerService, IAwbLogger logger)
+        public TimelinePlayer(PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineDataService timelineDataService, IAwbClientsService awbClientsService, IInvokerService invokerService, IAwbLogger logger)
         {
-            if (timelineData == null) throw new ArgumentNullException(nameof(timelineData));
-
             _logger = logger;
             _actuatorsService = actuatorsService;
             _timelineDataService = timelineDataService;
@@ -92,8 +88,6 @@ namespace Awb.Core.Player
 
             PlayPosSynchronizer = playPosSynchronizer;
             PlayPosSynchronizer.OnPlayPosChanged += async (sender, playPosMs) => await this.RequestActuatorUpdate();
-
-            this.SetTimelineData(timelineData);
 
             // Set up the actuator update timer
             if (throttlePackets == false)

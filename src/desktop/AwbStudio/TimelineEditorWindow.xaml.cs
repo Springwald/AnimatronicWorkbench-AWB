@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using Awb.Core.Actuators;
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Player;
 using Awb.Core.Project;
@@ -16,7 +15,6 @@ using Awb.Core.Timelines.NestedTimelines;
 using Awb.Core.Tools;
 using AwbStudio.Exports;
 using AwbStudio.Projects;
-using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using AwbStudio.Tools;
 using System;
@@ -33,21 +31,20 @@ namespace AwbStudio
     {
         const int msPerScreenWidth = 10 * 1000; // todo: zoom in/out
 
+        private readonly IAwbLogger _awbLogger;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
         private readonly IAwbClientsService _clientsService;
         private readonly IProjectManagerService _projectManagerService;
-        private readonly IAwbLogger _logger;
         private readonly AwbProject _project;
         private readonly ITimelineDataService _timelineDataService;
         private readonly ITimelineController[] _timelineControllers;
         private readonly TimelineViewContext _viewContext;
         private readonly IInvokerService _invokerService;
-        private readonly IAwbLogger _awbLogger;
-        private IActuatorsService? _actuatorsService;
+        private IActuatorsService _actuatorsService;
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
         private TimelineEventHandling? _timelineEventHandling;
-        private TimelinePlayer? _timelinePlayer;
-        protected TimelineData? _timelinedata;
+        private TimelinePlayer _timelinePlayer;
+        protected TimelineData _timelineData;
 
         private int _lastBankIndex = -1;
         private bool _unsavedChanges;
@@ -61,9 +58,11 @@ namespace AwbStudio
         {
             InitializeComponent();
 
-            _invokerService = invokerService;
-
             DebugOutputLabel.Content = string.Empty;
+
+            _invokerService = invokerService;
+            _clientsService = clientsService;
+            _projectManagerService = projectManagerService;
 
             _awbLogger = awbLogger;
             awbLogger.OnLog += (s, args) =>
@@ -83,9 +82,7 @@ namespace AwbStudio
                 }), System.Windows.Threading.DispatcherPriority.Background);
             };
 
-            _clientsService = clientsService;
-            _projectManagerService = projectManagerService;
-            _logger = awbLogger;
+            _buttonForegroundColorBackup = ButtonSave.Foreground;
 
             _project = _projectManagerService.ActualProject ?? throw new Exception("Actual project is null?!?");
             _timelineDataService = _project.TimelineDataService;
@@ -97,6 +94,22 @@ namespace AwbStudio
             _playPosSynchronizer = new PlayPosSynchronizer(_invokerService.GetInvoker());
             _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;
 
+            _actuatorsService = new ActuatorsService(_project, _clientsService, _awbLogger);
+            _timelinePlayer = new TimelinePlayer(playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _awbLogger);
+            _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
+
+            var timelineId = _project.TimelineDataService.TimelineIds.FirstOrDefault();
+            if (timelineId != null)
+            {
+                // load the first timeline
+                _timelineData = _project.TimelineDataService.GetTimelineData(timelineId) ?? throw new Exception($"Timeline ID '{timelineId}' exists but timeline cant be loaded?!?");
+            }
+            else
+            {
+                // create a new timeline
+                _timelineData = CreateNewTimelineData("");
+            }
+
             Loaded += TimelineEditorWindow_Loaded;
         }
 
@@ -107,8 +120,6 @@ namespace AwbStudio
 
             this.IsEnabled = false;
 
-            _buttonForegroundColorBackup = ButtonSave.Foreground;
-
             if (_project.TimelinesStates?.Any() == false)
             {
                 MessageBox.Show("Project file has no timelineStates defined!");
@@ -117,42 +128,14 @@ namespace AwbStudio
             this.SizeChanged += TimelineEditorWindow_SizeChanged;
             CalculateSizeAndPixelPerMs();
 
-            _actuatorsService = new ActuatorsService(_project, _clientsService, _logger);
-
-            var timelineId = _project.TimelineDataService.TimelineIds.FirstOrDefault();
-            TimelineData? timelineData = null;
-            if (timelineId != null)
-            {
-                timelineData = _project.TimelineDataService.GetTimelineData(timelineId);
-            }
-            else
-            {
-                timelineData = CreateNewTimelineData("");
-            }
-            if (timelineData == null) throw new Exception("No timeline data to play");
-            _timelinePlayer = new TimelinePlayer(timelineData: timelineData, playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _logger);
-            _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
-            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
-
-
-            var timelineCaptions = new TimelineCaptions();
-            TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _actuatorsService);
-
-            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds);
-
-            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _awbLogger, _project.Sounds);
-
+           
             SoundPlayer.Sounds = _project.Sounds;
-
-            await TimelineDataLoaded(timelineData);
 
             TimelineChooser.OnTimelineChosen += TimelineChosenToLoad;
 
             foreach (var timelineController in _timelineControllers)
-            {
                 timelineController.OnTimelineEvent += TimelineController_OnTimelineEvent;
-            }
 
             // fill timeline state chooser
             var states = _project.TimelinesStates?.Select(ts => $"[{ts.Id}] {GetTimelineStateName(ts)}").ToList();
@@ -168,18 +151,25 @@ namespace AwbStudio
             // zoomslider not working well - disable for now
             StackPanelZoom.Visibility = Visibility.Collapsed;
 
+            var timelineCaptions = new TimelineCaptions();
+            TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _actuatorsService);
+            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds);
+            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _awbLogger, _project.Sounds);
+
+
             // bring to front
             this.IsEnabled = true;
             this.Topmost = true;
             await Task.Delay(100);
             this.Topmost = false;
 
-            this.KeyDown += TimelineEditorWindow_KeyDown;
+            // Load and play the first timeline if existing
+            await TimelineDataLoaded(_timelineData);
+
             _unsavedChanges = false;
+
             Unloaded += TimelineEditorWindow_Unloaded;
         }
-
-
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -193,6 +183,52 @@ namespace AwbStudio
                 _timelinePlayer.Dispose();
             }
             _playPosSynchronizer.Dispose();
+        }
+
+        private async Task TimelineDataLoaded(TimelineData timelineData)
+        {
+            if (timelineData == null) throw new ArgumentNullException(nameof(timelineData));
+
+            _loading = true;
+            _timelineData = timelineData;
+
+            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
+
+            var changesAfterLoading = false;
+
+            _timelinePlayer?.SetTimelineData(timelineData);
+            ValuesEditorControl.TimelineDataLoaded(timelineData);
+            TimelineCaptionsViewer.TimelineDataLoaded(timelineData);
+            AllInOnePreviewControl.TimelineDataLoaded(timelineData);
+            TxtActualTimelineName.Text = timelineData?.Title ?? string.Empty;
+            ActualTimelineGrid.IsEnabled = timelineData != null;
+
+            _unsavedChanges = false;
+
+            // fill state choice
+            changesAfterLoading = SetupTimelineStateChoice(ComboTimelineStates, timelineData, changesAfterLoading);
+            changesAfterLoading = SetupTimelineNextStateOnceChoice(ComboTimelineNextStateOnce, timelineData, changesAfterLoading);
+
+            _playPosSynchronizer.SetNewPlayPos(0);
+
+            await _timelinePlayer.RequestActuatorUpdate();
+            _timelineEventHandling = new TimelineEventHandling(
+                timelineData: timelineData,
+                timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
+                actuatorsService: _actuatorsService,
+                timelinePlayer: _timelinePlayer,
+                timelineControllers: _timelineControllers,
+                viewContext: _viewContext,
+                playPosSynchronizer: _playPosSynchronizer,
+                awbLogger: _awbLogger);
+
+            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
+
+            ShowTitle(timelineData);
+            ValuesEditorControl.ZoomVerticalHeightPerValueEditor = ZoomSlider.Value;
+
+            _loading = false;
+            _unsavedChanges = changesAfterLoading;
         }
 
 
@@ -227,7 +263,7 @@ namespace AwbStudio
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                     _unsavedChanges = true;
                     break;
-
+                    
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
@@ -288,7 +324,7 @@ namespace AwbStudio
 
         private async void TimelineController_OnTimelineEvent(object? sender, TimelineControllerEventArgs e)
         {
-            if (_timelinedata == null) return;
+            if (_timelineData == null) return;
 
             switch (e.EventType)
             {
@@ -354,52 +390,7 @@ namespace AwbStudio
             return timelineData;
         }
 
-        private async Task TimelineDataLoaded(TimelineData timelineData)
-        {
-            if (timelineData == null) throw new ArgumentNullException(nameof(timelineData));
 
-            _loading = true;
-            _timelinedata = timelineData;
-
-            var changesAfterLoading = false;
-
-            _timelinePlayer?.SetTimelineData(timelineData);
-            ValuesEditorControl.TimelineDataLoaded(timelineData);
-            TimelineCaptionsViewer.TimelineDataLoaded(timelineData);
-            AllInOnePreviewControl.TimelineDataLoaded(timelineData);
-            TxtActualTimelineName.Text = timelineData?.Title ?? string.Empty;
-            ActualTimelineGrid.IsEnabled = timelineData != null;
-
-            _unsavedChanges = false;
-
-            // fill state choice
-            changesAfterLoading = SetupTimelineStateChoice(ComboTimelineStates, timelineData, changesAfterLoading);
-            changesAfterLoading = SetupTimelineNextStateOnceChoice(ComboTimelineNextStateOnce, timelineData, changesAfterLoading);
-
-            _playPosSynchronizer.SetNewPlayPos(0);
-
-            if (_timelinePlayer != null)
-            {
-                await _timelinePlayer.RequestActuatorUpdate();
-                _timelineEventHandling = new TimelineEventHandling(
-                    timelineData: timelineData,
-                    timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
-                    actuatorsService: _actuatorsService,
-                    timelinePlayer: _timelinePlayer,
-                    timelineControllers: _timelineControllers,
-                    viewContext: _viewContext,
-                    playPosSynchronizer: _playPosSynchronizer,
-                    awbLogger: _awbLogger);
-
-                FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
-            }
-
-            ShowTitle(timelineData);
-            ValuesEditorControl.ZoomVerticalHeightPerValueEditor = ZoomSlider.Value;
-
-            _loading = false;
-            _unsavedChanges = changesAfterLoading;
-        }
 
         private void ShowTitle(TimelineData? timelineData)
         {
@@ -471,25 +462,30 @@ namespace AwbStudio
                 }
             }
             var timelineData = _timelineDataService.GetTimelineData(timelineId);
+            if (timelineData == null)
+            {
+                MessageBox.Show($"Timeline with id {timelineId} not found in filemanager.");
+                return;
+            }
             await TimelineDataLoaded(timelineData);
         }
 
         private bool SaveTimelineData()
         {
-            if (_timelinedata == null)
+            if (_timelineData == null)
             {
                 MessageBox.Show("No timeline data to save!");
                 return false;
             }
 
-            var id = _timelinedata.Id;
+            var id = _timelineData.Id;
             if (string.IsNullOrWhiteSpace(id))
             {
                 MessageBox.Show("Timeline has no id!", "Can't save timeline");
                 return false;
             }
 
-            if (_timelineDataService.SaveTimelineData(_timelinedata))
+            if (_timelineDataService.SaveTimelineData(_timelineData))
             {
                 _unsavedChanges = false;
                 _invokerService.GetInvoker().Invoke(new Action(async () =>
@@ -509,33 +505,33 @@ namespace AwbStudio
 
         private void TxtActualTimelineName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-            if (_timelinedata == null) return;
-            _timelinedata.Title = TxtActualTimelineName.Text;
-            ShowTitle(_timelinedata);
+            if (_timelineData == null) return;
+            _timelineData.Title = TxtActualTimelineName.Text;
+            ShowTitle(_timelineData);
             _unsavedChanges = true;
         }
 
         private void ComboTimelineStates_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_loading) return; // ignore the first call (when loading the timeline data
-            if (_timelinedata == null) return;
+            if (_timelineData == null) return;
             if (_project == null) return;
-            _timelinedata.TimelineStateId = _project.TimelinesStates[ComboTimelineStates.SelectedIndex].Id;
+            _timelineData.TimelineStateId = _project.TimelinesStates[ComboTimelineStates.SelectedIndex].Id;
             _unsavedChanges = true;
         }
 
         private void ComboTimelineNextStateOnce_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_loading) return; // ignore the first call (when loading the timeline data
-            if (_timelinedata == null) return;
+            if (_timelineData == null) return;
             if (_project == null) return;
             if (ComboTimelineNextStateOnce.SelectedIndex == 0)
             {  // no next state selected
-                _timelinedata.NextTimelineStateIdOnce = null;
+                _timelineData.NextTimelineStateIdOnce = null;
                 _unsavedChanges = true;
                 return;
             }
-            _timelinedata.NextTimelineStateIdOnce = _project.TimelinesStates[ComboTimelineNextStateOnce.SelectedIndex - 1].Id; // the first is empty, so we have to subtract 1
+            _timelineData.NextTimelineStateIdOnce = _project.TimelinesStates[ComboTimelineNextStateOnce.SelectedIndex - 1].Id; // the first is empty, so we have to subtract 1
             _unsavedChanges = true;
         }
 

@@ -115,29 +115,25 @@ namespace AwbStudio.TimelineControls
             _gridPainter?.Dispose();
         }
 
-        public void TimelineDataLoaded(TimelineData? timelineData)
+        public void TimelineDataLoaded(TimelineData timelineData)
         {
             if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
 
-            if (timelineData == null) this.Visibility = Visibility.Hidden;
-            else
-            {
-                this.Visibility = Visibility.Visible;
+            this.Visibility = Visibility.Visible;
 
-                if (_timelineData != null) _timelineData.OnContentChanged -= OnTimelineDataChanged;
+            if (_timelineData != null) _timelineData.OnContentChanged -= OnTimelineDataChanged;
 
-                _timelineData = timelineData;
-                _playPosPainter!.TimelineDataLoaded(timelineData);
+            _timelineData = timelineData;
+            _playPosPainter!.TimelineDataLoaded(timelineData);
 
-                foreach (var subTimelineEditorControl in _timelineEditorControls!)
-                    subTimelineEditorControl.TimelineDataLoaded(timelineData);
+            foreach (var subTimelineEditorControl in _timelineEditorControls!)
+                subTimelineEditorControl.TimelineDataLoaded(timelineData);
 
-                foreach (var valuePainter in _timelineValuePainters!)
-                    valuePainter.TimelineDataLoaded(timelineData);
+            foreach (var valuePainter in _timelineValuePainters!)
+                valuePainter.TimelineDataLoaded(timelineData);
 
-                _timelineData.OnContentChanged += OnTimelineDataChanged;
-                OnTimelineDataChanged(null, null);
-            }
+            _timelineData.OnContentChanged += OnTimelineDataChanged;
+            OnTimelineDataChanged(null, null);
         }
 
         private void OnTimelineDataChanged(object? sender, TimelineDataChangedEventArgs? e)
@@ -159,7 +155,7 @@ namespace AwbStudio.TimelineControls
             if (_timelineData == null) return;
             if (_viewContext == null) return;
 
-          
+
             switch (e.ChangeType)
             {
                 case ViewContextChangedEventArgs.ChangeTypes.Duration:

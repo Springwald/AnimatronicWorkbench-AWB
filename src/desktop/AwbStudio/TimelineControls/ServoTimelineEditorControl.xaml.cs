@@ -53,7 +53,6 @@ namespace AwbStudio.TimelineControls
         }
         private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
-            DrawOpticalGrid("ServoValueViewerControl_Loaded");
             SizeChanged += ServoValueViewerControl_SizeChanged;
             Unloaded += ServoValueViewerControl_Unloaded;
         }
@@ -78,7 +77,7 @@ namespace AwbStudio.TimelineControls
             HeaderControl.TimelineCaption = _caption;
             HeaderControl.MyObject = servo;
             HeaderControl.ViewContext = viewContext;
-
+            
             _isInitialized = true;
         }
 
@@ -95,6 +94,8 @@ namespace AwbStudio.TimelineControls
                 _servoValuePainter!.TimelineDataLoaded(timelineData);
                 _timelineData = timelineData;
             }
+            DrawOpticalGrid("ServoValueViewerControl_TimelineDataLoaded");
+
         }
 
         private DateTime _lastOpticalGridPaintBecauseOfResize = DateTime.MinValue;

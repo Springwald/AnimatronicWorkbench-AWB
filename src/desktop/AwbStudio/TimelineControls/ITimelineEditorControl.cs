@@ -11,6 +11,6 @@ namespace AwbStudio.TimelineControls
 {
     internal interface ITimelineEditorControl
     {
-        void TimelineDataLoaded(TimelineData? timelineData);
+        void TimelineDataLoaded(TimelineData timelineData);
     }
 }
