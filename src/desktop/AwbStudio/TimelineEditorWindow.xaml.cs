@@ -54,6 +54,8 @@ namespace AwbStudio
         private Brush _buttonForegroundColorBackup;
         private bool _isZooming;
 
+        private TimelineEditorWindowContext _editorContext;
+
         public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
         {
             InitializeComponent();
@@ -107,13 +109,11 @@ namespace AwbStudio
         {
             Loaded -= TimelineEditorWindow_Loaded;
 
-            this.IsEnabled = false;
-
-            if (_project.TimelinesStates?.Any() == false)
+            _editorContext = new TimelineEditorWindowContext(_project)
             {
-                MessageBox.Show("Project file has no timelineStates defined!");
-            }
+            };
 
+            this.IsEnabled = false;
             this.SizeChanged += TimelineEditorWindow_SizeChanged;
             CalculateSizeAndPixelPerMs();
 
