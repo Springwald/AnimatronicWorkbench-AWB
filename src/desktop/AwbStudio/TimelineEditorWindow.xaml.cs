@@ -138,7 +138,7 @@ namespace AwbStudio
 
             var timelineCaptions = new TimelineCaptions();
             TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _actuatorsService);
-            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds);
+            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds, SoundPlayer);
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _awbLogger, _project.Sounds);
 
             // bring to front
@@ -169,7 +169,7 @@ namespace AwbStudio
             }
             if (_timelinePlayer != null)
             {
-                _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
+                _timelinePlayer.OnPlaySound -= SoundPlayer.SoundToPlay;
                 _timelinePlayer.Dispose();
             }
             _playPosSynchronizer.Dispose();
@@ -226,7 +226,7 @@ namespace AwbStudio
                 awbLogger: _awbLogger);
 
 
-            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds);
+            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds, SoundPlayer);
 
             _viewContext.ActualFocusObject = null;
 

@@ -28,6 +28,7 @@ namespace AwbStudio.TimelineControls
         private bool _isInitialized;
 
         private TimelineData? _timelineData;
+        private SoundPlayerControl _soundPlayer;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private PlayPosPainter? _playPosPainter;
@@ -70,8 +71,10 @@ namespace AwbStudio.TimelineControls
             _gridPainter = null;
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, ITimelineDataService timelineDataService, IAwbLogger awbLogger, Sound[] projectSounds)
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, ITimelineDataService timelineDataService, IAwbLogger awbLogger, Sound[] projectSounds, SoundPlayerControl soundPlayer)
         {
+            _soundPlayer = soundPlayer;
+
             _viewContext = viewContext;
             _playPosSynchronizer = playPosSynchronizer;
             _viewContext.Changed += OnViewContextChanged;

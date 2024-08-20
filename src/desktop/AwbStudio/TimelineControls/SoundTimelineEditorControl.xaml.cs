@@ -40,18 +40,18 @@ namespace AwbStudio.TimelineControls
         public SoundTimelineEditorControl()
         {
             InitializeComponent();
-            Loaded += ServoValueViewerControl_Loaded;
+            Loaded += SoundValueViewerControl_Loaded;
         }
-        private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
+        private void SoundValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
-            SizeChanged += ServoValueViewerControl_SizeChanged;
-            Unloaded += ServoValueViewerControl_Unloaded;
+            SizeChanged += SoundValueViewerControl_SizeChanged;
+            Unloaded += SoundValueViewerControl_Unloaded;
         }
 
-        private void ServoValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
+        private void SoundValueViewerControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            Unloaded -= ServoValueViewerControl_Unloaded;
-            SizeChanged -= ServoValueViewerControl_SizeChanged;
+            Unloaded -= SoundValueViewerControl_Unloaded;
+            SizeChanged -= SoundValueViewerControl_SizeChanged;
             if (_soundValuePainter != null)
             {
                 _soundValuePainter.Dispose();
@@ -83,7 +83,7 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        private void ServoValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void SoundValueViewerControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
         }
 

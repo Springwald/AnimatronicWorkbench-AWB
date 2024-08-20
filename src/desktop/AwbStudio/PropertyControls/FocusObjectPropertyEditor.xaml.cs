@@ -12,6 +12,7 @@ using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
+using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using System;
 using System.Windows;
@@ -25,6 +26,7 @@ namespace AwbStudio.PropertyControls
     public partial class FocusObjectPropertyEditor : UserControl
     {
         private Sound[]? _projectSounds;
+        private SoundPlayerControl _windowsSoundPlayerControl;
         private ITimelineDataService? _timelineDataService;
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
@@ -47,9 +49,10 @@ namespace AwbStudio.PropertyControls
             RemoveEditor();
         }
 
-        public void Init(TimelineViewContext timelineViewContext, TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, ITimelineDataService timelineDataService, Sound[] projectSounds)
+        public void Init(TimelineViewContext timelineViewContext, TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, ITimelineDataService timelineDataService, Sound[] projectSounds, SoundPlayerControl windowsSoundPlayerControl)
         {
             _projectSounds = projectSounds;
+            _windowsSoundPlayerControl = windowsSoundPlayerControl;
             _timelineDataService = timelineDataService;
             _timelineData = timelineData;
             _viewContext = timelineViewContext;
@@ -91,7 +94,7 @@ namespace AwbStudio.PropertyControls
 
                         if (_focusObject is ISoundPlayer soundPlayer)
                         {
-                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer, _projectSounds!, _timelineData!, _viewContext, _playPosSynchronizer!);
+                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer, _projectSounds!, _timelineData!, _viewContext, _playPosSynchronizer!, _windowsSoundPlayerControl);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }

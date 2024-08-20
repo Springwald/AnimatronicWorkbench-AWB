@@ -11,6 +11,7 @@ using Awb.Core.Player;
 using Awb.Core.Project.Various;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
+using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +26,7 @@ namespace AwbStudio.PropertyControls
         private readonly ISoundPlayer _soundPlayer;
         private readonly TimelineData _timelineData;
         private readonly Sound[] _projectSounds;
+        private readonly SoundPlayerControl _windowsSoundPlayerControl;
         private readonly TimelineViewContext _viewContext;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
         private bool _isUpdatingView;
@@ -32,11 +34,12 @@ namespace AwbStudio.PropertyControls
 
         public IAwbObject AwbObject => _soundPlayer;
 
-        public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, Sound[] projectSounds, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
+        public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, Sound[] projectSounds, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer, SoundPlayerControl windowsSoundPlayerControl)
         {
             InitializeComponent();
             _soundPlayer = soundPlayer;
             _projectSounds = projectSounds;
+            _windowsSoundPlayerControl = windowsSoundPlayerControl;
 
             _timelineData = timelineData;
             _timelineData.OnContentChanged += TimelineData_OnContentChanged;
@@ -127,6 +130,7 @@ namespace AwbStudio.PropertyControls
                 else
                 {
                     _soundPlayer.PlaySound(sound!.Id);
+                    _windowsSoundPlayerControl.SoundToPlay(this, new SoundPlayEventArgs(sound!.Id));
                 }
                 _viewContext.FocusObjectValueChanged(this);
             }
