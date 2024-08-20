@@ -44,7 +44,7 @@ namespace AwbStudio
         private TimelineControllerPlayViewPos _timelineControllerPlayViewPos = new TimelineControllerPlayViewPos();
         private TimelineEventHandling? _timelineEventHandling;
         private TimelinePlayer _timelinePlayer;
-        protected TimelineData _timelineData;
+        protected TimelineData? _timelineData;
 
         private int _lastBankIndex = -1;
         private bool _unsavedChanges;
@@ -53,8 +53,6 @@ namespace AwbStudio
         private bool _loading;
         private Brush _buttonForegroundColorBackup;
         private bool _isZooming;
-
-        private TimelineEditorWindowContext _editorContext;
 
         public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
         {
@@ -109,9 +107,8 @@ namespace AwbStudio
         {
             Loaded -= TimelineEditorWindow_Loaded;
 
-            _editorContext = new TimelineEditorWindowContext(_project)
-            {
-            };
+            if (_project.TimelinesStates?.Any() == false)
+                MessageBox.Show("Project file has no timelineStates defined!");
 
             this.IsEnabled = false;
             this.SizeChanged += TimelineEditorWindow_SizeChanged;
@@ -152,17 +149,12 @@ namespace AwbStudio
 
             // Load and play the first timeline if existing
             var timelineId = _project.TimelineDataService.TimelineIds.FirstOrDefault();
-            if (timelineId != null)
-            {
+            var newTimelineData = timelineId != null
                 // load the first timeline
-                _timelineData = _project.TimelineDataService.GetTimelineData(timelineId) ?? throw new Exception($"Timeline ID '{timelineId}' exists but timeline cant be loaded?!?");
-            }
-            else
-            {
+                ? _project.TimelineDataService.GetTimelineData(timelineId) ?? throw new Exception($"Timeline ID '{timelineId}' exists but timeline cant be loaded?!?")
                 // create a new timeline
-                _timelineData = CreateNewTimelineData("");
-            }
-            await TimelineDataLoaded(_timelineData);
+                : CreateNewTimelineData("");
+            await SetupChangedTimelineData(newTimelineData);
 
             _unsavedChanges = false;
 
@@ -183,10 +175,27 @@ namespace AwbStudio
             _playPosSynchronizer.Dispose();
         }
 
-        private async Task TimelineDataLoaded(TimelineData timelineData)
+        private async Task SetupChangedTimelineData(TimelineData? timelineData)
         {
             _loading = true;
-            _timelineData = timelineData ?? throw new ArgumentNullException(nameof(timelineData));
+
+
+            if (timelineData == null && _timelineData == null) return; // no change
+
+            if (_timelineEventHandling != null)
+            {
+                // Need to disconnect the old timeline event handling
+                _timelineEventHandling.Dispose();
+                _timelineEventHandling = null;
+            }
+
+            if (_timelineData != null)
+            {
+                // need to disconnect the old timeline data
+            }
+
+            _timelineData = timelineData;
+            if (_timelineData == null) return; // No new timeline data to connect to
 
             var changesAfterLoading = false;
 
@@ -207,7 +216,7 @@ namespace AwbStudio
 
             await _timelinePlayer.RequestActuatorUpdate();
             _timelineEventHandling = new TimelineEventHandling(
-                timelineData: timelineData,
+                timelineData: timelineData!,
                 timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
                 actuatorsService: _actuatorsService,
                 timelinePlayer: _timelinePlayer,
@@ -387,8 +396,6 @@ namespace AwbStudio
             return timelineData;
         }
 
-
-
         private void ShowTitle(TimelineData? timelineData)
         {
             this.Title = timelineData == null ? "No Timeline" : $"Timeline '{timelineData.Title}'";
@@ -464,7 +471,7 @@ namespace AwbStudio
                 MessageBox.Show($"Timeline with id {timelineId} not found in filemanager.");
                 return;
             }
-            await TimelineDataLoaded(timelineData);
+            await SetupChangedTimelineData(timelineData);
         }
 
         private bool SaveTimelineData()
@@ -561,7 +568,7 @@ namespace AwbStudio
             }
 
             var timelineData = CreateNewTimelineData("no title");
-            await TimelineDataLoaded(timelineData);
+            await SetupChangedTimelineData(timelineData);
         }
 
         private void ButtonExportEsp32_Click(object sender, RoutedEventArgs e)
