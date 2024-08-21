@@ -19,3 +19,16 @@ int NeopixelManager::getRgbVal(int ledIndex, int speed, int base)
     int intValue = (int)(value * base);
     return min(base, max(0, intValue));
 }
+
+void NeopixelManager::rainbow(int skip, int numToFill, uint8_t initialhue, uint8_t deltahue)
+{
+    CHSV hsv;
+    hsv.hue = initialhue;
+    hsv.val = 255;
+    hsv.sat = 240;
+    for (int i = 0; i < numToFill; ++i)
+    {
+        leds[i + skip] = hsv;
+        hsv.hue += deltahue;
+    }
+}

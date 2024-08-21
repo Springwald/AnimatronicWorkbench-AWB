@@ -34,16 +34,17 @@ public:
         FastLED.addLeds<NEOPIXEL, NEOPIXEL_GPIO>(leds, ledsCount);
         // FastLED.addLeds<CHIPSET, NEOPIXEL_GPIO, COLOR_ORDER>(leds, ledsCount).setCorrection(TypicalLEDStrip);
         FastLED.setBrightness(255);
-		
-		for (int i=0; i < ledsCount; i++)
-		leds[i] = CRGB(0, 0, 0);
-		FastLED.show();
+
+        for (int i = 0; i < ledsCount; i++)
+            leds[i] = CRGB(0, 0, 0);
+        FastLED.show();
 
 #endif
     }
 
     void setSingleLED(uint16_t LEDnum, uint8_t r, uint8_t g, uint8_t b);
     int getRgbVal(int ledIndex, int speed, int base);
+    void rainbow(int skip, int numToFill, uint8_t initialhue, uint8_t deltahue);
 };
 
 #endif
