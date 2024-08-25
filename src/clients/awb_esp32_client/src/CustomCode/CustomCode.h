@@ -41,6 +41,8 @@ protected:
 
     /* cc-start-protected - insert your protected code here before the end-protected comment: */
 
+    long count = 0;
+
     /* cc-end-protected  */
 
 public:

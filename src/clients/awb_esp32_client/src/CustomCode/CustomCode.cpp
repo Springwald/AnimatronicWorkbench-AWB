@@ -23,7 +23,19 @@ void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
 {
     /* cc-start-loop - insert your loop code here before the end-loop comment: */
 
-    _mp3PlayerDfPlayerMiniManager->playSound(0, 1);
+    int factor = 10;
+
+    count++;
+    if (count == 1 * factor)
+        _mp3PlayerDfPlayerMiniManager->setVolume(0, 4);
+    if (count == 2 * factor)
+        _mp3PlayerDfPlayerMiniManager->playSound(0, 4);
+    if (count == 3 * factor)
+        _mp3PlayerDfPlayerMiniManager->setVolume(0, 10);
+    if (count == 4 * factor)
+        _mp3PlayerDfPlayerMiniManager->playSound(0, 4);
+    if (count == 5 * factor)
+        count = 0;
 
     /* cc-end-loop  */
 }

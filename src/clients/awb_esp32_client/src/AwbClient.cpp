@@ -243,13 +243,13 @@ void AwbClient::loop()
     {
         _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 1);
         // set true to test the mp3 player
-        if (_mp3PlayerDfPlayerMini->playSound(0, 2) == true)
+        if (_mp3PlayerDfPlayerMini->playSound(0, 1) == true)
         {
         }
         else
         {
             delay(1000);
-            _mp3PlayerDfPlayerMini->playSound(0, 1);
+            _mp3PlayerDfPlayerMini->playSound(0, 2);
         }
         delay(1000);
         return;

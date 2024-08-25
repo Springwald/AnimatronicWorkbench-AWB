@@ -31,4 +31,3 @@ bool Mp3PlayerDfPlayerMiniManager::setVolume(int playerIndex, int volume)
     }
     return false;
 }
-
