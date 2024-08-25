@@ -19,8 +19,8 @@
 
 /* cc-start-include - insert your include code here before the end-protected comment: */
 
-// #include "PipButtons.h"
-// #include "PipNeopixel.h"
+#include "PipButtons.h"
+#include "PipNeopixel.h"
 
 /* cc-end-include - insert your include code here before the end-protected comment: */
 
