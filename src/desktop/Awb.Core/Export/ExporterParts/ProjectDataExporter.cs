@@ -142,9 +142,11 @@ namespace Awb.Core.Export.ExporterParts
                 #include "../ProjectData/StsServoPoint.h"
                 #include "../ProjectData/Pca9685PwmServoPoint.h"
                 #include "../ProjectData/Mp3PlayerYX5300Point.h"
+                #include "../ProjectData/Mp3PlayerDfPlayerMiniPoint.h"
                 #include "../ProjectData/StsScsServo.h"
                 #include "../ProjectData/Pca9685PwmServo.h"
                 #include "../ProjectData/Mp3PlayerYX5300Serial.h"
+                #include "../ProjectData/Mp3PlayerDfPlayerMiniSerial.h"
                 """;
 
             content.AppendLine(GetHeader(className: "ProjectData", includes: includes));
@@ -161,7 +163,8 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine($"\tstd::vector<Pca9685PwmServo> *pca9685PwmServos;");
             content.AppendLine($"\tstd::vector<TimelineState>* timelineStates;");
             content.AppendLine($"\tstd::vector<Timeline>* timelines;");
-            content.AppendLine($"\tstd::vector<Mp3PlayerYX5300Serial> *mp3Players;");
+            content.AppendLine($"\tstd::vector<Mp3PlayerYX5300Serial> *mp3PlayersYX5300;");
+            content.AppendLine($"\tstd::vector<Mp3PlayerDfPlayerMiniSerial> *mp3PlayersDfPlayerMini;");
 
             content.AppendLine();
 
@@ -175,6 +178,7 @@ namespace Awb.Core.Export.ExporterParts
             ExportStsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs, content);
             ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs, content);
             ExportMp3PlayerYX5300Informations(_projectData.Mp3PlayerYX5300Configs, content);
+            ExportMp3PlayerDfPlayerMiniInformations(_projectData.Mp3PlayerDfPlayerMiniConfigs, content);
             ExportTimelineStates(_projectData.TimelineStates, content);
             content.AppendLine();
             content.AppendLine("\taddTimelines();");
@@ -270,10 +274,21 @@ namespace Awb.Core.Export.ExporterParts
         private static void ExportMp3PlayerYX5300Informations(IEnumerable<Mp3PlayerYX5300Config>? mp3PlayerYX5300Configs, StringBuilder result)
         {
             var players = mp3PlayerYX5300Configs ?? Array.Empty<Mp3PlayerYX5300Config>();
-            // add all mp3 players using the constructor:  Mp3PlayerYX5300Serial(int rxPin, int txPin, String name) 
-            result.AppendLine($"\tmp3Players = new std::vector<Mp3PlayerYX5300Serial>();");
+            // add  mp3 players using the constructor:  Mp3PlayerYX5300Serial(int rxPin, int txPin, String name) 
+            result.AppendLine($"\tmp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();");
             foreach (var player in players)
-                result.AppendLine($"\tmp3Players->push_back(Mp3PlayerYX5300Serial({player.RxPin}, {player.TxPin}, \"{player.Title}\"));");
+                result.AppendLine($"\tmp3PlayersYX5300->push_back(Mp3PlayerYX5300Serial({player.RxPin}, {player.TxPin}, \"{player.Title}\"));");
+
+            result.AppendLine();
+        }
+
+        private static void ExportMp3PlayerDfPlayerMiniInformations(IEnumerable<Mp3PlayerDfPlayerMiniConfig>? mp3PlayerDfPlayerMiniConfigs, StringBuilder result)
+        {
+            var players = mp3PlayerDfPlayerMiniConfigs ?? Array.Empty<Mp3PlayerDfPlayerMiniConfig>();
+            // add  mp3 players using the constructor:  Mp3PlayerDfPlayerMiniConfig(int rxPin, int txPin, int volume, String name) 
+            result.AppendLine($"\tmp3PlayersDfPlayerMini = new std::vector<Mp3PlayerDfPlayerMiniSerial>();");
+            foreach (var player in players)
+                result.AppendLine($"\tmp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial({player.RxPin}, {player.TxPin}, {player.Volume}, \"{player.Title}\"));");
 
             result.AppendLine();
         }
@@ -296,6 +311,7 @@ namespace Awb.Core.Export.ExporterParts
                 result.AppendLine($"\t\tauto *scsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
                 result.AppendLine($"\t\tauto *pca9685PwmServoPoints{timelineNo} = new std::vector<Pca9685PwmServoPoint>();");
                 result.AppendLine($"\t\tauto *mp3PlayerYX5300Points{timelineNo} = new std::vector<Mp3PlayerYX5300Point>();");
+                result.AppendLine($"\t\tauto *mp3PlayerDfPlayerMiniPoints{timelineNo} = new std::vector<Mp3PlayerDfPlayerMiniPoint>();");
 
                 // Export Servo-Points
                 foreach (var servoPoint in timeline.Points.OfType<ServoPoint>().OrderBy(p => p.TimeMs))
@@ -333,7 +349,7 @@ namespace Awb.Core.Export.ExporterParts
                     return $"Servo id '{servoPoint.ServoId}' not found in project config!";
                 }
 
-                // Export Sound-Points
+                // Export YX5300 Sound-Points
                 foreach (var soundPoint in timeline.Points.OfType<SoundPoint>().OrderBy(p => p.TimeMs))
                 {
                     if (projectData.Mp3PlayerYX5300Configs != null)
@@ -359,11 +375,36 @@ namespace Awb.Core.Export.ExporterParts
                         }
                     }
 
+
+                    if (projectData.Mp3PlayerDfPlayerMiniConfigs != null)
+                    {
+                        // find Mp3PlayerDfPlayerMini soundplayer
+                        var soundPlayerIndex = -1;
+                        for (int i = 0; i < projectData.Mp3PlayerDfPlayerMiniConfigs?.Count(); i++)
+                        {
+                            if (projectData.Mp3PlayerDfPlayerMiniConfigs.ElementAt(i).Id == soundPoint.SoundPlayerId)
+                            {
+                                soundPlayerIndex = i;
+                                break;
+                            }
+                        }
+                        if (soundPlayerIndex != -1)
+                        {
+                            var soundPlayer = projectData.Mp3PlayerDfPlayerMiniConfigs!.ElementAt(soundPlayerIndex);
+                            if (soundPlayer != null)
+                            {
+                                result.AppendLine($"\t\tmp3PlayerDfPlayerMiniPoints{timelineNo}->push_back(Mp3PlayerDfPlayerMiniPoint({soundPoint.SoundId}, {soundPlayerIndex}, {soundPoint.TimeMs}));");
+                                continue;
+                            }
+                        }
+                    }
+
                     // todo: find other sound player
 
                     // servo id not sound
                     return $"Soundplayer id '{soundPoint.SoundPlayerId}' not found in project config!";
                 }
+
 
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineStateReference({state.Id}, String(\"{state.Title}\"));");
                 result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId ?? -1}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo});");

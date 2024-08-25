@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Project;
 
 namespace Awb.Core.Services
@@ -78,15 +79,10 @@ namespace Awb.Core.Services
             }
 
             // add sound player
-            if (projectConfig.Mp3PlayersYX5300 != null)
-            {
-                // actual is only one sound player supported
-                SoundPlayers = projectConfig.Mp3PlayersYX5300.Select(p => new Mp3PlayerYX5300(p)).ToArray();
-            }
-            else
-            {
-                SoundPlayers = Array.Empty<ISoundPlayer>();
-            }
+            var soundPlayers = new List<ISoundPlayer>();
+            if (projectConfig.Mp3PlayersYX5300 != null) soundPlayers.AddRange(projectConfig.Mp3PlayersYX5300.Select(p => new Mp3PlayerYX5300(p)));
+            if (projectConfig.Mp3PlayersDFPlayerMini != null) soundPlayers.AddRange(projectConfig.Mp3PlayersDFPlayerMini.Select(p => new Mp3PlayerDFPlayerMini(p)));
+            SoundPlayers = soundPlayers.ToArray();  
             
             var allActuators = new List<IActuator>();
             allActuators.AddRange(servos);    

@@ -181,6 +181,7 @@ namespace AwbStudio
                 ScsServos = [],
                 Pca9685PwmServos = [],
                 Mp3PlayersYX5300 = [],
+                Mp3PlayersDFPlayerMini = [],
                 Inputs = [],
             };
             project.SetProjectFolder(projectPath);
