@@ -7,6 +7,7 @@
 #include "Actuators/StScsSerialServoManager.h"
 #include "Actuators/Pca9685PwmManager.h"
 #include "Actuators/Mp3PlayerYX5300Manager.h"
+#include "Actuators/Mp3PlayerDfPlayerMiniManager.h"
 #include "Actuators/ActuatorValue.h"
 #include "PacketSenderReceiver.h"
 #include "PacketProcessor.h"
@@ -35,21 +36,22 @@ protected:
     long _startMillis = millis();          /// The start millis
     String _lastAutoPlayTimelineName = ""; /// The last selected timeline name for autoplay timeline filter
 
-    PacketSenderReceiver *_packetSenderReceiver = nullptr;       /// The packet sender receiver to communicate with the Animatronic Workbench Studio
-    PacketProcessor *_packetProcessor = nullptr;                 /// The packet processor to process the received packets from the Animatronic Workbench Studio
-    Pca9685PwmManager *_pca9685pwmManager = nullptr;             /// The pwm manager to control the Pca9685 pwm board
-    StScsSerialServoManager *_stSerialServoManager = nullptr;    /// The serial servo manager to control the sts serial servos
-    StScsSerialServoManager *_scSerialServoManager = nullptr;    /// The serial servo manager to control the scs serial servos
-    InputManager *_inputManager = nullptr;                       // the input manager
-    Mp3PlayerYX5300Manager *_mp3Player = nullptr;                /// The mp3 player to play sounds
-    NeopixelManager *_neopixelManager = nullptr;                 /// The neopixel manager to control the neopixel leds
-    AutoPlayer *_autoPlayer = nullptr;                           /// The auto player to play timeline animations
-    WlanConnector *_wlanConnector = nullptr;                     /// The wlan connector to open a WLAN AP and display status information as a web page
-    ProjectData *_projectData = nullptr;                         // the project data exported by Animatronic Workbench Studio
-    Debugging *_debugging = nullptr;                             // the debugging class
-    StatusManagement *_statusManagement = nullptr;               // the status management for acutator status information and health check
-    ActualStatusInformation *_actualStatusInformation = nullptr; /// The actual status information
-    CustomCode *_customCode = nullptr;                           // the custom code
+    PacketSenderReceiver *_packetSenderReceiver = nullptr;          /// The packet sender receiver to communicate with the Animatronic Workbench Studio
+    PacketProcessor *_packetProcessor = nullptr;                    /// The packet processor to process the received packets from the Animatronic Workbench Studio
+    Pca9685PwmManager *_pca9685pwmManager = nullptr;                /// The pwm manager to control the Pca9685 pwm board
+    StScsSerialServoManager *_stSerialServoManager = nullptr;       /// The serial servo manager to control the sts serial servos
+    StScsSerialServoManager *_scSerialServoManager = nullptr;       /// The serial servo manager to control the scs serial servos
+    InputManager *_inputManager = nullptr;                          // the input manager
+    Mp3PlayerYX5300Manager *_mp3PlayerYX5300 = nullptr;             /// The mp3 player to play sounds on YX5300
+    Mp3PlayerDfPlayerMiniManager *_mp3PlayerDfPlayerMini = nullptr; /// The mp3 player to play sounds on DfPlayerMini
+    NeopixelManager *_neopixelManager = nullptr;                    /// The neopixel manager to control the neopixel leds
+    AutoPlayer *_autoPlayer = nullptr;                              /// The auto player to play timeline animations
+    WlanConnector *_wlanConnector = nullptr;                        /// The wlan connector to open a WLAN AP and display status information as a web page
+    ProjectData *_projectData = nullptr;                            // the project data exported by Animatronic Workbench Studio
+    Debugging *_debugging = nullptr;                                // the debugging class
+    StatusManagement *_statusManagement = nullptr;                  // the status management for acutator status information and health check
+    ActualStatusInformation *_actualStatusInformation = nullptr;    /// The actual status information
+    CustomCode *_customCode = nullptr;                              // the custom code
 
     /**
      * Update the actuators
@@ -90,6 +92,8 @@ public:
         delete _neopixelManager;
         delete _autoPlayer;
         delete _wlanConnector;
+        delete _mp3PlayerYX5300;
+        delete _mp3PlayerDfPlayerMini;
         delete _projectData;
         delete _debugging;
         delete _statusManagement;

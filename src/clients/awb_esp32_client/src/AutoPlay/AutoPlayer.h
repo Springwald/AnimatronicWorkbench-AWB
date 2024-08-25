@@ -12,6 +12,7 @@
 #include "../Actuators/StScsSerialServoManager.h"
 #include "../Actuators/Pca9685PwmManager.h"
 #include "../Actuators/Mp3PlayerYX5300Manager.h"
+#include "../Actuators/Mp3PlayerDfPlayerMiniManager.h"
 #include "../Actuators/InputManager.h"
 #include "../Debugging.h"
 
@@ -24,13 +25,14 @@ class AutoPlayer
 protected:
     TCallBackErrorOccured _errorOccured; // the error occured callback
 
-    StScsSerialServoManager *_stSerialServoManager;  // the STS serial servo manager
-    StScsSerialServoManager *_scSerialServoManager;  // the SCS serial servo manager
-    Pca9685PwmManager *_pca9685PwmManager;           // the PCA9685 PWM manager
-    Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager; // the MP3 player manager
-    InputManager *_inputManager;                     // the input manager
-    ProjectData *_data;                              // the data exported by Animatronic Workbench Studio
-    Debugging *_debugging;                           /// the debugging class
+    StScsSerialServoManager *_stSerialServoManager;              // the STS serial servo manager
+    StScsSerialServoManager *_scSerialServoManager;              // the SCS serial servo manager
+    Pca9685PwmManager *_pca9685PwmManager;                       // the PCA9685 PWM manager
+    Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager;             // the MP3 player manager on YX5300
+    Mp3PlayerDfPlayerMiniManager *_mp3PlayerDfPlayerMiniManager; // the MP3 player manager on DFPlayer Mini
+    InputManager *_inputManager;                                 // the input manager
+    ProjectData *_data;                                          // the data exported by Animatronic Workbench Studio
+    Debugging *_debugging;                                       /// the debugging class
 
     long _lastMsUpdate;                  // millis() of last update
     long _lastPacketReceivedMillis = -1; // millis() of last received packet
@@ -47,8 +49,24 @@ protected:
     int calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints);
 
 public:
-    AutoPlayer(ProjectData *data, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, InputManager *inputManager, TCallBackErrorOccured errorOccured, Debugging *debugging)
-        : _data(data), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _inputManager(inputManager), _errorOccured(errorOccured), _debugging(debugging)
+    AutoPlayer(
+        ProjectData *data,
+        StScsSerialServoManager *stSerialServoManager,
+        StScsSerialServoManager *scSerialServoManager,
+        Pca9685PwmManager *pca9685PwmManager,
+        Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager,
+        Mp3PlayerDfPlayerMiniManager *mp3PlayerDfPlayerMiniManager,
+        InputManager *inputManager,
+        TCallBackErrorOccured errorOccured,
+        Debugging *debugging) : _data(data),
+                                _stSerialServoManager(stSerialServoManager),
+                                _scSerialServoManager(scSerialServoManager),
+                                _pca9685PwmManager(pca9685PwmManager),
+                                _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager),
+                                _mp3PlayerDfPlayerMiniManager(mp3PlayerDfPlayerMiniManager),
+                                _inputManager(inputManager),
+                                _errorOccured(errorOccured),
+                                _debugging(debugging)
     {
         _lastMsUpdate = millis();
     }

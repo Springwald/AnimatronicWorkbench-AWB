@@ -252,10 +252,36 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 
     _debugging->setState(Debugging::MJ_AUTOPLAY, 40);
 
-    // Play MP3
+    // Play MP3 on yx5300
     if (_mp3PlayerYX5300Manager != nullptr)
     {
         for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerYX5300Points->size(); iPoint++)
+        {
+            Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
+            if (point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
+            {
+                for (int trys = 0; trys < 3; trys++)
+                {
+                    if (_mp3PlayerYX5300Manager->playSound(point->soundPlayerIndex, point->soundId) == true)
+                    {
+                        _lastSoundPlayed = point->soundId;
+                        break;
+                    }
+                    else
+                    {
+                        _mp3PlayerYX5300Manager->stopSound(point->soundPlayerIndex);
+                        _lastSoundPlayed = -100;
+                        delay(50);
+                    }
+                }
+            }
+        }
+    }
+
+    // Play MP3 on DFPlayer Mini
+    if (_mp3PlayerDfPlayerMiniManager != nullptr)
+    {
+        for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerDfPlayerMiniPoints->size(); iPoint++)
         {
             Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
             if (point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
