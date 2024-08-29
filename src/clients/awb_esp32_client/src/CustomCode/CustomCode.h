@@ -4,7 +4,7 @@
 /*
     Enter your custom code in this header file and the corresponding cpp file.
     Only write code beween the cc-start and cc-end comments, otherwise it will be overwritten and lost.
-	---
+    ---
 */
 
 #include <Arduino.h>
@@ -13,6 +13,8 @@
 #include <Actuators/StScsSerialServoManager.h>
 #include <Actuators/Pca9685PwmManager.h>
 #include <Actuators/Mp3PlayerYX5300Manager.h>
+#include <Actuators/Mp3PlayerDfPlayerMiniManager.h>
+
 #include <Debugging.h>
 
 /* cc-start-include - insert your include code here before the end-protected comment: */
@@ -29,14 +31,17 @@ class CustomCode
 protected:
     TCallBackErrorOccured _errorOccured; // the error occured callback
 
-    StScsSerialServoManager *_stSerialServoManager;  // the STS serial servo manager
-    StScsSerialServoManager *_scSerialServoManager;  // the SCS serial servo manager
-    Pca9685PwmManager *_pca9685PwmManager;           // the PCA9685 PWM manager
-    Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager; // the MP3 player manager
-    Debugging *_debugging;                           /// the debugging class
+    StScsSerialServoManager *_stSerialServoManager;              // the STS serial servo manager
+    StScsSerialServoManager *_scSerialServoManager;              // the SCS serial servo manager
+    Pca9685PwmManager *_pca9685PwmManager;                       // the PCA9685 PWM manager
+    Mp3PlayerYX5300Manager *_mp3PlayerYX5300Manager;             // the MP3 player YX5300 manager
+    Mp3PlayerDfPlayerMiniManager *_mp3PlayerDfPlayerMiniManager; // the MP3 player DFPlayer Mini manager
+    Debugging *_debugging;                                       /// the debugging class
     NeopixelManager *neopixelManager;
 
     /* cc-start-protected - insert your protected code here before the end-protected comment: */
+
+    long count = 0;
 
     /* cc-end-protected  */
 
@@ -46,7 +51,19 @@ public:
     int *timelineStateToForceOnce = nullptr;      /// Here the globale timeline state can be overwritten by custom code a single time. Buttons and other inputs defined in AWB Studio will be ignored.
     int *timelineStateToForcePermanent = nullptr; /// Here the globale timeline state can be overwritten by custom code permanent. Buttons and other inputs defined in AWB Studio will be ignored.
 
-    CustomCode(NeopixelManager *neopixelManager, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager, TCallBackErrorOccured errorOccured, Debugging *debugging) : neopixelManager(neopixelManager), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager), _errorOccured(errorOccured), _debugging(debugging)
+    CustomCode(NeopixelManager *neopixelManager,
+               StScsSerialServoManager *stSerialServoManager,
+               StScsSerialServoManager *scSerialServoManager,
+               Pca9685PwmManager *pca9685PwmManager,
+               Mp3PlayerYX5300Manager *mp3PlayerYX5300Manager,
+               Mp3PlayerDfPlayerMiniManager *mp3PlayerDfPlayerMiniManager,
+               TCallBackErrorOccured errorOccured, Debugging *debugging) : neopixelManager(neopixelManager),
+                                                                           _stSerialServoManager(stSerialServoManager),
+                                                                           _scSerialServoManager(scSerialServoManager),
+                                                                           _pca9685PwmManager(pca9685PwmManager),
+                                                                           _mp3PlayerYX5300Manager(mp3PlayerYX5300Manager),
+                                                                           _mp3PlayerDfPlayerMiniManager(mp3PlayerDfPlayerMiniManager),
+                                                                           _errorOccured(errorOccured), _debugging(debugging)
     {
         /* cc-start-constructor - insert your constructor code here before the end-constructor comment: */
 

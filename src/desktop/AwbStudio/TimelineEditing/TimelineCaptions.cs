@@ -54,6 +54,7 @@ namespace AwbStudio.TimelineEditing
             var label = actuator switch
             {
                 Mp3PlayerYX5300 mp3 => $"{clientIdPraefix}{(string.IsNullOrWhiteSpace(mp3.Title) ? $"MP3-{mp3.Id}" : mp3.Title)}",
+                Mp3PlayerDfPlayerMiniConfig mp3 => $"{clientIdPraefix}{(string.IsNullOrWhiteSpace(mp3.Title) ? $"MP3-{mp3.Id}" : mp3.Title)}",
                 Pca9685PwmServo servo => $"{clientIdPraefix}PWM{servo.Channel} {servo.Title ?? string.Empty}",
                 StsScsServo stsScs => $"{clientIdPraefix}{stsScs.StsScsType.ToString()}{stsScs.Channel} {stsScs.Title ?? string.Empty}",
                 _ => $"{clientIdPraefix}{actuator.Id} {actuator.Title ?? string.Empty}"

@@ -39,7 +39,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
             Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n----------------------------------------------------" });
             Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Read regions from '{filename}'"});
 
-            var lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             var regionContent = new StringBuilder();
             var regions = new List<Region>();
             string? actualRegionKey = null;
@@ -103,7 +103,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
             Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Write regions to '{filename}'" });
 
             var result = new StringBuilder();
-            var lines = templateContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = templateContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             var regions = new List<Region>();
             string? actualRegionKey = null;
             int regionCount = 0;

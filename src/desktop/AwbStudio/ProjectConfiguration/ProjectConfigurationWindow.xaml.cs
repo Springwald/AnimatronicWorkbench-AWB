@@ -313,6 +313,21 @@ namespace AwbStudio
             Mp3PlayerYX5300List.SelectedProjectObject = item;
         }
 
+        private void Mp3PlayerDFPlayerMiniList_NewProjectObjectRequested(object sender, EventArgs e)
+        {
+            var item = new Mp3PlayerDfPlayerMiniConfig
+            {
+                Id = _idCreator.CreateNewObjectId("Mp3PlayerDFPlayerMini"),
+                Title = "",
+                ClientId = 1,
+                RxPin = 13,
+                TxPin = 14,
+                Volume = 10
+            };
+            _viewModel.Mp3PlayerDFPlayerMini.Add(item);
+            Mp3PlayerDFPlayerMiniList.SelectedProjectObject = item;
+        }
+
         private void InputsList_NewProjectObjectRequested(object sender, EventArgs e)
         {
             var item = new InputConfig

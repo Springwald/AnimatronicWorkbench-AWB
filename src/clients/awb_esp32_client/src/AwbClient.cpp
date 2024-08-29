@@ -124,13 +124,16 @@ void AwbClient::setup()
     }
 
     showSetupMsg("setup mp3 player YX5300");
-    this->_mp3Player = new Mp3PlayerYX5300Manager(_projectData->mp3Players, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
+    this->_mp3PlayerYX5300 = new Mp3PlayerYX5300Manager(_projectData->mp3PlayersYX5300, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
+
+    showSetupMsg("setup mp3 player DFPlayer Mini");
+    this->_mp3PlayerDfPlayerMini = new Mp3PlayerDfPlayerMiniManager(_projectData->mp3PlayersDfPlayerMini, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
 
     showSetupMsg("setup input manager");
     _inputManager = new InputManager(_projectData, inputManagerErrorOccured);
 
     showSetupMsg("setup autoplay");
-    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, _inputManager, autoPlayerErrorOccured, _debugging);
+    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3PlayerYX5300, _mp3PlayerDfPlayerMini, _inputManager, autoPlayerErrorOccured, _debugging);
 
     // setup the packet processor to process packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet processor");
@@ -169,7 +172,7 @@ void AwbClient::setup()
 
     // set up the custom code
     showSetupMsg("setup custom code");
-    _customCode = new CustomCode(_neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3Player, customCodeErrorOccured, _debugging);
+    _customCode = new CustomCode(_neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3PlayerYX5300, _mp3PlayerDfPlayerMini, customCodeErrorOccured, _debugging);
     _customCode->setup();
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
@@ -240,13 +243,13 @@ void AwbClient::loop()
     {
         _debugging->setState(Debugging::MJ_AWB_CLIENT_LOOP, 1);
         // set true to test the mp3 player
-        if (_mp3Player->playSound(0, 2) == true)
+        if (_mp3PlayerDfPlayerMini->playSound(0, 1) == true)
         {
         }
         else
         {
             delay(1000);
-            _mp3Player->playSound(0, 1);
+            _mp3PlayerDfPlayerMini->playSound(0, 2);
         }
         delay(1000);
         return;

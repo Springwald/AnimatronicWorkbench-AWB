@@ -30,6 +30,7 @@ namespace Awb.Core.Project
         public StsFeetechServoConfig[] StsServos { get; set; } = new StsFeetechServoConfig[] { };
         public ScsFeetechServoConfig[] ScsServos { get; set; } = new ScsFeetechServoConfig[] { };
         public Mp3PlayerYX5300Config[] Mp3PlayersYX5300 { get; set; } = new Mp3PlayerYX5300Config[] { };
+        public Mp3PlayerDfPlayerMiniConfig[] Mp3PlayersDFPlayerMini { get; set; } = new Mp3PlayerDfPlayerMiniConfig[] { };
         public TimelineState[] TimelinesStates { get; set; } = new TimelineState[] { };
         public InputConfig[] Inputs { get; set; } = new InputConfig[] { };
 
@@ -61,6 +62,7 @@ namespace Awb.Core.Project
             foreach (var item in StsServos) yield return item;
             foreach (var item in ScsServos) yield return item;
             foreach (var item in Mp3PlayersYX5300) yield return item;
+            foreach (var item in Mp3PlayersDFPlayerMini) yield return item;
             foreach (var item in TimelinesStates) yield return item;
             foreach (var item in Inputs) yield return item;
         }

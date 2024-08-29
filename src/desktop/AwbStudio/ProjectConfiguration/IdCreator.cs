@@ -60,6 +60,7 @@ namespace AwbStudio.ProjectConfiguration
             foreach (var item in _awbProject.StsServos) yield return item.Id;
             foreach (var item in _awbProject.ScsServos) yield return item.Id;
             foreach (var item in _awbProject.Mp3PlayersYX5300) yield return item.Id;
+            foreach (var item in _awbProject.Mp3PlayersDFPlayerMini) yield return item.Id;
         }
 
 

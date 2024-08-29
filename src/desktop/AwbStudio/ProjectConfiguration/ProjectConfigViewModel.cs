@@ -118,6 +118,17 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
+        private ObservableCollection<IProjectObjectListable> _mp3PlayerDFPlayerMini = new ObservableCollection<IProjectObjectListable>();
+        public ObservableCollection<IProjectObjectListable> Mp3PlayerDFPlayerMini
+        {
+            get => _mp3PlayerDFPlayerMini;
+            set
+            {
+                _mp3PlayerDFPlayerMini = value;
+                OnPropertyChanged();
+            }
+        }
+
         private ObservableCollection<IProjectObjectListable> _inputs = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> Inputs
         {
@@ -166,6 +177,10 @@ namespace AwbStudio.ProjectConfiguration
                 foreach (var mp3PlayerYX5300 in awbProject.Mp3PlayersYX5300)
                     this.Mp3PlayerYX5300.Add(mp3PlayerYX5300);
 
+            if (awbProject?.Mp3PlayersDFPlayerMini != null)
+                foreach (var mp3PlayerDfPlayerMini in awbProject.Mp3PlayersDFPlayerMini)
+                    this.Mp3PlayerDFPlayerMini.Add(mp3PlayerDfPlayerMini);
+
             if (awbProject?.Inputs != null)
                 foreach (var input in awbProject.Inputs)
                     this.Inputs.Add(input);
@@ -181,6 +196,7 @@ namespace AwbStudio.ProjectConfiguration
             awbProject.StsServos = this.StsServos.Cast<StsFeetechServoConfig>().ToArray();
             awbProject.Pca9685PwmServos = this.Pca9685PwmServos.Cast<Pca9685PwmServoConfig>().ToArray();
             awbProject.Mp3PlayersYX5300 = this.Mp3PlayerYX5300.Cast<Mp3PlayerYX5300Config>().ToArray();
+            awbProject.Mp3PlayersDFPlayerMini = this.Mp3PlayerDFPlayerMini.Cast<Mp3PlayerDfPlayerMiniConfig>().ToArray();
             awbProject.Inputs = this.Inputs.Cast<InputConfig>().ToArray();
             awbProject.TimelinesStates = this.TimelineStates.Cast<TimelineState>().ToArray();
             awbProject.Esp32ClientHardware = this.Esp32ClientHardwareConfig;

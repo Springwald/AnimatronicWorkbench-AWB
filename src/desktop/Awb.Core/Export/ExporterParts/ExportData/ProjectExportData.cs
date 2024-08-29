@@ -21,6 +21,7 @@ namespace Awb.Core.Export.ExporterParts.ExportData
         public required IEnumerable<ScsFeetechServoConfig> ScsServoConfigs { get; init; }
         public required IEnumerable<Pca9685PwmServoConfig> Pca9685PwmServoConfigs { get; init; }
         public required IEnumerable<Mp3PlayerYX5300Config> Mp3PlayerYX5300Configs { get; init; }
+        public required IEnumerable<Mp3PlayerDfPlayerMiniConfig> Mp3PlayerDfPlayerMiniConfigs { get; init; }
         public required IEnumerable<InputConfig> InputConfigs { get; init; }
         public required Esp32ClientHardwareConfig Esp32ClientHardwareConfig { get; init; }
     }
