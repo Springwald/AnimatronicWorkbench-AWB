@@ -16,11 +16,12 @@ private:
     SoftwareSerial *_serial;
 
 public:
+    String id;
     String name;
     TCallBackErrorOccured _errorOccured;
 
     // the constructor
-    Mp3PlayerYX5300Serial(int rxPin, int txPin, String name) : name(name)
+    Mp3PlayerYX5300Serial(int rxPin, int txPin, String name, String id) : name(name), id(id)
     {
         _serial = new SoftwareSerial(rxPin, txPin);
         _serial->begin(MD_YX5300::SERIAL_BPS);

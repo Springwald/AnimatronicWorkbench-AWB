@@ -139,18 +139,22 @@ namespace Awb.Core.Export.ExporterParts
                 #include "../ProjectData/TimelineState.h"
                 #include "../ProjectData/TimelineState.h"
                 #include "../ProjectData/TimelineStateReference.h"
-                #include "../ProjectData/StsServoPoint.h"
-                #include "../ProjectData/Pca9685PwmServoPoint.h"
-                #include "../ProjectData/Mp3PlayerYX5300Point.h"
-                #include "../ProjectData/Mp3PlayerDfPlayerMiniPoint.h"
-                #include "../ProjectData/StsScsServo.h"
-                #include "../ProjectData/Pca9685PwmServo.h"
-                #include "../ProjectData/Mp3PlayerYX5300Serial.h"
-                #include "../ProjectData/Mp3PlayerDfPlayerMiniSerial.h"
+
+                #include "../ProjectData/Servos/StsServoPoint.h"
+                #include "../ProjectData/Servos/Pca9685PwmServoPoint.h"
+                #include "../ProjectData/Servos/StsScsServo.h"
+                #include "../ProjectData/Servos/Pca9685PwmServo.h"
+
+                #include "../ProjectData/Mp3Player/Mp3PlayerYX5300Serial.h"
+                #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniSerial.h"
+                #include "../ProjectData/Mp3Player/Mp3PlayerYX5300Point.h"
+                #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniPoint.h"
                 """;
 
             content.AppendLine(GetHeader(className: "ProjectData", includes: includes));
 
+            content.AppendLine("using TCallBackErrorOccured = std::function<void(String)>;");
+            content.AppendLine();
             content.AppendLine("public:");
             content.AppendLine($"   const char *ProjectName = \"{_projectData.ProjectName}\";");
             content.AppendLine();
@@ -171,7 +175,7 @@ namespace Awb.Core.Export.ExporterParts
             ExportInputs(inputConfigs: _projectData.InputConfigs, content);
             content.AppendLine();
 
-            content.AppendLine("ProjectData()");
+            content.AppendLine("ProjectData(TCallBackErrorOccured errorOccured)");
             content.AppendLine("{");
             content.AppendLine();
             ExportScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs, content);
@@ -277,7 +281,7 @@ namespace Awb.Core.Export.ExporterParts
             // add  mp3 players using the constructor:  Mp3PlayerYX5300Serial(int rxPin, int txPin, String name) 
             result.AppendLine($"\tmp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();");
             foreach (var player in players)
-                result.AppendLine($"\tmp3PlayersYX5300->push_back(Mp3PlayerYX5300Serial({player.RxPin}, {player.TxPin}, \"{player.Title}\"));");
+                result.AppendLine($"\tmp3PlayersYX5300->push_back(Mp3PlayerYX5300Serial({player.RxPin}, {player.TxPin}, \"{player.Title}\", \"{player.Id}\"));");
 
             result.AppendLine();
         }
@@ -288,7 +292,7 @@ namespace Awb.Core.Export.ExporterParts
             // add  mp3 players using the constructor:  Mp3PlayerDfPlayerMiniConfig(int rxPin, int txPin, int volume, String name) 
             result.AppendLine($"\tmp3PlayersDfPlayerMini = new std::vector<Mp3PlayerDfPlayerMiniSerial>();");
             foreach (var player in players)
-                result.AppendLine($"\tmp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial({player.RxPin}, {player.TxPin}, {player.Volume}, \"{player.Title}\"));");
+                result.AppendLine($"\tmp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial({player.RxPin}, {player.TxPin}, {player.Volume}, \"{player.Title}\", \"{player.Id}\", errorOccured));");
 
             result.AppendLine();
         }

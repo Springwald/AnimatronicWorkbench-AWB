@@ -5,19 +5,28 @@
 bool Mp3PlayerDfPlayerMiniSerial::playSound(int trackNo)
 {
     _myDFPlayer.play(trackNo);
-    return checkOk();
+    if (checkOk())
+        return true;
+    _errorOccured("DfPlayerMini: Unable to play sound track " + String(trackNo));
+    return false;
 }
 
 bool Mp3PlayerDfPlayerMiniSerial::stopSound()
 {
     _myDFPlayer.stop();
-    return checkOk();
+    if (checkOk())
+        return true;
+    _errorOccured("DfPlayerMini: Unable to stop sound");
+    return false;
 }
 
 bool Mp3PlayerDfPlayerMiniSerial::setVolume(int volume)
 {
     _myDFPlayer.volume(volume); // Set volume value (0~30).
-    return checkOk();
+    if (checkOk())
+        return true;
+    _errorOccured("DfPlayerMini: Unable to set volume");
+    return false;
 }
 
 bool Mp3PlayerDfPlayerMiniSerial::checkOk()
