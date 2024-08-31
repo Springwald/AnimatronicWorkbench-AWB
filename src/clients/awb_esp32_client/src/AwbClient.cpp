@@ -135,6 +135,9 @@ void AwbClient::setup()
     showSetupMsg("setup mp3 player DFPlayer Mini");
     this->_mp3PlayerDfPlayerMini = new Mp3PlayerDfPlayerMiniManager(_projectData->mp3PlayersDfPlayerMini, errorOccuredCallback, messageToShowCallback);
 
+    showSetupMsg("setup global mp3 player manager");
+    this->_globalMp3PlayerManager = new GlobalMp3PlayerManager(_mp3PlayerDfPlayerMini, _mp3PlayerYX5300);
+
     _debugging->setState(Debugging::MJ_SETUP, 60);
 
     showSetupMsg("setup input manager");
@@ -192,7 +195,7 @@ void AwbClient::setup()
 
     // set up the custom code
     showSetupMsg("setup custom code");
-    _customCode = new CustomCode(_neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3PlayerYX5300, _mp3PlayerDfPlayerMini, errorOccuredCallback, _debugging);
+    _customCode = new CustomCode(_neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _globalMp3PlayerManager, errorOccuredCallback, _debugging);
     _customCode->setup();
 
     _debugging->setState(Debugging::MJ_SETUP, 95);

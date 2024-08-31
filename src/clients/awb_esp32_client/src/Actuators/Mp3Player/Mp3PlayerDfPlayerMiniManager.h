@@ -24,7 +24,7 @@ public:
     bool playSound(int playerIndex, int trackNo);
     bool stopSound(int playerIndex);
     bool setVolume(int playerIndex, int volume);
-    int getPlayerIndex(String playerId);
+    int getPlayerIndexByTitle(String playerTitle);
 };
 
 #endif

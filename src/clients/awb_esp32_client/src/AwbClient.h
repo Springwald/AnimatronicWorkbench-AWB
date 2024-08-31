@@ -8,6 +8,7 @@
 #include "Actuators/Servos/Pca9685PwmManager.h"
 #include "Actuators/Mp3Player/Mp3PlayerYX5300Manager.h"
 #include "Actuators/Mp3Player/Mp3PlayerDfPlayerMiniManager.h"
+#include "Actuators/Mp3Player/GlobalMp3PlayerManager.h"
 #include "Actuators/ActuatorValue.h"
 #include "PacketSenderReceiver.h"
 #include "PacketProcessor.h"
@@ -43,7 +44,8 @@ protected:
     StScsSerialServoManager *_scSerialServoManager = nullptr;       /// The serial servo manager to control the scs serial servos
     InputManager *_inputManager = nullptr;                          // the input manager
     Mp3PlayerYX5300Manager *_mp3PlayerYX5300 = nullptr;             /// The mp3 player to play sounds on YX5300
-    Mp3PlayerDfPlayerMiniManager *_mp3PlayerDfPlayerMini = nullptr; /// The mp3 player to play sounds on DfPlayerMini
+    Mp3PlayerDfPlayerMiniManager *_mp3PlayerDfPlayerMini = nullptr; /// The mp3 player to play sounds on DfPlayerMini_globalMp3PlayerManager
+    GlobalMp3PlayerManager *_globalMp3PlayerManager = nullptr;      /// The global mp3 player manager to control the mp3 players
     NeopixelManager *_neopixelManager = nullptr;                    /// The neopixel manager to control the neopixel leds
     AutoPlayer *_autoPlayer = nullptr;                              /// The auto player to play timeline animations
     WlanConnector *_wlanConnector = nullptr;                        /// The wlan connector to open a WLAN AP and display status information as a web page

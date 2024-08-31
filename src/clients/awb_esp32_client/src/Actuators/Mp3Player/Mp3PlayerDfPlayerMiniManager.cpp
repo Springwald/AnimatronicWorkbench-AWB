@@ -32,10 +32,10 @@ bool Mp3PlayerDfPlayerMiniManager::setVolume(int playerIndex, int volume)
     return false;
 }
 
-int Mp3PlayerDfPlayerMiniManager::getPlayerIndex(String playerId)
+int Mp3PlayerDfPlayerMiniManager::getPlayerIndexByTitle(String playerTitle)
 {
     for (int i = 0; i < _mp3Players->size(); i++)
-        if (_mp3Players->at(i).id == playerId)
+        if (_mp3Players->at(i).name == playerTitle)
             return i;
     return -1;
 }

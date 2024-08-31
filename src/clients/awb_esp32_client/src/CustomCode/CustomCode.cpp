@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "CustomCode.h"
+#include "../AwbDataImport/ProjectData.h"
 #include <Actuators/NeopixelManager.h>
 /*
     Enter your custom code in this cpp file and the corresponding header file.
@@ -59,7 +60,7 @@ void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
         {
             if (holdTime > 3000) // if the button "Hold Back" is pressed for more than 2 seconds
             {
-                this->_mp3PlayerYX5300Manager->playSound(0, 29);
+                this->_mp3PlayerManager->playSound("", 29);
                 timelineNameToPlay = new String("Wake up");
                 wokeUpByBackHold = true;
             }
@@ -85,7 +86,7 @@ void CustomCode::checkButtons(String actualTimelineName, int actualTimelineState
     // check if a button is pressed and set e.g. the action to play a timeline
     if (pipButtons->isButtonPressed(pipButtons->btnSleep))
     {
-        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 3);
+        this->_mp3PlayerManager->playSound(ProjectData::Mp3PlayerName_PipVoiceSound, 3);
         if (actualTimelineName == "Sleeping" || actualTimelineName == "Go Sleep") // if the timeline "Sleeping" is active
             timelineNameToPlay = new String("Wake up");
         else
@@ -93,13 +94,13 @@ void CustomCode::checkButtons(String actualTimelineName, int actualTimelineState
     }
     if (pipButtons->isButtonPressed(pipButtons->btnRainbow))
     {
-        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 4);
+        this->_mp3PlayerManager->playSound(ProjectData::Mp3PlayerName_PipVoiceSound, 4);
         timelineNameToPlay = new String("Rainbow");
     }
     // check if a button is pressed and set e.g. the action to play a timeline
     if (pipButtons->isButtonPressed(pipButtons->btnEvil))
     {
-        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 9);
+        this->_mp3PlayerManager->playSound(ProjectData::Mp3PlayerName_PipVoiceSound, 9);
         timelineNameToPlay = new String("Evil");
     }
     // check if docked into the charger
@@ -109,13 +110,13 @@ void CustomCode::checkButtons(String actualTimelineName, int actualTimelineState
         if (digitalRead(dockedPin) == HIGH)
         {
             if (!isDocked)
-                this->_mp3PlayerDfPlayerMiniManager->playSound(0, 2); // dock into charger sound
+                this->_mp3PlayerManager->playSound(ProjectData::Mp3PlayerName_PipVoiceSound, 2); // dock into charger sound
             isDocked = true;
         }
         else
         {
             if (isDocked)
-                this->_mp3PlayerDfPlayerMiniManager->playSound(0, 1); // undock from charger sound
+                this->_mp3PlayerManager->playSound(ProjectData::Mp3PlayerName_PipVoiceSound, 1); // undock from charger sound
             isDocked = false;
         }
     }

@@ -22,10 +22,10 @@ bool Mp3PlayerYX5300Manager::stopSound(int playerIndex)
     return false;
 }
 
-int Mp3PlayerYX5300Manager::getPlayerIndex(String playerId)
+int Mp3PlayerYX5300Manager::getPlayerIndexByTitle(String playerTitle)
 {
     for (int i = 0; i < _mp3Players->size(); i++)
-        if (_mp3Players->at(i).id == playerId)
+        if (_mp3Players->at(i).id == playerTitle)
             return i;
     return -1;
 }
