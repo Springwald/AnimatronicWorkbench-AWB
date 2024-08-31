@@ -19,7 +19,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench-EN
 
-// Created on 25.08.2024 22:47:21
+// Created on 31.08.2024 12:41:10
 
 class ProjectData
 {
@@ -57,10 +57,9 @@ ProjectData()
    pca9685PwmServos = new std::vector<Pca9685PwmServo>();
 
 	mp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();
-	mp3PlayersYX5300->push_back(Mp3PlayerYX5300Serial(63, 64, "PipVoiceSound_OLD"));
 
 	mp3PlayersDfPlayerMini = new std::vector<Mp3PlayerDfPlayerMiniSerial>();
-	mp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial(17, 16, 10, "PipVoiceSound"));
+	mp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial(17, 16, 20, "PipVoiceSound"));
 
 	timelineStates = new std::vector<TimelineState>();
 	timelineStates->push_back(TimelineState(1, String("idle"), true, new std::vector<int>({  }), new std::vector<int>({  })));
@@ -106,7 +105,6 @@ void addTimelines() {
 		stsServoPoints1->push_back(StsServoPoint(3,13000,2164));
 		stsServoPoints1->push_back(StsServoPoint(3,14500,2171));
 		stsServoPoints1->push_back(StsServoPoint(4,15500,1617));
-		mp3PlayerYX5300Points1->push_back(Mp3PlayerYX5300Point(15, 0, 2000));
 		mp3PlayerDfPlayerMiniPoints1->push_back(Mp3PlayerDfPlayerMiniPoint(15, 0, 2000));
 		auto state1 = new TimelineStateReference(1, String("idle"));
 		Timeline *timeline1 = new Timeline(state1, 1, String("Idle 1"), stsServoPoints1, scsServoPoints1, pca9685PwmServoPoints1, mp3PlayerYX5300Points1, mp3PlayerDfPlayerMiniPoints1);
@@ -138,7 +136,6 @@ void addTimelines() {
 		stsServoPoints2->push_back(StsServoPoint(1,7500,2418));
 		stsServoPoints2->push_back(StsServoPoint(1,8500,1670));
 		stsServoPoints2->push_back(StsServoPoint(1,9000,1670));
-		mp3PlayerYX5300Points2->push_back(Mp3PlayerYX5300Point(14, 0, 1000));
 		mp3PlayerDfPlayerMiniPoints2->push_back(Mp3PlayerDfPlayerMiniPoint(14, 0, 1000));
 		auto state2 = new TimelineStateReference(1, String("idle"));
 		Timeline *timeline2 = new Timeline(state2, 1, String("Idle 2"), stsServoPoints2, scsServoPoints2, pca9685PwmServoPoints2, mp3PlayerYX5300Points2, mp3PlayerDfPlayerMiniPoints2);
@@ -207,9 +204,7 @@ void addTimelines() {
 		stsServoPoints4->push_back(StsServoPoint(2,7000,1750));
 		stsServoPoints4->push_back(StsServoPoint(3,7000,2140));
 		stsServoPoints4->push_back(StsServoPoint(4,7000,2048));
-		mp3PlayerYX5300Points4->push_back(Mp3PlayerYX5300Point(25, 0, 1000));
 		mp3PlayerDfPlayerMiniPoints4->push_back(Mp3PlayerDfPlayerMiniPoint(25, 0, 1000));
-		mp3PlayerYX5300Points4->push_back(Mp3PlayerYX5300Point(28, 0, 5000));
 		mp3PlayerDfPlayerMiniPoints4->push_back(Mp3PlayerDfPlayerMiniPoint(28, 0, 5000));
 		auto state4 = new TimelineStateReference(1, String("idle"));
 		Timeline *timeline4 = new Timeline(state4, 1, String("Idle 4"), stsServoPoints4, scsServoPoints4, pca9685PwmServoPoints4, mp3PlayerYX5300Points4, mp3PlayerDfPlayerMiniPoints4);
@@ -258,7 +253,6 @@ void addTimelines() {
 		stsServoPoints6->push_back(StsServoPoint(2,6000,1744));
 		stsServoPoints6->push_back(StsServoPoint(3,6000,2110));
 		stsServoPoints6->push_back(StsServoPoint(4,6000,1617));
-		mp3PlayerYX5300Points6->push_back(Mp3PlayerYX5300Point(15, 0, 500));
 		mp3PlayerDfPlayerMiniPoints6->push_back(Mp3PlayerDfPlayerMiniPoint(15, 0, 500));
 		auto state6 = new TimelineStateReference(4, String("remote and custom code only"));
 		Timeline *timeline6 = new Timeline(state6, 1, String("Evil"), stsServoPoints6, scsServoPoints6, pca9685PwmServoPoints6, mp3PlayerYX5300Points6, mp3PlayerDfPlayerMiniPoints6);
@@ -279,7 +273,6 @@ void addTimelines() {
 		stsServoPoints7->push_back(StsServoPoint(1,1000,2150));
 		stsServoPoints7->push_back(StsServoPoint(4,2500,500));
 		stsServoPoints7->push_back(StsServoPoint(4,4500,500));
-		mp3PlayerYX5300Points7->push_back(Mp3PlayerYX5300Point(18, 0, 500));
 		mp3PlayerDfPlayerMiniPoints7->push_back(Mp3PlayerDfPlayerMiniPoint(18, 0, 500));
 		auto state7 = new TimelineStateReference(4, String("remote and custom code only"));
 		Timeline *timeline7 = new Timeline(state7, 2, String("Go Sleep"), stsServoPoints7, scsServoPoints7, pca9685PwmServoPoints7, mp3PlayerYX5300Points7, mp3PlayerDfPlayerMiniPoints7);
@@ -311,11 +304,8 @@ void addTimelines() {
 		stsServoPoints8->push_back(StsServoPoint(2,6000,1650));
 		stsServoPoints8->push_back(StsServoPoint(3,6000,2019));
 		stsServoPoints8->push_back(StsServoPoint(4,6000,1487));
-		mp3PlayerYX5300Points8->push_back(Mp3PlayerYX5300Point(29, 0, 1000));
 		mp3PlayerDfPlayerMiniPoints8->push_back(Mp3PlayerDfPlayerMiniPoint(29, 0, 1000));
-		mp3PlayerYX5300Points8->push_back(Mp3PlayerYX5300Point(22, 0, 3000));
 		mp3PlayerDfPlayerMiniPoints8->push_back(Mp3PlayerDfPlayerMiniPoint(22, 0, 3000));
-		mp3PlayerYX5300Points8->push_back(Mp3PlayerYX5300Point(21, 0, 6000));
 		mp3PlayerDfPlayerMiniPoints8->push_back(Mp3PlayerDfPlayerMiniPoint(21, 0, 6000));
 		auto state8 = new TimelineStateReference(4, String("remote and custom code only"));
 		Timeline *timeline8 = new Timeline(state8, -1, String("Rainbow"), stsServoPoints8, scsServoPoints8, pca9685PwmServoPoints8, mp3PlayerYX5300Points8, mp3PlayerDfPlayerMiniPoints8);
@@ -366,7 +356,6 @@ void addTimelines() {
 		stsServoPoints10->push_back(StsServoPoint(4,3750,2042));
 		stsServoPoints10->push_back(StsServoPoint(1,4000,2150));
 		stsServoPoints10->push_back(StsServoPoint(1,4500,2150));
-		mp3PlayerYX5300Points10->push_back(Mp3PlayerYX5300Point(12, 0, 750));
 		mp3PlayerDfPlayerMiniPoints10->push_back(Mp3PlayerDfPlayerMiniPoint(12, 0, 750));
 		auto state10 = new TimelineStateReference(4, String("remote and custom code only"));
 		Timeline *timeline10 = new Timeline(state10, 1, String("Wake up"), stsServoPoints10, scsServoPoints10, pca9685PwmServoPoints10, mp3PlayerYX5300Points10, mp3PlayerDfPlayerMiniPoints10);

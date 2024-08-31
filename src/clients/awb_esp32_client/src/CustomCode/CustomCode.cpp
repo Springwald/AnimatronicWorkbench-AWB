@@ -1,45 +1,123 @@
-
 #include <Arduino.h>
 #include "CustomCode.h"
 #include <Actuators/NeopixelManager.h>
-
 /*
     Enter your custom code in this cpp file and the corresponding header file.
     Only write code beween the cc-start and cc-end comments, otherwise it will be overwritten and lost.
 */
-
 /* cc-start-include - insert your include code here before the end-protected comment: */
-
 /* cc-end-include - insert your include code here before the end-protected comment: */
-
 void CustomCode::setup()
 {
     /* cc-start-setup - insert your setup code here before the end-setup comment: */
-
+    this->pipButtons->setup();
+    this->pipNeopixel->setup();
+    this->pipNeopixel->setEyeState(PipNeopixel::BigEyeStateOff);
+    timelineNameToPlay = new String("StartUp");
+    // set docked pin as input
+    pinMode(dockedPin, INPUT);
+    lastUpdateMs = millis();
     /* cc-end-setup  */
 }
-
 void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
 {
     /* cc-start-loop - insert your loop code here before the end-loop comment: */
-
-    int factor = 10;
-
-    count++;
-    if (count == 1 * factor)
-        _mp3PlayerDfPlayerMiniManager->setVolume(0, 4);
-    if (count == 2 * factor)
-        _mp3PlayerDfPlayerMiniManager->playSound(0, 4);
-    if (count == 3 * factor)
-        _mp3PlayerDfPlayerMiniManager->setVolume(0, 10);
-    if (count == 4 * factor)
-        _mp3PlayerDfPlayerMiniManager->playSound(0, 4);
-    if (count == 5 * factor)
-        count = 0;
-
+    auto diff = millis() - lastUpdateMs;
+    lastUpdateMs = millis();
+    int bigEyeState = PipNeopixel::BigEyeStateDefault;
+    pipButtons->loop();                                   // call the loop function of the pipButtons to update the button states
+    pipNeopixel->loop();                                  // call the loop function of the pipNeopixel to update the neopixel states
+    if (actualTimelineStateId == CustomCode::idleStateId) // check if the idle state is active
+    {
+        const int sleepAfterMinutes = 5;
+        idleStateDurationMs += diff;
+        if (idleStateDurationMs > sleepAfterMinutes * 60000)
+        {
+            // play the timeline "Go Sleep" after 60 seconds of idle time
+            timelineNameToPlay = new String("Go Sleep");
+            idleStateDurationMs = 0;
+        }
+    }
+    else
+        idleStateDurationMs = 0;
+    if (actualTimelineName == "Sleeping")
+    {
+        sleepingTime += diff;
+        if (sleepingTime > 5000) // if the timeline "Sleeping" is active for more than 30 seconds
+        {
+            for (int servoChannel = 1; servoChannel <= 4; servoChannel++) // turn off all neck and ear servos
+                this->_stSerialServoManager->setTorque(servoChannel, 0);
+        }
+        bigEyeState = PipNeopixel::BigEyeStateSleeping;
+        auto holdTime = pipButtons->buttonHoldTimeMs(pipButtons->btnHoldBack);
+        if (wokeUpByBackHold)
+        {
+            if (holdTime < 1000) // if the button "Hold Back" is released
+                wokeUpByBackHold = false;
+        }
+        else
+        {
+            if (holdTime > 3000) // if the button "Hold Back" is pressed for more than 2 seconds
+            {
+                this->_mp3PlayerYX5300Manager->playSound(0, 29);
+                timelineNameToPlay = new String("Wake up");
+                wokeUpByBackHold = true;
+            }
+        }
+    }
+    else
+    {
+        sleepingTime = 0;
+    }
+    if (actualTimelineName == "Go Sleep")
+        bigEyeState = PipNeopixel::BigEyeStateGoSleep;
+    if (actualTimelineName == "Evil")
+        bigEyeState = PipNeopixel::BigEyeStateEvil;
+    if (actualTimelineName == "Rainbow")
+        bigEyeState = PipNeopixel::BigEyeStateRainbow;
+    checkButtons(actualTimelineName, actualTimelineStateId);
+    pipNeopixel->setEyeState(bigEyeState);
     /* cc-end-loop  */
 }
-
 /* cc-start-functions - insert your functions here before the end-functions comment: */
-
+void CustomCode::checkButtons(String actualTimelineName, int actualTimelineStateId)
+{
+    // check if a button is pressed and set e.g. the action to play a timeline
+    if (pipButtons->isButtonPressed(pipButtons->btnSleep))
+    {
+        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 3);
+        if (actualTimelineName == "Sleeping" || actualTimelineName == "Go Sleep") // if the timeline "Sleeping" is active
+            timelineNameToPlay = new String("Wake up");
+        else
+            timelineNameToPlay = new String("Go Sleep");
+    }
+    if (pipButtons->isButtonPressed(pipButtons->btnRainbow))
+    {
+        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 4);
+        timelineNameToPlay = new String("Rainbow");
+    }
+    // check if a button is pressed and set e.g. the action to play a timeline
+    if (pipButtons->isButtonPressed(pipButtons->btnEvil))
+    {
+        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 9);
+        timelineNameToPlay = new String("Evil");
+    }
+    // check if docked into the charger
+    _errorOccured(String(analogRead(dockedPin)));
+    if (false)
+    {
+        if (digitalRead(dockedPin) == HIGH)
+        {
+            if (!isDocked)
+                this->_mp3PlayerDfPlayerMiniManager->playSound(0, 2); // dock into charger sound
+            isDocked = true;
+        }
+        else
+        {
+            if (isDocked)
+                this->_mp3PlayerDfPlayerMiniManager->playSound(0, 1); // undock from charger sound
+            isDocked = false;
+        }
+    }
+}
 /* cc-end-functions  */

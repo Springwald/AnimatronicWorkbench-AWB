@@ -283,19 +283,19 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     {
         for (int iPoint = 0; iPoint < actualTimelineData.mp3PlayerDfPlayerMiniPoints->size(); iPoint++)
         {
-            Mp3PlayerYX5300Point *point = &actualTimelineData.mp3PlayerYX5300Points->at(iPoint);
+            Mp3PlayerDfPlayerMiniPoint *point = &actualTimelineData.mp3PlayerDfPlayerMiniPoints->at(iPoint);
             if (point->ms > rememberLastPlayPos && point->ms <= _playPosInActualTimeline)
             {
                 for (int trys = 0; trys < 3; trys++)
                 {
-                    if (_mp3PlayerYX5300Manager->playSound(point->soundPlayerIndex, point->soundId) == true)
+                    if (_mp3PlayerDfPlayerMiniManager->playSound(point->soundPlayerIndex, point->soundId) == true)
                     {
                         _lastSoundPlayed = point->soundId;
                         break;
                     }
                     else
                     {
-                        _mp3PlayerYX5300Manager->stopSound(point->soundPlayerIndex);
+                        _mp3PlayerDfPlayerMiniManager->stopSound(point->soundPlayerIndex);
                         _lastSoundPlayed = -100;
                         delay(50);
                     }

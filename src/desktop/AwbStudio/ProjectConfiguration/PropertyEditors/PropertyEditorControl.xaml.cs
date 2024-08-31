@@ -7,6 +7,7 @@
 
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
+using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using System;
 using System.Collections.Generic;
@@ -66,9 +67,33 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     var objectsUsingThisObject = new List<string>();
                     switch (projectObject)
                     {
+                        /*  Servos */
+
                         case FeetechBusServoConfig feetechServoConfig:
                             objectsUsingThisObject.AddRange(
                                 timelines.Where(t => t.ServoPoints.Any(p => p.ServoId == feetechServoConfig.Id)).Select(t => $"Timeline '{t.Title}'"));
+                            break;
+
+                        case Pca9685PwmServoConfig pca9685PwmServoConfig:
+                            objectsUsingThisObject.AddRange(
+                                timelines.Where(t => t.ServoPoints.Any(p => p.ServoId == pca9685PwmServoConfig.Id)).Select(t => $"Timeline '{t.Title}'"));
+                            break;
+
+                        case DynamixelBusServoConfig dynamixelBusServoConfig:
+                            objectsUsingThisObject.AddRange(
+                                timelines.Where(t => t.ServoPoints.Any(p => p.ServoId == dynamixelBusServoConfig.Id)).Select(t => $"Timeline '{t.Title}'"));
+                            break;
+
+                        /* MP3-Player */
+
+                        case Mp3PlayerDfPlayerMiniConfig mp3PlayerDfPlayerMiniConfig:
+                            objectsUsingThisObject.AddRange(
+                                timelines.Where(t => t.SoundPoints.Any(p => p.SoundPlayerId == mp3PlayerDfPlayerMiniConfig.Id)).Select(t => $"Timeline '{t.Title}'"));
+                            break;
+
+                        case Mp3PlayerYX5300Config mp3PlayerYX5300Config:
+                            objectsUsingThisObject.AddRange(
+                                timelines.Where(t => t.SoundPoints.Any(p => p.SoundPlayerId == mp3PlayerYX5300Config.Id)).Select(t => $"Timeline '{t.Title}'"));
                             break;
 
                         default:
