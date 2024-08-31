@@ -8,10 +8,10 @@
 #include <Arduino.h>
 #include <String.h>
 #include <Actuators/NeopixelManager.h>
-#include <Actuators/StScsSerialServoManager.h>
-#include <Actuators/Pca9685PwmManager.h>
-#include <Actuators/Mp3PlayerYX5300Manager.h>
-#include <Actuators/Mp3PlayerDfPlayerMiniManager.h>
+#include <Actuators/Servos/StScsSerialServoManager.h>
+#include <Actuators/Servos/Pca9685PwmManager.h>
+#include <Actuators/Mp3Player/Mp3PlayerYX5300Manager.h>
+#include <Actuators/Mp3Player/Mp3PlayerDfPlayerMiniManager.h>
 #include <Debugging.h>
 /* cc-start-include - insert your include code here before the end-protected comment: */
 #include "PipButtons.h"

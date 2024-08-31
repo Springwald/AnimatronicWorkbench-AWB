@@ -4,8 +4,8 @@
 #include "AutoPlayer.h"
 #include "../ProjectData/Timeline.h"
 #include "../ProjectData/TimelineStateReference.h"
-#include "../ProjectData/StsServoPoint.h"
-#include "../ProjectData/Pca9685PwmServoPoint.h"
+#include "../ProjectData/Servos/StsServoPoint.h"
+#include "../ProjectData/Servos/Pca9685PwmServoPoint.h"
 
 /**
  * Initializes a new instance of the <see cref="AutoPlayer"/> class.
@@ -162,7 +162,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
             int servoSpeed = _data->stsServos->at(servoIndex).defaultSpeed;
             int servoAccelleration = _data->stsServos->at(servoIndex).defaultAcceleration;
 
-            int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.stsServoPoints);
+            int targetValue = this->calculateServoValueFromTimeline(servoChannel, actualTimelineData.stsServoPoints);
             if (targetValue == -1)
                 continue;
 
@@ -182,7 +182,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
             int servoSpeed = _data->scsServos->at(servoIndex).defaultSpeed;
             int servoAccelleration = _data->scsServos->at(servoIndex).defaultAcceleration;
 
-            int targetValue = this->calculateServoValueFromTimeline(servoChannel, servoSpeed, servoAccelleration, actualTimelineData.scsServoPoints);
+            int targetValue = this->calculateServoValueFromTimeline(servoChannel, actualTimelineData.scsServoPoints);
             if (targetValue == -1)
                 continue;
 
@@ -309,7 +309,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     _debugging->setState(Debugging::MJ_AUTOPLAY, 99);
 }
 
-int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints)
+int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, std::vector<StsServoPoint> *servoPoints)
 {
     StsServoPoint *point1 = nullptr;
     StsServoPoint *point2 = nullptr;

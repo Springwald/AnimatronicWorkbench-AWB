@@ -4,7 +4,8 @@
 #include <Arduino.h>
 #include <String.h>
 
-class StsServoPoint
+
+class StsServoPoint 
 {
 protected:
 public:

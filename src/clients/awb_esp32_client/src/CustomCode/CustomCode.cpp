@@ -15,7 +15,7 @@ void CustomCode::setup()
     this->pipNeopixel->setEyeState(PipNeopixel::BigEyeStateOff);
     timelineNameToPlay = new String("StartUp");
     // set docked pin as input
-    pinMode(dockedPin, ANALOG);
+    pinMode(dockedPin, INPUT);
     lastUpdateMs = millis();
     /* cc-end-setup  */
 }

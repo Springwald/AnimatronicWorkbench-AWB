@@ -4,9 +4,8 @@
 #include <Arduino.h>
 #include "AwbDisplay.h"
 #include "Adafruit_PWMServoDriver.h"
-#include "Actuators/StScsSerialServoManager.h"
-#include "Actuators/Pca9685PwmManager.h"
-#include "Actuators/Mp3PlayerYX5300Manager.h"
+#include "Actuators/Servos/StScsSerialServoManager.h"
+#include "Actuators/Servos/Pca9685PwmManager.h"
 #include "Actuators/ActuatorValue.h"
 #include "PacketSenderReceiver.h"
 #include "PacketProcessor.h"

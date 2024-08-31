@@ -3,7 +3,7 @@
 #include "StScsSerialServoManager.h"
 #include "AwbDataImport/HardwareConfig.h"
 #include "ActualStatusInformation.h"
-#include "ActuatorValue.h"
+#include "../ActuatorValue.h"
 
 // It's pretty messy and also a bit unclean that the library creates a global object.
 // But it is the only way I found to use the library.

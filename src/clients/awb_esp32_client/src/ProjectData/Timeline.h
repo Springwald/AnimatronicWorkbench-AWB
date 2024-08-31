@@ -5,10 +5,10 @@
 #include <String.h>
 #include <vector>
 #include <string>
-#include "StsServoPoint.h"
-#include "Pca9685PwmServoPoint.h"
-#include "Mp3PlayerYX5300Point.h"
-#include "Mp3PlayerDfPlayerMiniPoint.h"
+#include "Servos/StsServoPoint.h"
+#include "Servos/Pca9685PwmServoPoint.h"
+#include "Mp3Player/Mp3PlayerYX5300Point.h"
+#include "Mp3Player/Mp3PlayerDfPlayerMiniPoint.h"
 #include "TimelineStateReference.h"
 
 using byte = unsigned char;
