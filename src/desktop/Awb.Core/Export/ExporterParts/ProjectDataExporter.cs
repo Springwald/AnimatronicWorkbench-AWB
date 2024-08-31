@@ -218,21 +218,26 @@ namespace Awb.Core.Export.ExporterParts
         {
             content.AppendLine($"   /* Names as const to prevent magic strings in custom code: */");
             content.AppendLine();
+
+            var constString = (string praefix, string s) => $"   const String {praefix}{CleanUpName(s)} =\"{s}\";";
+
             // timeline names
             foreach (var timeline in _projectData.TimelineData)
-                content.AppendLine($"   static inline const std::string TimelineName_{CleanUpName(timeline.Title)} = \"{timeline.Title}\";");
+                content.AppendLine(constString("TimelineName_",timeline.Title));
+
             // mp3 player names
             foreach (var mp3Player in _projectData.Mp3PlayerYX5300Configs)
-                content.AppendLine($"   static inline const std::string Mp3PlayerName_{CleanUpName(mp3Player.Title)} = \"{mp3Player.Title}\";");
+                content.AppendLine(constString("Mp3PlayerName_", mp3Player.Title));
             foreach (var mp3Player in _projectData.Mp3PlayerDfPlayerMiniConfigs)
-                content.AppendLine($"   static inline const std::string Mp3PlayerName_{CleanUpName(mp3Player.Title)} = \"{mp3Player.Title}\";");
+                content.AppendLine(constString("Mp3PlayerName_", mp3Player.Title));
+
             // servo names
             foreach (var servo in _projectData.ScsServoConfigs)
-                content.AppendLine($"   static inline const std::string ScsServoName_{CleanUpName(servo.Title)} = \"{servo.Title}\";");
+                content.AppendLine(constString("ScsServoName_", servo.Title));
             foreach (var servo in _projectData.StsServoConfigs)
-                content.AppendLine($"   static inline const std::string StsServoName_{CleanUpName(servo.Title)} = \"{servo.Title}\";");
+                content.AppendLine(constString("StsServoName_", servo.Title));
             foreach (var servo in _projectData.Pca9685PwmServoConfigs)
-                content.AppendLine($"   static inline const std::string Pca9685PwmServoName_{CleanUpName(servo.Title)} = \"{servo.Title}\";");
+                content.AppendLine(constString("Pca9685PwmServoName_", servo.Title));
             content.AppendLine();
         }
 

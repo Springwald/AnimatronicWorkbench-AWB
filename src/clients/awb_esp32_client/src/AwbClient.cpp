@@ -195,7 +195,7 @@ void AwbClient::setup()
 
     // set up the custom code
     showSetupMsg("setup custom code");
-    _customCode = new CustomCode(_neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _globalMp3PlayerManager, errorOccuredCallback, _debugging);
+    _customCode = new CustomCode(_projectData, _neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _globalMp3PlayerManager, errorOccuredCallback, _debugging);
     _customCode->setup();
 
     _debugging->setState(Debugging::MJ_SETUP, 95);
