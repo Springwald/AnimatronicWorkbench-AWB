@@ -278,6 +278,8 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         }
     }
 
+    _debugging->setState(Debugging::MJ_AUTOPLAY, 41);
+
     // Play MP3 on DFPlayer Mini
     if (_mp3PlayerDfPlayerMiniManager != nullptr)
     {

@@ -15,7 +15,7 @@ void CustomCode::setup()
     this->pipNeopixel->setEyeState(PipNeopixel::BigEyeStateOff);
     timelineNameToPlay = new String("StartUp");
     // set docked pin as input
-    pinMode(dockedPin, INPUT);
+    pinMode(dockedPin, ANALOG);
     lastUpdateMs = millis();
     /* cc-end-setup  */
 }
@@ -103,7 +103,7 @@ void CustomCode::checkButtons(String actualTimelineName, int actualTimelineState
         timelineNameToPlay = new String("Evil");
     }
     // check if docked into the charger
-    _errorOccured(String(analogRead(dockedPin)));
+    //_errorOccured(String(analogRead(dockedPin)));
     if (false)
     {
         if (digitalRead(dockedPin) == HIGH)

@@ -19,7 +19,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AnimatronicWorkbench-EN
 
-// Created on 31.08.2024 12:41:10
+// Created on 31.08.2024 12:50:20
 
 class ProjectData
 {
@@ -50,7 +50,7 @@ ProjectData()
 
    stsServos = new std::vector<StsScsServo>();
    stsServos->push_back(StsScsServo(1, "HeadTiltLeftRight", 2600, 1600, 55, 500, 2150, 25, 1200, false ));
-   stsServos->push_back(StsScsServo(2, "NeckInOut", 2500, 1650, 55, 600, 1750, 10, 800, true ));
+   stsServos->push_back(StsScsServo(2, "NeckInOut", 2450, 1600, 55, 600, 1750, 10, 800, true ));
    stsServos->push_back(StsScsServo(3, "HeadTiltUpDown", 2480, 1800, 55, 500, 2140, 25, 1200, true ));
    stsServos->push_back(StsScsServo(4, "Ear", 500, 3800, 55, 200, 2048, 100, 1500, false ));
 
@@ -59,7 +59,7 @@ ProjectData()
 	mp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();
 
 	mp3PlayersDfPlayerMini = new std::vector<Mp3PlayerDfPlayerMiniSerial>();
-	mp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial(17, 16, 20, "PipVoiceSound"));
+	mp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial(16, 17, 20, "PipVoiceSound"));
 
 	timelineStates = new std::vector<TimelineState>();
 	timelineStates->push_back(TimelineState(1, String("idle"), true, new std::vector<int>({  }), new std::vector<int>({  })));
@@ -78,10 +78,10 @@ void addTimelines() {
 		auto *pca9685PwmServoPoints1 = new std::vector<Pca9685PwmServoPoint>();
 		auto *mp3PlayerYX5300Points1 = new std::vector<Mp3PlayerYX5300Point>();
 		auto *mp3PlayerDfPlayerMiniPoints1 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
-		stsServoPoints1->push_back(StsServoPoint(2,0,1744));
+		stsServoPoints1->push_back(StsServoPoint(2,0,1694));
 		stsServoPoints1->push_back(StsServoPoint(1,1000,2141));
 		stsServoPoints1->push_back(StsServoPoint(3,1000,2137));
-		stsServoPoints1->push_back(StsServoPoint(2,1000,1650));
+		stsServoPoints1->push_back(StsServoPoint(2,1000,1600));
 		stsServoPoints1->push_back(StsServoPoint(1,2000,1889));
 		stsServoPoints1->push_back(StsServoPoint(4,2000,1402));
 		stsServoPoints1->push_back(StsServoPoint(1,2500,2600));
@@ -115,22 +115,22 @@ void addTimelines() {
 		auto *pca9685PwmServoPoints2 = new std::vector<Pca9685PwmServoPoint>();
 		auto *mp3PlayerYX5300Points2 = new std::vector<Mp3PlayerYX5300Point>();
 		auto *mp3PlayerDfPlayerMiniPoints2 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
-		stsServoPoints2->push_back(StsServoPoint(2,500,1744));
-		stsServoPoints2->push_back(StsServoPoint(2,1000,1743));
+		stsServoPoints2->push_back(StsServoPoint(2,500,1694));
+		stsServoPoints2->push_back(StsServoPoint(2,1000,1693));
 		stsServoPoints2->push_back(StsServoPoint(4,1000,1721));
-		stsServoPoints2->push_back(StsServoPoint(2,1500,1744));
+		stsServoPoints2->push_back(StsServoPoint(2,1500,1694));
 		stsServoPoints2->push_back(StsServoPoint(3,1500,2140));
-		stsServoPoints2->push_back(StsServoPoint(2,2500,2098));
+		stsServoPoints2->push_back(StsServoPoint(2,2500,2048));
 		stsServoPoints2->push_back(StsServoPoint(3,2500,1810));
 		stsServoPoints2->push_back(StsServoPoint(3,3000,1810));
 		stsServoPoints2->push_back(StsServoPoint(3,3500,2024));
 		stsServoPoints2->push_back(StsServoPoint(4,3500,2292));
 		stsServoPoints2->push_back(StsServoPoint(3,5500,1955));
 		stsServoPoints2->push_back(StsServoPoint(4,5500,1279));
-		stsServoPoints2->push_back(StsServoPoint(2,5500,1744));
-		stsServoPoints2->push_back(StsServoPoint(2,6500,2259));
+		stsServoPoints2->push_back(StsServoPoint(2,5500,1694));
+		stsServoPoints2->push_back(StsServoPoint(2,6500,2209));
 		stsServoPoints2->push_back(StsServoPoint(3,6500,2480));
-		stsServoPoints2->push_back(StsServoPoint(2,7500,1744));
+		stsServoPoints2->push_back(StsServoPoint(2,7500,1694));
 		stsServoPoints2->push_back(StsServoPoint(3,7500,1944));
 		stsServoPoints2->push_back(StsServoPoint(4,7500,1513));
 		stsServoPoints2->push_back(StsServoPoint(1,7500,2418));
@@ -146,16 +146,16 @@ void addTimelines() {
 		auto *pca9685PwmServoPoints3 = new std::vector<Pca9685PwmServoPoint>();
 		auto *mp3PlayerYX5300Points3 = new std::vector<Mp3PlayerYX5300Point>();
 		auto *mp3PlayerDfPlayerMiniPoints3 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
-		stsServoPoints3->push_back(StsServoPoint(2,0,1744));
-		stsServoPoints3->push_back(StsServoPoint(2,500,1744));
+		stsServoPoints3->push_back(StsServoPoint(2,0,1694));
+		stsServoPoints3->push_back(StsServoPoint(2,500,1694));
 		stsServoPoints3->push_back(StsServoPoint(1,500,1914));
 		stsServoPoints3->push_back(StsServoPoint(3,500,2480));
 		stsServoPoints3->push_back(StsServoPoint(4,500,993));
-		stsServoPoints3->push_back(StsServoPoint(2,1000,1650));
-		stsServoPoints3->push_back(StsServoPoint(2,1500,2165));
+		stsServoPoints3->push_back(StsServoPoint(2,1000,1600));
+		stsServoPoints3->push_back(StsServoPoint(2,1500,2115));
 		stsServoPoints3->push_back(StsServoPoint(3,1500,1800));
 		stsServoPoints3->push_back(StsServoPoint(4,1500,2422));
-		stsServoPoints3->push_back(StsServoPoint(2,2000,1744));
+		stsServoPoints3->push_back(StsServoPoint(2,2000,1694));
 		stsServoPoints3->push_back(StsServoPoint(1,2500,1891));
 		stsServoPoints3->push_back(StsServoPoint(1,3000,2348));
 		stsServoPoints3->push_back(StsServoPoint(3,3000,1800));
@@ -163,11 +163,11 @@ void addTimelines() {
 		stsServoPoints3->push_back(StsServoPoint(1,3500,2371));
 		stsServoPoints3->push_back(StsServoPoint(3,4000,1933));
 		stsServoPoints3->push_back(StsServoPoint(4,4000,2266));
-		stsServoPoints3->push_back(StsServoPoint(2,4000,1857));
+		stsServoPoints3->push_back(StsServoPoint(2,4000,1807));
 		stsServoPoints3->push_back(StsServoPoint(1,4000,2214));
-		stsServoPoints3->push_back(StsServoPoint(2,4500,1783));
-		stsServoPoints3->push_back(StsServoPoint(2,6000,1783));
-		stsServoPoints3->push_back(StsServoPoint(2,7000,2145));
+		stsServoPoints3->push_back(StsServoPoint(2,4500,1733));
+		stsServoPoints3->push_back(StsServoPoint(2,6000,1733));
+		stsServoPoints3->push_back(StsServoPoint(2,7000,2095));
 		auto state3 = new TimelineStateReference(1, String("idle"));
 		Timeline *timeline3 = new Timeline(state3, 1, String("Idle 3"), stsServoPoints3, scsServoPoints3, pca9685PwmServoPoints3, mp3PlayerYX5300Points3, mp3PlayerDfPlayerMiniPoints3);
 		timelines->push_back(*timeline3);
@@ -179,29 +179,29 @@ void addTimelines() {
 		auto *mp3PlayerDfPlayerMiniPoints4 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
 		stsServoPoints4->push_back(StsServoPoint(4,0,1955));
 		stsServoPoints4->push_back(StsServoPoint(3,0,1821));
-		stsServoPoints4->push_back(StsServoPoint(2,0,1911));
+		stsServoPoints4->push_back(StsServoPoint(2,0,1861));
 		stsServoPoints4->push_back(StsServoPoint(1,0,2411));
 		stsServoPoints4->push_back(StsServoPoint(3,1000,1800));
-		stsServoPoints4->push_back(StsServoPoint(2,1000,1663));
+		stsServoPoints4->push_back(StsServoPoint(2,1000,1613));
 		stsServoPoints4->push_back(StsServoPoint(1,1000,2182));
 		stsServoPoints4->push_back(StsServoPoint(4,1000,3280));
 		stsServoPoints4->push_back(StsServoPoint(1,2000,2458));
-		stsServoPoints4->push_back(StsServoPoint(2,2000,1670));
+		stsServoPoints4->push_back(StsServoPoint(2,2000,1620));
 		stsServoPoints4->push_back(StsServoPoint(3,2000,2480));
 		stsServoPoints4->push_back(StsServoPoint(3,2500,2480));
 		stsServoPoints4->push_back(StsServoPoint(4,2500,1097));
-		stsServoPoints4->push_back(StsServoPoint(2,2500,1670));
+		stsServoPoints4->push_back(StsServoPoint(2,2500,1620));
 		stsServoPoints4->push_back(StsServoPoint(1,2500,2458));
 		stsServoPoints4->push_back(StsServoPoint(3,3000,2480));
 		stsServoPoints4->push_back(StsServoPoint(1,4000,1600));
 		stsServoPoints4->push_back(StsServoPoint(4,4000,2500));
 		stsServoPoints4->push_back(StsServoPoint(1,4500,1600));
 		stsServoPoints4->push_back(StsServoPoint(1,6000,2150));
-		stsServoPoints4->push_back(StsServoPoint(2,6000,1803));
+		stsServoPoints4->push_back(StsServoPoint(2,6000,1753));
 		stsServoPoints4->push_back(StsServoPoint(3,6000,1800));
 		stsServoPoints4->push_back(StsServoPoint(3,6500,1800));
 		stsServoPoints4->push_back(StsServoPoint(1,7000,2150));
-		stsServoPoints4->push_back(StsServoPoint(2,7000,1750));
+		stsServoPoints4->push_back(StsServoPoint(2,7000,1700));
 		stsServoPoints4->push_back(StsServoPoint(3,7000,2140));
 		stsServoPoints4->push_back(StsServoPoint(4,7000,2048));
 		mp3PlayerDfPlayerMiniPoints4->push_back(Mp3PlayerDfPlayerMiniPoint(25, 0, 1000));
@@ -226,21 +226,21 @@ void addTimelines() {
 		auto *pca9685PwmServoPoints6 = new std::vector<Pca9685PwmServoPoint>();
 		auto *mp3PlayerYX5300Points6 = new std::vector<Mp3PlayerYX5300Point>();
 		auto *mp3PlayerDfPlayerMiniPoints6 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
-		stsServoPoints6->push_back(StsServoPoint(2,0,1750));
-		stsServoPoints6->push_back(StsServoPoint(2,500,1650));
+		stsServoPoints6->push_back(StsServoPoint(2,0,1700));
+		stsServoPoints6->push_back(StsServoPoint(2,500,1600));
 		stsServoPoints6->push_back(StsServoPoint(3,500,1976));
 		stsServoPoints6->push_back(StsServoPoint(4,500,1383));
 		stsServoPoints6->push_back(StsServoPoint(1,500,2308));
-		stsServoPoints6->push_back(StsServoPoint(2,1000,1844));
+		stsServoPoints6->push_back(StsServoPoint(2,1000,1794));
 		stsServoPoints6->push_back(StsServoPoint(1,1000,2025));
-		stsServoPoints6->push_back(StsServoPoint(2,1500,1650));
+		stsServoPoints6->push_back(StsServoPoint(2,1500,1600));
 		stsServoPoints6->push_back(StsServoPoint(3,1500,2244));
 		stsServoPoints6->push_back(StsServoPoint(4,1500,2994));
-		stsServoPoints6->push_back(StsServoPoint(2,2000,1830));
+		stsServoPoints6->push_back(StsServoPoint(2,2000,1780));
 		stsServoPoints6->push_back(StsServoPoint(1,2000,2371));
 		stsServoPoints6->push_back(StsServoPoint(3,2500,2121));
 		stsServoPoints6->push_back(StsServoPoint(1,2500,1859));
-		stsServoPoints6->push_back(StsServoPoint(2,3000,1744));
+		stsServoPoints6->push_back(StsServoPoint(2,3000,1694));
 		stsServoPoints6->push_back(StsServoPoint(4,3000,1643));
 		stsServoPoints6->push_back(StsServoPoint(3,3000,1800));
 		stsServoPoints6->push_back(StsServoPoint(3,3500,2239));
@@ -250,7 +250,7 @@ void addTimelines() {
 		stsServoPoints6->push_back(StsServoPoint(1,4500,2009));
 		stsServoPoints6->push_back(StsServoPoint(3,5000,2421));
 		stsServoPoints6->push_back(StsServoPoint(1,5000,2529));
-		stsServoPoints6->push_back(StsServoPoint(2,6000,1744));
+		stsServoPoints6->push_back(StsServoPoint(2,6000,1694));
 		stsServoPoints6->push_back(StsServoPoint(3,6000,2110));
 		stsServoPoints6->push_back(StsServoPoint(4,6000,1617));
 		mp3PlayerDfPlayerMiniPoints6->push_back(Mp3PlayerDfPlayerMiniPoint(15, 0, 500));
@@ -263,11 +263,11 @@ void addTimelines() {
 		auto *pca9685PwmServoPoints7 = new std::vector<Pca9685PwmServoPoint>();
 		auto *mp3PlayerYX5300Points7 = new std::vector<Mp3PlayerYX5300Point>();
 		auto *mp3PlayerDfPlayerMiniPoints7 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
-		stsServoPoints7->push_back(StsServoPoint(2,0,1777));
+		stsServoPoints7->push_back(StsServoPoint(2,0,1727));
 		stsServoPoints7->push_back(StsServoPoint(3,0,2110));
 		stsServoPoints7->push_back(StsServoPoint(4,0,2042));
 		stsServoPoints7->push_back(StsServoPoint(1,500,2150));
-		stsServoPoints7->push_back(StsServoPoint(2,1000,2500));
+		stsServoPoints7->push_back(StsServoPoint(2,1000,2450));
 		stsServoPoints7->push_back(StsServoPoint(3,1000,2110));
 		stsServoPoints7->push_back(StsServoPoint(4,1000,2042));
 		stsServoPoints7->push_back(StsServoPoint(1,1000,2150));
@@ -283,25 +283,25 @@ void addTimelines() {
 		auto *pca9685PwmServoPoints8 = new std::vector<Pca9685PwmServoPoint>();
 		auto *mp3PlayerYX5300Points8 = new std::vector<Mp3PlayerYX5300Point>();
 		auto *mp3PlayerDfPlayerMiniPoints8 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
-		stsServoPoints8->push_back(StsServoPoint(2,0,1650));
+		stsServoPoints8->push_back(StsServoPoint(2,0,1600));
 		stsServoPoints8->push_back(StsServoPoint(3,0,1800));
-		stsServoPoints8->push_back(StsServoPoint(2,1000,2346));
+		stsServoPoints8->push_back(StsServoPoint(2,1000,2296));
 		stsServoPoints8->push_back(StsServoPoint(3,1000,1800));
 		stsServoPoints8->push_back(StsServoPoint(4,1000,2059));
 		stsServoPoints8->push_back(StsServoPoint(1,1000,2150));
-		stsServoPoints8->push_back(StsServoPoint(2,2000,1650));
+		stsServoPoints8->push_back(StsServoPoint(2,2000,1600));
 		stsServoPoints8->push_back(StsServoPoint(3,2000,2480));
 		stsServoPoints8->push_back(StsServoPoint(4,2000,500));
-		stsServoPoints8->push_back(StsServoPoint(2,3000,2245));
+		stsServoPoints8->push_back(StsServoPoint(2,3000,2195));
 		stsServoPoints8->push_back(StsServoPoint(3,3000,1800));
 		stsServoPoints8->push_back(StsServoPoint(4,3000,2890));
-		stsServoPoints8->push_back(StsServoPoint(2,4000,1650));
+		stsServoPoints8->push_back(StsServoPoint(2,4000,1600));
 		stsServoPoints8->push_back(StsServoPoint(3,4000,2480));
 		stsServoPoints8->push_back(StsServoPoint(4,4000,759));
-		stsServoPoints8->push_back(StsServoPoint(2,5000,2252));
+		stsServoPoints8->push_back(StsServoPoint(2,5000,2202));
 		stsServoPoints8->push_back(StsServoPoint(3,5000,1800));
 		stsServoPoints8->push_back(StsServoPoint(4,5000,3800));
-		stsServoPoints8->push_back(StsServoPoint(2,6000,1650));
+		stsServoPoints8->push_back(StsServoPoint(2,6000,1600));
 		stsServoPoints8->push_back(StsServoPoint(3,6000,2019));
 		stsServoPoints8->push_back(StsServoPoint(4,6000,1487));
 		mp3PlayerDfPlayerMiniPoints8->push_back(Mp3PlayerDfPlayerMiniPoint(29, 0, 1000));
@@ -316,12 +316,12 @@ void addTimelines() {
 		auto *pca9685PwmServoPoints9 = new std::vector<Pca9685PwmServoPoint>();
 		auto *mp3PlayerYX5300Points9 = new std::vector<Mp3PlayerYX5300Point>();
 		auto *mp3PlayerDfPlayerMiniPoints9 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
-		stsServoPoints9->push_back(StsServoPoint(2,0,2500));
+		stsServoPoints9->push_back(StsServoPoint(2,0,2450));
 		stsServoPoints9->push_back(StsServoPoint(3,0,2140));
 		stsServoPoints9->push_back(StsServoPoint(1,0,2150));
 		stsServoPoints9->push_back(StsServoPoint(4,0,525));
 		stsServoPoints9->push_back(StsServoPoint(1,1000,2150));
-		stsServoPoints9->push_back(StsServoPoint(2,1000,2500));
+		stsServoPoints9->push_back(StsServoPoint(2,1000,2450));
 		stsServoPoints9->push_back(StsServoPoint(3,1000,2140));
 		stsServoPoints9->push_back(StsServoPoint(4,1000,525));
 		auto state9 = new TimelineStateReference(4, String("remote and custom code only"));
@@ -335,7 +335,7 @@ void addTimelines() {
 		auto *mp3PlayerDfPlayerMiniPoints10 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
 		stsServoPoints10->push_back(StsServoPoint(1,-125,2150));
 		stsServoPoints10->push_back(StsServoPoint(3,-125,2140));
-		stsServoPoints10->push_back(StsServoPoint(2,0,1650));
+		stsServoPoints10->push_back(StsServoPoint(2,0,1600));
 		stsServoPoints10->push_back(StsServoPoint(1,0,2150));
 		stsServoPoints10->push_back(StsServoPoint(3,0,2140));
 		stsServoPoints10->push_back(StsServoPoint(4,0,2042));
