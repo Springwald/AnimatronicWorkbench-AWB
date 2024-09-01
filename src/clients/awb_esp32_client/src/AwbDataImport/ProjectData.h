@@ -80,7 +80,7 @@ public:
 		mp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();
 
 		mp3PlayersDfPlayerMini = new std::vector<Mp3PlayerDfPlayerMiniSerial>();
-		mp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial(17, 16, 18, "PipVoiceSound", "Mp3PlayerDFPlayerMini-1", errorOccured));
+		mp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial(17, 16, 20, "PipVoiceSound", "Mp3PlayerDFPlayerMini-1", errorOccured));
 
 		timelineStates = new std::vector<TimelineState>();
 		timelineStates->push_back(TimelineState(1, String("idle"), true, new std::vector<int>({}), new std::vector<int>({})));
