@@ -41,7 +41,7 @@ bool GlobalMp3PlayerManager::stopSound(String playerTitle)
     return false;
 }
 
-bool GlobalMp3PlayerManager::setVolume(String playerTitle, int volume)
+bool GlobalMp3PlayerManager::setVolume(String playerTitle, uint8_t volume)
 {
     if (_mp3PlayersDfPlayerMiniManager != nullptr)
     {

@@ -18,6 +18,7 @@ void CustomCode::setup()
     // set docked pin as input
     pinMode(dockedPin, INPUT);
     lastUpdateMs = millis();
+
     /* cc-end-setup  */
 }
 void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
@@ -60,7 +61,7 @@ void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
         {
             if (holdTime > 3000) // if the button "Hold Back" is pressed for more than 2 seconds
             {
-                this->_mp3PlayerManager->playSound("", 29);
+                this->_mp3PlayerManager->playSound(this->_projectData->Mp3PlayerName_PipVoiceSound, 29);
                 timelineNameToPlay = new String(this->_projectData->TimelineName_Wakeup);
                 wokeUpByBackHold = true;
             }

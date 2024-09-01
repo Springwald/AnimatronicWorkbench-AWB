@@ -22,7 +22,7 @@ bool Mp3PlayerDfPlayerMiniManager::stopSound(int playerIndex)
     return false;
 }
 
-bool Mp3PlayerDfPlayerMiniManager::setVolume(int playerIndex, int volume)
+bool Mp3PlayerDfPlayerMiniManager::setVolume(int playerIndex, uint8_t volume)
 {
     if (playerIndex < _mp3Players->size())
     {

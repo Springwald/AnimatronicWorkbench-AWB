@@ -24,7 +24,7 @@ public:
 
     bool playSound(String playerTitle, int trackNo);
     bool stopSound(String playerTitle);
-    bool setVolume(String playerTitle, int volume);
+    bool setVolume(String playerTitle, uint8_t volume);
 };
 
 #endif
