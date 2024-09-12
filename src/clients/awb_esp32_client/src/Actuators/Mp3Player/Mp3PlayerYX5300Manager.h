@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <vector>
-#include "../ProjectData/Mp3PlayerYX5300Serial.h"
+#include "../../ProjectData/Mp3Player/Mp3PlayerYX5300Serial.h"
 
 class Mp3PlayerYX5300Manager
 {
@@ -23,6 +23,7 @@ public:
 
     bool playSound(int playerIndex, int trackNo);
     bool stopSound(int playerIndex);
+    int getPlayerIndexByTitle(String playerTitle);
 };
 
 #endif

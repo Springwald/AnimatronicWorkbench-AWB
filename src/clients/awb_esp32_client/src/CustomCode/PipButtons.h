@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <String.h>
 #include <Actuators/NeopixelManager.h>
-#include <Actuators/Mp3PlayerYX5300Manager.h>
+#include <Actuators/Mp3Player/Mp3PlayerYX5300Manager.h>
 #include "PipNeopixel.h"
 class PipButtons
 {
@@ -19,6 +19,7 @@ protected:
     unsigned long lastPressEffectUpdate;
     PipNeopixel *neopixel;
     void calculatePressEffectAnimations(int diffTime);
+
 public:
     const int btnEvil = 0;
     const int btnRainbow = 1;

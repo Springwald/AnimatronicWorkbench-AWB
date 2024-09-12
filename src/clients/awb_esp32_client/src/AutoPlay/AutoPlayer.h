@@ -5,14 +5,14 @@
 #include <String.h>
 #include <vector>
 #include <string>
-#include "../ProjectData/StsServoPoint.h"
-#include "../ProjectData/Pca9685PwmServoPoint.h"
+#include "../ProjectData/Servos/StsServoPoint.h"
+#include "../ProjectData/Servos/Pca9685PwmServoPoint.h"
 #include "../ProjectData/TimelineStateReference.h"
 #include "../AwbDataImport/ProjectData.h"
-#include "../Actuators/StScsSerialServoManager.h"
-#include "../Actuators/Pca9685PwmManager.h"
-#include "../Actuators/Mp3PlayerYX5300Manager.h"
-#include "../Actuators/Mp3PlayerDfPlayerMiniManager.h"
+#include "../Actuators/Servos/StScsSerialServoManager.h"
+#include "../Actuators/Servos/Pca9685PwmManager.h"
+#include "../Actuators/Mp3Player/Mp3PlayerYX5300Manager.h"
+#include "../Actuators/Mp3Player/Mp3PlayerDfPlayerMiniManager.h"
 #include "../Actuators/InputManager.h"
 #include "../Debugging.h"
 
@@ -46,7 +46,7 @@ protected:
     int *_timeLineStateForcedOnceByRemoteOrCustomCodeId = nullptr;      // Here the globale timeline state can be overwritten by custom code a single time. Buttons and other inputs defined in AWB Studio will be ignored.
     int *_timeLineStateForcedPermanentByRemoteOrCustomCodeId = nullptr; // Here the globale timeline state can be overwritten by custom code permanent. Buttons and other inputs defined in AWB Studio will be ignored.
 
-    int calculateServoValueFromTimeline(u8 servoChannel, int servoSpeed, int servoAccelleration, std::vector<StsServoPoint> *servoPoints);
+    int calculateServoValueFromTimeline(u8 servoChannel, std::vector<StsServoPoint> *servoPoints);
 
 public:
     AutoPlayer(

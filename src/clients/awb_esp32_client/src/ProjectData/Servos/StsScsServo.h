@@ -5,6 +5,7 @@
 #include <String.h>
 #include <vector>
 #include <string>
+#include "Servo.h"
 
 using byte = unsigned char;
 

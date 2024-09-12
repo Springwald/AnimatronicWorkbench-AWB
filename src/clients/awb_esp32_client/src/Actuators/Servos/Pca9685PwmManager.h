@@ -5,7 +5,7 @@
 #include "Adafruit_PWMServoDriver.h"
 #include <Wire.h>
 #include <vector>
-#include "ProjectData/Pca9685PwmServo.h"
+#include "../../ProjectData/Servos/Pca9685PwmServo.h"
 
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 

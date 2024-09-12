@@ -14,36 +14,33 @@ class Mp3PlayerDfPlayerMiniSerial
 private:
     SoftwareSerial *_serial;
     DFRobotDFPlayerMini _myDFPlayer;
+    uint8_t _initialVolume;
     bool checkOk();
 
 public:
+    String id;
     String name;
     TCallBackErrorOccured _errorOccured;
 
     // the constructor
-    Mp3PlayerDfPlayerMiniSerial(int rxPin, int txPin, int volume, String name) : name(name)
+    Mp3PlayerDfPlayerMiniSerial(int rxPin, int txPin, uint8_t volume, String name, String id, TCallBackErrorOccured errorOccured) : name(name), id(id), _errorOccured(errorOccured), _initialVolume(volume)
     {
         _serial = new SoftwareSerial(/*rx =*/rxPin, /*tx =*/txPin);
         _serial->begin(9600);
 
         if (!_myDFPlayer.begin(*_serial, /*isACK = */ true, /*doReset = */ true))
-        { // Use serial to communicate with mp3.
-            _errorOccured("Unable to begin:");
+        {
+            // Use serial to communicate with mp3.
+            _errorOccured("DfPlayerMini: Unable to begin:");
             _errorOccured("1.Please recheck the connection!");
             _errorOccured("2.Please insert the SD card!");
         }
-        else
-        {
-            _myDFPlayer.EQ(DFPLAYER_EQ_NORMAL);
-            _myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
-            _myDFPlayer.volume(volume); // Set volume value (0~30).
-        }
     }
 
-    bool
-    playSound(int trackNo);
+    bool setup();
+    bool playSound(int trackNo);
     bool stopSound();
-    bool setVolume(int volume);
+    bool setVolume(uint8_t volume);
 };
 
 #endif

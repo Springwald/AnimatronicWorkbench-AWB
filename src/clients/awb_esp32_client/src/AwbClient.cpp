@@ -29,8 +29,24 @@ void AwbClient::setup()
     _display.setup(_clientId); // set up the display
     delay(1000);
 
+    _debugging->setState(Debugging::MJ_SETUP, 0);
+
+    showSetupMsg("setup callbacks");
+    // set up error callbacks for the different components
+    const TCallBackMessageToShowWithDuration packetProcessorMessageToShow = [this](String message, int duration)
+    { showMsgWithDuration(message, duration); };
+    const TCallBackMessageToShow messageToShowCallback = [this](String message)
+    { showMsg(message); };
+    const TCallBackErrorOccured errorOccuredCallback = [this](String message)
+    { showError(message); };
+    showSetupMsg("setup callbacks done");
+
+    _debugging->setState(Debugging::MJ_SETUP, 1);
+
     // load the AWB project data
-    _projectData = new ProjectData();
+    _projectData = new ProjectData(errorOccuredCallback);
+
+    _debugging->setState(Debugging::MJ_SETUP, 5);
 
     // set up the wlan connector
     showSetupMsg("setup wifi");
@@ -39,6 +55,8 @@ void AwbClient::setup()
     _wlanConnector = new WlanConnector(_clientId, _projectData, _actualStatusInformation, _debugging, wlanErrorOccured);
     _wlanConnector->setup();
     showSetupMsg("setup wifi done");
+
+    _debugging->setState(Debugging::MJ_SETUP, 10);
 
 #ifdef USE_NEOPIXEL
     showSetupMsg("setup neopixel");
@@ -50,6 +68,8 @@ void AwbClient::setup()
     showSetupMsg("setup neopixel done");
 #endif
 
+    _debugging->setState(Debugging::MJ_SETUP, 15);
+
 #ifdef USE_DAC_SPEAKER
     showSetupMsg("setup dac speaker");
     this->_dacSpeaker = new DacSpeaker();
@@ -57,35 +77,9 @@ void AwbClient::setup()
     showSetupMsg("setup dac speaker done");
 #endif
 
-    showSetupMsg("setup callbacks");
-    // set up error callbacks for the different components
-    const TCallBackErrorOccured packetErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackErrorOccured packetProcessorErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackMessageToShowWithDuration packetProcessorMessageToShow = [this](String message, int duration)
-    { showMsgWithDuration(message, duration); };
-    const TCallBackErrorOccured pca9685PwmErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackMessageToShow pca9685PwmMessageToShow = [this](String message)
-    { showMsg(message); };
-    const TCallBackErrorOccured stsServoErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackErrorOccured scsServoErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackErrorOccured mp3PlayerErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackMessageToShow mp3PlayerMessageToShow = [this](String message)
-    { showMsg(message); };
-    const TCallBackErrorOccured autoPlayerErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackErrorOccured inputManagerErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackErrorOccured statusManagementErrorOccured = [this](String message)
-    { showError(message); };
-    const TCallBackErrorOccured customCodeErrorOccured = [this](String message)
-    { showError(message); };
-    showSetupMsg("setup callbacks done");
+    _debugging->setState(Debugging::MJ_SETUP, 20);
+
+    _debugging->setState(Debugging::MJ_SETUP, 25);
 
     // set up the actuators
 
@@ -100,11 +94,15 @@ void AwbClient::setup()
     }
 #endif
 
+    _debugging->setState(Debugging::MJ_SETUP, 30);
+
     showSetupMsg("setup STS servos");
-    this->_stSerialServoManager = new StScsSerialServoManager(_projectData->stsServos, false, stsServoErrorOccured, STS_SERVO_RXD, STS_SERVO_TXD);
+    this->_stSerialServoManager = new StScsSerialServoManager(_projectData->stsServos, false, errorOccuredCallback, STS_SERVO_RXD, STS_SERVO_TXD);
     this->_stSerialServoManager->setup();
     showSetupMsg("setup STS servos done");
 #endif
+
+    _debugging->setState(Debugging::MJ_SETUP, 35);
 
 #ifdef USE_SCS_SERVO
     showSetupMsg("setup SCS servos");
@@ -113,31 +111,50 @@ void AwbClient::setup()
     showSetupMsg("setup SCS servos done");
 #endif
 
+    _debugging->setState(Debugging::MJ_SETUP, 40);
+
     showMsg("Found " + String(this->_stSerialServoManager == nullptr ? 0 : this->_stSerialServoManager->servoIds->size()) + " STS / " + String(this->_scSerialServoManager == nullptr ? 0 : this->_scSerialServoManager->servoIds->size()) + " SCS");
     delay(_debugging->isDebugging() ? 1000 : 100);
+
+    _debugging->setState(Debugging::MJ_SETUP, 45);
 
     if (this->_projectData->pca9685PwmServos->size() > 0)
     {
         showSetupMsg("setup PCA9685 PWM servos");
         uint32_t osc_frequency = 25000000; // todo: get this from the project data
-        this->_pca9685pwmManager = new Pca9685PwmManager(_projectData->pca9685PwmServos, pca9685PwmErrorOccured, pca9685PwmMessageToShow, this->_projectData->pca9685PwmServos->at(0).i2cAdress, osc_frequency);
+        this->_pca9685pwmManager = new Pca9685PwmManager(_projectData->pca9685PwmServos, errorOccuredCallback, messageToShowCallback, this->_projectData->pca9685PwmServos->at(0).i2cAdress, osc_frequency);
     }
 
+    _debugging->setState(Debugging::MJ_SETUP, 50);
+
     showSetupMsg("setup mp3 player YX5300");
-    this->_mp3PlayerYX5300 = new Mp3PlayerYX5300Manager(_projectData->mp3PlayersYX5300, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
+    this->_mp3PlayerYX5300 = new Mp3PlayerYX5300Manager(_projectData->mp3PlayersYX5300, errorOccuredCallback, messageToShowCallback);
+
+    _debugging->setState(Debugging::MJ_SETUP, 55);
 
     showSetupMsg("setup mp3 player DFPlayer Mini");
-    this->_mp3PlayerDfPlayerMini = new Mp3PlayerDfPlayerMiniManager(_projectData->mp3PlayersDfPlayerMini, mp3PlayerErrorOccured, mp3PlayerMessageToShow);
+    this->_mp3PlayerDfPlayerMini = new Mp3PlayerDfPlayerMiniManager(_projectData->mp3PlayersDfPlayerMini, errorOccuredCallback, messageToShowCallback);
+
+    showSetupMsg("setup global mp3 player manager");
+    this->_globalMp3PlayerManager = new GlobalMp3PlayerManager(_mp3PlayerDfPlayerMini, _mp3PlayerYX5300);
+
+    _debugging->setState(Debugging::MJ_SETUP, 60);
 
     showSetupMsg("setup input manager");
-    _inputManager = new InputManager(_projectData, inputManagerErrorOccured);
+    _inputManager = new InputManager(_projectData, errorOccuredCallback);
+
+    _debugging->setState(Debugging::MJ_SETUP, 65);
 
     showSetupMsg("setup autoplay");
-    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3PlayerYX5300, _mp3PlayerDfPlayerMini, _inputManager, autoPlayerErrorOccured, _debugging);
+    _autoPlayer = new AutoPlayer(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3PlayerYX5300, _mp3PlayerDfPlayerMini, _inputManager, errorOccuredCallback, _debugging);
+
+    _debugging->setState(Debugging::MJ_SETUP, 70);
 
     // setup the packet processor to process packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet processor");
-    this->_packetProcessor = new PacketProcessor(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, packetProcessorErrorOccured, packetProcessorMessageToShow);
+    this->_packetProcessor = new PacketProcessor(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback, packetProcessorMessageToShow);
+
+    _debugging->setState(Debugging::MJ_SETUP, 75);
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet receiver");
@@ -156,11 +173,15 @@ void AwbClient::setup()
         }
     };
     char *packetHeader = (char *)"AWB";
-    this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, packetErrorOccured);
+    this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, errorOccuredCallback);
+
+    _debugging->setState(Debugging::MJ_SETUP, 80);
 
     // set up the status management
     showSetupMsg("setup status management");
-    _statusManagement = new StatusManagement(_projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, statusManagementErrorOccured);
+    _statusManagement = new StatusManagement(_projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback);
+
+    _debugging->setState(Debugging::MJ_SETUP, 85);
 
     if (this->_dacSpeaker != nullptr)
     {
@@ -170,13 +191,19 @@ void AwbClient::setup()
         this->_dacSpeaker->setVolume(DEFAULT_VOLUME);
     }
 
+    _debugging->setState(Debugging::MJ_SETUP, 90);
+
     // set up the custom code
     showSetupMsg("setup custom code");
-    _customCode = new CustomCode(_neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _mp3PlayerYX5300, _mp3PlayerDfPlayerMini, customCodeErrorOccured, _debugging);
+    _customCode = new CustomCode(_projectData, _neopixelManager, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, _globalMp3PlayerManager, errorOccuredCallback, _debugging);
     _customCode->setup();
+
+    _debugging->setState(Debugging::MJ_SETUP, 95);
 
     showMsg("Welcome! Animatronic WorkBench ESP32 Client");
     delay(_debugging->isDebugging() ? 1000 : 100);
+
+    _debugging->setState(Debugging::MJ_SETUP, 99);
 
     _startMillis = millis(); /// The start millis
 }

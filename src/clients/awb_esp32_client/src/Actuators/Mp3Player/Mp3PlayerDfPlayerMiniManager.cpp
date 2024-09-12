@@ -22,7 +22,7 @@ bool Mp3PlayerDfPlayerMiniManager::stopSound(int playerIndex)
     return false;
 }
 
-bool Mp3PlayerDfPlayerMiniManager::setVolume(int playerIndex, int volume)
+bool Mp3PlayerDfPlayerMiniManager::setVolume(int playerIndex, uint8_t volume)
 {
     if (playerIndex < _mp3Players->size())
     {
@@ -30,4 +30,12 @@ bool Mp3PlayerDfPlayerMiniManager::setVolume(int playerIndex, int volume)
         return player.setVolume(volume);
     }
     return false;
+}
+
+int Mp3PlayerDfPlayerMiniManager::getPlayerIndexByTitle(String playerTitle)
+{
+    for (int i = 0; i < _mp3Players->size(); i++)
+        if (_mp3Players->at(i).name == playerTitle)
+            return i;
+    return -1;
 }

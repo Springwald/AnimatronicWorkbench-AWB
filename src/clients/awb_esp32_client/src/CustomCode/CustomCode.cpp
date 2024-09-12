@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "CustomCode.h"
+#include "../AwbDataImport/ProjectData.h"
 #include <Actuators/NeopixelManager.h>
 /*
     Enter your custom code in this cpp file and the corresponding header file.
@@ -13,10 +14,11 @@ void CustomCode::setup()
     this->pipButtons->setup();
     this->pipNeopixel->setup();
     this->pipNeopixel->setEyeState(PipNeopixel::BigEyeStateOff);
-    timelineNameToPlay = new String("StartUp");
+    timelineNameToPlay = new String(this->_projectData->TimelineName_StartUp);
     // set docked pin as input
-    pinMode(dockedPin, ANALOG);
+    pinMode(dockedPin, INPUT);
     lastUpdateMs = millis();
+
     /* cc-end-setup  */
 }
 void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
@@ -34,13 +36,13 @@ void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
         if (idleStateDurationMs > sleepAfterMinutes * 60000)
         {
             // play the timeline "Go Sleep" after 60 seconds of idle time
-            timelineNameToPlay = new String("Go Sleep");
+            timelineNameToPlay = new String(this->_projectData->TimelineName_GoSleep);
             idleStateDurationMs = 0;
         }
     }
     else
         idleStateDurationMs = 0;
-    if (actualTimelineName == "Sleeping")
+    if (actualTimelineName == this->_projectData->TimelineName_Sleeping)
     {
         sleepingTime += diff;
         if (sleepingTime > 5000) // if the timeline "Sleeping" is active for more than 30 seconds
@@ -59,8 +61,8 @@ void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
         {
             if (holdTime > 3000) // if the button "Hold Back" is pressed for more than 2 seconds
             {
-                this->_mp3PlayerYX5300Manager->playSound(0, 29);
-                timelineNameToPlay = new String("Wake up");
+                this->_mp3PlayerManager->playSound(this->_projectData->Mp3PlayerName_PipVoiceSound, 29);
+                timelineNameToPlay = new String(this->_projectData->TimelineName_Wakeup);
                 wokeUpByBackHold = true;
             }
         }
@@ -69,11 +71,11 @@ void CustomCode::loop(String actualTimelineName, int actualTimelineStateId)
     {
         sleepingTime = 0;
     }
-    if (actualTimelineName == "Go Sleep")
+    if (actualTimelineName == this->_projectData->TimelineName_GoSleep)
         bigEyeState = PipNeopixel::BigEyeStateGoSleep;
-    if (actualTimelineName == "Evil")
+    if (actualTimelineName == this->_projectData->TimelineName_Evil)
         bigEyeState = PipNeopixel::BigEyeStateEvil;
-    if (actualTimelineName == "Rainbow")
+    if (actualTimelineName == this->_projectData->TimelineName_Rainbow)
         bigEyeState = PipNeopixel::BigEyeStateRainbow;
     checkButtons(actualTimelineName, actualTimelineStateId);
     pipNeopixel->setEyeState(bigEyeState);
@@ -85,22 +87,22 @@ void CustomCode::checkButtons(String actualTimelineName, int actualTimelineState
     // check if a button is pressed and set e.g. the action to play a timeline
     if (pipButtons->isButtonPressed(pipButtons->btnSleep))
     {
-        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 3);
-        if (actualTimelineName == "Sleeping" || actualTimelineName == "Go Sleep") // if the timeline "Sleeping" is active
-            timelineNameToPlay = new String("Wake up");
+        this->_mp3PlayerManager->playSound(this->_projectData->Mp3PlayerName_PipVoiceSound, 3);
+        if (actualTimelineName == this->_projectData->TimelineName_Sleeping || actualTimelineName == this->_projectData->TimelineName_GoSleep) // if the timeline "Sleeping" is active
+            timelineNameToPlay = new String(this->_projectData->TimelineName_Wakeup);
         else
-            timelineNameToPlay = new String("Go Sleep");
+            timelineNameToPlay = new String(this->_projectData->TimelineName_GoSleep);
     }
     if (pipButtons->isButtonPressed(pipButtons->btnRainbow))
     {
-        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 4);
-        timelineNameToPlay = new String("Rainbow");
+        this->_mp3PlayerManager->playSound(this->_projectData->Mp3PlayerName_PipVoiceSound, 4);
+        timelineNameToPlay = new String(this->_projectData->TimelineName_Rainbow);
     }
     // check if a button is pressed and set e.g. the action to play a timeline
     if (pipButtons->isButtonPressed(pipButtons->btnEvil))
     {
-        this->_mp3PlayerDfPlayerMiniManager->playSound(0, 9);
-        timelineNameToPlay = new String("Evil");
+        this->_mp3PlayerManager->playSound(this->_projectData->Mp3PlayerName_PipVoiceSound, 9);
+        timelineNameToPlay = new String(this->_projectData->TimelineName_Evil);
     }
     // check if docked into the charger
     //_errorOccured(String(analogRead(dockedPin)));
@@ -109,13 +111,13 @@ void CustomCode::checkButtons(String actualTimelineName, int actualTimelineState
         if (digitalRead(dockedPin) == HIGH)
         {
             if (!isDocked)
-                this->_mp3PlayerDfPlayerMiniManager->playSound(0, 2); // dock into charger sound
+                this->_mp3PlayerManager->playSound(this->_projectData->Mp3PlayerName_PipVoiceSound, 2); // dock into charger sound
             isDocked = true;
         }
         else
         {
             if (isDocked)
-                this->_mp3PlayerDfPlayerMiniManager->playSound(0, 1); // undock from charger sound
+                this->_mp3PlayerManager->playSound(this->_projectData->Mp3PlayerName_PipVoiceSound, 1); // undock from charger sound
             isDocked = false;
         }
     }

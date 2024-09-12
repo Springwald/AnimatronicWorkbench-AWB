@@ -4,8 +4,8 @@
 #include <Arduino.h>
 #include <vector>
 #include <SCServo.h>
-#include "ActuatorValue.h"
-#include "ProjectData/StsScsServo.h"
+#include "../ActuatorValue.h"
+#include "../../ProjectData/Servos/StsScsServo.h"
 class StScsSerialServoManager
 {
 
