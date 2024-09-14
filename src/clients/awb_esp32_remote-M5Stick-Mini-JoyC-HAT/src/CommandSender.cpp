@@ -5,6 +5,7 @@
 #include "AwbDataImport/WifiConfig.h"
 #include <HTTPClient.h>
 #include "CommandSender.h"
+#include "Hardware.h"
 
 void CommandSender::playTimeline(String timelineName)
 {
@@ -37,20 +38,26 @@ void CommandSender::sendCommand(String command)
 
         if (httpResponseCode > 0)
         {
+            digitalWrite(RED_LED, HIGH); // turn red led off
             String payload = http.getString();
             _display.draw_message(payload, 1500, MSG_TYPE_INFO);
             delay(1500);
         }
         else
         {
+            digitalWrite(RED_LED, LOW); // turn red led on
             _display.draw_message("Error code: " + httpResponseCode, 1500, MSG_TYPE_ERROR);
             delay(1500);
         }
+
         // Free resources
         http.end();
+
+        digitalWrite(RED_LED, HIGH); // turn red led off
     }
     else
     {
+        digitalWrite(RED_LED, LOW); // turn red led on
         _display.draw_message("WiFi Disconnected", 1500, MSG_TYPE_ERROR);
         delay(1500);
     }

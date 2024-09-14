@@ -7,5 +7,6 @@
 #define BUTTON 2   // Joystick press
 #define BUTTON2 37 // M5Stick middle button
 #define BUTTON3 39 // M5Stick top button
+#define RED_LED 10 // M5Stick red LED
 
 #endif

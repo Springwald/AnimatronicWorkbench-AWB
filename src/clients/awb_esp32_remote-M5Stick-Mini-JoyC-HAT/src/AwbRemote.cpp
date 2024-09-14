@@ -18,7 +18,10 @@ void AwbRemote::setup()
 #ifdef M5STICKC_PLUS2
     pinMode(4, OUTPUT);
     digitalWrite(4, HIGH);
+
 #endif
+
+    pinMode(RED_LED, OUTPUT); // init red led
 
     _display.setup(); // set up the display
 
@@ -32,10 +35,20 @@ void AwbRemote::setup()
     while (trys-- > 0 && WiFi.status() != WL_CONNECTED)
     {
         _display.draw_message(String("connect wifi\r\n") + String(this->_wifiConfig->WlanSSID) + "\r\nRetrys " + String(trys), 1000, MSG_TYPE_INFO);
+        digitalWrite(RED_LED, LOW); // turn red led on
         delay(1000);
     }
-    _display.draw_message(WiFi.localIP().toString(), 1000, MSG_TYPE_INFO);
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        _display.draw_message(String("connect wifi\r\n") + String(this->_wifiConfig->WlanSSID) + "\r\nFailed", 1000, MSG_TYPE_ERROR);
+        delay(1000);
+    }
+    else
+    {
+        digitalWrite(RED_LED, HIGH); // turn red led off
+    }
 
+    _display.draw_message(WiFi.localIP().toString(), 1000, MSG_TYPE_INFO);
     while (!(_joystick.begin(&Wire, JoyC_ADDR, 0, 26, 100000UL)))
     {
         _display.draw_message(String("I2C Error"), 500, MSG_TYPE_ERROR);
