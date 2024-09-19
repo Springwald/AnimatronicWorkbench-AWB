@@ -49,7 +49,8 @@ namespace AwbStudio
         private int _lastBankIndex = -1;
         private bool _unsavedChanges;
         private bool _switchingPages;
-        private bool _ctrlKeyPressed;
+        private bool _ctrlKeyPressed; // is the control key on the keyboard pressed?
+        private bool _winKeyPressed; // is the windows key on the keyboard pressed?
         private bool _loading;
         private Brush _buttonForegroundColorBackup;
         private bool _isZooming;
@@ -280,31 +281,60 @@ namespace AwbStudio
         private async void TimelineChosenToLoad(object? sender, TimelineNameChosenEventArgs e) => await this.LoadTimelineData(timelineId: e.TimelineId);
 
 
+        /// <summary>
+        /// Keybord input handling
+        /// </summary>
         private void TimelineEditorWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            const int manualScrollSpeedMs = 125;
+
+            var switchPlayStop = () => {
+                if (this._timelineEventHandling != null)
+                {
+                    if (this._timelinePlayer.PlayState == TimelinePlayer.PlayStates.Playing)
+                        this._timelineEventHandling.Stop();
+                    else
+                        this._timelineEventHandling.Play();
+                }
+            };
+
             switch (e.Key)
             {
-                case System.Windows.Input.Key.S:
-                    if (this._ctrlKeyPressed)
-                    {
-                        SaveTimelineData();
-                    }
-                    break;
-
+                // remember special key states
                 case System.Windows.Input.Key.LeftCtrl:
                 case System.Windows.Input.Key.RightCtrl:
                     this._ctrlKeyPressed = e.IsDown;
                     break;
 
-                case System.Windows.Input.Key.Space:
-                    if (this._timelineEventHandling != null)
-                    {
-                        if (this._timelinePlayer.PlayState == TimelinePlayer.PlayStates.Playing)
-                            this._timelineEventHandling.Stop();
-                        else
-                            this._timelineEventHandling.Play();
-                    }
+                case System.Windows.Input.Key.LWin:
+                case System.Windows.Input.Key.RWin:
+                    this._winKeyPressed = e.IsDown;
                     break;
+
+                // save actual timeline
+                case System.Windows.Input.Key.S:
+                    if (this._ctrlKeyPressed) SaveTimelineData();
+                    break;
+
+                // start / stop playback
+                case System.Windows.Input.Key.Space:
+                    switchPlayStop();
+                    break;
+
+                case System.Windows.Input.Key.System:
+                    if (this._winKeyPressed) switchPlayStop(); // support for e.g. shuttle express controller
+                    break;
+
+                // playpos navigation support for e.g. shuttle express controller
+                case System.Windows.Input.Key.F12: // scroll playpos forward,  support for e.g. shuttle express controller
+                    if (_winKeyPressed && _playPosSynchronizer.PlayPosMsGuaranteedSnapped <= _viewContext.DurationMs - manualScrollSpeedMs) 
+                        _playPosSynchronizer.SetNewPlayPos(_playPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped + manualScrollSpeedMs);
+                    break;
+                case System.Windows.Input.Key.F11: // scroll playpos backwards
+                    if (_winKeyPressed && _playPosSynchronizer.PlayPosMsGuaranteedSnapped >= manualScrollSpeedMs) 
+                        _playPosSynchronizer.SetNewPlayPos(_playPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped - manualScrollSpeedMs);
+                    break;
+
             }
         }
 
