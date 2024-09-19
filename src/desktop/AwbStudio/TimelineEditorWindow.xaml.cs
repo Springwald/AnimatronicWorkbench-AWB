@@ -364,8 +364,21 @@ namespace AwbStudio
             }
         }
 
-        private void PlayPos_Changed(object? sender, int newPlayPosMs) =>
+        private void PlayPos_Changed(object? sender, int newPlayPosMs)
+        {
+            const int detectionZonePx = 30;
+
             this.LabelPlayTime.Content = $"{(newPlayPosMs / 1000.0):0.00}s / {_timelinePlayer.PlaybackSpeed:0.0}X";
+
+            // check if the play position is out of the view
+            var newPlayPosMsInPixel = _viewContext.GetXPos(newPlayPosMs);
+            if (newPlayPosMsInPixel < _viewContext.ScrollPositionPx + detectionZonePx || newPlayPosMsInPixel > _viewContext.ScrollPositionPx + timelineAllValuesScrollViewer.ActualWidth - detectionZonePx)
+            {
+                var newScrollX = newPlayPosMsInPixel - timelineAllValuesScrollViewer.ActualWidth / 2;
+                _viewContext.ScrollPositionPx = newScrollX;
+                timelineAllValuesScrollViewer.ScrollToHorizontalOffset(newScrollX);
+            }
+        }
 
         private async Task ScrollPaging(int howManyMs)
         {
