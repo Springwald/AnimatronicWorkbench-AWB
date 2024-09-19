@@ -117,6 +117,20 @@ void WlanConnector::handle_remote_play_timeline()
         return;
     }
     timelineNameToPlay = new String(timeline);
+    bool timelineExists = false; // check if timeline exists
+    for (int i = 0; i < _projectData->timelines->size(); i++)
+    {
+        if (_projectData->timelines->at(i).name == timeline)
+        {
+            timelineExists = true;
+            break;
+        }
+    }
+    if (timelineExists == false)
+    {
+        _server->send(400, "text/plain", "BAD REQUEST");
+        return;
+    }
     _server->send(200, "text/plain", "OK " + timeline);
 }
 
