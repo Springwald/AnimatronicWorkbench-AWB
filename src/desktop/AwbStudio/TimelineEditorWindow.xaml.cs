@@ -295,6 +295,16 @@ namespace AwbStudio
                 case System.Windows.Input.Key.RightCtrl:
                     this._ctrlKeyPressed = e.IsDown;
                     break;
+
+                case System.Windows.Input.Key.Space:
+                    if (this._timelineEventHandling != null)
+                    {
+                        if (this._timelinePlayer.PlayState == TimelinePlayer.PlayStates.Playing)
+                            this._timelineEventHandling.Stop();
+                        else
+                            this._timelineEventHandling.Play();
+                    }
+                    break;
             }
         }
 
