@@ -106,7 +106,7 @@ void AwbClient::setup()
 
 #ifdef USE_SCS_SERVO
     showSetupMsg("setup SCS servos");
-    this->_scSerialServoManager = new StScsSerialServoManager(_projectData->scsServos, true, scsServoErrorOccured, SCS_SERVO_RXD, SCS_SERVO_TXD);
+    this->_scSerialServoManager = new StScsSerialServoManager(_projectData->scsServos, true, errorOccuredCallback, SCS_SERVO_RXD, SCS_SERVO_TXD);
     this->_scSerialServoManager->setup();
     showSetupMsg("setup SCS servos done");
 #endif
