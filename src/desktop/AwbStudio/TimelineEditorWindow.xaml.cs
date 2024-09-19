@@ -298,7 +298,7 @@ namespace AwbStudio
                 }
             };
 
-            switch (e.Key)
+             switch (e.Key)
             {
                 // remember special key states
                 case System.Windows.Input.Key.LeftCtrl:
