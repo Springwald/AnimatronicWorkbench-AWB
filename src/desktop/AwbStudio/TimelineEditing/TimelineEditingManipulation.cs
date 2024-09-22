@@ -14,6 +14,9 @@ using System.Linq;
 
 namespace AwbStudio.TimelineEditing
 {
+    /// <summary>
+    /// Routines to manipulate the timeline data
+    /// </summary>
     public class TimelineEditingManipulation
     {
         private readonly TimelineData _timelineData;
@@ -25,6 +28,9 @@ namespace AwbStudio.TimelineEditing
             _playPosSynchronizer = playPosSynchronizer;
         }
 
+        #region COPY + PASTE
+
+        #endregion
 
         #region SERVOS
 
