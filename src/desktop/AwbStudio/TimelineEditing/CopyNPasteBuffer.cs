@@ -13,7 +13,7 @@ namespace AwbStudio.TimelineEditing
     /// <summary>
     /// The buffer to hold timeline keyframes for copy and paste operations
     /// </summary>
-    internal sealed record CopyNPasteBuffer
+    public sealed record CopyNPasteBuffer
     {
         /// <summary>
         /// the timeline content to copy or paste is defined by the timeline points
@@ -21,8 +21,15 @@ namespace AwbStudio.TimelineEditing
         public required IEnumerable<TimelinePoint> TimelinePoints { get; init; }
 
         /// <summary>
-        /// where was the timeline content copied or cut from 
+        /// where was the timeline content copied or cut from (start in milliseconds) 
         /// </summary>
-        public required int StartMs { get; init; }
+        public required int OldStartMs { get; init; }
+
+        /// <summary>
+        /// where was the timeline content copied or cut from (end in milliseconds)
+        /// </summary>
+        public required int OldEndMs { get; init; }
+
+
     }
 }
