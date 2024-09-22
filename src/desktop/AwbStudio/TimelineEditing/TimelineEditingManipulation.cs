@@ -40,7 +40,7 @@ namespace AwbStudio.TimelineEditing
             if (point == null)
             {
                 point = new ServoPoint(servo.Id, targetPercent, _playPosSynchronizer.PlayPosMsGuaranteedSnapped);
-                _timelineData?.ServoPoints.Add(point);
+                _ = _timelineData?.AddPoint(point);
             }
             else
             {
@@ -57,12 +57,12 @@ namespace AwbStudio.TimelineEditing
                 // Insert a new servo point
                 var percentValue = servo.PercentCalculator.CalculatePercent(servo.TargetValue);
                 servoPoint = new ServoPoint(servo.Id, percentValue, _playPosSynchronizer.PlayPosMsGuaranteedSnapped);
-                _timelineData?.ServoPoints.Add(servoPoint);
+                _ = _timelineData?.AddPoint(servoPoint);
             }
             else
             {
                 // Remove the existing servo point
-                _timelineData?.ServoPoints.Remove(servoPoint);
+                _ = _timelineData?.RemovePoint(servoPoint);
             }
             _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, servoPoint.ServoId);
         }
@@ -78,7 +78,7 @@ namespace AwbStudio.TimelineEditing
             {
                 // sound should be removed from timeline at this position
                 if (soundPoint == null) return; // nothing to do
-                _timelineData?.SoundPoints.Remove(soundPoint);
+                _ = _timelineData?.RemovePoint(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, soundPlayer.Id);
             }
             else
             {
@@ -86,7 +86,7 @@ namespace AwbStudio.TimelineEditing
                 if (soundPoint == null)
                 {
                     soundPoint = new SoundPoint(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, soundPlayer.Id, soundTitle ?? $"Sound {soundId}", soundId.Value);
-                    _timelineData?.SoundPoints.Add(soundPoint);
+                    _ = _timelineData?.AddPoint(soundPoint);
                 }
                 else
                 {
@@ -107,7 +107,7 @@ namespace AwbStudio.TimelineEditing
             {
                 // nested timeline value should be removed from timeline at this position
                 if (nestedTimelinePoint == null) return; // nothing to do
-                _timelineData?.NestedTimelinePoints.Remove(nestedTimelinePoint);
+                _ = _timelineData?.RemovePoint(nestedTimelinePoint);
             }
             else
             {
@@ -115,7 +115,7 @@ namespace AwbStudio.TimelineEditing
                 if (nestedTimelinePoint == null)
                 {
                     nestedTimelinePoint = new NestedTimelinePoint(_playPosSynchronizer.PlayPosMsGuaranteedSnapped, timelineId);
-                    _timelineData?.NestedTimelinePoints.Add(nestedTimelinePoint);
+                    _timelineData?.AddPoint(nestedTimelinePoint);
                 }
                 else
                 {

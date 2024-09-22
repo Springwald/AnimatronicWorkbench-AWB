@@ -230,7 +230,7 @@ namespace Awb.Core.Player
                 {
                     case PlayStates.Nothing:
                         // take exactly the point at the actual position
-                        soundPoint = soundPoints.GetPoint<SoundPoint>(playPos, soundTargetObjectId);
+                        soundPoint = soundPoints.GetPoint(playPos, soundTargetObjectId) as SoundPoint;
                         break;
                     case PlayStates.Playing:
                         // take a point between the last and the actual position
@@ -269,11 +269,11 @@ namespace Awb.Core.Player
             {
                 case PlayStates.Nothing:
                     // take exactly the point at the actual position
-                    nestedTimelinePoint = TimelineData.NestedTimelinePoints.GetPoint<NestedTimelinePoint>(playPos, NestedTimelinesFakeObject.Singleton.Id);
+                    nestedTimelinePoint = TimelineData?.NestedTimelinePoints.GetPoint<NestedTimelinePoint>(playPos, NestedTimelinesFakeObject.Singleton.Id);
                     break;
                 case PlayStates.Playing:
                     // take a point between the last and the actual position
-                    nestedTimelinePoint = TimelineData.NestedTimelinePoints.GetPointsBetween<NestedTimelinePoint>(_playPosMsOnLastUpdate, playPos, NestedTimelinesFakeObject.Singleton.Id).FirstOrDefault();
+                    nestedTimelinePoint = TimelineData?.NestedTimelinePoints.GetPointsBetween<NestedTimelinePoint>(_playPosMsOnLastUpdate, playPos, NestedTimelinesFakeObject.Singleton.Id).FirstOrDefault();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");

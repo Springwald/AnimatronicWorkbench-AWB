@@ -9,8 +9,12 @@ namespace Awb.Core.Timelines
 {
     public static class TimelinePointFinderExtensions
     {
-        public static TimelinePointType? GetPoint<TimelinePointType>(this IEnumerable<TimelinePoint> points, int timeMs, string awbObjectId) where TimelinePointType : TimelinePoint
+
+         public static TimelinePointType? GetPoint<TimelinePointType>(this IEnumerable<TimelinePoint> points, int timeMs, string awbObjectId) where TimelinePointType : TimelinePoint
            => points.OfType<TimelinePointType>().SingleOrDefault(p => p.AbwObjectId == awbObjectId && (int)p.TimeMs == timeMs); // check existing point
+
+        public static TimelinePoint? GetPoint(this IEnumerable<TimelinePoint> points, int timeMs, string awbObjectId)
+           => points.SingleOrDefault(p => p.AbwObjectId == awbObjectId && (int)p.TimeMs == timeMs); // check existing point
 
         public static IEnumerable<TimelinePointType> GetPointsBetween<TimelinePointType>(this IEnumerable<TimelinePoint> points, int timeMs1, int timeMs2, string awbObjectId) where TimelinePointType : TimelinePoint
         {
