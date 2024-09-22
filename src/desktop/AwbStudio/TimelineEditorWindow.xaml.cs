@@ -49,11 +49,11 @@ namespace AwbStudio
         private int _lastBankIndex = -1;
         private bool _unsavedChanges;
         private bool _switchingPages;
-        private bool _ctrlKeyPressed; // is the control key on the keyboard pressed?
-        private bool _winKeyPressed; // is the windows key on the keyboard pressed?
+
         private bool _loading;
         private Brush _buttonForegroundColorBackup;
         private bool _isZooming;
+        private TimelineKeyboardHandling? _timelineKeyboardHandling;
 
         public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
         {
@@ -134,6 +134,7 @@ namespace AwbStudio
             Closing += TimelineEditorWindow_Closing;
             KeyDown += TimelineEditorWindow_KeyDown;
 
+
             // zoomslider not working well - disable for now
             StackPanelZoom.Visibility = Visibility.Collapsed;
 
@@ -162,6 +163,8 @@ namespace AwbStudio
             Unloaded += TimelineEditorWindow_Unloaded;
         }
 
+
+
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {
             if (_timelineEventHandling != null)
@@ -173,6 +176,7 @@ namespace AwbStudio
                 _timelinePlayer.OnPlaySound -= SoundPlayer.SoundToPlay;
                 _timelinePlayer.Dispose();
             }
+            KeyDown -= TimelineEditorWindow_KeyDown;
             _playPosSynchronizer.Dispose();
         }
 
@@ -182,6 +186,13 @@ namespace AwbStudio
 
 
             if (timelineData == null && _timelineData == null) return; // no change
+
+            if (_timelineKeyboardHandling != null)
+            {
+                // Need to disconnect the old timeline keyboard handling
+                _timelineKeyboardHandling.SaveTimelineData -= OnSaveTimelineDataKeyboardEvent;
+                _timelineKeyboardHandling = null;
+            }
 
             if (_timelineEventHandling != null)
             {
@@ -226,8 +237,10 @@ namespace AwbStudio
                 playPosSynchronizer: _playPosSynchronizer,
                 awbLogger: _awbLogger);
 
+            this._timelineKeyboardHandling = new TimelineKeyboardHandling(_timelineEventHandling!, _timelinePlayer, _playPosSynchronizer, _viewContext);
+            this._timelineKeyboardHandling.SaveTimelineData += OnSaveTimelineDataKeyboardEvent;
 
-            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds, SoundPlayer);
+            FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds, SoundPlayer);
 
             _viewContext.ActualFocusObject = null;
 
@@ -238,6 +251,7 @@ namespace AwbStudio
             _unsavedChanges = changesAfterLoading;
         }
 
+        
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
@@ -279,65 +293,6 @@ namespace AwbStudio
         private void CalculateSizeAndPixelPerMs() => this._viewContext.PixelPerMs = this.ActualWidth / msPerScreenWidth;
         private void TimelineEditorWindow_SizeChanged(object sender, SizeChangedEventArgs e) => CalculateSizeAndPixelPerMs();
         private async void TimelineChosenToLoad(object? sender, TimelineNameChosenEventArgs e) => await this.LoadTimelineData(timelineId: e.TimelineId);
-
-
-        /// <summary>
-        /// Keybord input handling
-        /// </summary>
-        private void TimelineEditorWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            const int manualScrollSpeedMs = 125;
-
-            var switchPlayStop = () => {
-                if (this._timelineEventHandling != null)
-                {
-                    if (this._timelinePlayer.PlayState == TimelinePlayer.PlayStates.Playing)
-                        this._timelineEventHandling.Stop();
-                    else
-                        this._timelineEventHandling.Play();
-                }
-            };
-
-             switch (e.Key)
-            {
-                // remember special key states
-                case System.Windows.Input.Key.LeftCtrl:
-                case System.Windows.Input.Key.RightCtrl:
-                    this._ctrlKeyPressed = e.IsDown;
-                    break;
-
-                case System.Windows.Input.Key.LWin:
-                case System.Windows.Input.Key.RWin:
-                    this._winKeyPressed = e.IsDown;
-                    break;
-
-                // save actual timeline
-                case System.Windows.Input.Key.S:
-                    if (this._ctrlKeyPressed) SaveTimelineData();
-                    break;
-
-                // start / stop playback
-                case System.Windows.Input.Key.Space:
-                    switchPlayStop();
-                    break;
-
-                case System.Windows.Input.Key.System:
-                    if (this._winKeyPressed) switchPlayStop(); // support for e.g. shuttle express controller
-                    break;
-
-                // playpos navigation support for e.g. shuttle express controller
-                case System.Windows.Input.Key.F12: // scroll playpos forward,  support for e.g. shuttle express controller
-                    if (_winKeyPressed && _playPosSynchronizer.PlayPosMsGuaranteedSnapped <= _viewContext.DurationMs - manualScrollSpeedMs) 
-                        _playPosSynchronizer.SetNewPlayPos(_playPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped + manualScrollSpeedMs);
-                    break;
-                case System.Windows.Input.Key.F11: // scroll playpos backwards
-                    if (_winKeyPressed && _playPosSynchronizer.PlayPosMsGuaranteedSnapped >= manualScrollSpeedMs) 
-                        _playPosSynchronizer.SetNewPlayPos(_playPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped - manualScrollSpeedMs);
-                    break;
-
-            }
-        }
-
         private string GetTimelineStateName(TimelineState ts) => ts.Export ? ts.Title : $"{ts.Title} (no export)";
 
         private void TimelineEditorWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
@@ -592,6 +547,15 @@ namespace AwbStudio
             _unsavedChanges = true;
         }
 
+        /// <summary>
+        /// Redirects the keyboard input to the timeline keyboard handling
+        /// </summary>
+        private void TimelineEditorWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) => _timelineKeyboardHandling?.KeyDown(sender, e);
+
+        /// <summary>
+        /// reacts on the save timeline data event from the timeline keyboard handling
+        /// </summary>
+        private void OnSaveTimelineDataKeyboardEvent(object? sender, EventArgs e) => this.SaveTimelineData();
 
         #region Button Events
 
