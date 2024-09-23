@@ -285,6 +285,9 @@ namespace AwbStudio
                     _unsavedChanges = true;
                     break;
 
+                case ViewContextChangedEventArgs.ChangeTypes.Selection:
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }

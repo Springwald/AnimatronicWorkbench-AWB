@@ -42,8 +42,12 @@ namespace Awb.Core.Player
         /// <summary>
         /// the actual play position in  millseconds; snapped - independing on "InSnapMode"
         /// </summary>
-        public int PlayPosMsGuaranteedSnapped => (PlayPosMsAutoSnappedOrUnSnapped / SnapMs) * SnapMs;
+        public int PlayPosMsGuaranteedSnapped => Snap(PlayPosMsAutoSnappedOrUnSnapped);
 
+        /// <summary>
+        /// Snap the given millisecond value to the next snap position
+        /// </summary>
+        public static int Snap(int ms) => (ms / SnapMs) * SnapMs;  
 
         public PlayPosSynchronizer(IInvoker invoker)
         {

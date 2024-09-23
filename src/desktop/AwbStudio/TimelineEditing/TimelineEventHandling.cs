@@ -121,6 +121,8 @@ namespace AwbStudio.TimelineEditing
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                case ViewContextChangedEventArgs.ChangeTypes.Selection:
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
@@ -130,9 +132,6 @@ namespace AwbStudio.TimelineEditing
                         _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null);
                     if (_viewContext?.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
                         _timelineEditingManipulation.UpdateNestedTimelinesValue();
-                    break;
-
-                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     break;
 
                 default:

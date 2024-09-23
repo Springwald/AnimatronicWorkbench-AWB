@@ -19,6 +19,7 @@ namespace AwbStudio.TimelineEditing
             BankIndex,
             PixelPerMs,
             Scroll,
+            Selection,
             FocusObject,
             FocusObjectValue
         }

@@ -7,11 +7,13 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid 
-        PreviewMouseDown="AllValuesGrid_PreviewMouseDown" 
-        PreviewMouseMove="AllValuesGrid_PreviewMouseMove"
+        PreviewMouseLeftButtonDown="Grid_PreviewMouseLeftButtonDown"
+        PreviewMouseLeftButtonUp="Grid_PreviewMouseLeftButtonUp"
+        PreviewMouseMove="Grid_PreviewMouseMove"
         Background="Black">
         <Grid x:Name="OpticalGrid" IsHitTestVisible="False"></Grid>
         <Grid x:Name="AllValuesGrid"></Grid>
         <Grid x:Name="PlayPosGrid"></Grid>
+        <Rectangle x:Name="SelectionRectangle" HorizontalAlignment="Left" Height="100" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Width="100" Fill="#7F86ADFF"/>
     </Grid>
 </UserControl>

@@ -113,6 +113,7 @@ namespace AwbStudio.PropertyControls
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
+                case ViewContextChangedEventArgs.ChangeTypes.Selection:
                     break;
 
                 default:

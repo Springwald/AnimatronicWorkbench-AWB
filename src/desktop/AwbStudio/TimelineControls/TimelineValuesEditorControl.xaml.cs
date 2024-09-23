@@ -28,17 +28,15 @@ namespace AwbStudio.TimelineControls
         private bool _isInitialized;
 
         private TimelineData? _timelineData;
-        private SoundPlayerControl _soundPlayer;
+        private SoundPlayerControl? _soundPlayer;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private PlayPosPainter? _playPosPainter;
         private GridTimePainter? _gridPainter;
-
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
 
         private double _zoomVerticalHeightPerValueEditorBackingField = 180; // pixel per value editor
-
 
         public double ZoomVerticalHeightPerValueEditor
         {
@@ -195,10 +193,7 @@ namespace AwbStudio.TimelineControls
                 case ViewContextChangedEventArgs.ChangeTypes.Duration:
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                     var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
-                    //MyInvoker.Invoke(() =>
-                    {
-                        this.Width = newWidth;
-                    }//);
+                    this.Width = newWidth;
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
@@ -207,6 +202,9 @@ namespace AwbStudio.TimelineControls
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                    break;
+
+                case ViewContextChangedEventArgs.ChangeTypes.Selection:
                     break;
 
                 default:

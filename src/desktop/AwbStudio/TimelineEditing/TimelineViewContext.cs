@@ -17,10 +17,36 @@ namespace AwbStudio.TimelineEditing
         ///  The index of the active actuator bank
         /// </summary>
         private int _bankIndex;
+
+        /// <summary>
+        /// How many pixels are needed to represent one ms in the timeline x -axis
+        /// </summary>
         private double _pixelPerMs;
+
+        /// <summary>
+        /// How many pixels are scrolled in the timeline x-view
+        /// </summary>
         private double _scrollPositionPx;
+
+        /// <summary>
+        /// The total duration of the timeline in ms, initially 20s
+        /// </summary>
         private int _durationMs = 20 * 1000;
+
+        /// <summary>
+        /// The actual focus object if selected
+        /// </summary>
         private IAwbObject? _actualFocusObject;
+
+        /// <summary>
+        /// If a selection is active, this is the start of the selection in ms
+        /// </summary>
+        private int? _selectionStartMs;
+
+        /// <summary>
+        /// If a selection is active, this is the end of the selection in ms
+        /// </summary>
+        private int? _selectionEndMs;
 
         /// <summary>
         /// Is fired, when the timeline position or view has changed
@@ -35,8 +61,11 @@ namespace AwbStudio.TimelineEditing
         public void FocusObjectValueChanged(object sender)
         {
             Changed?.Invoke(sender, new ViewContextChangedEventArgs(ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue));
-        }   
+        }
 
+        /// <summary>
+        ///  The actual focus object if selected
+        /// </summary>
         public IAwbObject? ActualFocusObject
         {
             get => _actualFocusObject;
@@ -48,6 +77,9 @@ namespace AwbStudio.TimelineEditing
             }
         }
 
+        /// <summary>
+        /// How many pixels are needed to represent one ms in the timeline x -axis
+        /// </summary>
         public double PixelPerMs
         {
             get => _pixelPerMs;
@@ -59,6 +91,9 @@ namespace AwbStudio.TimelineEditing
             }
         }
 
+        /// <summary>
+        /// The total duration of the timeline in ms, initially 20s
+        /// </summary>
         public int DurationMs
         {
             get => _durationMs;
@@ -108,9 +143,53 @@ namespace AwbStudio.TimelineEditing
             }
         }
 
+        /// <summary>
+        /// When a selection is active, this is the start of the selection in ms
+        /// </summary>
+        public int? SelectionStartMs
+        {
+            get => _selectionStartMs ;
+            set
+            {
+                if (_selectionStartMs.Equals(value)) return;
+                _selectionStartMs = value;
+                Changed?.Invoke(this, new ViewContextChangedEventArgs(ViewContextChangedEventArgs.ChangeTypes.Selection));
+            }
+        }
+
+        /// <summary>
+        /// When a selection is active, this is the end of the selection in ms
+        /// </summary>
+        public int? SelectionEndMs
+        {
+            get => _selectionEndMs;
+            set
+            {
+                if (_selectionEndMs.Equals(value)) return;
+                _selectionEndMs = value;
+                Changed?.Invoke(this, new ViewContextChangedEventArgs(ViewContextChangedEventArgs.ChangeTypes.Selection));
+            }
+        }
+
+        /// <summary>
+        /// For usage of a midi controller: this is the actuator item number of the first item in the bank
+        /// </summary>
         public int FirstBankItemNo => BankIndex * ItemsPerBank + 1; // base 1
+
+        /// <summary>
+        /// For usage of a midi controller: this is the actuator item number of the last item in the bank
+        /// </summary>
         public int LastBankItemNo => FirstBankItemNo + ItemsPerBank - 1; // base 1
+
+        /// <summary>
+        ///  Calculates the x position of a given time in the timeline
+        /// </summary>
+        /// <returns></returns>
         public double GetXPos(int timeMs, TimelineData? timelineData) => timelineData == null ? 0 : GetXPos(timeMs);
+
+        /// <summary>
+        ///  calculates the x position of a given time in the timeline
+        /// </summary>
         public double GetXPos(int timeMs) => timeMs * PixelPerMs;
     }
 }
