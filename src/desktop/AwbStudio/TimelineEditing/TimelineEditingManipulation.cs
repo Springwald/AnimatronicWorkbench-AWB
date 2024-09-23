@@ -21,6 +21,7 @@ namespace AwbStudio.TimelineEditing
     {
         private readonly TimelineData _timelineData;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
+        private CopyNPasteBuffer _copyNPasteBuffer;
 
         public TimelineEditingManipulation(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer)
         {
@@ -34,12 +35,13 @@ namespace AwbStudio.TimelineEditing
         /// Copies the timeline content between the given start and end position into the copy buffer.
         /// </summary>
         /// <returns></returns>
-        public CopyNPasteBuffer? Copy(int startMs, int endMs)
+        public bool Copy(int startMs, int endMs)
         {
-            if (startMs == endMs) return null;
+            if (startMs == endMs) return false;
             if (startMs > endMs) (startMs, endMs) = (endMs, startMs); // swap values
             var points = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs).ToList();
-            return new CopyNPasteBuffer { TimelinePoints = points, OldEndMs = endMs, OldStartMs = startMs };
+            _copyNPasteBuffer =  new CopyNPasteBuffer { TimelinePoints = points, OldEndMs = endMs, OldStartMs = startMs };
+            return true;
             // todo: undo logic
         }
 
@@ -47,16 +49,17 @@ namespace AwbStudio.TimelineEditing
         /// Cuts the timeline content between the given start and end position into the copy buffer.
         /// Removes also the space between start and end position, so the timeline gets shorter by the duration of the cut content.
         /// </summary>
-        public CopyNPasteBuffer? Cut(int startMs, int endMs)
+        public bool Cut(int startMs, int endMs)
         {
-            if (startMs == endMs) return null;
+            if (startMs == endMs) return false;
             if (startMs > endMs) (startMs, endMs) = (endMs, startMs); // swap values
             var points = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs).ToList();
             foreach (var point in points)
                 _ = _timelineData.RemovePoint(point);
-            if (MovePoints(oldStartMs: endMs, oldEndMs: int.MaxValue, newStartMs: startMs) == false) return null; // todo: better error handling
-
-            return new CopyNPasteBuffer { TimelinePoints = points, OldEndMs = endMs, OldStartMs = startMs };
+            if (MovePoints(oldStartMs: endMs, oldEndMs: int.MaxValue, newStartMs: startMs) == false) return false; // todo: better error handling
+            _copyNPasteBuffer = new CopyNPasteBuffer { TimelinePoints = points, OldEndMs = endMs, OldStartMs = startMs };
+            _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
+            return false;
             // todo: undo logic
         }
 
@@ -67,6 +70,7 @@ namespace AwbStudio.TimelineEditing
         public bool Paste(CopyNPasteBuffer buffer, int targetMs)
         {
             if (buffer == null) return false;
+            _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
             return true;
             // todo: undo logic
         }
@@ -77,6 +81,7 @@ namespace AwbStudio.TimelineEditing
         /// </summary>
         public bool Clear(int startMs, int endMs)
         {
+            _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
             return false;
             // todo: undo logic
         }
@@ -87,6 +92,7 @@ namespace AwbStudio.TimelineEditing
         private bool MovePoints(int oldStartMs, int oldEndMs, int newStartMs)
         {
             var pointsBetween = _timelineData.AllPoints.Where(p => p.TimeMs >= oldStartMs && p.TimeMs <= oldEndMs).ToList();
+            _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
             return false;
         }
 

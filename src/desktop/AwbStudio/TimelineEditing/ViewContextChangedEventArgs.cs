@@ -21,7 +21,7 @@ namespace AwbStudio.TimelineEditing
             Scroll,
             Selection,
             FocusObject,
-            FocusObjectValue
+            FocusObjectValue,
         }
 
         public ViewContextChangedEventArgs(ChangeTypes changeType)

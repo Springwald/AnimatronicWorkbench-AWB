@@ -204,10 +204,13 @@ namespace AwbStudio
             if (_timelineData != null)
             {
                 // need to disconnect the old timeline data
+                _timelineData.OnContentChanged -= TimelineData_OnContentChanged;
             }
 
             _timelineData = timelineData;
             if (_timelineData == null) return; // No new timeline data to connect to
+
+            _timelineData.OnContentChanged += TimelineData_OnContentChanged;
 
             var changesAfterLoading = false;
 
@@ -237,7 +240,7 @@ namespace AwbStudio
                 playPosSynchronizer: _playPosSynchronizer,
                 awbLogger: _awbLogger);
 
-            this._timelineKeyboardHandling = new TimelineKeyboardHandling(_timelineEventHandling!, _timelinePlayer, _playPosSynchronizer, _viewContext);
+            this._timelineKeyboardHandling = new TimelineKeyboardHandling(_timelineEventHandling!, _timelinePlayer, _playPosSynchronizer, _timelineEventHandling.TimelineEditingManipulation, _viewContext);
             this._timelineKeyboardHandling.SaveTimelineData += OnSaveTimelineDataKeyboardEvent;
 
             FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds, SoundPlayer);
@@ -251,7 +254,7 @@ namespace AwbStudio
             _unsavedChanges = changesAfterLoading;
         }
 
-        
+        private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e) => _unsavedChanges = true;
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {

@@ -15,6 +15,7 @@ namespace AwbStudio.TimelineEditing
         private readonly TimelineEventHandling _timelineEventHandling;
         private readonly TimelinePlayer _timelinePlayer;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
+        private readonly TimelineEditingManipulation _timelineEditingManipulation;
         private readonly TimelineViewContext _timelineViewContext;
         private bool _ctrlKeyPressed; // is the control key on the keyboard pressed?
         private bool _winKeyPressed; // is the windows key on the keyboard pressed?
@@ -25,16 +26,20 @@ namespace AwbStudio.TimelineEditing
             TimelineEventHandling timelineEventHandling, 
             TimelinePlayer timelinePlayer, 
             PlayPosSynchronizer playPosSynchronizer,
+            TimelineEditingManipulation timelineEditingManipulation,
             TimelineViewContext timelineViewContext)
         {
             if (timelineEventHandling == null) throw new ArgumentNullException(nameof(timelineEventHandling));
             if (timelinePlayer == null) throw new ArgumentNullException(nameof(timelinePlayer));
             if (playPosSynchronizer == null) throw new ArgumentNullException(nameof(playPosSynchronizer));
+            if (timelineEditingManipulation == null) throw new ArgumentNullException(nameof(timelineEditingManipulation));
             if (timelineViewContext == null) throw new ArgumentNullException(nameof(timelineViewContext));
+
 
             _timelineEventHandling = timelineEventHandling;
             _timelinePlayer = timelinePlayer;
             _playPosSynchronizer = playPosSynchronizer;
+            _timelineEditingManipulation = timelineEditingManipulation;
             _timelineViewContext = timelineViewContext;
         }
 
@@ -67,6 +72,15 @@ namespace AwbStudio.TimelineEditing
                 case System.Windows.Input.Key.RWin:
                     this._winKeyPressed = e.IsDown;
                     break;
+
+                case System.Windows.Input.Key.X:
+                    if (this._ctrlKeyPressed)
+                    {
+                        if (_timelineViewContext.SelectionStartMs != null && _timelineViewContext.SelectionEndMs != null)
+                        _timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs.Value, _timelineViewContext.SelectionEndMs.Value);
+                    }
+                    break;
+
 
                 // save actual timeline
                 case System.Windows.Input.Key.S:
