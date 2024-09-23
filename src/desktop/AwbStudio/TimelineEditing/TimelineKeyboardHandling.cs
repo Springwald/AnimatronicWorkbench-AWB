@@ -23,8 +23,8 @@ namespace AwbStudio.TimelineEditing
         public EventHandler? SaveTimelineData { get; set; }
 
         public TimelineKeyboardHandling(
-            TimelineEventHandling timelineEventHandling, 
-            TimelinePlayer timelinePlayer, 
+            TimelineEventHandling timelineEventHandling,
+            TimelinePlayer timelinePlayer,
             PlayPosSynchronizer playPosSynchronizer,
             TimelineEditingManipulation timelineEditingManipulation,
             TimelineViewContext timelineViewContext)
@@ -50,7 +50,8 @@ namespace AwbStudio.TimelineEditing
         {
             const int manualScrollSpeedMs = 125;
 
-            var switchPlayStop = () => {
+            var switchPlayStop = () =>
+            {
                 if (this._timelineEventHandling != null)
                 {
                     if (this._timelinePlayer.PlayState == TimelinePlayer.PlayStates.Playing)
@@ -76,8 +77,14 @@ namespace AwbStudio.TimelineEditing
                 case System.Windows.Input.Key.X:
                     if (this._ctrlKeyPressed)
                     {
+                        // STRG + X : cut 
                         if (_timelineViewContext.SelectionStartMs != null && _timelineViewContext.SelectionEndMs != null)
-                        _timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs.Value, _timelineViewContext.SelectionEndMs.Value);
+                            if (_timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs.Value, _timelineViewContext.SelectionEndMs.Value))
+                            {
+                                _timelineViewContext.SelectionStartMs = null;
+                                _timelineViewContext.SelectionEndMs = null;
+
+                            }
                     }
                     break;
 

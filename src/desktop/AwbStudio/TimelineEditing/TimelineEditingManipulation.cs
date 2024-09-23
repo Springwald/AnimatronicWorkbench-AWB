@@ -92,8 +92,11 @@ namespace AwbStudio.TimelineEditing
         private bool MovePoints(int oldStartMs, int oldEndMs, int newStartMs)
         {
             var pointsBetween = _timelineData.AllPoints.Where(p => p.TimeMs >= oldStartMs && p.TimeMs <= oldEndMs).ToList();
+            var delta = newStartMs - oldStartMs;
+            foreach (var point in pointsBetween)
+                point.TimeMs = point.TimeMs + delta;
             _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
-            return false;
+            return true;
         }
 
         #endregion
