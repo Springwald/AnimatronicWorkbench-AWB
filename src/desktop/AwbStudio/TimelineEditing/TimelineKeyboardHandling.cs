@@ -152,6 +152,7 @@ namespace AwbStudio.TimelineEditing
                     if (existsSelection)
                     {
                         _ = _timelineEditingManipulation.Cut(startMs!.Value, endMs!.Value);
+                        _playPosSynchronizer.SetNewPlayPos(startMs!.Value);
                         _timelineViewContext.SelectionStartMs = null;
                         _timelineViewContext.SelectionEndMs = null;
                     }

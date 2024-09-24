@@ -386,10 +386,31 @@ bool AwbDisplay::draw_debugInfos()
     statusFooterSprite.drawString(memoryInfo, statusFooterSprite.width() / 2, y);
 
     y += _textSizeLineHeight;
+    statusFooterSprite.setTextDatum(bottom_center);
     statusFooterSprite.setTextColor(0xAAAAFFU, 0);
     statusFooterSprite.drawString(_statusMsg, statusFooterSprite.width() / 2, y);
 
     statusFooterSprite.pushSprite(0, _statusFooterSpriteTop);
 
     return true;
+}
+
+/*
+ disables any input for the given time
+ */
+void AwbDisplay::pause(int seconds, String message)
+{
+    primarySprite.fillSprite(0x000000U);
+    unsigned long lastUpdate = millis();
+    long msLeft = seconds * 1000;
+    while (msLeft > 0)
+    {
+        long diff = millis() - lastUpdate;
+        lastUpdate = millis();
+        msLeft -= diff;
+        delay(250);
+        primarySprite.setTextColor(0xAAAAFFU, 0);
+        primarySprite.drawString(" " + message + " :" + String(msLeft / 1000) + "s ", primarySprite.width() / 2, primarySprite.height() / 2);
+        primarySprite.pushSprite(0, _primarySpriteTop);
+    }
 }

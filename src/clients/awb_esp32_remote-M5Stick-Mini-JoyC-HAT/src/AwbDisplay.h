@@ -89,6 +89,11 @@ public:
    * true, if actually a message is shown
    */
   bool isShowingMessage();
+
+  /*
+  disables any input for the given time
+  */
+  void pause(int seconds, String message);
 };
 
 #endif

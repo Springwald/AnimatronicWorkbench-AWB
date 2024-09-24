@@ -45,7 +45,7 @@ namespace AwbStudio.TimelineEditing
             if (startMs == endMs) return null;
             if (startMs > endMs) (startMs, endMs) = (endMs, startMs); // swap values
             var originalPoints = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs);
-            return new CopyNPasteBuffer { TimelinePoints = ReAlignPoints(originalPoints, -startMs), LengthMs = endMs - startMs };
+            return new CopyNPasteBuffer { TimelinePoints = ReAlignPoints(originalPoints, -startMs).ToArray(), LengthMs = endMs - startMs };
             // todo: undo logic
         }
 
@@ -69,6 +69,7 @@ namespace AwbStudio.TimelineEditing
             if (MovePoints(oldStartMs: endMs, oldEndMs: int.MaxValue, newStartMs: startMs) == false) return null; // todo: better error handling
 
             _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
+
             return copyNPasteBuffer;
             // todo: undo logic
         }
@@ -80,9 +81,9 @@ namespace AwbStudio.TimelineEditing
         public bool Paste(CopyNPasteBuffer copyNPasteBuffer, int targetMs)
         {
             if (copyNPasteBuffer == null) return false;
+
             var originalPoints = copyNPasteBuffer.TimelinePoints;
-            // re-align the points to insert
-            var reAlignedPoints = ReAlignPoints(originalPoints, targetMs);
+            var reAlignedPoints = ReAlignPoints(originalPoints, targetMs).ToArray(); // re-align the points to insert
 
             // create a gap for the clipboard content
             if (MovePoints(oldStartMs: targetMs, oldEndMs: int.MaxValue, newStartMs: targetMs + copyNPasteBuffer.LengthMs) == false)
@@ -97,6 +98,7 @@ namespace AwbStudio.TimelineEditing
                     // there is a point for the same awb-object at the target position, so we have to remove it first
                     _ = _timelineData.RemovePoint(collidingPointAtTargetPosition);
                 }
+                // insert the new point
                 _ = _timelineData.AddPoint(point);
             }
             _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);

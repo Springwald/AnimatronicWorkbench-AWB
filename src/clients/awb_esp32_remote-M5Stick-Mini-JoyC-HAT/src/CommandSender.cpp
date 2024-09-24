@@ -7,14 +7,16 @@
 #include "CommandSender.h"
 #include "Hardware.h"
 
-void CommandSender::playTimeline(String timelineName)
+bool CommandSender::playTimeline(String timelineName)
 {
     _display.draw_message("timeline:\r\n" + timelineName, 500, MSG_TYPE_INFO);
-    this->sendCommand("/remote/play/?timeline=" + timelineName);
+    return this->sendCommand("/remote/play/?timeline=" + timelineName);
 }
 
-void CommandSender::sendCommand(String command)
+bool CommandSender::sendCommand(String command)
 {
+    bool success = false;
+
     if (WiFi.status() == WL_CONNECTED)
     {
         // url encode command
@@ -42,6 +44,7 @@ void CommandSender::sendCommand(String command)
             String payload = http.getString();
             _display.draw_message(payload, 1500, MSG_TYPE_INFO);
             delay(1500);
+            success = true;
         }
         else
         {
@@ -49,10 +52,8 @@ void CommandSender::sendCommand(String command)
             _display.draw_message("Error code: " + httpResponseCode, 1500, MSG_TYPE_ERROR);
             delay(1500);
         }
-
         // Free resources
         http.end();
-
         digitalWrite(RED_LED, HIGH); // turn red led off
     }
     else
@@ -61,4 +62,6 @@ void CommandSender::sendCommand(String command)
         _display.draw_message("WiFi Disconnected", 1500, MSG_TYPE_ERROR);
         delay(1500);
     }
+
+    return success;
 }

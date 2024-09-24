@@ -18,7 +18,7 @@ void CustomCode::setup()
 void CustomCode::loop(int8_t joyPosX, int8_t joyPosY, bool joyButton, bool button2, bool button3)
 {
     /* cc-start-loop - insert your loop code here before the end-loop comment: */
-
+    
     /* cc-end-loop  */
 }
 
