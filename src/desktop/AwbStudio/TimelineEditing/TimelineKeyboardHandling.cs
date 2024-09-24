@@ -61,6 +61,59 @@ namespace AwbStudio.TimelineEditing
                 }
             };
 
+            var existsSelection = _timelineViewContext.SelectionStartMs != null && _timelineViewContext.SelectionEndMs != null;
+
+            if (this._ctrlKeyPressed)
+            {
+                switch (e.Key)
+                {
+                    case System.Windows.Input.Key.X: // STRG + X : cut 
+                        if (existsSelection)
+                        { 
+                            _timelineEditingManipulation.CopyNPasteBuffer = _timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs.Value, _timelineViewContext.SelectionEndMs.Value);
+                            if (_timelineEditingManipulation.CopyNPasteBuffer != null)
+                            {
+                                _timelineViewContext.SelectionStartMs = null;
+                                _timelineViewContext.SelectionEndMs = null;
+                            }
+                        }
+                        break;
+
+                    case System.Windows.Input.Key.C:// STRG + C : copy
+                        if (existsSelection)
+                        {
+                            _timelineEditingManipulation.CopyNPasteBuffer = _timelineEditingManipulation.Copy(_timelineViewContext.SelectionStartMs!.Value, _timelineViewContext.SelectionEndMs!.Value);
+                            if (_timelineEditingManipulation.CopyNPasteBuffer != null)
+                            {
+                                // copy was successful
+                            }
+                        }
+                        break;
+
+                    case System.Windows.Input.Key.V: // STRG + V : paste
+                        if (_timelineEditingManipulation.CopyNPasteBuffer != null)
+                        {
+                            var targetStartMs = _playPosSynchronizer.PlayPosMsGuaranteedSnapped;
+                            if (existsSelection)
+                            {
+                                // first remove the actual selection, to replace 
+                                _ = _timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs!.Value, _timelineViewContext.SelectionEndMs!.Value);
+                                targetStartMs = _timelineViewContext.SelectionStartMs!.Value;
+                            }
+
+                            if (_timelineEditingManipulation.Paste(_timelineEditingManipulation.CopyNPasteBuffer, targetStartMs))
+                            {
+                                // paste was successful
+                            }
+                        }
+                        break;
+
+                    case System.Windows.Input.Key.S: // save actual timeline
+                        SaveTimelineData?.Invoke(this, EventArgs.Empty);
+                        break;
+                }
+            }
+
             switch (e.Key)
             {
                 // remember special key states
@@ -74,28 +127,16 @@ namespace AwbStudio.TimelineEditing
                     this._winKeyPressed = e.IsDown;
                     break;
 
-                case System.Windows.Input.Key.X:
-                    if (this._ctrlKeyPressed)
+                case System.Windows.Input.Key.Back: // backspace to delete the selected points
+                    if (existsSelection)
                     {
-                        // STRG + X : cut 
-                        if (_timelineViewContext.SelectionStartMs != null && _timelineViewContext.SelectionEndMs != null)
-                            if (_timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs.Value, _timelineViewContext.SelectionEndMs.Value))
-                            {
-                                _timelineViewContext.SelectionStartMs = null;
-                                _timelineViewContext.SelectionEndMs = null;
-
-                            }
+                        _ = _timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs!.Value, _timelineViewContext.SelectionEndMs!.Value);
+                        _timelineViewContext.SelectionStartMs = null;
+                        _timelineViewContext.SelectionEndMs = null;
                     }
                     break;
-
-
-                // save actual timeline
-                case System.Windows.Input.Key.S:
-                    if (this._ctrlKeyPressed) SaveTimelineData?.Invoke(this, EventArgs.Empty);
-                    break;
-
-                // start / stop playback
-                case System.Windows.Input.Key.Space:
+                
+                case System.Windows.Input.Key.Space: // start / stop playback
                     switchPlayStop();
                     break;
 

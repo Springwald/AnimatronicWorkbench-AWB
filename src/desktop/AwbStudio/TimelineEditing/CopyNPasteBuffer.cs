@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Timelines;
+using System;
 using System.Collections.Generic;
 
 namespace AwbStudio.TimelineEditing
@@ -13,7 +14,7 @@ namespace AwbStudio.TimelineEditing
     /// <summary>
     /// The buffer to hold timeline keyframes for copy and paste operations
     /// </summary>
-    public sealed record CopyNPasteBuffer
+    public sealed class CopyNPasteBuffer
     {
         /// <summary>
         /// the timeline content to copy or paste is defined by the timeline points
@@ -29,6 +30,13 @@ namespace AwbStudio.TimelineEditing
         /// where was the timeline content copied or cut from (end in milliseconds)
         /// </summary>
         public required int OldEndMs { get; init; }
+
+        public int LengthMs { get
+            {
+                var length = OldEndMs - OldStartMs;
+                return Math.Abs(length);
+            } 
+        }
 
 
     }

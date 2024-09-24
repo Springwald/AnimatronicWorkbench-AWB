@@ -10,6 +10,9 @@ using Awb.Core.Player;
 using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AwbStudio.TimelineEditing
@@ -21,7 +24,9 @@ namespace AwbStudio.TimelineEditing
     {
         private readonly TimelineData _timelineData;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
-        private CopyNPasteBuffer _copyNPasteBuffer;
+
+        public CopyNPasteBuffer? CopyNPasteBuffer { get; set; }
+
 
         public TimelineEditingManipulation(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer)
         {
@@ -35,13 +40,12 @@ namespace AwbStudio.TimelineEditing
         /// Copies the timeline content between the given start and end position into the copy buffer.
         /// </summary>
         /// <returns></returns>
-        public bool Copy(int startMs, int endMs)
+        public CopyNPasteBuffer? Copy(int startMs, int endMs)
         {
-            if (startMs == endMs) return false;
+            if (startMs == endMs) return null;
             if (startMs > endMs) (startMs, endMs) = (endMs, startMs); // swap values
-            var points = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs).ToList();
-            _copyNPasteBuffer =  new CopyNPasteBuffer { TimelinePoints = points, OldEndMs = endMs, OldStartMs = startMs };
-            return true;
+            var originalPoints = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs);
+            return new CopyNPasteBuffer { TimelinePoints = ReAlignPoints(originalPoints, -startMs), OldEndMs = endMs, OldStartMs = startMs };
             // todo: undo logic
         }
 
@@ -49,17 +53,19 @@ namespace AwbStudio.TimelineEditing
         /// Cuts the timeline content between the given start and end position into the copy buffer.
         /// Removes also the space between start and end position, so the timeline gets shorter by the duration of the cut content.
         /// </summary>
-        public bool Cut(int startMs, int endMs)
+        public CopyNPasteBuffer? Cut(int startMs, int endMs)
         {
-            if (startMs == endMs) return false;
+            if (startMs == endMs) return null;
             if (startMs > endMs) (startMs, endMs) = (endMs, startMs); // swap values
-            var points = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs).ToList();
-            foreach (var point in points)
-                _ = _timelineData.RemovePoint(point);
-            if (MovePoints(oldStartMs: endMs, oldEndMs: int.MaxValue, newStartMs: startMs) == false) return false; // todo: better error handling
-            _copyNPasteBuffer = new CopyNPasteBuffer { TimelinePoints = points, OldEndMs = endMs, OldStartMs = startMs };
+            var originalPoints = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs).ToList();
+            foreach (var originalPoint in originalPoints)
+                _ = _timelineData.RemovePoint(originalPoint);
+            // close the gap between start and end
+            if (MovePoints(oldStartMs: endMs, oldEndMs: int.MaxValue, newStartMs: startMs) == false) return null; // todo: better error handling
+            var copyNPasteBuffer = new CopyNPasteBuffer { TimelinePoints = ReAlignPoints(originalPoints, -startMs), OldEndMs = endMs, OldStartMs = startMs };
+            // put the re-aligned points into clipboard
             _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
-            return false;
+            return copyNPasteBuffer;
             // todo: undo logic
         }
 
@@ -67,9 +73,28 @@ namespace AwbStudio.TimelineEditing
         /// Inserts the timeline content from the copy buffer into the timeline at the given position.
         /// The timeline gets longer by the duration of the copied content.
         /// </summary>
-        public bool Paste(CopyNPasteBuffer buffer, int targetMs)
+        public bool Paste(CopyNPasteBuffer copyNPasteBuffer, int targetMs)
         {
-            if (buffer == null) return false;
+            if (copyNPasteBuffer == null) return false;
+            var originalPoints = copyNPasteBuffer.TimelinePoints;
+            // re-align the points to insert
+            var reAlignedPoints = ReAlignPoints(originalPoints, targetMs);
+
+            // create a gap for the clipboard content
+            if (MovePoints(oldStartMs: targetMs, oldEndMs: int.MaxValue, newStartMs: targetMs + copyNPasteBuffer.LengthMs) == false)
+                return false; // todo: better error handling
+
+            // insert he clipboard content
+            foreach (var point in reAlignedPoints)
+            {
+                var collidingPointAtTargetPosition = _timelineData.AllPoints.Where(p => p.TimeMs == point.TimeMs && p.AbwObjectId == point.AbwObjectId).SingleOrDefault();
+                if (collidingPointAtTargetPosition != null)
+                {
+                    // there is a point for the same awb-object at the target position, so we have to remove it first
+                    _ = _timelineData.RemovePoint(collidingPointAtTargetPosition);
+                }
+                _ = _timelineData.AddPoint(point);
+            }
             _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
             return true;
             // todo: undo logic
@@ -84,6 +109,19 @@ namespace AwbStudio.TimelineEditing
             _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
             return false;
             // todo: undo logic
+        }
+
+        /// <summary>
+        /// sets the timeline content between the given start and end position to the timebase
+        /// </summary>
+        private IEnumerable<TimelinePoint> ReAlignPoints(IEnumerable<TimelinePoint> points, int deltaMs)
+        {
+            foreach (var originalPoint in points)
+            {
+                var point = originalPoint.Clone();
+                point.TimeMs = point.TimeMs + deltaMs;
+                yield return point;
+            }
         }
 
         /// <summary>

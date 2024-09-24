@@ -68,7 +68,7 @@ namespace Awb.Core.Timelines
         public TimelinePoint AddPoint(TimelinePoint point)
         {
             if (point == null) throw new ArgumentNullException(nameof(point));
-            var collidingPoint = _timelinePoints.GetPoint(LatestPointMs, point.AbwObjectId);
+            var collidingPoint = _timelinePoints.GetPoint(point.TimeMs, point.AbwObjectId);
             if (collidingPoint != null) throw new ArgumentOutOfRangeException($"Point '{point.Description}' collides with existing point '{collidingPoint.Description}'.");
             _timelinePoints.Add(point);
             SetContentChangedByPoint(point);
