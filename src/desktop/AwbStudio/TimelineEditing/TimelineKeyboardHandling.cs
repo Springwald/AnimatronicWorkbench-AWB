@@ -61,16 +61,20 @@ namespace AwbStudio.TimelineEditing
                 }
             };
 
-            var existsSelection = _timelineViewContext.SelectionStartMs != null && _timelineViewContext.SelectionEndMs != null;
+          
+            var startMs = _timelineViewContext.SelectionStartMs;
+            var endMs = _timelineViewContext.SelectionEndMs;
+            var existsSelection = startMs != null && endMs != null;
+            if (startMs != null && endMs != null && startMs > endMs) (startMs, endMs) = (endMs, startMs); // swap values
 
             if (this._ctrlKeyPressed)
             {
                 switch (e.Key)
                 {
-                    case System.Windows.Input.Key.X: // STRG + X : cut 
+                    case System.Windows.Input.Key.X: // CTRL + X : cut 
                         if (existsSelection)
                         { 
-                            _timelineEditingManipulation.CopyNPasteBuffer = _timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs.Value, _timelineViewContext.SelectionEndMs.Value);
+                            _timelineEditingManipulation.CopyNPasteBuffer = _timelineEditingManipulation.Cut(startMs!.Value, endMs!.Value);
                             if (_timelineEditingManipulation.CopyNPasteBuffer != null)
                             {
                                 _timelineViewContext.SelectionStartMs = null;
@@ -79,10 +83,10 @@ namespace AwbStudio.TimelineEditing
                         }
                         break;
 
-                    case System.Windows.Input.Key.C:// STRG + C : copy
+                    case System.Windows.Input.Key.C:// CTRL + C : copy
                         if (existsSelection)
                         {
-                            _timelineEditingManipulation.CopyNPasteBuffer = _timelineEditingManipulation.Copy(_timelineViewContext.SelectionStartMs!.Value, _timelineViewContext.SelectionEndMs!.Value);
+                            _timelineEditingManipulation.CopyNPasteBuffer = _timelineEditingManipulation.Copy(startMs!.Value, endMs!.Value);
                             if (_timelineEditingManipulation.CopyNPasteBuffer != null)
                             {
                                 // copy was successful
@@ -90,25 +94,42 @@ namespace AwbStudio.TimelineEditing
                         }
                         break;
 
-                    case System.Windows.Input.Key.V: // STRG + V : paste
+                    case System.Windows.Input.Key.V: // CTRL + V : paste
                         if (_timelineEditingManipulation.CopyNPasteBuffer != null)
                         {
-                            var targetStartMs = _playPosSynchronizer.PlayPosMsGuaranteedSnapped;
+                            var targetStartMs2 = _playPosSynchronizer.PlayPosMsGuaranteedSnapped;
                             if (existsSelection)
                             {
-                                // first remove the actual selection, to replace 
-                                _ = _timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs!.Value, _timelineViewContext.SelectionEndMs!.Value);
-                                targetStartMs = _timelineViewContext.SelectionStartMs!.Value;
+                                // first remove the actual selection
+                                _ = _timelineEditingManipulation.Cut(startMs!.Value, endMs!.Value);
+                                targetStartMs2 = startMs!.Value;
                             }
 
-                            if (_timelineEditingManipulation.Paste(_timelineEditingManipulation.CopyNPasteBuffer, targetStartMs))
+                            if (_timelineEditingManipulation.Paste(_timelineEditingManipulation.CopyNPasteBuffer, targetStartMs2))
                             {
                                 // paste was successful
+                                _playPosSynchronizer.SetNewPlayPos(targetStartMs2);
                             }
                         }
                         break;
 
-                    case System.Windows.Input.Key.S: // save actual timeline
+                    case System.Windows.Input.Key.I:// CTRL + I : insert 1 second empt
+                        var targetStartMs = _playPosSynchronizer.PlayPosMsGuaranteedSnapped;
+                        if (existsSelection)
+                        {
+                            // first remove the actual selection
+                           
+                            _ = _timelineEditingManipulation.Cut(startMs!.Value, endMs!.Value);
+                            targetStartMs = startMs!.Value;
+                        }
+                        var emptyBuffer = new CopyNPasteBuffer { LengthMs = 1000, TimelinePoints = [] };
+                        if (_timelineEditingManipulation.Paste(emptyBuffer, targetStartMs))
+                        {
+                            // paste was successful
+                        }
+                        break;
+
+                    case System.Windows.Input.Key.S: // CTRL + S: save actual timeline
                         SaveTimelineData?.Invoke(this, EventArgs.Empty);
                         break;
                 }
@@ -127,10 +148,10 @@ namespace AwbStudio.TimelineEditing
                     this._winKeyPressed = e.IsDown;
                     break;
 
-                case System.Windows.Input.Key.Back: // backspace to delete the selected points
+                case System.Windows.Input.Key.Delete: // del to delete the selected points
                     if (existsSelection)
                     {
-                        _ = _timelineEditingManipulation.Cut(_timelineViewContext.SelectionStartMs!.Value, _timelineViewContext.SelectionEndMs!.Value);
+                        _ = _timelineEditingManipulation.Cut(startMs!.Value, endMs!.Value);
                         _timelineViewContext.SelectionStartMs = null;
                         _timelineViewContext.SelectionEndMs = null;
                     }

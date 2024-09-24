@@ -45,7 +45,7 @@ namespace AwbStudio.TimelineEditing
             if (startMs == endMs) return null;
             if (startMs > endMs) (startMs, endMs) = (endMs, startMs); // swap values
             var originalPoints = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs);
-            return new CopyNPasteBuffer { TimelinePoints = ReAlignPoints(originalPoints, -startMs), OldEndMs = endMs, OldStartMs = startMs };
+            return new CopyNPasteBuffer { TimelinePoints = ReAlignPoints(originalPoints, -startMs), LengthMs = endMs - startMs };
             // todo: undo logic
         }
 
@@ -57,13 +57,17 @@ namespace AwbStudio.TimelineEditing
         {
             if (startMs == endMs) return null;
             if (startMs > endMs) (startMs, endMs) = (endMs, startMs); // swap values
-            var originalPoints = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs).ToList();
-            foreach (var originalPoint in originalPoints)
-                _ = _timelineData.RemovePoint(originalPoint);
+
+            // copy the points to clipboard
+            var copyNPasteBuffer = Copy(startMs, endMs);
+            if (copyNPasteBuffer == null) return null; // todo: better error handling
+
+            // remove the points between start and end
+            if (Clear(startMs, endMs) == false) return null; // todo: better error handling
+
             // close the gap between start and end
             if (MovePoints(oldStartMs: endMs, oldEndMs: int.MaxValue, newStartMs: startMs) == false) return null; // todo: better error handling
-            var copyNPasteBuffer = new CopyNPasteBuffer { TimelinePoints = ReAlignPoints(originalPoints, -startMs), OldEndMs = endMs, OldStartMs = startMs };
-            // put the re-aligned points into clipboard
+
             _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
             return copyNPasteBuffer;
             // todo: undo logic
@@ -107,7 +111,10 @@ namespace AwbStudio.TimelineEditing
         public bool Clear(int startMs, int endMs)
         {
             _timelineData.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste, changedObjectId: null);
-            return false;
+            var pointsToRemove = _timelineData.AllPoints.Where(p => p.TimeMs >= startMs && p.TimeMs <= endMs).ToList();
+            foreach (var point in pointsToRemove)
+                _ = _timelineData.RemovePoint(point);
+            return true;
             // todo: undo logic
         }
 

@@ -6,7 +6,6 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Timelines;
-using System;
 using System.Collections.Generic;
 
 namespace AwbStudio.TimelineEditing
@@ -21,23 +20,7 @@ namespace AwbStudio.TimelineEditing
         /// </summary>
         public required IEnumerable<TimelinePoint> TimelinePoints { get; init; }
 
-        /// <summary>
-        /// where was the timeline content copied or cut from (start in milliseconds) 
-        /// </summary>
-        public required int OldStartMs { get; init; }
-
-        /// <summary>
-        /// where was the timeline content copied or cut from (end in milliseconds)
-        /// </summary>
-        public required int OldEndMs { get; init; }
-
-        public int LengthMs { get
-            {
-                var length = OldEndMs - OldStartMs;
-                return Math.Abs(length);
-            } 
-        }
-
+        public required int LengthMs { get; init; }
 
     }
 }
