@@ -12,8 +12,8 @@ class WifiConfig
 {
 
 public:
-   const char *WlanSSID = "AWB-Grogu2";
-   const char *WlanPassword = "awb77889";
+   const char *WlanSSID = "yyyy";
+   const char *WlanPassword = "xxxx";
 
 };
 

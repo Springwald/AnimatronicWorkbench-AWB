@@ -187,7 +187,15 @@ namespace Awb.Core.Player
                 var point2 = servoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
 
                 if (point1 == null && point2 == null) continue; // no points found for this object before or after the actual position
-                point1 ??= point2;
+
+                const bool fillUpStart = false;
+                if (fillUpStart)
+                {
+                    point1 ??= point2;
+                } else
+                {
+                    if (point1 == null) continue; // no points found for this object before or after the actual position
+                }
                 point2 ??= point1;
 
                 var pointDistanceMs = point2!.TimeMs - point1!.TimeMs;

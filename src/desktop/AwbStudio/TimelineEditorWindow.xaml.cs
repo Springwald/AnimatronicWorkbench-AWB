@@ -134,6 +134,7 @@ namespace AwbStudio
 
             Closing += TimelineEditorWindow_Closing;
             KeyDown += TimelineEditorWindow_KeyDown;
+            KeyUp += TimelineEditorWindow_KeyUp;
 
 
             // zoomslider not working well - disable for now
@@ -178,6 +179,7 @@ namespace AwbStudio
                 _timelinePlayer.Dispose();
             }
             KeyDown -= TimelineEditorWindow_KeyDown;
+            KeyUp -= TimelineEditorWindow_KeyUp;
             _playPosSynchronizer.Dispose();
         }
 
@@ -559,6 +561,12 @@ namespace AwbStudio
         /// Redirects the keyboard input to the timeline keyboard handling
         /// </summary>
         private void TimelineEditorWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) => _timelineKeyboardHandling?.KeyDown(sender, e);
+
+        /// <summary>
+        /// Redirects the keyboard input to the timeline keyboard handling
+        /// </summary>
+        private void TimelineEditorWindow_KeyUp(object sender, System.Windows.Input.KeyEventArgs e) => _timelineKeyboardHandling?.KeyUp(sender, e);
+
 
         /// <summary>
         /// reacts on the save timeline data event from the timeline keyboard handling

@@ -38,6 +38,7 @@ protected:
     long _lastPacketReceivedMillis = -1; // millis() of last received packet
     int _actualTimelineIndex = -1;       // the index of the actual playing timeline
     long _playPosInActualTimeline = 0;   // the actual play position in the actual playing timeline (in milliseconds)
+    const bool fillUpStart = false;      // if true, the timeline will be filled up with the start point
 
     int _lastSoundPlayed = -1;
 

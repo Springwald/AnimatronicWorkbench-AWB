@@ -43,6 +43,23 @@ namespace AwbStudio.TimelineEditing
             _timelineViewContext = timelineViewContext;
         }
 
+        public void KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                // remember special key states
+                case System.Windows.Input.Key.LeftCtrl:
+                case System.Windows.Input.Key.RightCtrl:
+                    this._ctrlKeyPressed = false;
+                    break;
+
+                case System.Windows.Input.Key.LWin:
+                case System.Windows.Input.Key.RWin:
+                    this._winKeyPressed = false;
+                    break;
+            }
+        }
+
         /// <summary>
         /// Keybord input handling
         /// </summary>
@@ -61,7 +78,7 @@ namespace AwbStudio.TimelineEditing
                 }
             };
 
-          
+
             var startMs = _timelineViewContext.SelectionStartMs;
             var endMs = _timelineViewContext.SelectionEndMs;
             var existsSelection = startMs != null && endMs != null;
@@ -73,7 +90,7 @@ namespace AwbStudio.TimelineEditing
                 {
                     case System.Windows.Input.Key.X: // CTRL + X : cut 
                         if (existsSelection)
-                        { 
+                        {
                             _timelineEditingManipulation.CopyNPasteBuffer = _timelineEditingManipulation.Cut(startMs!.Value, endMs!.Value);
                             if (_timelineEditingManipulation.CopyNPasteBuffer != null)
                             {
@@ -118,7 +135,7 @@ namespace AwbStudio.TimelineEditing
                         if (existsSelection)
                         {
                             // first remove the actual selection
-                           
+
                             _ = _timelineEditingManipulation.Cut(startMs!.Value, endMs!.Value);
                             targetStartMs = startMs!.Value;
                         }
@@ -140,12 +157,12 @@ namespace AwbStudio.TimelineEditing
                 // remember special key states
                 case System.Windows.Input.Key.LeftCtrl:
                 case System.Windows.Input.Key.RightCtrl:
-                    this._ctrlKeyPressed = e.IsDown;
+                    this._ctrlKeyPressed = true;
                     break;
 
                 case System.Windows.Input.Key.LWin:
                 case System.Windows.Input.Key.RWin:
-                    this._winKeyPressed = e.IsDown;
+                    this._winKeyPressed = true;
                     break;
 
                 case System.Windows.Input.Key.Delete: // del to delete the selected points
@@ -157,7 +174,7 @@ namespace AwbStudio.TimelineEditing
                         _timelineViewContext.SelectionEndMs = null;
                     }
                     break;
-                
+
                 case System.Windows.Input.Key.Space: // start / stop playback
                     switchPlayStop();
                     break;
