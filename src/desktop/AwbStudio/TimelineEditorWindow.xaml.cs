@@ -45,6 +45,7 @@ namespace AwbStudio
         private TimelineEventHandling? _timelineEventHandling;
         private TimelinePlayer _timelinePlayer;
         protected TimelineData? _timelineData;
+        private readonly CopyNPasteBufferHolder _copyNPasteBufferHolder = new CopyNPasteBufferHolder();
 
         private int _lastBankIndex = -1;
         private bool _unsavedChanges;
@@ -233,6 +234,7 @@ namespace AwbStudio
             _timelineEventHandling = new TimelineEventHandling(
                 timelineData: timelineData!,
                 timelineControllerPlayViewPos: _timelineControllerPlayViewPos,
+                copyNPasteBufferHolder: _copyNPasteBufferHolder,
                 actuatorsService: _actuatorsService,
                 timelinePlayer: _timelinePlayer,
                 timelineControllers: _timelineControllers,
@@ -243,7 +245,7 @@ namespace AwbStudio
             this._timelineKeyboardHandling = new TimelineKeyboardHandling(_timelineEventHandling!, _timelinePlayer, _playPosSynchronizer, _timelineEventHandling.TimelineEditingManipulation, _viewContext);
             this._timelineKeyboardHandling.SaveTimelineData += OnSaveTimelineDataKeyboardEvent;
 
-            FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _playPosSynchronizer, _timelineDataService, _project.Sounds, SoundPlayer);
+            FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _timelineEventHandling,  _playPosSynchronizer, _timelineDataService, _project.Sounds, SoundPlayer);
 
             _viewContext.ActualFocusObject = null;
 

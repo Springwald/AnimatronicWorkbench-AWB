@@ -1,6 +1,10 @@
 #ifndef hardware_config_h
 #define hardware_config_h
 
+/* Debugging settings */
+#define DEBUGGING_IO_PIN 25 // the GPIO pin to use for debugging
+#define DEBUGGING_IO_PIN_ACTIVE HIGH // if the debugging pin is active low, set this to true
+
 /* Display settings */
 
 // -- SSD1306 Displays  --
@@ -13,13 +17,13 @@
 
 /* STS serial servo settings */
 #define USE_STS_SERVO
-#define STS_SERVO_RXD 18
-#define STS_SERVO_TXD 19
+#define STS_SERVO_RXD 16
+#define STS_SERVO_TXD 17
 
-/* Neopixel RGB LEDs */
-#define USE_NEOPIXEL
-#define NEOPIXEL_GPIO 26
-#define NEOPIXEL_COUNT 32
+/* SCS serial servo settings */
+#define USE_SCS_SERVO
+#define SCS_SERVO_RXD 18
+#define SCS_SERVO_TXD 19
 
 
 #endif

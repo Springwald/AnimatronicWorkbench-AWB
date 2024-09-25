@@ -47,7 +47,7 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
         // get a pointer to the current servo
         StsScsServo *servo = &this->_servos->at(i);
 
-        if (servo->isFault || anyServoWithGlobalFaultHasCiriticalState == true)
+        if (servo->isFaultCountDownMs > 0 || anyServoWithGlobalFaultHasCiriticalState == true)
         {
             // turn servo off when is fault or another servo is defined as global fault and in critical state
             setTorque(servo->channel, false);

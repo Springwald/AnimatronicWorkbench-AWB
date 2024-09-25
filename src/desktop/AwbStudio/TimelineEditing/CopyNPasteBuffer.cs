@@ -10,6 +10,11 @@ using System.Collections.Generic;
 
 namespace AwbStudio.TimelineEditing
 {
+    public sealed class CopyNPasteBufferHolder
+    {
+        public CopyNPasteBuffer? CopyNPasteBuffer { get; set; }
+    }
+
     /// <summary>
     /// The buffer to hold timeline keyframes for copy and paste operations
     /// </summary>

@@ -17,7 +17,7 @@ using System.Linq;
 
 namespace AwbStudio.TimelineEditing
 {
-    internal class TimelineEventHandling : IDisposable
+    public class TimelineEventHandling : IDisposable
     {
         private readonly IAwbLogger _awbLogger;
         private readonly TimelineData _timelineData;
@@ -45,6 +45,7 @@ namespace AwbStudio.TimelineEditing
             TimelineControllerPlayViewPos timelineControllerPlayViewPos,
             IActuatorsService actuatorsService,
             TimelinePlayer timelinePlayer,
+            CopyNPasteBufferHolder copyNPasteBufferHolder,
             ITimelineController[] timelineControllers,
             TimelineViewContext viewContext,
             PlayPosSynchronizer playPosSynchronizer,
@@ -63,7 +64,7 @@ namespace AwbStudio.TimelineEditing
             _timelineControllers = timelineControllers;
             _timelineControllerPlayViewPos = timelineControllerPlayViewPos;
 
-            TimelineEditingManipulation = new TimelineEditingManipulation(timelineData, playPosSynchronizer);
+            TimelineEditingManipulation = new TimelineEditingManipulation(timelineData, copyNPasteBufferHolder,playPosSynchronizer);
 
             _playPosSynchronizer = playPosSynchronizer;
             _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;

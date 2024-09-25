@@ -14,7 +14,7 @@ void StatusManagement::setDebugStatus(String state)
 void StatusManagement::update()
 {
     auto diff = millis() - _millisLastDisplayChange;
-    if (diff < 2000)
+    if (diff < 1000)
         return;
 
     _millisLastDisplayChange = millis();
@@ -26,7 +26,7 @@ void StatusManagement::update()
         _awbDisplay->set_actual_status_info(getDebugInfos());
         break;
     case 3:
-        _awbDisplay->set_actual_status_info(updateActuatorsStatuses());
+        _awbDisplay->set_actual_status_info(updateActuatorsStatuses(diff));
         break;
     case 4:
         _displayStateCounter = 0;
@@ -57,7 +57,7 @@ String StatusManagement::getDebugInfos()
 /**
  * read the status information from the actuators
  */
-String StatusManagement::updateActuatorsStatuses()
+String StatusManagement::updateActuatorsStatuses(unsigned long diffMs)
 {
     _isAnyGlobalFaultActuatorInCriticalState = false;
 
@@ -65,11 +65,11 @@ String StatusManagement::updateActuatorsStatuses()
 
     // check Sts serial bus servos
     if (this->_stSerialServoManager != nullptr)
-        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_stSerialServoManager, _projectData->stsServos, false);
+        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_stSerialServoManager, _projectData->stsServos, false, diffMs);
 
     // check Scs serial bus servos
     if (this->_scSerialServoManager != nullptr)
-        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_scSerialServoManager, _projectData->scsServos, true);
+        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_scSerialServoManager, _projectData->scsServos, true, diffMs);
 
     // check PWM servos
     if (this->_pca9685PwmManager != nullptr)
@@ -92,7 +92,7 @@ String StatusManagement::updateActuatorsStatuses()
     return actualActuatorsStateInfo;
 }
 
-String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo)
+String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo, unsigned long diffMs)
 {
     String errors = "";
 
@@ -102,12 +102,13 @@ String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *seri
         StsScsServo *servo = &servos->at(i);
         if (servo->title.length() > 0)
         {
-            servo->isFault = false;
+            auto wasFault = servo->isFaultCountDownMs > 0;
+            servo->isFaultCountDownMs = max((unsigned long)0, servo->isFaultCountDownMs - diffMs); // decrease fault countdown
 
             servo->temperature = serialServoManager->readTemperature(servo->channel);
-            if (servo->temperature > servo->maxTemp)
+            if (servo->temperature > servo->maxTemp) // servo is too hot
             {
-                servo->isFault = true;
+                servo->isFaultCountDownMs = 5000; // pause servo for 5 seconds
                 if (servo->globalFault == true)
                     _isAnyGlobalFaultActuatorInCriticalState = true;
 
@@ -117,14 +118,19 @@ String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *seri
             }
 
             servo->load = serialServoManager->readLoad(servo->channel);
-            if (abs(servo->load) > servo->maxTorque)
+            if (abs(servo->load) > servo->maxTorque) // servo is overloaded
             {
-                servo->isFault = true;
+                servo->isFaultCountDownMs = 2000; // pause servo for 2 seconds
                 if (servo->globalFault == true)
                     _isAnyGlobalFaultActuatorInCriticalState = true;
                 serialServoManager->setTorque(servo->channel, false);
                 _errorOccured("Servo " + String(servo->channel) + "' critical load! " + String(servo->load));
                 errors += "Servo " + String(servo->title) + ":L" + String(servo->temperature) + "\r\n";
+            }
+
+            if (wasFault && servo->isFaultCountDownMs == 0) // fault cleared, reenable servo
+            {
+                serialServoManager->setTorque(servo->channel, true);
             }
         }
     }

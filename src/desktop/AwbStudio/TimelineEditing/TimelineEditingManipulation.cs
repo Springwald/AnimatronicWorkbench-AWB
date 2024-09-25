@@ -10,8 +10,6 @@ using Awb.Core.Player;
 using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,14 +22,19 @@ namespace AwbStudio.TimelineEditing
     {
         private readonly TimelineData _timelineData;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
+        private readonly CopyNPasteBufferHolder _copyNPasteBufferHolder;
 
-        public CopyNPasteBuffer? CopyNPasteBuffer { get; set; }
+        public CopyNPasteBuffer? CopyNPasteBuffer
+        {
+            get => _copyNPasteBufferHolder.CopyNPasteBuffer;
+            set => _copyNPasteBufferHolder.CopyNPasteBuffer = value;
+        }
 
-
-        public TimelineEditingManipulation(TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer)
+        public TimelineEditingManipulation(TimelineData timelineData, CopyNPasteBufferHolder copyNPasteBufferHolder, PlayPosSynchronizer playPosSynchronizer)
         {
             _timelineData = timelineData;
             _playPosSynchronizer = playPosSynchronizer;
+            _copyNPasteBufferHolder = copyNPasteBufferHolder;
         }
 
         #region COPY + PASTE
