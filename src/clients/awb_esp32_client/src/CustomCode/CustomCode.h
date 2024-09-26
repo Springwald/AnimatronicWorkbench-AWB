@@ -14,8 +14,6 @@
 #include <Actuators/Mp3Player/GlobalMp3PlayerManager.h>
 #include <Debugging.h>
 /* cc-start-include - insert your include code here before the end-protected comment: */
-#include "PipButtons.h"
-#include "PipNeopixel.h"
 /* cc-end-include - insert your include code here before the end-protected comment: */
 class CustomCode
 {
@@ -31,16 +29,6 @@ protected:
     Debugging *_debugging;                          /// the debugging class
     NeopixelManager *_neopixelManager;
     /* cc-start-protected - insert your protected code here before the end-protected comment: */
-    const int dockedPin = 34;
-    const int idleStateId = 1;
-    unsigned long lastUpdateMs = 0;
-    unsigned long idleStateDurationMs = 0;
-    PipButtons *pipButtons = nullptr;
-    PipNeopixel *pipNeopixel = nullptr;
-    long sleepingTime = 0;
-    bool wokeUpByBackHold = false;
-    bool isDocked = false;
-    void checkButtons(String actualTimelineName, int actualTimelineStateId);
     /* cc-end-protected  */
 public:
     String *timelineNameToPlay = nullptr;         /// The name of the timeline to play by custom code. Beware: This is excuted immediately and will overwrite the current timeline and will interrupt the current timeline movements.
@@ -62,8 +50,6 @@ public:
                                                                            _errorOccured(errorOccured), _debugging(debugging)
     {
         /* cc-start-constructor - insert your constructor code here before the end-constructor comment: */
-        pipNeopixel = new PipNeopixel(neopixelManager);
-        pipButtons = new PipButtons(pipNeopixel);
         /* cc-end-constructor  */
     }
     ~CustomCode()
