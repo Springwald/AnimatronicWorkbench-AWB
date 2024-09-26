@@ -202,7 +202,7 @@ String WlanConnector::GetHtml()
                    this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
                    this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
                    this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
-                   this->getTd(String((servo.lastFaultMs != 0 ? String((millis() - servo.lastFaultMs / 1000)) : "") + "s " + servo.lastFaultMessage), false) + "</tr>\n";
+                   this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
         }
 
         _debugging->setState(Debugging::MJ_WLAN, 38);
@@ -214,7 +214,7 @@ String WlanConnector::GetHtml()
                    this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
                    this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
                    this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
-                   this->getTd(String((servo.lastFaultMs != 0 ? String((millis() - servo.lastFaultMs) / 1000) : "") + "s " + servo.lastFaultMessage), false) + "</tr>\n";
+                   this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
         }
 
         _debugging->setState(Debugging::MJ_WLAN, 40);
@@ -280,6 +280,14 @@ String WlanConnector::GetHtml()
     ptr += "</body>\n";
     ptr += "</html>\n";
     return ptr;
+}
+
+String WlanConnector::getErrorTime(unsigned long errorMs)
+{
+    auto ageSeconds = (millis() - errorMs) / 1000;
+    auto ageMinutes = ageSeconds / 60;
+    auto ageHours = ageMinutes / 60;
+    return String(ageHours) + ":" + String(ageMinutes % 60) + ":" + String(ageSeconds % 60);
 }
 
 String WlanConnector::getTd(String content, boolean isError)
