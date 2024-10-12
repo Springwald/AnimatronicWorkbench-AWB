@@ -7,7 +7,7 @@
 
 namespace AwbStudio.TimelineEditing
 {
-    internal class TimelineControllerPlayViewPos
+    public class TimelineControllerPlayViewPos
     {
         /// <summary>
         /// The range in which the PlayPos can be moved by the controller

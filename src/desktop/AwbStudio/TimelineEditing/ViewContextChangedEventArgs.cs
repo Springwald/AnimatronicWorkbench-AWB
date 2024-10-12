@@ -19,8 +19,9 @@ namespace AwbStudio.TimelineEditing
             BankIndex,
             PixelPerMs,
             Scroll,
+            Selection,
             FocusObject,
-            FocusObjectValue
+            FocusObjectValue,
         }
 
         public ViewContextChangedEventArgs(ChangeTypes changeType)

@@ -5,21 +5,22 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
-using System.Drawing;
-using System.Text.Json.Serialization;
 using Awb.Core.Project;
 using Awb.Core.Timelines.NestedTimelines;
+using System.Drawing;
 
 namespace Awb.Core.Timelines
 {
     public class TimelineData
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString(); 
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public int TimelineStateId { get; set; }
         public int? NextTimelineStateIdOnce { get; set; }
 
         public string Title { get; set; } = "no name";
+
+        private List<TimelinePoint> _timelinePoints = new List<TimelinePoint>();
 
         /// <summary>
         /// The content of the timeline has changed
@@ -31,30 +32,23 @@ namespace Awb.Core.Timelines
         /// </summary>
         public int DurationMs => AllPoints?.Any() == true ? AllPoints.Max(p => p.TimeMs) : 0;
 
-        public IEnumerable<TimelinePoint> AllPoints
-        {
-            get
-            {
-                foreach (var point in ServoPoints) yield return point;
-                foreach (var point in SoundPoints) yield return point;
-                foreach (var point in NestedTimelinePoints) yield return point;
-            }
-        }
+        public IEnumerable<TimelinePoint> AllPoints => _timelinePoints.ToArray();
 
         /// <summary>
-        /// All servo values changes of the timeline are stored as single points
+        /// All servo values changes of the timeline are stored as single points.
+        /// Returns all servo points of _timelinePoints
         /// </summary>
-        public List<ServoPoint> ServoPoints { get;  }
+        public IEnumerable<ServoPoint> ServoPoints => _timelinePoints.OfType<ServoPoint>();
 
         /// <summary>
         /// All sound events of the timeline are stored as single points
         /// </summary>
-        public List<SoundPoint> SoundPoints { get;  }
+        public IEnumerable<SoundPoint> SoundPoints => _timelinePoints.OfType<SoundPoint>();
 
         /// <summary>
         /// All nested timelines are stored as single points
         /// </summary>
-        public List<NestedTimelinePoint> NestedTimelinePoints { get;  }
+        public IEnumerable<NestedTimelinePoint> NestedTimelinePoints => _timelinePoints.OfType<NestedTimelinePoint>();
 
         public int LatestPointMs => AllPoints.Max(p => p.TimeMs);
 
@@ -63,66 +57,51 @@ namespace Awb.Core.Timelines
             Id = id;
             TimelineStateId = timelineStateId;
             NextTimelineStateIdOnce = nextTimelineStateIdOnce;
-            ServoPoints = servoPoints;
-            SoundPoints = soundPoints;
-            NestedTimelinePoints = nestedTimelinePoints;
+            _timelinePoints.AddRange(servoPoints);
+            _timelinePoints.AddRange(soundPoints);
+            _timelinePoints.AddRange(nestedTimelinePoints);
         }
 
-       
-
-        public TimelinePoint InsertPoint(TimelinePoint point)
+        /// <summary>
+        /// inserts a point into the timeline
+        /// </summary>
+        public TimelinePoint AddPoint(TimelinePoint point)
         {
             if (point == null) throw new ArgumentNullException(nameof(point));
-
-            if (point is ServoPoint servoPoint)
-            {
-                ServoPoints.Add(servoPoint);
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, point.AbwObjectId);
-            }
-            else if (point is SoundPoint soundPoint)
-            {
-                SoundPoints.Add(soundPoint);
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, point.AbwObjectId);
-            }
-            else if (point is NestedTimelinePoint nestedTimelinePoint)
-            {
-                NestedTimelinePoints.Add(nestedTimelinePoint);
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged, point.AbwObjectId);
-            }
-
-            throw new ArgumentOutOfRangeException($"Point type {typeof(Point)} not supported for RemovePoint method.");
+            var collidingPoint = _timelinePoints.GetPoint(point.TimeMs, point.AbwObjectId);
+            if (collidingPoint != null) throw new ArgumentOutOfRangeException($"Point '{point.Description}' collides with existing point '{collidingPoint.Description}'.");
+            _timelinePoints.Add(point);
+            SetContentChangedByPoint(point);
+            return point;
         }
 
-        public bool RemovePoint<TimelinePointType>(int timeMs, string awbObjectId) where TimelinePointType : TimelinePoint
+        /// <summary>
+        /// removes a point from the timeline
+        /// </summary>
+        public bool RemovePoint(int timeMs, string awbObjectId)         {
+            var point = AllPoints.GetPoint(timeMs, awbObjectId);
+            return RemovePoint(point);
+        }
+
+        /// <summary>
+        /// removes a point from the timeline
+        /// </summary>
+        public bool RemovePoint(TimelinePoint? timelinePoint)
         {
-            var point = AllPoints.GetPoint<TimelinePointType>(timeMs, awbObjectId);
-            if (point == null) return false;
-
-            if (point is ServoPoint servoPoint)
-            {
-                ServoPoints.Remove(servoPoint);
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, point.AbwObjectId);
-            } 
-            else if (point is SoundPoint soundPoint)
-            {
-                SoundPoints.Remove(soundPoint);
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, point.AbwObjectId);
-            }
-            else if (point is NestedTimelinePoint nestedTimelinePoint)
-            {
-                NestedTimelinePoints.Remove(nestedTimelinePoint);
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged, point.AbwObjectId);
-            }
-
-            throw new ArgumentOutOfRangeException($"Point type {typeof(Point)} not supported for RemovePoint method.");   
+            if (timelinePoint == null) return false;
+            if (!_timelinePoints.Remove(timelinePoint)) throw new ArgumentOutOfRangeException($"Point '{timelinePoint.Description}' could not be removed from timeline.");
+            SetContentChangedByPoint(timelinePoint);
+            return true;
         }
 
+        /// <summary>
+        /// Announce that the content of the timeline has changed
+        /// </summary>
         public void SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes changeType, string? changedObjectId)
-        {
-            OnContentChanged?.Invoke(this, new TimelineDataChangedEventArgs(changeType, changedObjectId));
-        }
+            => OnContentChanged?.Invoke(this, new TimelineDataChangedEventArgs(changeType, changedObjectId));
 
-        public void SetContentChangedByPoint(TimelinePoint point)
+
+        private void SetContentChangedByPoint(TimelinePoint point)
         {
             if (point is ServoPoint servoPoint)
             {
@@ -136,8 +115,10 @@ namespace Awb.Core.Timelines
             {
                 SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged, point.AbwObjectId);
             }
-
-            throw new ArgumentOutOfRangeException($"Point type {typeof(Point)} not supported for content change event.");
+            else
+            {
+                throw new ArgumentOutOfRangeException($"Point type {typeof(Point)} not supported for content change event.");
+            }
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ using System.Linq;
 
 namespace AwbStudio.TimelineEditing
 {
-    internal class TimelineEventHandling : IDisposable
+    public class TimelineEventHandling : IDisposable
     {
         private readonly IAwbLogger _awbLogger;
         private readonly TimelineData _timelineData;
@@ -27,7 +27,7 @@ namespace AwbStudio.TimelineEditing
         private readonly ITimelineController[] _timelineControllers;
         private readonly TimelineControllerPlayViewPos _timelineControllerPlayViewPos;
         private readonly TimelineViewContext _viewContext;
-        private readonly TimelineEditingManipulation _timelineEditingManipulation;
+        
         private readonly IActuator[] _allActuators;
         private readonly IActuator[] _controllerTuneableActuators;
 
@@ -37,12 +37,15 @@ namespace AwbStudio.TimelineEditing
         private volatile int _timlineControllerUpdateCounter = 0;
         private volatile bool _updatingByTimelineController = false;
 
+        public readonly TimelineEditingManipulation TimelineEditingManipulation;
+
 
         public TimelineEventHandling(
             TimelineData timelineData,
             TimelineControllerPlayViewPos timelineControllerPlayViewPos,
             IActuatorsService actuatorsService,
             TimelinePlayer timelinePlayer,
+            CopyNPasteBufferHolder copyNPasteBufferHolder,
             ITimelineController[] timelineControllers,
             TimelineViewContext viewContext,
             PlayPosSynchronizer playPosSynchronizer,
@@ -61,7 +64,7 @@ namespace AwbStudio.TimelineEditing
             _timelineControllers = timelineControllers;
             _timelineControllerPlayViewPos = timelineControllerPlayViewPos;
 
-            _timelineEditingManipulation = new TimelineEditingManipulation(timelineData, playPosSynchronizer);
+            TimelineEditingManipulation = new TimelineEditingManipulation(timelineData, copyNPasteBufferHolder,playPosSynchronizer);
 
             _playPosSynchronizer = playPosSynchronizer;
             _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;
@@ -86,6 +89,7 @@ namespace AwbStudio.TimelineEditing
                 case TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged:
                 case TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged:
                 case TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged:
+                case TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste:
                     await _timelinePlayer.RequestActuatorUpdate();
                     if (!_updatingByTimelineController && myCounter  == _timelineData_ContentChangedCounter)
                     {
@@ -95,6 +99,7 @@ namespace AwbStudio.TimelineEditing
                             ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: null);
                     }
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
@@ -121,18 +126,17 @@ namespace AwbStudio.TimelineEditing
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObject:
+                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                case ViewContextChangedEventArgs.ChangeTypes.Selection:
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                     if (_viewContext?.ActualFocusObject is IServo servo)
-                        _timelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
+                        TimelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     if (_viewContext?.ActualFocusObject is ISoundPlayer soundPlayer)
-                        _timelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null);
+                        TimelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null);
                     if (_viewContext?.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
-                        _timelineEditingManipulation.UpdateNestedTimelinesValue();
-                    break;
-
-                case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                        TimelineEditingManipulation.UpdateNestedTimelinesValue();
                     break;
 
                 default:
@@ -215,7 +219,7 @@ namespace AwbStudio.TimelineEditing
                         switch (actuator)
                         {
                             case IServo servo:
-                                _timelineEditingManipulation.UpdateServoValue(servo, targetPercent);
+                                TimelineEditingManipulation.UpdateServoValue(servo, targetPercent);
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException($"{nameof(actuator)}:{actuator} ");
@@ -234,7 +238,7 @@ namespace AwbStudio.TimelineEditing
                         switch (actuator)
                         {
                             case IServo servo:
-                                _timelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.DefaultValue));
+                                TimelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.DefaultValue));
                                 break;
 
                             default:
@@ -252,7 +256,7 @@ namespace AwbStudio.TimelineEditing
                         switch (actuator)
                         {
                             case IServo servo:
-                                _timelineEditingManipulation.ToggleServoPoint(servo);
+                                TimelineEditingManipulation.ToggleServoPoint(servo);
                                 break;
 
                             default:

@@ -187,7 +187,15 @@ namespace Awb.Core.Player
                 var point2 = servoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
 
                 if (point1 == null && point2 == null) continue; // no points found for this object before or after the actual position
-                point1 ??= point2;
+
+                const bool fillUpStart = false;
+                if (fillUpStart)
+                {
+                    point1 ??= point2;
+                } else
+                {
+                    if (point1 == null) continue; // no points found for this object before or after the actual position
+                }
                 point2 ??= point1;
 
                 var pointDistanceMs = point2!.TimeMs - point1!.TimeMs;
@@ -230,7 +238,7 @@ namespace Awb.Core.Player
                 {
                     case PlayStates.Nothing:
                         // take exactly the point at the actual position
-                        soundPoint = soundPoints.GetPoint<SoundPoint>(playPos, soundTargetObjectId);
+                        soundPoint = soundPoints.GetPoint(playPos, soundTargetObjectId) as SoundPoint;
                         break;
                     case PlayStates.Playing:
                         // take a point between the last and the actual position
@@ -269,11 +277,11 @@ namespace Awb.Core.Player
             {
                 case PlayStates.Nothing:
                     // take exactly the point at the actual position
-                    nestedTimelinePoint = TimelineData.NestedTimelinePoints.GetPoint<NestedTimelinePoint>(playPos, NestedTimelinesFakeObject.Singleton.Id);
+                    nestedTimelinePoint = TimelineData?.NestedTimelinePoints.GetPoint<NestedTimelinePoint>(playPos, NestedTimelinesFakeObject.Singleton.Id);
                     break;
                 case PlayStates.Playing:
                     // take a point between the last and the actual position
-                    nestedTimelinePoint = TimelineData.NestedTimelinePoints.GetPointsBetween<NestedTimelinePoint>(_playPosMsOnLastUpdate, playPos, NestedTimelinesFakeObject.Singleton.Id).FirstOrDefault();
+                    nestedTimelinePoint = TimelineData?.NestedTimelinePoints.GetPointsBetween<NestedTimelinePoint>(_playPosMsOnLastUpdate, playPos, NestedTimelinesFakeObject.Singleton.Id).FirstOrDefault();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");

@@ -54,8 +54,21 @@ namespace AwbStudio.TimelineValuePainters
 
         private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
-            if (this.IsChangedEventSuitableForThisPainter(e))
-                PaintValues(_timelineData?.AllPoints);
+            switch (e.ChangeType)
+            {
+                case TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste:
+                    PaintValues(_timelineData?.AllPoints);
+                    break;
+                case TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged:
+                case TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged:
+                case TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged:
+                    if (this.IsChangedEventSuitableForThisPainter(e))
+                        PaintValues(_timelineData?.AllPoints);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
+            }
         }
 
 

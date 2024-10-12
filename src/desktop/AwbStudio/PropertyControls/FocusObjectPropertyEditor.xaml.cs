@@ -28,6 +28,7 @@ namespace AwbStudio.PropertyControls
         private Sound[]? _projectSounds;
         private SoundPlayerControl _windowsSoundPlayerControl;
         private ITimelineDataService? _timelineDataService;
+        private TimelineEventHandling _timelineEventHandling;
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
@@ -49,11 +50,12 @@ namespace AwbStudio.PropertyControls
             RemoveEditor();
         }
 
-        public void Init(TimelineViewContext timelineViewContext, TimelineData timelineData, PlayPosSynchronizer playPosSynchronizer, ITimelineDataService timelineDataService, Sound[] projectSounds, SoundPlayerControl windowsSoundPlayerControl)
+        public void Init(TimelineViewContext timelineViewContext, TimelineData timelineData, TimelineEventHandling timelineEventHandling, PlayPosSynchronizer playPosSynchronizer, ITimelineDataService timelineDataService, Sound[] projectSounds, SoundPlayerControl windowsSoundPlayerControl)
         {
             _projectSounds = projectSounds;
             _windowsSoundPlayerControl = windowsSoundPlayerControl;
             _timelineDataService = timelineDataService;
+            _timelineEventHandling = timelineEventHandling;
             _timelineData = timelineData;
             _viewContext = timelineViewContext;
             if (!_initialized) _viewContext.Changed += ViewContext_Changed;
@@ -87,7 +89,7 @@ namespace AwbStudio.PropertyControls
                         // cast the focus object to a property editor
                         if (_focusObject is IServo servo)
                         {
-                            _actualPropertyEditor = new ServoPropertiesControl(servo, _timelineData!, _viewContext, _playPosSynchronizer!);
+                            _actualPropertyEditor = new ServoPropertiesControl(servo, _timelineData!, _timelineEventHandling.TimelineEditingManipulation, _viewContext, _playPosSynchronizer!);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }
@@ -113,6 +115,7 @@ namespace AwbStudio.PropertyControls
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
+                case ViewContextChangedEventArgs.ChangeTypes.Selection:
                     break;
 
                 default:

@@ -13,6 +13,7 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,9 +36,8 @@ namespace AwbStudio.TimelineControls
         private TimelinePlayer? _timelinePlayer;
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
-
+        private double _mouseX = 0;
         private bool _isInitialized;
-
         private double _zoomVerticalHeightPerValueEditor = 180; // pixel per value editor
 
         /// <summary>
@@ -134,6 +134,7 @@ namespace AwbStudio.TimelineControls
 
             _timelineData.OnContentChanged += OnTimelineDataChanged;
             OnTimelineDataChanged(null, null);
+            ShowSelectionRectangle();
         }
 
         private void OnTimelineDataChanged(object? sender, TimelineDataChangedEventArgs? e)
@@ -162,6 +163,7 @@ namespace AwbStudio.TimelineControls
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                     var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
                     this.Width = newWidth;
+                    ShowSelectionRectangle();
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
@@ -173,23 +175,102 @@ namespace AwbStudio.TimelineControls
                     // todo: hightlight the selectect object lines
                     break;
 
+                case ViewContextChangedEventArgs.ChangeTypes.Selection:
+                    ShowSelectionRectangle();
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
         }
 
+        /// <summary>
+        /// show and position the timeline selection rectangle
+        /// </summary>
+        private void ShowSelectionRectangle()
+        {
+            if (_viewContext == null || _viewContext.SelectionStartMs == null || _viewContext.SelectionEndMs == null)
+            {
+                // no selection
+                SelectionRectangle.Visibility = Visibility.Hidden;
+                return;
+            }
+
+            //if (_viewContext.SelectionEndMs < _viewContext.SelectionStartMs)
+            //{
+            //    // Dont allow backwards selection
+            //    _viewContext.SelectionEndMs = null;
+            //    SelectionRectangle.Visibility = Visibility.Hidden;
+            //    return;
+            //}
+
+            var x1 = _viewContext.GetXPos(_viewContext.SelectionStartMs.Value);
+            var x2 = _viewContext.GetXPos(_viewContext.SelectionEndMs.Value);
+            if (x1 > x2) (x1, x2) = (x2, x1); // flip start and end if start is after end
+            SelectionRectangle.Margin = new Thickness(x1, 0, 0, 0);
+            SelectionRectangle.Width = x2 - x1;
+            SelectionRectangle.Height = AllValuesGrid.ActualHeight;
+            SelectionRectangle.Visibility = Visibility.Visible;
+        }
+
         #region mouse events
 
-        double _mouseX = 0;
 
-        private async void AllValuesGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e) =>
-            await SetPlayPosByMouse(_mouseX);
-
-        private async void AllValuesGrid_PreviewMouseMove(object sender, MouseEventArgs e)
+        private async void  Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _mouseX = e.GetPosition(AllValuesGrid).X;
+            await SetPlayPosByMouse(_mouseX);
+            await SetSelectionStartByMouse(_mouseX);
+        }
+
+        private void Grid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_viewContext == null) return;
+            if (_viewContext.SelectionEndMs == null)  _viewContext.SelectionStartMs = null;
+        }
+
+        private async void Grid_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
             if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                _mouseX = e.GetPosition(AllValuesGrid).X;
                 await SetPlayPosByMouse(_mouseX);
+                await SetSelectionEndByMouse(_mouseX);
+            }
+        }
+
+  
+        private async Task SetSelectionEndByMouse(double mouseX)
+        {
+            if (_viewContext == null) return;
+            if (_playPosSynchronizer == null) return;
+
+            /// set the play position by the mouse position
+            var playPosMs = PlayPosSynchronizer.Snap((int)(((mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2));
+
+            // set the selection start by the mouse position
+            _viewContext.SelectionEndMs = playPosMs;
+
+            ShowSelectionRectangle();
+
+            await Task.CompletedTask;
+        }
+
+        private async Task SetSelectionStartByMouse(double mouseX)
+        {
+            if (_viewContext == null) return;
+            if (_playPosSynchronizer == null) return;
+
+            /// set the play position by the mouse position
+            var playPosMs = PlayPosSynchronizer.Snap((int)(((mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2));
+
+            // set the selection start by the mouse position
+            _viewContext.SelectionStartMs = playPosMs;
+            _viewContext.SelectionEndMs = null;
+
+            ShowSelectionRectangle();
+
+            await Task.CompletedTask;
         }
 
         private async Task SetPlayPosByMouse(double mouseX)
@@ -197,12 +278,20 @@ namespace AwbStudio.TimelineControls
             if (_viewContext == null) return;
             if (_playPosSynchronizer == null) return;
 
+            /// set the play position by the mouse position
             var newPlayPosMs = (int)(((mouseX) / _viewContext.PixelPerMs) + PlayPosSynchronizer.SnapMs / 2);
             _playPosSynchronizer.SetNewPlayPos(newPlayPosMs);
 
             await Task.CompletedTask;
         }
 
+        private double GetXPos(int playPosMs, bool snaped)
+        {
+            return playPosMs * _viewContext.PixelPerMs;
+        }
+
         #endregion
+
+
     }
 }

@@ -45,6 +45,7 @@ private:
     void handle_remote_play_timeline();            /// start a timeline via the webserver
     String getTd(String content, boolean isError); /// get the  table style for a error message
     String getTdVal(String content, int maxValue, int minValue, int value);
+    String getErrorTime(unsigned long errorMs); // get a displayable error time
 
 public:
     /**

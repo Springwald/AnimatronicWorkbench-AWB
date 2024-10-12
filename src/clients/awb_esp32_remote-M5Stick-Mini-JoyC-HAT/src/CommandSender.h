@@ -21,8 +21,8 @@ public:
     {
     }
 
-    void playTimeline(String timelineName);
-    void sendCommand(String command);
+    bool playTimeline(String timelineName);
+    bool sendCommand(String command);
 };
 
 #endif

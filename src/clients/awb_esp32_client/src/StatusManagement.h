@@ -45,9 +45,9 @@ private:
     /**
      * read the status information from the actuators
      */
-    String updateActuatorsStatuses();
+    String updateActuatorsStatuses(unsigned long diffMs);
 
-    String updateStsScsServoStatuses(StScsSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo);
+    String updateStsScsServoStatuses(StScsSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo, unsigned long diffMs);
 
     String getDebugInfos();
 

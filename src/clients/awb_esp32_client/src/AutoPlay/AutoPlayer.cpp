@@ -225,13 +225,14 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 
             if (point1 == nullptr)
             {
-                // no point before the actual position found, so we take the first point after the actual position
-                point1 = point2;
+                if (fillUpStart)
+                    point1 = point2; // no point before the actual position found, so we take the first point after the actual position
+                else
+                    continue; // no start point found
             }
             else if (point2 == nullptr)
             {
-                // no point after the actual position found, so we take the last point before the actual position
-                point2 = point1;
+                point2 = point1; // no point after the actual position found, so we take the last point before the actual position
             }
 
             int pointDistanceMs = point2->ms - point1->ms;
@@ -335,13 +336,14 @@ int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, std::vector<Sts
 
     if (point1 == nullptr)
     {
-        // no point before the actual position found, so we take the first point after the actual position
-        point1 = point2;
+        if (fillUpStart)
+            point1 = point2; // no point before the actual position found, so we take the first point after the actual position
+        else
+            return -1; // no start point found
     }
     else if (point2 == nullptr)
     {
-        // no point after the actual position found, so we take the last point before the actual position
-        point2 = point1;
+        point2 = point1; // no point after the actual position found, so we take the last point before the actual position
     }
 
     int pointDistanceMs = point2->ms - point1->ms;

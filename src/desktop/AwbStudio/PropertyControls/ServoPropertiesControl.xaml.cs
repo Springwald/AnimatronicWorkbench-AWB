@@ -25,18 +25,20 @@ namespace AwbStudio.PropertyControls
         private readonly IServo _servo;
         private readonly TimelineData _timelineData;
         private readonly TimelineViewContext _viewContext;
+        private readonly TimelineEditingManipulation _timelineEditingManipulation;
         private readonly PlayPosSynchronizer _playPosSynchronizer;
         private volatile bool _isUpdatingView;
 
         public IAwbObject AwbObject => _servo;
 
-        public ServoPropertiesControl(IServo servo, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
+        public ServoPropertiesControl(IServo servo, TimelineData timelineData, TimelineEditingManipulation timelineEditingManipulation, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
         {
             InitializeComponent();
             _servo = servo;
             _timelineData = timelineData;
             _timelineData.OnContentChanged+= TimelineData_OnContentChanged; 
             _viewContext = viewContext;
+            _timelineEditingManipulation = timelineEditingManipulation;
 
             _playPosSynchronizer = playPosSynchronizer;
 
@@ -115,7 +117,7 @@ namespace AwbStudio.PropertyControls
 
         private void BtnTooglePoint_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            new TimelineEditingManipulation(_timelineData, _playPosSynchronizer).ToggleServoPoint(_servo);
+            _timelineEditingManipulation.ToggleServoPoint(_servo);
             ShowActualValue();
         }
 
