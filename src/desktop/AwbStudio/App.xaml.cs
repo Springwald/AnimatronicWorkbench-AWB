@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
+// (C) 2025 Daniel Springwald  - 44789 Bochum, Germany
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
@@ -26,13 +26,23 @@ namespace AwbStudio
     public partial class App : Application
     {
         private static string _errorMessages = string.Empty;
+        private static ServiceProvider? _serviceProvider;
 
-        private ServiceProvider serviceProvider;
+        public static ServiceProvider ServiceProvider
+        {
+            get
+            {
+                if (_serviceProvider == null) throw new InvalidOperationException("Service provider not initialized.");
+                return _serviceProvider!;
+            }
+            private set => _serviceProvider = value;
+        }
+
         public App()
         {
             ServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
-            serviceProvider = services.BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider();
             SetupUnhandledExceptionHandling();
         }
 
@@ -45,6 +55,7 @@ namespace AwbStudio
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
             services.TryAddTransient<IAwbClientsService, AwbClientsService>();
+            services.TryAddTransient<AwbClientsWindow>();
             services.TryAddTransient<DebugWindow>();
             services.TryAddTransient<ProjectManagementWindow>();
             services.TryAddTransient<ProjectConfigurationWindow>();
@@ -53,11 +64,18 @@ namespace AwbStudio
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            var projectManagementWindow = serviceProvider.GetService<ProjectManagementWindow>();
+            var projectManagementWindow = ServiceProvider.GetService<ProjectManagementWindow>();
             if (projectManagementWindow != null)
             {
                 projectManagementWindow.Show();
                 projectManagementWindow.Closed += (s, args) => Shutdown();
+            }
+
+            var awbClientWindow = ServiceProvider.GetService<AwbClientsWindow>();
+            if (awbClientWindow != null)
+            {
+                awbClientWindow.Show();
+                // awbClientWindow.Closed += (s, args) => Shutdown();
             }
         }
 
@@ -65,7 +83,7 @@ namespace AwbStudio
         {
             // Catch exceptions from all threads in the AppDomain.
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-                ShowUnhandledException(args.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException", false);
+                ShowUnhandledException(args.ExceptionObject as Exception ?? new Exception(args.ExceptionObject?.ToString()), "AppDomain.CurrentDomain.UnhandledException", false);
 
             // Catch exceptions from each AppDomain that uses a task scheduler for async operations.
             TaskScheduler.UnobservedTaskException += (sender, args) =>
