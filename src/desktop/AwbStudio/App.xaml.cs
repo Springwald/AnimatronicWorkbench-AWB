@@ -28,22 +28,26 @@ namespace AwbStudio
         private static string _errorMessages = string.Empty;
         private static ServiceProvider? _serviceProvider;
 
-        public static ServiceProvider ServiceProvider
-        {
-            get
-            {
-                if (_serviceProvider == null) throw new InvalidOperationException("Service provider not initialized.");
-                return _serviceProvider!;
-            }
-            private set => _serviceProvider = value;
-        }
 
         public App()
         {
             ServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
-            ServiceProvider = services.BuildServiceProvider();
+            _serviceProvider = services.BuildServiceProvider();
             SetupUnhandledExceptionHandling();
+        }
+
+        /// <summary>
+        /// Gets registered service.
+        /// </summary>
+        /// <typeparam name="T">Type of the service to get.</typeparam>
+        /// <returns>Instance of the service or <see langword="null"/>.</returns>
+        public static T GetService<T>()
+            where T : class
+        {
+            if (_serviceProvider == null) throw new Exception("Service provider not ready.");
+            var service = _serviceProvider.GetService(typeof(T)) as T;
+            return service!;
         }
 
         private void ConfigureServices(ServiceCollection services)
@@ -64,14 +68,14 @@ namespace AwbStudio
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            var projectManagementWindow = ServiceProvider.GetService<ProjectManagementWindow>();
+            var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
             if (projectManagementWindow != null)
             {
                 projectManagementWindow.Show();
                 projectManagementWindow.Closed += (s, args) => Shutdown();
             }
 
-            var awbClientWindow = ServiceProvider.GetService<AwbClientsWindow>();
+            var awbClientWindow = _serviceProvider!.GetService<AwbClientsWindow>();
             if (awbClientWindow != null)
             {
                 awbClientWindow.Show();

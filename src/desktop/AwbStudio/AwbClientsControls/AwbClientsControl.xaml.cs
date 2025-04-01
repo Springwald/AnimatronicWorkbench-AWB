@@ -30,22 +30,41 @@ namespace AwbStudio.AwbClientsControls
     {
         private readonly IAwbClientsService _awbClientsService;
 
-        public AwbClientsControl(IAwbClientsService awbClientsService)
+        public AwbClientsControl()
         {
-            _awbClientsService = awbClientsService;
+            _awbClientsService =  App.GetService<IAwbClientsService>();
             InitializeComponent();
             Loaded += AwbClientsControl_Loaded;
-
         }
 
         private async void AwbClientsControl_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadClients();
+            if (_awbClientsService.ComPortClients == null)
+            {
+                _awbClientsService.ClientsLoaded += AwbClientsService_ClientsLoaded;
+            }
+            else
+            {
+                await ShowClients();
+            }
         }
 
-        private async Task LoadClients()
+        private async void AwbClientsService_ClientsLoaded(object? sender, EventArgs e)
         {
-            var clients = 
+           await  ShowClients();
+        }
+
+        private async Task ShowClients()
+        {
+            var clients = _awbClientsService.ComPortClients;
+            this.stackPanelClients.Children.Clear();
+            foreach (var client in clients)
+            {
+                var clientControl = new AwbClientControl();
+                this.stackPanelClients.Children.Add(clientControl);
+            }
+            labelClientCount.Content = $"{clients.Length} clients found";
+            await Task.CompletedTask;
         }
     }
 }
