@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +28,24 @@ namespace AwbStudio.AwbClientsControls
     /// </summary>
     public partial class AwbClientsControl : UserControl
     {
-        public AwbClientsControl()
+        private readonly IAwbClientsService _awbClientsService;
+
+        public AwbClientsControl(IAwbClientsService awbClientsService)
         {
+            _awbClientsService = awbClientsService;
             InitializeComponent();
+            Loaded += AwbClientsControl_Loaded;
+
+        }
+
+        private async void AwbClientsControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadClients();
+        }
+
+        private async Task LoadClients()
+        {
+            var clients = 
         }
     }
 }
