@@ -8,10 +8,12 @@
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
+using Awb.Core.Services;
 using Awb.Core.Timelines;
 using AwbStudio.ProjectConfiguration;
 using AwbStudio.ProjectConfiguration.PropertyEditors;
 using AwbStudio.Projects;
+using AwbStudio.PropertyControls;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,6 +29,7 @@ namespace AwbStudio
     {
 
         private ProjectConfigViewModel _viewModel;
+        private readonly IAwbClientsService _awbClientsService;
         private readonly IProjectManagerService _projectManagerService;
         private readonly AwbProject _awbProject;
         private readonly IdCreator _idCreator;
@@ -46,8 +49,9 @@ namespace AwbStudio
             }
         }
 
-        public ProjectConfigurationWindow(IProjectManagerService projectManagerService)
+        public ProjectConfigurationWindow(IProjectManagerService projectManagerService, IAwbClientsService awbClientsService)
         {
+            _awbClientsService = awbClientsService;
             _projectManagerService = projectManagerService;
             _awbProject = projectManagerService.ActualProject ?? throw new ArgumentNullException(nameof(projectManagerService.ActualProject));
             _viewModel = new ProjectConfigViewModel(_awbProject);
@@ -63,6 +67,8 @@ namespace AwbStudio
 
         private async void ProjectConfigurationWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            PropertyEditor.AwbClientsService = _awbClientsService;
+
             // select the project properties as default
             SetObjectToEdit(_viewModel.ProjectMetaData);
 

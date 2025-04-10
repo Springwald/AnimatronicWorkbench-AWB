@@ -88,6 +88,7 @@ namespace AwbStudio.Projects
                 }
             }
 
+            await Task.CompletedTask;
             return true;
         }
 

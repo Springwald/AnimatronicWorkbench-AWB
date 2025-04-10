@@ -6,26 +6,28 @@
              xmlns:local="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="800">
-
-    <StackPanel Margin="5">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
-            <Label Grid.Column="1" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
-            <Label Grid.Column="2" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
-        </Grid>
-        <Slider  VerticalAlignment="Center"/>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="10*"/>
-                <ColumnDefinition Width="10*"/>
-            </Grid.ColumnDefinitions>
-            <CheckBox Grid.Column="0" Content="Send changes to servo" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button Grid.Column="1"  Content="read position" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        </Grid>
-    </StackPanel>
+    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0 0 0 5" Background="#FF333333"  >
+        <StackPanel Margin="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
+                <Label Grid.Column="1" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
+                <Label Grid.Column="2" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
+            </Grid>
+            <Slider x:Name="SliderServoPosition" VerticalAlignment="Center"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="313*"/>
+                    <ColumnDefinition Width="81*"/>
+                    <ColumnDefinition Width="394*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" Content="Send changes to servo" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Button Grid.Column="2" x:Name="ButtonReadPosition"  Content="read position" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonReadPosition_Click" Margin="289,0,0,0"/>
+            </Grid>
+        </StackPanel>
+    </Border>
 </UserControl>

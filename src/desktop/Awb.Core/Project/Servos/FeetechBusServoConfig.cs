@@ -19,7 +19,6 @@ namespace Awb.Core.Project.Servos
         [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
         public required string Title { get; set; }
 
-
         [Display(Name = "Client ID", GroupName = "General", Order = 2)]
         [Description("The ID of the AWB client device that controls this servo.")]
         [Range(1, 254)]
@@ -108,5 +107,8 @@ namespace Awb.Core.Project.Servos
 
         [JsonIgnore]
         public string TitleDetailed => $"StsServo '{TitleShort}' (Id: {Id}, ClientId: {ClientId}, Channel: {Channel})";
+
+        [JsonIgnore]
+        public bool CanReadServoPosition => true;
     }
 }

@@ -7,6 +7,7 @@
 
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
+using Awb.Core.Services;
 using Awb.Core.Tools.Validation;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private IProjectObjectListable _projectObject;
         private AwbProject _awbProject;
         private string[] _objectsUsingThisObject;
+        private readonly IAwbClientsService _awbClientsService;
 
         public EventHandler OnUpdatedData { get; set; }
         public EventHandler<DeleteObjectEventArgs> OnDeleteObject { get; set; }
@@ -67,8 +69,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             get => _projectObject;
         }
 
-        public ProjectObjectGenericEditorControl()
+        public ProjectObjectGenericEditorControl(IAwbClientsService awbClientsService)
         {
+            _awbClientsService = awbClientsService;
             InitializeComponent();
             this.DataContext = ProjectObjectToEdit;
         }
@@ -88,13 +91,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             var type = projectObject.GetType();
             _editors = new List<SinglePropertyEditorControl>();
 
-            if (projectObject is IServoConfig servoConfig)
-            {
-                var servoBonusEditorControl = new ServoConfigBonusEditorControl();
-                var groupBox = CreateGroupBox("Interactive servo settings");
-                groupBox.Content = servoBonusEditorControl;
-                this.EditorStackPanel.Children.Add(groupBox);
-            }
 
             // Group properties
             var propertyGroups = type.GetProperties().Select(p =>
@@ -139,6 +135,18 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     _editors.Add(editor);
                     stackPanel.Children.Add(editor);
                 }
+            }
+
+            // add special editors for servos to tune and test the values interactively
+            if (projectObject is IServoConfig servoConfig)
+            {
+                var servoBonusEditorControl = new ServoConfigBonusEditorControl(_awbClientsService)
+                {
+                     ServoConfig = servoConfig,
+                };
+                var groupBox = CreateGroupBox("Interactive servo settings");
+                groupBox.Content = servoBonusEditorControl;
+                this.EditorStackPanel.Children.Add(groupBox);
             }
 
             // find objects using this object

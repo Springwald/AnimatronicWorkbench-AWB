@@ -1,13 +1,14 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
+using Awb.Core.Services;
 using Awb.Core.Timelines;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     PropertyEditorGrid.Children.Add(_actualEditor);
             }
         }
+
+        public IAwbClientsService AwbClientsService { get; set; }
 
         public IProjectObjectListable? ProjectObject
         {
@@ -106,7 +109,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                         ActualEditor.OnUpdatedData -= UpdatedData_Fired;
                     }
 
-                    var editor = new ProjectObjectGenericEditorControl();
+                    var editor = new ProjectObjectGenericEditorControl(AwbClientsService);
                     editor.SetProjectAndObject(projectObject, awbProject, objectsUsingThisObject.ToArray());
                     ActualEditor = editor;
                     ActualEditor.OnDeleteObject += OnObjectDelete_Fired;
