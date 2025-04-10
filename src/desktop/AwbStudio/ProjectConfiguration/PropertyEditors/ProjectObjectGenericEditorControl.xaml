@@ -15,15 +15,15 @@
             <StackPanel x:Name="EditorStackPanel">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" x:Name="LabelObjectTypeTitle" FontSize="20" FontWeight="Bold">Object title loading...</Label>
                     <Button Grid.Column="1" x:Name="ButtonDelete" HorizontalAlignment="Right" Click="ButtonDelete_Click">❌ Delete</Button>
                 </Grid>
-                    <TextBlock Grid.Row="1" Margin="5" x:Name="TextUsageIn"  Grid.Column="0" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top">
+                <TextBlock Grid.Row="1" Margin="5" x:Name="TextUsageIn"  Grid.Column="0" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top">
 Used in: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-                    </TextBlock>
+                </TextBlock>
             </StackPanel>
         </ScrollViewer>
         <TextBlock x:Name="TextProblems" Grid.Row="1" Foreground="White" Background="Red" Padding="5" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top">
