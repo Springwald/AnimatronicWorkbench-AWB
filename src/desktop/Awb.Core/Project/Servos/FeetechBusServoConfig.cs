@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Servos
 {
-    public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable
+    public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig
     {
         public required string Id { get; set; }
 
@@ -80,7 +80,7 @@ namespace Awb.Core.Project.Servos
         protected IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project)
         {
             // check if the default value is between the min and max value
-            if (DefaultValue < Math.Min(MinValue,MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
+            if (DefaultValue < Math.Min(MinValue, MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
                 yield return new ProjectProblem
                 {
                     ProblemType = ProjectProblem.ProblemTypes.Error,
@@ -104,7 +104,7 @@ namespace Awb.Core.Project.Servos
         }
 
         [JsonIgnore]
-        public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"StsServo has no title set '{Id}'": Title;
+        public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"StsServo has no title set '{Id}'" : Title;
 
         [JsonIgnore]
         public string TitleDetailed => $"StsServo '{TitleShort}' (Id: {Id}, ClientId: {ClientId}, Channel: {Channel})";

@@ -1,11 +1,9 @@
-﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
-// https://github.com/Springwald/PacketLogistics
+﻿// Animatronic WorkBench
+// https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald, Bochum Germany
-// Springwald Software  -   www.springwald.de
-// daniel@springwald.de -  +49 234 298 788 46
-// All rights reserved
-// Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using System.IO.Ports;
 using System.Management;
@@ -103,7 +101,7 @@ namespace PacketLogistics.Tools
                     .Where(p =>
                     p != null &&
                     p.ComPort != null &&
-                    p.ComPort.StartsWith("com", ignoreCase: true,culture: null) &&
+                    p.ComPort.StartsWith("com", ignoreCase: true, culture: null) &&
                     (_ignoreBluetoothPorts == false || !p.Caption.Contains("bluetooth", StringComparison.OrdinalIgnoreCase)))
                     .Select(p => p!)
                     .ToArray();

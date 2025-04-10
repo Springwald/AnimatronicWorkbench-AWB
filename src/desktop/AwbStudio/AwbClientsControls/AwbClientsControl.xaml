@@ -13,8 +13,13 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Vertical" x:Name="stackPanelClients" >
         </StackPanel>
-        <Label Grid.Row="1" Content="labelClientCount" x:Name="labelClientCount" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
-
-
+        <Grid  Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*"></ColumnDefinition>
+                <ColumnDefinition Width="50*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="labelClientCount" HorizontalAlignment="Left" x:Name="labelClientCount" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Content="Rescan" HorizontalAlignment="Right"   VerticalAlignment="Center"/>
+        </Grid>
     </Grid>
 </UserControl>

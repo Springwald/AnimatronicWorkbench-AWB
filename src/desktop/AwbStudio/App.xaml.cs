@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
 using Awb.Core.Tools;
@@ -27,7 +27,6 @@ namespace AwbStudio
     {
         private static string _errorMessages = string.Empty;
         private static ServiceProvider? _serviceProvider;
-
 
         public App()
         {
@@ -58,7 +57,7 @@ namespace AwbStudio
             services.AddPropertyEditorVirtualInputControllerService();
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
-            services.TryAddTransient<IAwbClientsService, AwbClientsService>();
+            services.TryAddSingleton<IAwbClientsService, AwbClientsService>();
             services.TryAddTransient<AwbClientsWindow>();
             services.TryAddTransient<DebugWindow>();
             services.TryAddTransient<ProjectManagementWindow>();
@@ -125,7 +124,7 @@ namespace AwbStudio
             var messageBoxButtons = MessageBoxButton.OK;
 
             // copy the exception message to the clipboard
-            _errorMessages+= "\r\n--------------------------------------------------\r\n" +  e.ToString(); 
+            _errorMessages += "\r\n--------------------------------------------------\r\n" + e.ToString();
             Clipboard.SetText(_errorMessages);
 
             if (promptUserForShutdown)
