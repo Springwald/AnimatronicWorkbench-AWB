@@ -14,6 +14,7 @@
 #include "AwbDataImport/HardwareConfig.h"
 #include "ActualStatusInformation.h"
 #include "Debugging.h"
+#include <String.h>
 
 using byte = unsigned char;
 
@@ -47,9 +48,10 @@ public:
     }
 
     /**
-     * Process a packet received from the Animatronic Workbench Studio
+     * Process a packet received from the Animatronic Workbench Studio.
+     * Returns the string response for the respone message. Normally empty.
      */
-    void processPacket(String payload);
+    String processPacket(String payload);
 };
 
 #endif

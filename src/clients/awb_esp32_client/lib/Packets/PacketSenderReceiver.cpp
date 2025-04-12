@@ -17,7 +17,7 @@ bool PacketSenderReceiver::loop()
 
             if (value == REQUEST_ALIFE_PACKET_BYTE) // request for alife packet
             {
-                //errorReceiving("Sent alife packet");
+                // errorReceiving("Sent alife packet");
 
                 // send alife packet header with client id
                 byte packetType = 1; // 1 = alife packet
@@ -78,6 +78,8 @@ bool PacketSenderReceiver::loop()
 
                     case 3: // packet response packet
                         break;
+
+                    case 4: // read values packet
 
                     default: // unknown packet type
                         break;
@@ -205,18 +207,16 @@ void PacketSenderReceiver::processDataPacket(u_int length)
     packet->id = packetId;
     String packetString = String(payloadArr, payloadLength);
 
-    // if (false)
-    {
-        // packet->payload = packetString;
-        //  call packet received callback
-        _packetReceived(_clientId, packetString);
-    }
+    String response = _packetReceived(_clientId, packetString);
+
+    // if response string is empty, set it to "ok"
+    if (response.length() == 0)
+        response = "ok";
 
     free(packet);
 
     // send response packet
-    // sendResponsePacket(packetId, true, "packet " + String(packetId) + " ok");
-    sendResponsePacket(packetId, true, "ok");
+    sendResponsePacket(packetId, true, response);
 }
 
 void PacketSenderReceiver::sendResponsePacket(unsigned int packetId, bool ok, String message)

@@ -3,6 +3,7 @@
 
 #include "Packet.h"
 #include <Arduino.h>
+#include <String.h>
 
 #define PACKET_HEADER_START_BYTE 250
 #define PACKET_HEADER_END_BYTE 251
@@ -17,7 +18,7 @@ using byte = unsigned char;
  */
 class PacketSenderReceiver
 {
-    using TCallBackPacketReceived = std::function<void(unsigned int, String)>;
+    using TCallBackPacketReceived = std::function<String(unsigned int, String)>;
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:

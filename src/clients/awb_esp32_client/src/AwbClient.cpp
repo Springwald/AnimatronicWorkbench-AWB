@@ -6,8 +6,9 @@
 #include <ArduinoJson.h>
 #include "WlanConnector.h"
 #include "AwbClient.h"
+#include <String.h>
 
-using TCallBackPacketReceived = std::function<void(unsigned int, String)>;
+using TCallBackPacketReceived = std::function<String(unsigned int, String)>;
 using TCallBackErrorOccured = std::function<void(String)>;
 using TCallBackMessageToShow = std::function<void(String)>;                  // message, duration in ms (0=auto duration)
 using TCallBackMessageToShowWithDuration = std::function<void(String, int)>; // message, duration in ms (0=auto duration)
@@ -158,7 +159,7 @@ void AwbClient::setup()
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet receiver");
-    const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload)
+    const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload) -> String
     {
         // process the packet
         if (clientId == this->_clientId)
@@ -166,10 +167,16 @@ void AwbClient::setup()
             if (this->_statusManagement->getIsAnyGlobalFaultActuatorInCriticalState())
             {
                 showError("Packet received, but dropped because at least one actuator is in critical state!");
-                return;
+                return String("Packet received, but dropped because at least one actuator is in critical state!");
             }
 
-            this->_packetProcessor->processPacket(payload);
+            String resultString = this->_packetProcessor->processPacket(payload);
+            return resultString;
+        }
+        else
+        {
+            // packet is not for this client, so ignore it
+            return String();
         }
     };
     char *packetHeader = (char *)"AWB";

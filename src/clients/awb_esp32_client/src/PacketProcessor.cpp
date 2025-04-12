@@ -11,14 +11,69 @@ StaticJsonDocument<1024 * 32> jsondoc;
 /**
  * process a received packet from the Animatronic Workbench Studio
  */
-void PacketProcessor::processPacket(String payload)
+String PacketProcessor::processPacket(String payload)
 {
     DeserializationError error = deserializeJson(jsondoc, payload);
     if (error)
     {
         // packet content is not valid json
         //_errorOccured("json:" + String(error.c_str()));
-        return;
+        return String("json:") + String(error.c_str()) + " " + payload;
+    }
+
+    if (jsondoc.containsKey("ReadValue")) // AWB studio requests a value from the client e.g. Servo Position
+    {
+        // read a value from the client
+        String typeName = jsondoc["ReadValue"]["Type"];
+        if (typeName == nullptr)
+        {
+            // should not happen, instead the whole ReadValue should be missing
+            _errorOccured("ReadValue?!? " + payload);
+            return String("ReadValue but no type received?!? " + payload);
+        }
+        else
+        {
+            if (typeName == "ScsServo")
+            {
+                // read a value from the SCS bus servo
+                int id = jsondoc["ReadValue"]["Id"];
+                int value = 0;
+                if (this->_scSerialServoManager != nullptr)
+                {
+                    value = this->_scSerialServoManager->readPosition(id);
+                    // send the value back to the AWB studio
+                    String response = "{\"ScsServo\":{\"Id\":" + String(id) + ",\"Position\":" + String(value) + "}}";
+                    return response;
+                }
+                else
+                {
+                    _errorOccured("ScsServoManager not configured!");
+                    return String("ScsServoManager not configured!");
+                }
+            }
+
+            if (typeName = "StsServo")
+            {
+                // read a value from the STS bus servo
+                int id = jsondoc["ReadValue"]["Id"];
+                int value = 0;
+                if (this->_stSerialServoManager != nullptr)
+                {
+                    value = this->_stSerialServoManager->readPosition(id);
+                    // send the value back to the AWB studio
+                    String response = "{\"StsServo\":{\"Id\":" + String(id) + ",\"Position\":" + String(value) + "}}";
+                    return response;
+                }
+                else
+                {
+                    _errorOccured("StsServoManager not configured!");
+                    return String("StsServoManager not configured!");
+                }
+            }
+
+            _errorOccured("ReadValue type not supported: " + typeName);
+            return String("ReadValue type not supported: " + typeName);
+        }
     }
 
     if (jsondoc.containsKey("DispMsg")) // packat contains a display message
@@ -46,7 +101,7 @@ void PacketProcessor::processPacket(String payload)
             if (this->_pca9685PwmManager == nullptr)
             {
                 _errorOccured("Pca9685Pwm not configured!");
-                return;
+                return String("Pca9685Pwm not configured!");
             }
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
@@ -68,7 +123,7 @@ void PacketProcessor::processPacket(String payload)
             if (this->_stSerialServoManager == nullptr)
             {
                 _errorOccured("STS not configured!");
-                return;
+                return String("STS not configured!");
             }
 
             int channel = servos[i]["Ch"];
@@ -103,7 +158,7 @@ void PacketProcessor::processPacket(String payload)
             if (this->_scSerialServoManager == nullptr)
             {
                 _errorOccured("SCS not configured!");
-                return;
+                return String("SCS not configured!");
             }
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
@@ -130,4 +185,7 @@ void PacketProcessor::processPacket(String payload)
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->showActivity();
 #endif
+
+    // return empty string, because no response is needed
+    return String();
 }
