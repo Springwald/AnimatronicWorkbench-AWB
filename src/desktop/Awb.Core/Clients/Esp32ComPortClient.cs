@@ -53,9 +53,13 @@ namespace Awb.Core.Clients
 
         public async Task<SendResult> Send(byte[] payload)
         {
-            if (!_connected) return new SendResult(false, "not connected, please run Init() before using Esp32ComPortClient!", null);
+            if (!_connected) return new SendResult(false, errorMessage: "not connected, please run Init() before using Esp32ComPortClient!", resultPlayload: null, debugInfos: null);
             var result = await _comPortReceiver.SendPacket(payload);
-            return new SendResult(result.Ok, result.Message, $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
+
+            if (result.Ok == false)
+                return new SendResult(ok: false, errorMessage: result.Message, resultPlayload: null, $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
+
+            return new SendResult(ok: true, errorMessage: null, resultPlayload: result.Message, debugInfos: $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
         }
 
         private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver.PacketReceivedEventArgs e)

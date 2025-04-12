@@ -11,6 +11,7 @@ namespace Awb.Core.DataPackets
 {
     public class DataPacketFactory
     {
+
         public IEnumerable<ClientDataPacket> GetDataPackets(IServo[] servos)
         {
             // group servos by their clients

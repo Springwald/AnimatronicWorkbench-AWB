@@ -23,13 +23,14 @@ namespace Awb.Core.Clients
         {
             public bool Ok { get; }
             public string? ErrorMessage { get; }
-
+            public string? ResultPayload { get; }
             public string? DebugInfos { get; }
 
-            public SendResult(bool ok, string? errorMessage, string? debugInfos)
+            public SendResult(bool ok, string? errorMessage,string? resultPlayload, string? debugInfos)
             {
                 Ok = ok;
                 ErrorMessage = errorMessage;
+                ResultPayload = resultPlayload;
                 DebugInfos = debugInfos;
             }
         }

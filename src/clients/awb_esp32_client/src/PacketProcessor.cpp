@@ -24,7 +24,7 @@ String PacketProcessor::processPacket(String payload)
     if (jsondoc.containsKey("ReadValue")) // AWB studio requests a value from the client e.g. Servo Position
     {
         // read a value from the client
-        String typeName = jsondoc["ReadValue"]["Type"];
+        String typeName = jsondoc["ReadValue"]["TypeName"];
         if (typeName == nullptr)
         {
             // should not happen, instead the whole ReadValue should be missing
@@ -36,11 +36,10 @@ String PacketProcessor::processPacket(String payload)
             if (typeName == "ScsServo")
             {
                 // read a value from the SCS bus servo
-                int id = jsondoc["ReadValue"]["Id"];
-                int value = 0;
+                u8 id = jsondoc["ReadValue"]["Id"];
                 if (this->_scSerialServoManager != nullptr)
                 {
-                    value = this->_scSerialServoManager->readPosition(id);
+                    int value = this->_scSerialServoManager->readPosition(id);
                     // send the value back to the AWB studio
                     String response = "{\"ScsServo\":{\"Id\":" + String(id) + ",\"Position\":" + String(value) + "}}";
                     return response;
@@ -55,11 +54,10 @@ String PacketProcessor::processPacket(String payload)
             if (typeName = "StsServo")
             {
                 // read a value from the STS bus servo
-                int id = jsondoc["ReadValue"]["Id"];
-                int value = 0;
+                u8 id = jsondoc["ReadValue"]["Id"];
                 if (this->_stSerialServoManager != nullptr)
                 {
-                    value = this->_stSerialServoManager->readPosition(id);
+                    int value = this->_stSerialServoManager->readPosition(id);
                     // send the value back to the AWB studio
                     String response = "{\"StsServo\":{\"Id\":" + String(id) + ",\"Position\":" + String(value) + "}}";
                     return response;
