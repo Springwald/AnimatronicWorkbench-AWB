@@ -6,11 +6,40 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Actuators;
+using Awb.Core.Project.Servos;
 
 namespace Awb.Core.DataPackets
 {
     public class DataPacketFactory
     {
+
+        public ClientDataPacket? GetDataPacketGetServoPos(IServoConfig servo)
+        {
+            if (servo is StsFeetechServoConfig stsFeetechServoConfig)
+            {
+                return new ClientDataPacket(stsFeetechServoConfig.ClientId,
+                new DataPacketContent
+                {
+                    ReadValue = new ReadValueData(typeName: ReadValueData.TypeNames.StsServo, id: stsFeetechServoConfig.Channel.ToString())
+                });
+            }
+
+            if (servo is ScsFeetechServoConfig scsFeetechServoConfig)
+            {
+                return new ClientDataPacket(scsFeetechServoConfig.ClientId,
+                    new DataPacketContent
+                    {
+                        ReadValue = new ReadValueData(typeName: ReadValueData.TypeNames.ScsServo, id: scsFeetechServoConfig.Channel.ToString())
+                    });
+            }
+
+            if (servo is Pca9685PwmServoConfig pwmServoConfig)
+            {
+                return null; // PWM servos can't send their position
+            }
+
+            return null;
+        }
 
         public IEnumerable<ClientDataPacket> GetDataPackets(IServo[] servos)
         {

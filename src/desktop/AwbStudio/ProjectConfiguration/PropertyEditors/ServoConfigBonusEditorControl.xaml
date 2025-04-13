@@ -14,9 +14,9 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
-                <Label Grid.Column="1" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
-                <Label Grid.Column="2" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
+                <Label Grid.Column="0" x:Name="LabelMinValue" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
+                <Label Grid.Column="1" x:Name="LabelValue" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
+                <Label Grid.Column="2" x:Name="LabelMaxValue" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
             </Grid>
             <Slider x:Name="SliderServoPosition" VerticalAlignment="Center"/>
             <Grid>

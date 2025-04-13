@@ -17,6 +17,7 @@ namespace Awb.Core.DataPackets
             get
             {
                 if (Content == null) return true;
+                if (Content.ReadValue != null) return false;
                 if (Content.DisplayMessage?.Message != null && !string.IsNullOrWhiteSpace(Content.DisplayMessage.Message)) return false;
                 if (Content.StsServos?.Servos?.Any() == true) return false;
                 if (Content.ScsServos?.Servos?.Any() == true) return false;
