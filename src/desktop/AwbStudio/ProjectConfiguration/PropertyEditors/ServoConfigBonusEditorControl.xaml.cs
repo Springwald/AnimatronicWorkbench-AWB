@@ -51,19 +51,16 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 // get the maximum values from "range" property annotation of the attribute FeetechBusServoConfig.MaxValue
                 if (_servoConfig is ScsFeetechServoConfig scsFeetechServoConfig)
                 {
-                    // ScsFeetechServoConfig has a max value of 1023
                     maxValue = ScsFeetechServoConfig.MaxValConst;
                     defaultValue = scsFeetechServoConfig.DefaultValue;
                 }
                 else if (_servoConfig is StsFeetechServoConfig stsFeetechServoConfig)
                 {
-                    // StsFeetechServoConfig has a max value of 4095
                     maxValue = StsFeetechServoConfig.MaxValueConst;
                     defaultValue = stsFeetechServoConfig.DefaultValue;
                 }
                 else if (_servoConfig is Pca9685PwmServoConfig pca9685PwmServoConfig)
                 {
-                    // FeetechBusServoConfig has a max value of 4095
                     maxValue = Pca9685PwmServoConfig.MaxValConst;
                     defaultValue = pca9685PwmServoConfig.DefaultValue;
                 }
@@ -72,6 +69,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     MessageBox.Show("Servo config is not a FeetechBusServoConfig or Pca9685PwmServoConfig.");
                     // hide the sliders if the servo config is not a supported type
                     SliderServoPosition.Visibility = Visibility.Collapsed;
+                    LabelMaxValue.Content = "?!?";
+                    LabelMinValue.Content = "?!?";
+                    LabelValue.Content = "?!?";
                     return;
                 }
 

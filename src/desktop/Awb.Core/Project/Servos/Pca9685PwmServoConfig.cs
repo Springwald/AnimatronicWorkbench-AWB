@@ -36,7 +36,6 @@ namespace Awb.Core.Project.Servos
         [Range(0, 15)]
         public required uint Channel { get; set; }
 
-
         [DisplayName("Lowest value")]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
         [Range(0, MaxValConst)]
