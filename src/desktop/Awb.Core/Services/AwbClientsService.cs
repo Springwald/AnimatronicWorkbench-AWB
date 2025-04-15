@@ -98,8 +98,8 @@ namespace Awb.Core.Services
             _clients = clients;
             _logger?.LogAsync($"Found {_clients.Length} clients. ({string.Join(", ", _clients.Select(c => c.ClientId))})");
 
-            if (ClientsLoaded != null)
-                ClientsLoaded(this, EventArgs.Empty);
+            // call the ClientsLoaded event in a new task to avoid blocking the UI thread
+            await Task.Run(() => ClientsLoaded?.Invoke(this, EventArgs.Empty));
 
             return _clients.Length;
         }

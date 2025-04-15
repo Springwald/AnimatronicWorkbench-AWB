@@ -57,7 +57,10 @@ namespace AwbStudio
             services.AddPropertyEditorVirtualInputControllerService();
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
-            services.TryAddSingleton<IAwbClientsService, AwbClientsService>();
+
+            // add the AwbClientsService as a singleton of IAwbClientsService and call the InitAsync method when initializing the service
+            services.AddAwbClientService();
+
             services.TryAddTransient<AwbClientsWindow>();
             services.TryAddTransient<DebugWindow>();
             services.TryAddTransient<ProjectManagementWindow>();

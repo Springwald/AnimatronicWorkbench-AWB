@@ -41,6 +41,73 @@ namespace Awb.Core.DataPackets
             return null;
         }
 
+        /// <summary>
+        /// created a data packet to set the position of a servo
+        /// </summary>
+        public ClientDataPacket? GetDataPacketSetServoPos(IServoConfig servo, int absolutePos)
+        {
+            if (servo is StsFeetechServoConfig stsFeetechServoConfig)
+            {
+                return new ClientDataPacket(stsFeetechServoConfig.ClientId,
+                new DataPacketContent
+                {
+                     StsServos = new StsServosPacketData
+                     {
+                         Servos = new[]
+                         {
+                             new StsServoPacketData
+                             {
+                                 Channel = stsFeetechServoConfig.Channel,
+                                 TargetValue = absolutePos,
+                                 Name = string.IsNullOrWhiteSpace(stsFeetechServoConfig.Title) ? $"STS{stsFeetechServoConfig.Channel}" : stsFeetechServoConfig.Title,
+                             }
+                         }
+                     },
+                });
+            }
+            if (servo is ScsFeetechServoConfig scsFeetechServoConfig)
+            {
+                return new ClientDataPacket(scsFeetechServoConfig.ClientId,
+                    new DataPacketContent
+                    {
+                        ScsServos = new StsServosPacketData
+                        {
+                            Servos = new[]
+                            {
+                                new StsServoPacketData
+                                {
+                                    Channel = scsFeetechServoConfig.Channel,
+                                    TargetValue = absolutePos,
+                                    Name = string.IsNullOrWhiteSpace(scsFeetechServoConfig.Title) ? $"SCS{scsFeetechServoConfig.Channel}" : scsFeetechServoConfig.Title,
+                                }
+                            }
+                        },
+                    });
+            }
+            if (servo is Pca9685PwmServoConfig pwmServoConfig)
+            {
+                return new ClientDataPacket(pwmServoConfig.ClientId,
+                    new DataPacketContent
+                    {
+                        Pca9685PwmServos = new Pca9685PwmServosPacketData
+                        {
+                            Servos = new[]
+                            {
+                                new Pca9685PwmServoPacketData
+                                {
+                                    I2cAddress = pwmServoConfig.I2cAdress,
+                                    Channel = pwmServoConfig.Channel,
+                                    TargetValue = absolutePos,
+                                    Name = string.IsNullOrWhiteSpace(pwmServoConfig.Title) ? $"PWM{pwmServoConfig.Channel}" : pwmServoConfig.Title,
+                                }
+                            }
+                        },
+                    });
+            }
+
+            return null;
+        }
+
         public IEnumerable<ClientDataPacket> GetDataPackets(IServo[] servos)
         {
             // group servos by their clients

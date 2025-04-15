@@ -1,25 +1,15 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AwbStudio.AwbClientsControls
 {
@@ -32,39 +22,54 @@ namespace AwbStudio.AwbClientsControls
 
         public AwbClientsControl()
         {
-            _awbClientsService =  App.GetService<IAwbClientsService>();
+            _awbClientsService = App.GetService<IAwbClientsService>();
             InitializeComponent();
             Loaded += AwbClientsControl_Loaded;
         }
 
         private async void AwbClientsControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_awbClientsService.ComPortClients == null)
-            {
-                _awbClientsService.ClientsLoaded += AwbClientsService_ClientsLoaded;
-            }
-            else
-            {
-                await ShowClients();
-            }
+            _awbClientsService.ClientsLoaded += AwbClientsService_ClientsLoaded;
+            if (_awbClientsService.ComPortClients != null) await ShowClients();
+
         }
 
         private async void AwbClientsService_ClientsLoaded(object? sender, EventArgs e)
         {
-           await  ShowClients();
+            await ShowClients();
         }
 
         private async Task ShowClients()
         {
-            var clients = _awbClientsService.ComPortClients;
-            this.stackPanelClients.Children.Clear();
-            foreach (var client in clients)
+            // wrap into an new Task to avoid cross-thread exception
+            await Task.Run(() =>
             {
-                var clientControl = new AwbClientControl();
-                this.stackPanelClients.Children.Add(clientControl);
+                Dispatcher.Invoke(() =>
+                {
+                    var clients = _awbClientsService.ComPortClients;
+                    this.stackPanelClients.Children.Clear();
+                    foreach (var client in clients)
+                    {
+                        var clientControl = new AwbClientControl();
+                        this.stackPanelClients.Children.Add(clientControl);
+                    }
+                    labelClientCount.Content = $"{clients.Length} clients found";
+                });
+            });
+        }
+
+        private async void ButtonRescan_Click(object sender, RoutedEventArgs e)
+        {
+            var result = await _awbClientsService.ScanForClients(false);
+            if (result > 0)
+            {
+                labelClientCount.Content = $"{result} clients found";
             }
-            labelClientCount.Content = $"{clients.Length} clients found";
-            await Task.CompletedTask;
+            else
+            {
+                labelClientCount.Content = "No clients found";
+            }
+            await ShowClients();
         }
     }
 }

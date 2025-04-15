@@ -18,15 +18,16 @@
                 <Label Grid.Column="1" x:Name="LabelValue" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
                 <Label Grid.Column="2" x:Name="LabelMaxValue" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
             </Grid>
-            <Slider x:Name="SliderServoPosition" VerticalAlignment="Center"/>
+            <Slider x:Name="SliderServoPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="313*"/>
-                    <ColumnDefinition Width="81*"/>
+                    <ColumnDefinition Width="55*"/>
+                    <ColumnDefinition Width="26*"/>
                     <ColumnDefinition Width="394*"/>
                 </Grid.ColumnDefinitions>
-                <CheckBox Grid.Column="0" Content="Send changes to servo" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Button Grid.Column="2" x:Name="ButtonReadPosition"  Content="read position" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonReadPosition_Click" Margin="289,0,0,0"/>
+                <CheckBox Grid.Column="0" x:Name="CheckboxSendChangesToServo" Content="Send changes to servo" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Button Grid.Column="3" x:Name="ButtonReadPosition"  Content="read position" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonReadPosition_Click" Margin="289,0,0,0"/>
             </Grid>
         </StackPanel>
     </Border>

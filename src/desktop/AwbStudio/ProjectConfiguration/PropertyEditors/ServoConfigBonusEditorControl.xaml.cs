@@ -5,8 +5,6 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
-using Awb.Core.Actuators;
-using Awb.Core.Clients;
 using Awb.Core.DataPackets;
 using Awb.Core.DataPackets.ResponseDataPackets;
 using Awb.Core.Project.Servos;
@@ -28,6 +26,11 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private readonly IAwbClientsService _awbClientsService;
 
         private IServoConfig _servoConfig;
+
+        private DateTime _lastError = DateTime.MinValue;
+
+        private int? _newSendPositionValue = null;
+        private volatile bool _sendingValueToServo = false;
 
         public IServoConfig ServoConfig
         {
@@ -114,7 +117,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
             if (packet == null || packet.IsEmpty)
             {
-                MessageBox.Show("Unable to create data packet.");
+                ShowError("Unable to create data packet.");
                 return null;
             }
 
@@ -122,7 +125,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             var client = _awbClientsService.GetClient(clientID);
             if (client == null)
             {
-                MessageBox.Show($"ClientId '{clientID}' not found!");
+                ShowError($"ClientId '{clientID}' not found!");
                 return null;
             }
 
@@ -140,7 +143,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 var resultDataPacket = JsonSerializer.Deserialize<ReadValueResponseDataPacket>(resultPayloadJsonStr, options);
                 if (resultDataPacket == null)
                 {
-                    MessageBox.Show($"Unable to read position from servo. Result data packet is null:" + resultPayloadJsonStr);
+                    ShowError($"Unable to read position from servo. Result data packet is null:" + resultPayloadJsonStr);
                     return null;
                 }
 
@@ -148,7 +151,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 {
                     if (resultDataPacket.ScsServo == null)
                     {
-                        MessageBox.Show($"Unable to read position from servo. Result data packet ScsServo is null:" + resultPayloadJsonStr);
+                        ShowError($"Unable to read position from servo. Result data packet ScsServo is null:" + resultPayloadJsonStr);
                         return null;
                     }
                     return resultDataPacket.ScsServo.Position;
@@ -157,20 +160,100 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 {
                     if (resultDataPacket.StsServo == null)
                     {
-                        MessageBox.Show($"Unable to read position from servo. Result data packet ScsServo is null:" + resultPayloadJsonStr);
+                        ShowError($"Unable to read position from servo. Result data packet ScsServo is null:" + resultPayloadJsonStr);
                         return null;
                     }
                     return resultDataPacket.StsServo.Position;
                 }
 
-                MessageBox.Show($"Unable to read position from servo. Result data packet is not a ScsFeetechServoConfig or StsFeetechServoConfig:" + resultPayloadJsonStr);
+                ShowError($"Unable to read position from servo. Result data packet is not a ScsFeetechServoConfig or StsFeetechServoConfig:" + resultPayloadJsonStr);
                 return null;
             }
             else
             {
-                MessageBox.Show($"Error sending request  to client Id '{clientID}': {result.ErrorMessage}");
+                ShowError($"Error sending request  to client Id '{clientID}': {result.ErrorMessage}");
                 return null;
             }
+        }
+
+        private async void SliderServoPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (CheckboxSendChangesToServo.IsChecked == true)
+            {
+                var absolutePosition = (int)e.NewValue;
+                _newSendPositionValue = absolutePosition;
+                await this.SendValueToServo(ServoConfig, absolutePosition);
+            }
+            else
+            {
+                LabelValue.Content = ((int)e.NewValue).ToString();
+            }
+        }
+
+        private async Task SendValueToServo(IServoConfig servoConfig, int absolutePosition)
+        {
+            if (_sendingValueToServo) return;
+            _sendingValueToServo = true;
+
+            while (true)
+            {
+                var dataPacketFactory = new DataPacketFactory();
+                var packet = dataPacketFactory.GetDataPacketSetServoPos(servoConfig, absolutePosition);
+                if (packet == null || packet.IsEmpty)
+                {
+                    ShowError("Unable to create data packet.");
+                    return;
+                }
+                var clientID = packet.ClientId;
+                var client = _awbClientsService.GetClient(clientID);
+                if (client == null)
+                {
+                    ShowError($"ClientId '{clientID}' not found!");
+                    return;
+                }
+                var options = new JsonSerializerOptions()
+                {
+                    WriteIndented = false,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                };
+                var jsonStr = JsonSerializer.Serialize(packet.Content, options);
+                var payload = Encoding.ASCII.GetBytes(jsonStr);
+                var result = await client.Send(payload);
+                if (result.Ok)
+                {
+                    // set the label for the slider to the new value
+                    LabelValue.Content = absolutePosition.ToString();
+                }
+                else
+                {
+                    ShowError($"Error sending servo pos to client Id '{clientID}': {result.ErrorMessage}");
+                }
+
+                if (_newSendPositionValue.HasValue == false || absolutePosition == _newSendPositionValue)
+                {
+                    // if the value is not changed, break the loop
+                    break;
+                }
+                else
+                {
+                    // if the value is changed, wait for 100ms and send the new value
+                    absolutePosition = _newSendPositionValue.Value;
+                    _newSendPositionValue = null;
+                    await Task.Delay(100);
+                }
+            }
+            _sendingValueToServo = false;
+        }
+
+        /// <summary>
+        /// Shows an error message if the last error was more than 5 seconds ago.
+        /// </summary>
+        private void ShowError(string message)
+        {
+            var diff = DateTime.UtcNow - _lastError;
+            if (diff.TotalSeconds < 5) return;
+            _lastError = DateTime.UtcNow;
+            MessageBox.Show(message);
         }
     }
 }
