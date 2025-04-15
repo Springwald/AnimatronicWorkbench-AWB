@@ -13,7 +13,7 @@ namespace Awb.Core.Project.Servos
 {
     public class Pca9685PwmServoConfig : IDeviceConfig, IProjectObjectListable
     {
-        private const int maxValConst = 4095;
+        public const int MaxValConst = 4095;
 
         public required string Id { get; set; }
 
@@ -39,17 +39,17 @@ namespace Awb.Core.Project.Servos
 
         [DisplayName("Lowest value")]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
-        [Range(0, maxValConst)]
+        [Range(0, MaxValConst)]
         public int MinValue { get; set; }
 
         [DisplayName("Highest value")]
         [Description("The value when the servo curve is at its highest point. Possibly confusing: Can be greater than the value for 'low'.")]
-        [Range(0, maxValConst)]
+        [Range(0, MaxValConst)]
         public int MaxValue { get; set; }
 
         [DisplayName("Default value")]
         [Description("Must be between the highest and lowest value.")]
-        [Range(0, maxValConst)]
+        [Range(0, MaxValConst)]
         public int? DefaultValue { get; set; }
 
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)

@@ -44,34 +44,55 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
                 // Enable/disable the read position button
                 ButtonReadPosition.Visibility = _servoConfig.CanReadServoPosition ? Visibility.Visible : Visibility.Collapsed;
+                var maxValue = 0;
+                var minValue = 0;
+                int? defaultValue = null;
 
-                // set the max / min values for the slider
-                if (_servoConfig is FeetechBusServoConfig servo)
+                // get the maximum values from "range" property annotation of the attribute FeetechBusServoConfig.MaxValue
+                if (_servoConfig is ScsFeetechServoConfig scsFeetechServoConfig)
                 {
-                    SliderServoPosition.Minimum = servo.MinValue;
-                    LabelMinValue.Content = servo.MinValue.ToString();
-
-                    SliderServoPosition.Maximum = servo.MaxValue;
-                    LabelMaxValue.Content = servo.MaxValue.ToString();
-
-                    // show the default values
-                    if (servo.DefaultValue is null)
-                    {
-                        // if the default value is not set, set the slider to the center value
-                        var centerValue = servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
-                        SliderServoPosition.Value = centerValue;
-                        LabelValue.Content = centerValue.ToString();
-                    }
-                    else
-                    {
-                        SliderServoPosition.Value = servo.DefaultValue.Value;
-                        LabelValue.Content = servo.DefaultValue.Value.ToString();
-                    }
+                    // ScsFeetechServoConfig has a max value of 1023
+                    maxValue = ScsFeetechServoConfig.MaxValConst;
+                    defaultValue = scsFeetechServoConfig.DefaultValue;
+                }
+                else if (_servoConfig is StsFeetechServoConfig stsFeetechServoConfig)
+                {
+                    // StsFeetechServoConfig has a max value of 4095
+                    maxValue = StsFeetechServoConfig.MaxValueConst;
+                    defaultValue = stsFeetechServoConfig.DefaultValue;
+                }
+                else if (_servoConfig is Pca9685PwmServoConfig pca9685PwmServoConfig)
+                {
+                    // FeetechBusServoConfig has a max value of 4095
+                    maxValue = Pca9685PwmServoConfig.MaxValConst;
+                    defaultValue = pca9685PwmServoConfig.DefaultValue;
                 }
                 else
                 {
-                    // hide the sliders if the servo config is not a FeetechBusServoConfig
+                    MessageBox.Show("Servo config is not a FeetechBusServoConfig or Pca9685PwmServoConfig.");
+                    // hide the sliders if the servo config is not a supported type
                     SliderServoPosition.Visibility = Visibility.Collapsed;
+                    return;
+                }
+
+                SliderServoPosition.Maximum = maxValue;
+                LabelMaxValue.Content = maxValue.ToString();
+
+                SliderServoPosition.Minimum = minValue;
+                LabelMinValue.Content = minValue.ToString();
+
+                // show the default values
+                if (defaultValue is null)
+                {
+                    // if the default value is not set, set the slider to the center value
+                    var centerValue = minValue + (maxValue - minValue) / 2;
+                    SliderServoPosition.Value = centerValue;
+                    LabelValue.Content = centerValue.ToString();
+                }
+                else
+                {
+                    SliderServoPosition.Value = defaultValue.Value;
+                    LabelValue.Content = defaultValue.Value.ToString();
                 }
             }
         }
