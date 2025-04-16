@@ -117,21 +117,16 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 return;
             }
 
-            if (ServoConfig is FeetechBusServoConfig feetechBusServoConfig)
+            var value = await ReadPosFromServo(ServoConfig);
+            if (value.HasValue)
             {
-                var value = await ReadPosFromServo(feetechBusServoConfig);
-                if (value.HasValue)
-                {
-                    LabelValue.Content = value;
-                    SliderServoPosition.Value = value.Value;
-                }
-                return;
+                LabelValue.Content = value;
+                SliderServoPosition.Value = value.Value;
             }
-
-            MessageBox.Show("This servo type does not support reading the position.");
+            return;
         }
 
-        private async Task<int?> ReadPosFromServo(FeetechBusServoConfig servoConfig)
+        public async Task<int?> ReadPosFromServo(IServoConfig servoConfig)
         {
             var dataPacketFactory = new DataPacketFactory();
             var packet = dataPacketFactory.GetDataPacketGetServoPos(servoConfig);

@@ -13,13 +13,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static AwbStudio.ProjectConfiguration.PropertyEditors.SinglePropertyEditorControl;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
@@ -84,13 +86,22 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             _ => "1_" + groupname
         };
 
-        private void WriteDataToEditor(IProjectObjectListable projectObject)
+        private async Task WriteDataToEditor(IProjectObjectListable projectObject)
         {
             if (_editors != null) throw new System.Exception("Object to edit is already set.");
 
             var type = projectObject.GetType();
             _editors = new List<SinglePropertyEditorControl>();
 
+            // add special editors for servos to tune and test the values interactively
+            ServoConfigBonusEditorControl? servoConfigBonusEditorControl = null;
+            if (projectObject is IServoConfig servoConfig)
+            {
+                servoConfigBonusEditorControl = new ServoConfigBonusEditorControl(_awbClientsService)
+                {
+                    ServoConfig = servoConfig,
+                };
+            }
 
             // Group properties
             var propertyGroups = type.GetProperties().Select(p =>
@@ -125,29 +136,38 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 {
                     var editor = new SinglePropertyEditorControl();
                     //editor.SetPropertyToEditByExpression(() => stsServoConfig.GetType().GetProperty(property.Name));
-                    editor.SetPropertyToEditByName(target: projectObject, propertyName: property.TechnicalName, title: property.Title);
+                    editor.SetPropertyToEditByName(targetObject: projectObject, propertyName: property.TechnicalName, title: property.Title);
                     editor.PropertyChanged += (s, e) =>
                     {
                         LabelObjectTypeTitle.Content = projectObject.TitleDetailed;
                         this.UpdateProblems();
                         this.OnUpdatedData?.Invoke(this, EventArgs.Empty);
                     };
+
+                    // connect the button to get the actual servo position to the editor
+                    editor.GetActualServoPositionRequested += async (s,  e) =>
+                    {
+                        if (servoConfigBonusEditorControl != null && projectObject is IServoConfig servoConfig && servoConfig.CanReadServoPosition)
+                        {
+                            var position = await servoConfigBonusEditorControl.ReadPosFromServo(servoConfig);
+                            if (position.HasValue)
+                                e.ServoPositionReceivedDelegate(position.Value);
+                        }
+                    };
+
                     _editors.Add(editor);
                     stackPanel.Children.Add(editor);
                 }
             }
 
-            // add special editors for servos to tune and test the values interactively
-            if (projectObject is IServoConfig servoConfig)
+            // if this object supports servo bonus editor, add it to the editor stack panel
+            if (servoConfigBonusEditorControl != null)
             {
-                var servoBonusEditorControl = new ServoConfigBonusEditorControl(_awbClientsService)
-                {
-                     ServoConfig = servoConfig,
-                };
                 var groupBox = CreateGroupBox("Interactive servo settings");
-                groupBox.Content = servoBonusEditorControl;
+                groupBox.Content = servoConfigBonusEditorControl;
                 this.EditorStackPanel.Children.Add(groupBox);
             }
+
 
             // find objects using this object
             if (_objectsUsingThisObject.Any())
@@ -169,7 +189,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 Padding = new System.Windows.Thickness(left: 10, top: 10, right: 5, bottom: 10),
                 Background = new SolidColorBrush(Color.FromRgb(25, 25, 25))
             };
-          
+
         }
 
         private void UpdateProblems()

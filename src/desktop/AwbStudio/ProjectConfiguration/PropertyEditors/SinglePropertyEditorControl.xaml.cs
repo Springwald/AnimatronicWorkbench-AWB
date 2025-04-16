@@ -1,10 +1,11 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Project.Servos;
 using Awb.Core.Tools.Validation;
 using System;
 using System.ComponentModel;
@@ -19,10 +20,20 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     /// </summary>
     public partial class SinglePropertyEditorControl : UserControl, INotifyPropertyChanged
     {
+        // define a delegate to return the actual servo position
+        public delegate void ActualServoPositionReceivedDelegate(int? servoPositionAbsolute);
+
+        public sealed class GetActualServoPositionEventArgs: EventArgs
+        {
+            public required ActualServoPositionReceivedDelegate ServoPositionReceivedDelegate { get; set; }
+
+        }
+
+        public EventHandler<GetActualServoPositionEventArgs>? GetActualServoPositionRequested;
+
         private object? _targetObject;
         private string? _propertyName;
         private PropertyValidator? _propertyValidator;
-        private PropertyInfo? _propertyInfo;
 
         private string? _propertyTitle;
         public string? PropertyTitle
@@ -123,13 +134,13 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         /// <summary>
         /// Set property to edit by name
         /// </summary>
-        public void SetPropertyToEditByName(object target, string propertyName, string? title)
+        public void SetPropertyToEditByName(object targetObject, string propertyName, string? title)
         {
-            _targetObject = target;
+            _targetObject = targetObject;
             _propertyName = propertyName;
-            _propertyValidator = new PropertyValidator(target, propertyName);
+            _propertyValidator = new PropertyValidator(_targetObject, propertyName);
 
-            var prop = target.GetType().GetProperty(propertyName);
+            var prop = _targetObject.GetType().GetProperty(propertyName);
             if (prop == null) throw new Exception($"Property '{propertyName}' not found");
 
             // get the title of the property using the DisplayName annotation
@@ -141,8 +152,22 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
             // activate the correct editor control for this type of property
             // e.g. a checkbox for bool, a textbox for string, a numeric up down for int, etc.
-            var value = prop.GetValue(target); // get the value of the property
+            var value = prop.GetValue(_targetObject); // get the value of the property
 
+            VisualizeValue(prop, value);
+
+            // special handling for servo properties
+            var canTakeServoPosition = prop.GetCustomAttribute<SupportsTakeOverTheCurrentServoValueAttribute>();
+            ButtonTakeActualServoPosition.Visibility = canTakeServoPosition == null ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+
+            ErrorMessagesJoined = _propertyValidator.GetAllErrorMessages(value) ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Display the current value of the property in the correct editor control
+        /// </summary>
+        private void VisualizeValue(PropertyInfo prop, object? value)
+        {
             var propertyType = prop.PropertyType;
             if (propertyType == typeof(bool))
             {
@@ -156,8 +181,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 PropertyContentText = value?.ToString() ?? string.Empty;
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
             }
-
-            ErrorMessagesJoined = _propertyValidator.GetAllErrorMessages(value) ?? string.Empty;
         }
 
         private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)
@@ -192,7 +215,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
         }
 
-        private void CheckBoxPropertyContentBoolEditor_Unchecked(object sender, System.Windows.RoutedEventArgs e) =>    SetCheckboxValue(false);
+        private void CheckBoxPropertyContentBoolEditor_Unchecked(object sender, System.Windows.RoutedEventArgs e) => SetCheckboxValue(false);
         private void CheckBoxPropertyContentBoolEditor_Checked(object sender, System.Windows.RoutedEventArgs e) => SetCheckboxValue(true);
 
         private void SetCheckboxValue(bool value)
@@ -218,6 +241,27 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-       
+        private void ButtonTakeActualServoPosition_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var eventArgs = new GetActualServoPositionEventArgs
+            {
+                ServoPositionReceivedDelegate = (int? servoPositionAbsolute) =>
+                {
+                    if (servoPositionAbsolute != null)
+                    {
+                        // set the value of the property to the value of the textbox,
+                        // casting to the correct type e.g. int
+                        if (_targetObject != null && _propertyName != null)
+                        {
+                            var prop = _targetObject.GetType().GetProperty(_propertyName);
+                            if (prop == null) throw new Exception($"Property '{_propertyName}' not found");
+                            prop.SetValue(_targetObject, servoPositionAbsolute);
+                            VisualizeValue(prop, servoPositionAbsolute);
+                        }
+                    }
+                }
+            };
+            GetActualServoPositionRequested?.Invoke(this, eventArgs);
+        }
     }
 }

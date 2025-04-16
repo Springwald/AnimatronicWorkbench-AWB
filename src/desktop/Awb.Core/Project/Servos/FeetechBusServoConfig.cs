@@ -13,6 +13,8 @@ namespace Awb.Core.Project.Servos
 {
     public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig
     {
+
+
         public required string Id { get; set; }
 
         [Display(Name = "Title", GroupName = "General", Order = 1)]
@@ -61,14 +63,17 @@ namespace Awb.Core.Project.Servos
 
         [Display(Name = "Lowest value", GroupName = "Values", Order = 4)]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
+        [SupportsTakeOverTheCurrentServoValue]
         public abstract int MinValue { get; set; }
 
         [Display(Name = "Highest value", GroupName = "Values", Order = 5)]
         [Description("The value when the servo curve is at its highest point. Possibly confusing: Can be greater than the value for 'low'.")]
+        [SupportsTakeOverTheCurrentServoValue]
         public abstract int MaxValue { get; set; }
 
         [Display(Name = "Default value", GroupName = "Values", Order = 6)]
         [Description("Must be between the highest and lowest value.")]
+        [SupportsTakeOverTheCurrentServoValue]
         public abstract int? DefaultValue { get; set; }
 
         [Display(Name = "Speed value", GroupName = "Values", Order = 7)]
