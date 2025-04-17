@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:AwbStudio"
         xmlns:AwbClientsControls="clr-namespace:AwbStudio.AwbClientsControls" x:Class="AwbStudio.AwbClientsWindow"
         mc:Ignorable="d"
-        Title="AwbClientsWindow" Height="450" Width="800">
-    <Grid>
-        
-        <AwbClientsControls:AwbClientsControl HorizontalAlignment="Center" VerticalAlignment="Center"/>
-    </Grid>
+        Title="AWB Clients" Height="450" Width="800">
+    <Window.Icon>
+        <DrawingImage />
+    </Window.Icon>
+    <AwbClientsControls:AwbClientsControl />
 </Window>
