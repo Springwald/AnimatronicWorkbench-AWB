@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 namespace Awb.Core.Clients
 {
@@ -13,7 +13,9 @@ namespace Awb.Core.Clients
 
         public string FriendlyName => throw new NotImplementedException();
 
-        public EventHandler<IAwbClient.ReceivedEventArgs> Received => throw new NotImplementedException();
+        public EventHandler<IAwbClient.ReceivedEventArgs>? Received { get; set; }
+
+        public EventHandler<string>? OnError { get; set; }
 
         public async Task<bool> InitAsync()
         {

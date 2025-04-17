@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 namespace Awb.Core.Clients
 {
@@ -26,7 +26,7 @@ namespace Awb.Core.Clients
             public string? ResultPayload { get; }
             public string? DebugInfos { get; }
 
-            public SendResult(bool ok, string? errorMessage,string? resultPlayload, string? debugInfos)
+            public SendResult(bool ok, string? errorMessage, string? resultPlayload, string? debugInfos)
             {
                 Ok = ok;
                 ErrorMessage = errorMessage;
@@ -38,7 +38,9 @@ namespace Awb.Core.Clients
         uint ClientId { get; }
         string FriendlyName { get; }
 
-        EventHandler<ReceivedEventArgs>? Received { get; }
+        EventHandler<ReceivedEventArgs>? Received { get; set; }
+
+        EventHandler<string>? OnError { get; set; }
 
         Task<bool> InitAsync();
         Task<SendResult> Send(byte[] payload);
