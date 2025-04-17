@@ -5,44 +5,45 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Clients.Models;
+
 namespace Awb.Core.Clients
 {
     public interface IAwbClient
     {
-        public class ReceivedEventArgs : EventArgs
-        {
-            public byte[] Payload { get; }
-
-            public ReceivedEventArgs(byte[] payload)
-            {
-                Payload = payload;
-            }
-        }
-
-        public class SendResult
-        {
-            public bool Ok { get; }
-            public string? ErrorMessage { get; }
-            public string? ResultPayload { get; }
-            public string? DebugInfos { get; }
-
-            public SendResult(bool ok, string? errorMessage, string? resultPlayload, string? debugInfos)
-            {
-                Ok = ok;
-                ErrorMessage = errorMessage;
-                ResultPayload = resultPlayload;
-                DebugInfos = debugInfos;
-            }
-        }
-
+        /// <summary>
+        /// the unique id of the AWB hardware client
+        /// </summary>
         uint ClientId { get; }
+
+        /// <summary>
+        /// a friendly name for the client, to show it in lists or other UI elements
+        /// </summary>
         string FriendlyName { get; }
 
+        /// <summary>
+        /// when has the last error occurred
+        /// </summary>
+        DateTime? LastErrorUtc { get; }
+
+        /// <summary>
+        /// a payload was received from the client
+        /// </summary>
         EventHandler<ReceivedEventArgs>? Received { get; set; }
 
+        /// <summary>
+        /// the client has send an error message or the communication to the client failed
+        /// </summary>
         EventHandler<string>? OnError { get; set; }
 
+        /// <summary>
+        /// initialize the client
+        /// </summary>
         Task<bool> InitAsync();
+
+        /// <summary>
+        /// send a payload to the client
+        /// </summary>
         Task<SendResult> Send(byte[] payload);
     }
 }

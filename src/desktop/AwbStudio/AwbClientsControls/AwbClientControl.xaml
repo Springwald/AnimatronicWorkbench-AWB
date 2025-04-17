@@ -6,11 +6,16 @@
              xmlns:local="clr-namespace:AwbStudio.AwbClientsControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0 0 0 5" Background="#FF333333"  >
+    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0 0 0 5" Background="#FF333333" Height="Auto"  >
         <StackPanel>
-            <Label x:Name="LabelTitle" Content="LabelTitle" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <TextBlock x:Name="TextBlockDebugLog" TextWrapping="Wrap" Text="TextBlock" Height="100"/>
-            <Button HorizontalAlignment="Right" x:Name="ButtonDisconnect" Margin="5" Content="Disconnect" />
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Label x:Name="LabelTitle" Content="LabelTitle" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"/>
+                    <Label x:Name="LabelStatus" Content="LabelStatus" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </StackPanel>
+                <Button HorizontalAlignment="Right" x:Name="ButtonDisconnect" Margin="5" Content="Disconnect" />
+            </Grid>
+            <TextBlock x:Name="TextBlockDebugLog" TextWrapping="Wrap" Text="" MaxHeight="100"/>
             
         </StackPanel>
     </Border>

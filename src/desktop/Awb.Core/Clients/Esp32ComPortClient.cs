@@ -5,8 +5,8 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Clients.Models;
 using PacketLogistics.ComPorts;
-using static Awb.Core.Clients.IAwbClient;
 
 namespace Awb.Core.Clients
 {
@@ -14,14 +14,17 @@ namespace Awb.Core.Clients
     {
         private PacketSenderReceiverComPort _comPortReceiver;
 
-        private bool _connected;
+        public bool Connected { get; private set; } = false;
 
         public uint ClientId { get; }
 
         public string FriendlyName { get; }
 
-        public EventHandler<IAwbClient.ReceivedEventArgs>? Received { get; set; }
+        public DateTime? LastErrorUtc { get; private set; }
+
+        public EventHandler<ReceivedEventArgs>? Received { get; set; }
         public EventHandler<string>? OnError { get; set; }
+        
 
         public Esp32ComPortClient(string comPortName, uint clientId)
         {
@@ -34,26 +37,30 @@ namespace Awb.Core.Clients
             serialPortName: comPortName,
             clientID: clientId,
             comPortCommandConfig: new AwbEsp32ComportClientConfig());
-            _comPortReceiver.ErrorOccured += (sender, args) => OnError?.Invoke(this, args.Message);
+            _comPortReceiver.ErrorOccured += (sender, args) =>
+            {
+                LastErrorUtc = DateTime.UtcNow;
+                OnError?.Invoke(this, args.Message);
+            };
         }
 
         public async Task<bool> InitAsync()
         {
             _comPortReceiver.PacketReceived += _comPortReceiver_PacketReceived;
-            _connected = await _comPortReceiver.Connect();
-            return _connected;
+            Connected = await _comPortReceiver.Connect();
+            return Connected;
         }
 
         public void Dispose()
         {
-            _connected = false;
+            Connected = false;
             _comPortReceiver.PacketReceived -= _comPortReceiver_PacketReceived;
             _comPortReceiver?.Dispose();
         }
 
         public async Task<SendResult> Send(byte[] payload)
         {
-            if (!_connected) return new SendResult(false, errorMessage: "not connected, please run Init() before using Esp32ComPortClient!", resultPlayload: null, debugInfos: null);
+            if (!Connected) return new SendResult(false, errorMessage: "not connected, please run Init() before using Esp32ComPortClient!", resultPlayload: null, debugInfos: null);
             var result = await _comPortReceiver.SendPacket(payload);
 
             if (result.Ok == false)
@@ -64,7 +71,7 @@ namespace Awb.Core.Clients
 
         private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver.PacketReceivedEventArgs e)
         {
-            Received?.Invoke(this, new IAwbClient.ReceivedEventArgs(payload: e.Payload));
+            Received?.Invoke(this, new ReceivedEventArgs(payload: e.Payload));
         }
 
     }

@@ -52,7 +52,9 @@ namespace AwbStudio.AwbClientsControls
                     {
                         var clientControl = new AwbClientControl();
                         this.stackPanelClients.Children.Add(clientControl);
+                        clientControl.SetClient(client);
                     }
+
                     labelClientCount.Content = $"{clients.Length} clients found";
                 });
             });

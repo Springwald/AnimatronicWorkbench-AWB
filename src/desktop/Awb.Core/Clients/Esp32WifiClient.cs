@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Clients.Models;
+
 namespace Awb.Core.Clients
 {
     internal class Esp32WifiClient : IAwbClient
@@ -13,9 +15,12 @@ namespace Awb.Core.Clients
 
         public string FriendlyName => throw new NotImplementedException();
 
-        public EventHandler<IAwbClient.ReceivedEventArgs>? Received { get; set; }
 
         public EventHandler<string>? OnError { get; set; }
+
+        public DateTime? LastErrorUtc => throw new NotImplementedException();
+
+        public EventHandler<ReceivedEventArgs>? Received { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public async Task<bool> InitAsync()
         {
@@ -23,9 +28,8 @@ namespace Awb.Core.Clients
             throw new NotImplementedException();
         }
 
-        public async Task<IAwbClient.SendResult> Send(byte[] payload)
+        public Task<SendResult> Send(byte[] payload)
         {
-            await Task.CompletedTask;
             throw new NotImplementedException();
         }
     }
