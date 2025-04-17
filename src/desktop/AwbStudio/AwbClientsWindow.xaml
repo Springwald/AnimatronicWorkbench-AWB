@@ -10,5 +10,8 @@
     <Window.Icon>
         <DrawingImage />
     </Window.Icon>
-    <AwbClientsControls:AwbClientsControl />
+    <Grid Margin="8">
+        <AwbClientsControls:AwbClientsControl>
+        </AwbClientsControls:AwbClientsControl>
+    </Grid>
 </Window>
