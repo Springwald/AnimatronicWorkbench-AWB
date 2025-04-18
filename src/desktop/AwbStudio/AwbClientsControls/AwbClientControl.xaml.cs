@@ -73,17 +73,17 @@ namespace AwbStudio.AwbClientsControls
         private void UpdateClientInformationInternal()
         {
             if (_awbClient == null) return;
-            this.LabelTitle.Content = $"AWB Client ID {_awbClient.ClientId} ({_awbClient.FriendlyName})";
+            this.LabelTitle.Text = $"AWB Client ID {_awbClient.ClientId} ({_awbClient.FriendlyName})";
 
             var sinceLastError = DateTime.UtcNow - (_awbClient.LastErrorUtc ?? DateTime.MinValue);
             var maxErrorSeconds = 5;
             if (sinceLastError < TimeSpan.FromSeconds(maxErrorSeconds))
             {
-                this.LabelStatus.Content = $"🚨 {maxErrorSeconds-sinceLastError.TotalSeconds:0}";
+                this.LabelStatus.Text = $"🚨 {maxErrorSeconds-sinceLastError.TotalSeconds:0}";
             }
             else
             {
-                this.LabelStatus.Content = $"✅";
+                this.LabelStatus.Text = $"✅";
             }
         }
 

@@ -4,18 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AwbStudio.AwbClientsControls"
+             xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0 0 0 5" Background="#FF333333" Height="Auto"  >
         <StackPanel>
             <Grid>
                 <StackPanel Orientation="Horizontal">
-                    <Label x:Name="LabelTitle" Content="LabelTitle" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"/>
-                    <Label x:Name="LabelStatus" Content="LabelStatus" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <emoji:TextBlock x:Name="LabelTitle" Text="LabelTitle" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"  Foreground="{StaticResource ForegroundBrush}"/>
+                    <emoji:TextBlock x:Name="LabelStatus" Text="LabelStatus" HorizontalAlignment="Left" VerticalAlignment="Top"  Foreground="{StaticResource ForegroundBrush}"/>
                 </StackPanel>
                 <Button HorizontalAlignment="Right" x:Name="ButtonDisconnect" Margin="5" Content="Disconnect" />
             </Grid>
-            <TextBlock x:Name="TextBlockDebugLog" TextWrapping="Wrap" Text="" MaxHeight="100"/>
+            <emoji:TextBlock x:Name="TextBlockDebugLog" TextWrapping="Wrap" Foreground="{StaticResource ForegroundBrush}" Text="" MaxHeight="100"/>
             
         </StackPanel>
     </Border>

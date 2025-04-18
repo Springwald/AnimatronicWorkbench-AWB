@@ -21,13 +21,11 @@
             <Slider x:Name="SliderServoPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="313*"/>
-                    <ColumnDefinition Width="55*"/>
-                    <ColumnDefinition Width="26*"/>
-                    <ColumnDefinition Width="394*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <CheckBox Grid.Column="0" x:Name="CheckboxSendChangesToServo" Content="Send changes to servo" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Button Grid.Column="3" x:Name="ButtonReadPosition"  Content="read position" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ButtonReadPosition_Click" Margin="289,0,0,0"/>
+                <Button Grid.Column="1" x:Name="ButtonReadPosition"  Content="read position" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonReadPosition_Click" />
             </Grid>
         </StackPanel>
     </Border>
