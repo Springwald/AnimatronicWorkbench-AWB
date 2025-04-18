@@ -83,7 +83,7 @@ namespace AwbStudio.AwbClientsControls
             }
             else
             {
-                this.LabelStatus.Content = $"💡";
+                this.LabelStatus.Content = $"✅";
             }
         }
 
