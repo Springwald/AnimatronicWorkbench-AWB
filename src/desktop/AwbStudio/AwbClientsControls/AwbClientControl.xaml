@@ -11,12 +11,12 @@
         <StackPanel>
             <Grid>
                 <StackPanel Orientation="Horizontal">
-                    <emoji:TextBlock x:Name="LabelTitle" Text="LabelTitle" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"  Foreground="{StaticResource ForegroundBrush}"/>
-                    <emoji:TextBlock x:Name="LabelStatus" Text="LabelStatus" HorizontalAlignment="Left" VerticalAlignment="Top"  Foreground="{StaticResource ForegroundBrush}"/>
+                    <emoji:TextBlock x:Name="LabelTitle" Text="LabelTitle" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"  Foreground="{StaticResource ForegroundBrush}"/>
+                    <emoji:TextBlock x:Name="LabelStatus" Text="LabelStatus" IsEnabled="False"  HorizontalAlignment="Left" VerticalAlignment="Top"  Foreground="{StaticResource ForegroundBrush}"/>
                 </StackPanel>
                 <Button HorizontalAlignment="Right" x:Name="ButtonDisconnect" Margin="5" Content="Disconnect" />
             </Grid>
-            <emoji:TextBlock x:Name="TextBlockDebugLog" TextWrapping="Wrap" Foreground="{StaticResource ForegroundBrush}" Text="" MaxHeight="100"/>
+            <emoji:TextBlock x:Name="TextBlockDebugLog"  IsEnabled="False" TextWrapping="Wrap" Foreground="{StaticResource ForegroundBrush}" Text="" MaxHeight="100"/>
             
         </StackPanel>
     </Border>
