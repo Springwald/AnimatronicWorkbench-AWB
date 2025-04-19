@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using System.Text.Json.Serialization;
 
@@ -12,12 +12,18 @@ namespace Awb.Core.DataPackets
     public class StsServoPacketData
     {
         [JsonPropertyName("Ch")]
-        public uint Channel { get; set; }
+        public required uint Channel { get; set; }
 
         [JsonPropertyName("TVal")]
-        public int TargetValue { get; set; }
+        public required int TargetValue { get; set; }
 
         [JsonPropertyName("Name")]
         public string? Name { get; set; }
+
+        [JsonPropertyName("Speed")]
+        public required int Speed { get; set; }
+
+        [JsonPropertyName("Acc")]
+        public int Acc { get; set; }
     }
 }

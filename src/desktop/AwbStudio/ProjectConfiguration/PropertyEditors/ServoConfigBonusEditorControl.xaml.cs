@@ -156,7 +156,17 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             if (result.Ok)
             {
                 var resultPayloadJsonStr = result.ResultPayload;
-                var resultDataPacket = JsonSerializer.Deserialize<ReadValueResponseDataPacket>(resultPayloadJsonStr, options);
+
+                ReadValueResponseDataPacket? resultDataPacket = null;
+                try
+                {
+                    resultDataPacket = JsonSerializer.Deserialize<ReadValueResponseDataPacket>(resultPayloadJsonStr, options);
+                }
+                catch (JsonException ex)
+                {
+                    ShowError($"Unable to read position from servo. Error deserializing result payload: {ex.Message} - Payload: {resultPayloadJsonStr}");
+                    return null;
+                }
                 if (resultDataPacket == null)
                 {
                     ShowError($"Unable to read position from servo. Result data packet is null:" + resultPayloadJsonStr);

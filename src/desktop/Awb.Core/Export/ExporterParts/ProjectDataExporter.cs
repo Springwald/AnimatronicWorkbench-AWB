@@ -49,6 +49,9 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("#define hardware_config_h");
             content.AppendLine();
 
+            content.AppendLine($"#define AwbClientId {_projectData.Esp32ClientHardwareConfig.ClientId} // If you use more than one AWB-client, you have to enter different IDs per client here");
+            content.AppendLine();
+
             if (_projectData.Esp32ClientHardwareConfig.DebuggingIoPin != null)
             {
                 content.AppendLine("/* Debugging settings */");

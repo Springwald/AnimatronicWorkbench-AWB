@@ -54,6 +54,13 @@ public:
     void writePosition(int id, int position);
 
     /**
+     * write the position to the servo, using the given speed and acceleration, ignoring any settings in the project data.
+     * This is used for the direct communication with the servo controller by the AWB Studio software in hardware config mode
+     *
+     */
+    void writePositionDirectToHardware(int id, int position, int speed, int acc);
+
+    /**
      * read the actual position from the servo
      */
     int readPosition(u8 id);

@@ -1,8 +1,10 @@
 #ifndef hardware_config_h
 #define hardware_config_h
 
+#define AwbClientId 1 // If you use more than one AWB-client, you have to enter different IDs per client here
+
 /* Debugging settings */
-#define DEBUGGING_IO_PIN 25 // the GPIO pin to use for debugging
+#define DEBUGGING_IO_PIN 25          // the GPIO pin to use for debugging
 #define DEBUGGING_IO_PIN_ACTIVE HIGH // if the debugging pin is active low, set this to true
 
 /* Display settings */
@@ -24,6 +26,5 @@
 #define USE_SCS_SERVO
 #define SCS_SERVO_RXD 18
 #define SCS_SERVO_TXD 19
-
 
 #endif

@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.Project.Servos;
@@ -51,18 +51,20 @@ namespace Awb.Core.DataPackets
                 return new ClientDataPacket(stsFeetechServoConfig.ClientId,
                 new DataPacketContent
                 {
-                     StsServos = new StsServosPacketData
-                     {
-                         Servos = new[]
+                    StsServos = new StsServosPacketData
+                    {
+                        Servos = new[]
                          {
                              new StsServoPacketData
                              {
                                  Channel = stsFeetechServoConfig.Channel,
                                  TargetValue = absolutePos,
                                  Name = string.IsNullOrWhiteSpace(stsFeetechServoConfig.Title) ? $"STS{stsFeetechServoConfig.Channel}" : stsFeetechServoConfig.Title,
+                                 Speed = stsFeetechServoConfig.Speed.HasValue ? stsFeetechServoConfig.Speed.Value : 0,
+                                 Acc = stsFeetechServoConfig.Acceleration.HasValue ? stsFeetechServoConfig.Acceleration.Value : 0,
                              }
                          }
-                     },
+                    },
                 });
             }
             if (servo is ScsFeetechServoConfig scsFeetechServoConfig)
@@ -79,6 +81,7 @@ namespace Awb.Core.DataPackets
                                     Channel = scsFeetechServoConfig.Channel,
                                     TargetValue = absolutePos,
                                     Name = string.IsNullOrWhiteSpace(scsFeetechServoConfig.Title) ? $"SCS{scsFeetechServoConfig.Channel}" : scsFeetechServoConfig.Title,
+                                    Speed = scsFeetechServoConfig.Speed.HasValue ? scsFeetechServoConfig.Speed.Value : 0,
                                 }
                             }
                         },
@@ -175,6 +178,8 @@ namespace Awb.Core.DataPackets
                         Channel = stsServo.Channel,
                         TargetValue = servo.TargetValue,
                         Name = string.IsNullOrWhiteSpace(stsServo.Title) ? $"STS{stsServo.Channel}" : stsServo.Title,
+                        Speed = stsServo.Speed.HasValue ? stsServo.Speed.Value : 0,
+                        Acc = stsServo.Acceleration.HasValue ? stsServo.Acceleration.Value : 0,
                     });
                 }
             }

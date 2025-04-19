@@ -54,6 +54,16 @@ namespace Awb.Core.Actuators
         public int MinValue { get; private set; }
 
         /// <summary>
+        /// The speed of the servo 
+        /// </summary>
+        public int? Speed { get; private set; }
+
+        /// <summary>
+        /// The Acceleration of the servo
+        /// </summary>
+        public int? Acceleration { get; private set; }
+
+        /// <summary>
         /// The maximum value this servo should handle in the constructred animatronic figure
         /// </summary>
         public int MaxValue { get; private set; }
@@ -102,10 +112,14 @@ namespace Awb.Core.Actuators
 
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
 
+            var acc = config is StsFeetechServoConfig stsFeetechServoConfig ? stsFeetechServoConfig.Acceleration : null;
+
             Id = config.Id;
             StsScsType = type;
             MaxValue = config.MaxValue;
             MinValue = config.MinValue;
+            Speed = config.Speed;
+            Acceleration = acc;
             ClientId = config.ClientId;
             Channel = config.Channel;
             Title = config.Title;

@@ -13,6 +13,8 @@ StaticJsonDocument<1024 * 32> jsondoc;
  */
 String PacketProcessor::processPacket(String payload)
 {
+    boolean sendServoUpdateDirectly = true; // should the servo update directly send to the servo controller or via the project data? If set to false, the project data is used to set the target value of the servo. Servos not defined in the project data are ignored.
+
     DeserializationError error = deserializeJson(jsondoc, payload);
     if (error)
     {
@@ -126,22 +128,32 @@ String PacketProcessor::processPacket(String payload)
 
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
+            int speed = servos[i]["Speed"];
+            int acc = servos[i]["Acc"];
             String name = servos[i]["Name"];
 
-            bool done = false;
-
-            for (int f = 0; f < this->_projectData->stsServos->size(); f++)
+            if (sendServoUpdateDirectly)
             {
-                if (this->_projectData->stsServos->at(f).channel == channel)
-                {
-                    // set servo target value
-                    this->_projectData->stsServos->at(f).targetValue = value;
-                    done = true;
-                    break;
-                }
+                // send the value to the STS bus servo
+                this->_stSerialServoManager->writePositionDirectToHardware(channel, value, speed, acc);
             }
-            if (!done)
-                _errorOccured("STS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+            else
+            {
+                // use the project data to set the target value
+                bool done = false;
+                for (int f = 0; f < this->_projectData->stsServos->size(); f++)
+                {
+                    if (this->_projectData->stsServos->at(f).channel == channel)
+                    {
+                        // set servo target value
+                        this->_projectData->stsServos->at(f).targetValue = value;
+                        done = true;
+                        break;
+                    }
+                }
+                if (!done)
+                    _errorOccured("STS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+            }
         }
     }
     if (this->_stSerialServoManager != nullptr)
@@ -161,20 +173,30 @@ String PacketProcessor::processPacket(String payload)
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
             String name = servos[i]["Name"];
+            int speed = servos[i]["Speed"];
 
-            bool done = false;
-            for (int f = 0; f < this->_projectData->scsServos->size(); f++)
+            if (sendServoUpdateDirectly)
             {
-                if (this->_projectData->scsServos->at(f).channel == channel)
-                {
-                    // set servo target value
-                    this->_projectData->scsServos->at(f).targetValue = value;
-                    done = true;
-                    break;
-                }
+                // send the value to the STS bus servo
+                this->_scSerialServoManager->writePositionDirectToHardware(channel, value, speed, 0);
             }
-            if (!done)
-                _errorOccured("SCS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+            else
+            {
+                // use the project data to set the target value
+                bool done = false;
+                for (int f = 0; f < this->_projectData->scsServos->size(); f++)
+                {
+                    if (this->_projectData->scsServos->at(f).channel == channel)
+                    {
+                        // set servo target value
+                        this->_projectData->scsServos->at(f).targetValue = value;
+                        done = true;
+                        break;
+                    }
+                }
+                if (!done)
+                    _errorOccured("SCS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+            }
         }
     }
     if (this->_scSerialServoManager != nullptr)
