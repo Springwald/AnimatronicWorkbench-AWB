@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -21,7 +20,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static AwbStudio.ProjectConfiguration.PropertyEditors.SinglePropertyEditorControl;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
@@ -36,7 +34,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 ObjectToDelete = objectToDelete;
             }
         }
-
         private class PropertyDetails
         {
             public string Group { get; set; } = string.Empty;
@@ -142,10 +139,15 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                         LabelObjectTypeTitle.Content = projectObject.TitleDetailed;
                         this.UpdateProblems();
                         this.OnUpdatedData?.Invoke(this, EventArgs.Empty);
+                        if (servoConfigBonusEditorControl != null && projectObject is IServoConfig servoConfig)
+                        {
+                            // update the servo limits in the config bonus editor control
+                            servoConfigBonusEditorControl.UpdateProjectLimits();
+                        }
                     };
 
                     // connect the button to get the actual servo position to the editor
-                    editor.GetActualServoPositionRequested += async (s,  e) =>
+                    editor.GetActualServoPositionRequested += async (s, e) =>
                     {
                         if (servoConfigBonusEditorControl != null && projectObject is IServoConfig servoConfig && servoConfig.CanReadServoPosition)
                         {

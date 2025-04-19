@@ -8,17 +8,45 @@
              d:DesignHeight="200" d:DesignWidth="800">
     <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0 0 0 5" Background="#FF333333"  >
         <StackPanel Margin="5">
+            <Label Content="Servo physical range" HorizontalAlignment="Center" FontWeight="Bold"></Label>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" x:Name="LabelMinValue" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
-                <Label Grid.Column="1" x:Name="LabelValue" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
-                <Label Grid.Column="2" x:Name="LabelMaxValue" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
+                <Label Grid.Column="0" x:Name="LabelPhysMinValue" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
+                <Label Grid.Column="1" x:Name="LabelPhysValue" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
+                <Label Grid.Column="2" x:Name="LabelPhysMaxValue" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
             </Grid>
-            <Slider x:Name="SliderServoPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
+            <Slider x:Name="SliderServoPhysPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
+            <Label Content="Servo project limitation" HorizontalAlignment="Center" FontWeight="Bold"></Label>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" x:Name="LabelLimitMinValue" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
+                <Label Grid.Column="1" x:Name="LabelLimitValue" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
+                <Label Grid.Column="2" x:Name="LabelLimitMaxValue" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
+            </Grid>
+            <Slider x:Name="SliderServoLimitPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
+            <Separator Width="500"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" x:Name="CheckboxAutomove" Content="auto move between the project limits" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="1" x:Name="ComboBoxAutomoveDelay" HorizontalAlignment="Left" Margin="32,10,0,0" VerticalAlignment="Top" Width="120">
+                    <ComboBoxItem Content="delay 2 second"/>
+                    <ComboBoxItem Content="delay 5 seconds"/>
+                    <ComboBoxItem Content="delay 10 seconds"/>
+                    <ComboBoxItem Content="delay 20 seconds"/>
+                </ComboBox>
+            </Grid>
+            <Separator Width="500"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -27,6 +55,9 @@
                 <CheckBox Grid.Column="0" x:Name="CheckboxSendChangesToServo" Content="Send changes to servo" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Button Grid.Column="1" x:Name="ButtonReadPosition"  Content="read position" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonReadPosition_Click" />
             </Grid>
+            
+
+
         </StackPanel>
     </Border>
 </UserControl>

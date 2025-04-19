@@ -44,63 +44,103 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
                 // Enable/disable the read position button
                 ButtonReadPosition.Visibility = _servoConfig.CanReadServoPosition ? Visibility.Visible : Visibility.Collapsed;
-                var maxValue = 0;
-                var minValue = 0;
+                var maxPhysValue = 0;
+                var minPhysValue = 0;
                 int? defaultValue = null;
 
                 // get the maximum values from "range" property annotation of the attribute FeetechBusServoConfig.MaxValue
                 if (_servoConfig is ScsFeetechServoConfig scsFeetechServoConfig)
                 {
-                    maxValue = ScsFeetechServoConfig.MaxValConst;
+                    maxPhysValue = ScsFeetechServoConfig.MaxValConst;
                     defaultValue = scsFeetechServoConfig.DefaultValue;
                 }
                 else if (_servoConfig is StsFeetechServoConfig stsFeetechServoConfig)
                 {
-                    maxValue = StsFeetechServoConfig.MaxValueConst;
+                    maxPhysValue = StsFeetechServoConfig.MaxValueConst;
                     defaultValue = stsFeetechServoConfig.DefaultValue;
                 }
                 else if (_servoConfig is Pca9685PwmServoConfig pca9685PwmServoConfig)
                 {
-                    maxValue = Pca9685PwmServoConfig.MaxValConst;
+                    maxPhysValue = Pca9685PwmServoConfig.MaxValConst;
                     defaultValue = pca9685PwmServoConfig.DefaultValue;
                 }
                 else
                 {
                     MessageBox.Show("Servo config is not a FeetechBusServoConfig or Pca9685PwmServoConfig.");
                     // hide the sliders if the servo config is not a supported type
-                    SliderServoPosition.Visibility = Visibility.Collapsed;
-                    LabelMaxValue.Content = "?!?";
-                    LabelMinValue.Content = "?!?";
-                    LabelValue.Content = "?!?";
+                    SliderServoPhysPosition.Visibility = Visibility.Collapsed;
+                    LabelPhysMaxValue.Content = "?!?";
+                    LabelPhysMinValue.Content = "?!?";
+                    LabelPhysValue.Content = "?!?";
+
+                    SliderServoLimitPosition.Visibility = Visibility.Collapsed;
+                    LabelLimitMaxValue.Content = "?!?";
+                    LabelLimitMinValue.Content = "?!?";
+                    LabelLimitValue.Content = "?!?";
+
                     return;
                 }
 
-                SliderServoPosition.Maximum = maxValue;
-                LabelMaxValue.Content = maxValue.ToString();
-
-                SliderServoPosition.Minimum = minValue;
-                LabelMinValue.Content = minValue.ToString();
+                // show the sliders if the servo config is a supported type
+                SliderServoPhysPosition.Minimum = minPhysValue;
+                SliderServoPhysPosition.Maximum = maxPhysValue;
+                LabelPhysMinValue.Content = minPhysValue.ToString();
+                LabelPhysMaxValue.Content = maxPhysValue.ToString();
 
                 // show the default values
                 if (defaultValue is null)
                 {
                     // if the default value is not set, set the slider to the center value
-                    var centerValue = minValue + (maxValue - minValue) / 2;
-                    SliderServoPosition.Value = centerValue;
-                    LabelValue.Content = centerValue.ToString();
+                    var centerValue = minPhysValue + (maxPhysValue - minPhysValue) / 2;
+                    SliderServoPhysPosition.Value = centerValue;
+                    LabelPhysValue.Content = centerValue.ToString();
                 }
                 else
                 {
-                    SliderServoPosition.Value = defaultValue.Value;
-                    LabelValue.Content = defaultValue.Value.ToString();
+                    SliderServoPhysPosition.Value = defaultValue.Value;
+                    LabelPhysValue.Content = defaultValue.Value.ToString();
                 }
+
+                UpdateProjectLimits();
             }
         }
+
+      
 
         public ServoConfigBonusEditorControl(IAwbClientsService awbClientsService)
         {
             _awbClientsService = awbClientsService;
             InitializeComponent();
+        }
+
+        public void UpdateProjectLimits()
+        {
+            var maxProjectLimitValue = 0;
+            var minProjectLimitValue = 0;
+
+            if (_servoConfig is ScsFeetechServoConfig scsFeetechServoConfig)
+            {
+                minProjectLimitValue = scsFeetechServoConfig.MinValue;
+                maxProjectLimitValue = scsFeetechServoConfig.MaxValue;
+            }
+            else if (_servoConfig is StsFeetechServoConfig stsFeetechServoConfig)
+            {
+                minProjectLimitValue = stsFeetechServoConfig.MinValue;
+                maxProjectLimitValue = stsFeetechServoConfig.MaxValue;
+            }
+            else if (_servoConfig is Pca9685PwmServoConfig pca9685PwmServoConfig)
+            {
+                minProjectLimitValue = pca9685PwmServoConfig.MinValue;
+                maxProjectLimitValue = pca9685PwmServoConfig.MaxValue;
+            }
+
+            if(minProjectLimitValue > maxProjectLimitValue) // swap the values if they are in the wrong order
+                (minProjectLimitValue, maxProjectLimitValue) = (maxProjectLimitValue, minProjectLimitValue);
+
+            SliderServoLimitPosition.Minimum = minProjectLimitValue;
+            SliderServoLimitPosition.Maximum = maxProjectLimitValue;
+            LabelLimitMinValue.Content = minProjectLimitValue.ToString();
+            LabelLimitMaxValue.Content = maxProjectLimitValue.ToString();
         }
 
         private async void ButtonReadPosition_Click(object sender, RoutedEventArgs e)
@@ -120,8 +160,11 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             var value = await ReadPosFromServo(ServoConfig);
             if (value.HasValue)
             {
-                LabelValue.Content = value;
-                SliderServoPosition.Value = value.Value;
+                LabelPhysValue.Content = value;
+                SliderServoPhysPosition.Value = value.Value;
+
+                LabelLimitValue.Content = value;
+                SliderServoLimitPosition.Value = value.Value;
             }
             return;
         }
@@ -210,10 +253,10 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 _newSendPositionValue = absolutePosition;
                 await this.SendValueToServo(ServoConfig, absolutePosition);
             }
-            else
-            {
-                LabelValue.Content = ((int)e.NewValue).ToString();
-            }
+            if (sender != SliderServoPhysPosition) SliderServoPhysPosition.Value = e.NewValue;
+            if (sender != SliderServoLimitPosition) SliderServoLimitPosition.Value = e.NewValue;
+            LabelPhysValue.Content = ((int)e.NewValue).ToString();
+            LabelLimitValue.Content = ((int)e.NewValue).ToString();
         }
 
         private async Task SendValueToServo(IServoConfig servoConfig, int absolutePosition)
@@ -248,7 +291,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 if (result.Ok)
                 {
                     // set the label for the slider to the new value
-                    LabelValue.Content = absolutePosition.ToString();
+                    LabelPhysValue.Content = absolutePosition.ToString();
+                    LabelLimitValue.Content = absolutePosition.ToString();
                 }
                 else
                 {

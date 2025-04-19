@@ -61,12 +61,12 @@ namespace Awb.Core.Project.Servos
         [Range(100, 1000)]
         public uint MaxTorque { get; set; } = 400;
 
-        [Display(Name = "Lowest value", GroupName = "Values", Order = 4)]
+        [Display(Name = "Project lowest position", GroupName = "Values", Order = 4)]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
         [SupportsTakeOverTheCurrentServoValue]
         public abstract int MinValue { get; set; }
 
-        [Display(Name = "Highest value", GroupName = "Values", Order = 5)]
+        [Display(Name = "Project highest position", GroupName = "Values", Order = 5)]
         [Description("The value when the servo curve is at its highest point. Possibly confusing: Can be greater than the value for 'low'.")]
         [SupportsTakeOverTheCurrentServoValue]
         public abstract int MaxValue { get; set; }
