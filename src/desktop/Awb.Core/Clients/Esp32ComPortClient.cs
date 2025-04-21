@@ -24,7 +24,7 @@ namespace Awb.Core.Clients
 
         public EventHandler<ReceivedEventArgs>? Received { get; set; }
         public EventHandler<string>? OnError { get; set; }
-        
+        public EventHandler<string>? PacketSending { get; set; }
 
         public Esp32ComPortClient(string comPortName, uint clientId)
         {
@@ -58,13 +58,21 @@ namespace Awb.Core.Clients
             _comPortReceiver?.Dispose();
         }
 
-        public async Task<SendResult> Send(byte[] payload)
+        public async Task<SendResult> Send(byte[] payload, string? debugInfo)
         {
             if (!Connected) return new SendResult(false, errorMessage: "not connected, please run Init() before using Esp32ComPortClient!", resultPlayload: null, debugInfos: null);
+
+            if (!string.IsNullOrWhiteSpace(debugInfo))
+                this.PacketSending?.Invoke(this, $"Send packet info\r\n{debugInfo}");
+
             var result = await _comPortReceiver.SendPacket(payload);
 
             if (result.Ok == false)
-                return new SendResult(ok: false, errorMessage: result.Message, resultPlayload: null, $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
+            {
+                var details = $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}";
+                OnError?.Invoke(this, $"Error sending packet: {result.Message} / {details}");
+                return new SendResult(ok: false, errorMessage: result.Message, resultPlayload: null, details);
+            }
 
             return new SendResult(ok: true, errorMessage: null, resultPlayload: result.Message, debugInfos: $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
         }

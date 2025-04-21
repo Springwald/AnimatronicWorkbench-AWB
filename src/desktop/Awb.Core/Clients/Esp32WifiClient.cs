@@ -21,6 +21,7 @@ namespace Awb.Core.Clients
         public DateTime? LastErrorUtc => throw new NotImplementedException();
 
         public EventHandler<ReceivedEventArgs>? Received { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public EventHandler<string>? PacketSending { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public async Task<bool> InitAsync()
         {
@@ -29,6 +30,11 @@ namespace Awb.Core.Clients
         }
 
         public Task<SendResult> Send(byte[] payload)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SendResult> Send(byte[] payload, string? debugInfos)
         {
             throw new NotImplementedException();
         }

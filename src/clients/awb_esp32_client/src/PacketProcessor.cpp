@@ -23,6 +23,8 @@ String PacketProcessor::processPacket(String payload)
         return String("json:") + String(error.c_str()) + " " + payload;
     }
 
+    // #### READ VALUES ####
+
     if (jsondoc.containsKey("ReadValue")) // AWB studio requests a value from the client e.g. Servo Position
     {
         // read a value from the client
@@ -76,6 +78,8 @@ String PacketProcessor::processPacket(String payload)
         }
     }
 
+    // #### DISPLAY MESSAGE ####
+
     if (jsondoc.containsKey("DispMsg")) // packat contains a display message
     {
         const char *message = jsondoc["DispMsg"]["Msg"];
@@ -92,6 +96,8 @@ String PacketProcessor::processPacket(String payload)
             _messageToShow(message, duration);
         }
     }
+
+    // #### RECEIVE VALUES ####
 
     if (jsondoc.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
     {
@@ -135,7 +141,13 @@ String PacketProcessor::processPacket(String payload)
             if (sendServoUpdateDirectly)
             {
                 // send the value to the STS bus servo
-                this->_stSerialServoManager->writePositionDirectToHardware(channel, value, speed, acc);
+                if (value < 0) // -1 means stop the servo
+                    this->_stSerialServoManager->setTorque(channel, false);
+                else
+                {
+                    this->_stSerialServoManager->setTorque(channel, true);
+                    this->_stSerialServoManager->writePositionDirectToHardware(channel, value, speed, acc);
+                }
             }
             else
             {
@@ -156,7 +168,7 @@ String PacketProcessor::processPacket(String payload)
             }
         }
     }
-    if (this->_stSerialServoManager != nullptr)
+    if (!sendServoUpdateDirectly && this->_stSerialServoManager != nullptr)
         _stSerialServoManager->updateActuators(false);
 
     if (jsondoc.containsKey("SCS")) // package contains SCS bus servo data
@@ -177,8 +189,14 @@ String PacketProcessor::processPacket(String payload)
 
             if (sendServoUpdateDirectly)
             {
-                // send the value to the STS bus servo
-                this->_scSerialServoManager->writePositionDirectToHardware(channel, value, speed, 0);
+                if (value < 0) // -1 means stop the servo
+                    this->_scSerialServoManager->setTorque(channel, false);
+                else
+                {
+                    // send the value to the SCS bus servo
+                    this->_scSerialServoManager->setTorque(channel, true);
+                    this->_scSerialServoManager->writePositionDirectToHardware(channel, value, speed, 0);
+                }
             }
             else
             {
@@ -199,7 +217,7 @@ String PacketProcessor::processPacket(String payload)
             }
         }
     }
-    if (this->_scSerialServoManager != nullptr)
+    if (!sendServoUpdateDirectly && this->_scSerialServoManager != nullptr)
         _scSerialServoManager->updateActuators(false);
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL

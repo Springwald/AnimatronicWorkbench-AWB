@@ -220,7 +220,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             };
             var jsonStr = JsonSerializer.Serialize(packet.Content, options);
             var payload = Encoding.ASCII.GetBytes(jsonStr);
-            var result = await client.Send(payload);
+            var result = await client.Send(payload: payload, debugInfo: jsonStr);
             if (result.Ok)
             {
                 var resultPayloadJsonStr = result.ResultPayload;
@@ -324,7 +324,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 };
                 var jsonStr = JsonSerializer.Serialize(packet.Content, options);
                 var payload = Encoding.ASCII.GetBytes(jsonStr);
-                var result = await client.Send(payload);
+                var result = await client.Send(payload: payload, debugInfo: jsonStr);
                 if (result.Ok)
                 {
                     // set the label for the slider to the new value

@@ -32,6 +32,11 @@ namespace Awb.Core.Clients
         EventHandler<ReceivedEventArgs>? Received { get; set; }
 
         /// <summary>
+        /// a payload was sent to the client (for debugging purposes)
+        /// </summary>
+        EventHandler<string>? PacketSending { get; set; }
+
+        /// <summary>
         /// the client has send an error message or the communication to the client failed
         /// </summary>
         EventHandler<string>? OnError { get; set; }
@@ -44,6 +49,6 @@ namespace Awb.Core.Clients
         /// <summary>
         /// send a payload to the client
         /// </summary>
-        Task<SendResult> Send(byte[] payload);
+        Task<SendResult> Send(byte[] payload, string? debugInfos);
     }
 }

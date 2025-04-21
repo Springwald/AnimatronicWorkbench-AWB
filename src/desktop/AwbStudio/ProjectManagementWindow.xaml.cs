@@ -283,6 +283,7 @@ namespace AwbStudio
                 }
                 ShowProjectTimelineEditor(clientsService, timelineControllers);
             }
+            await Task.CompletedTask;
         }
 
         private void ShowProjectTimelineEditor(IAwbClientsService clientsService, ITimelineController[] timelineControllers)

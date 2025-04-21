@@ -33,7 +33,6 @@ namespace AwbStudio.AwbClientsControls
         }
 
       
-
         internal void SetClient(IAwbClient client)
         {
             UnbindClient();
@@ -89,17 +88,38 @@ namespace AwbStudio.AwbClientsControls
             _awbClient = client;
             _awbClient.OnError += AwbClient_OnError;
             _awbClient.Received += AwbClient_Received;
+            _awbClient.PacketSending += AwbClient_PacketSending;
         }
-
+        
         private void UnbindClient()
         {
             if (_awbClient != null)
             {
                 _awbClient.OnError -= AwbClient_OnError;
+                _awbClient.Received -= AwbClient_Received;
+                _awbClient.PacketSending -= AwbClient_PacketSending;
                 _awbClient = null;
             }
         }
 
+        private void AwbClient_PacketSending(object? sender, string e)
+        {
+            var old = this.TextBlockDebugLog.Text ?? string.Empty;
+            if (old.Length > 1000)
+                old = old.Substring(0, 1000);
+            var debugInfos = $"----------------------------{Environment.NewLine}📦 {e}{Environment.NewLine}{old}";
+            this.TextBlockDebugLog.Text = debugInfos;
+        }
 
+        private void btnCopyDebugToClipboard_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var content = this.TextBlockDebugLog.Text;
+            if (string.IsNullOrEmpty(content))
+            {
+                System.Windows.MessageBox.Show("No content to copy");
+                return;
+            }
+            System.Windows.Clipboard.SetText(content);
+        }
     }
 }

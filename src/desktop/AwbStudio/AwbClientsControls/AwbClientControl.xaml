@@ -17,7 +17,7 @@
                 <Button HorizontalAlignment="Right" x:Name="ButtonDisconnect" Margin="5" Content="Disconnect" />
             </Grid>
             <emoji:TextBlock x:Name="TextBlockDebugLog"  IsEnabled="False" TextWrapping="Wrap" Foreground="{StaticResource ForegroundBrush}" Text="" MaxHeight="100"/>
-            
+            <Button x:Name="btnCopyDebugToClipboard" Content="copy debug to clipboard" Click="btnCopyDebugToClipboard_Click"/>
         </StackPanel>
     </Border>
 </UserControl>

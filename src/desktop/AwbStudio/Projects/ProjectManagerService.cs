@@ -81,7 +81,7 @@ namespace AwbStudio.Projects
                     {
                         Directory.CreateDirectory(path);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         return false;
                     }
