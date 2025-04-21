@@ -7,6 +7,7 @@
 
 using Awb.Core.Clients;
 using Awb.Core.Clients.Models;
+using Awb.Core.Tools;
 using System;
 using System.Threading;
 using System.Windows.Controls;
@@ -20,10 +21,13 @@ namespace AwbStudio.AwbClientsControls
     {
         private Timer? _updateClientInformationTimer;
         private IAwbClient? _awbClient;
+        private readonly IInvokerService _invokerService;
 
-        public AwbClientControl()
+        public AwbClientControl(IInvokerService invokerService)
         {
+            _invokerService = invokerService;
             InitializeComponent();
+            
             Unloaded += AwbClientControl_Unloaded;
             _updateClientInformationTimer = new Timer(UpdateClientInformation, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
         }
@@ -60,14 +64,7 @@ namespace AwbStudio.AwbClientsControls
         private void UpdateClientInformation(object? state)
         {
             // call the update method in the UI thread
-            if (this.Dispatcher.CheckAccess())
-            {
-                UpdateClientInformationInternal();
-            }
-            else
-            {
-                this.Dispatcher.Invoke(UpdateClientInformationInternal);
-            }
+           _invokerService.GetInvoker().Invoke(() => UpdateClientInformationInternal());
         }
 
         private void UpdateClientInformationInternal()

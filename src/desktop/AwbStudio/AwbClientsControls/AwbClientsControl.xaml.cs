@@ -6,6 +6,7 @@
 // All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
+using Awb.Core.Tools;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,10 +20,12 @@ namespace AwbStudio.AwbClientsControls
     public partial class AwbClientsControl : UserControl
     {
         private readonly IAwbClientsService _awbClientsService;
+        private readonly IInvokerService _invokerService;
 
         public AwbClientsControl()
         {
             _awbClientsService = App.GetService<IAwbClientsService>();
+            _invokerService = App.GetService<IInvokerService>();
             InitializeComponent();
             Loaded += AwbClientsControl_Loaded;
         }
@@ -50,7 +53,7 @@ namespace AwbStudio.AwbClientsControls
                     this.stackPanelClients.Children.Clear();
                     foreach (var client in clients)
                     {
-                        var clientControl = new AwbClientControl();
+                        var clientControl = new AwbClientControl(_invokerService);
                         this.stackPanelClients.Children.Add(clientControl);
                         clientControl.SetClient(client);
                     }
