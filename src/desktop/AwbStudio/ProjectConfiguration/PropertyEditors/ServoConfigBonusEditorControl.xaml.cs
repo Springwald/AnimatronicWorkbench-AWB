@@ -30,6 +30,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private readonly IInvoker _invoker;
         private IServoConfig _servoConfig;
 
+        private volatile bool _isMoving = false;
+
         private DateTime _lastError = DateTime.MinValue;
 
         private int? _newSendPositionValue = null;
@@ -270,22 +272,28 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         private async void SliderServoPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (_isMoving) return; // prevent recursive calls
+           
             if (CheckboxSendChangesToServo.IsChecked == true)
             {
                 var absolutePosition = (int)e.NewValue;
                 _newSendPositionValue = absolutePosition;
                 await this.SendValueToServo(ServoConfig, absolutePosition);
             }
+         
             await ShowActualPosition(sender, (int)e.NewValue);
+         
         }
 
         private async Task ShowActualPosition(object sender, int position)
         {
+            _isMoving = true;
             if (sender != SliderServoPhysPosition) SliderServoPhysPosition.Value = position;
             if (sender != SliderServoLimitPosition) SliderServoLimitPosition.Value = position;
             LabelPhysValue.Content = (position).ToString();
             LabelLimitValue.Content = (position).ToString();
             await Task.CompletedTask;
+            _isMoving = false;
         }
 
         private async Task SendValueToServo(IServoConfig servoConfig, int absolutePosition)
