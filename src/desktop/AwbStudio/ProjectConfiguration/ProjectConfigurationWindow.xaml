@@ -79,7 +79,7 @@
                     <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" CornerRadius="3" Padding="10">
                         <PropertyEditors:PropertyEditorControl x:Name="PropertyEditor" Grid.Row="1"
                                                            OnDeleteObject="PropertyEditorOnObjectDelete_Fired" 
-                                                           OnUpdatedData="PropertyEditorUpdatedData_Fired"/>
+                                                           OnUpdatedData="PropertyEditorUpdatedData_Fired"  />
                     </Border>
                 </Grid>
 

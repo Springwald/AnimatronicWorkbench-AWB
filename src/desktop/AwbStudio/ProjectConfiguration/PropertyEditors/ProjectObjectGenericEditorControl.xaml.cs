@@ -8,6 +8,7 @@
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Services;
+using Awb.Core.Tools;
 using Awb.Core.Tools.Validation;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private List<SinglePropertyEditorControl> _editors;
         private IProjectObjectListable _projectObject;
         private AwbProject _awbProject;
+        private IInvoker _invoker;
         private string[] _objectsUsingThisObject;
         private readonly IAwbClientsService _awbClientsService;
 
@@ -54,12 +56,13 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         public string? ActualProblems { get; set; }
 
-        public void SetProjectAndObject(IProjectObjectListable projectObject, AwbProject awbProject, string[] objectsUsingThisObject)
+        public async Task SetProjectAndObject(IProjectObjectListable projectObject, AwbProject awbProject, IInvoker invoker, string[] objectsUsingThisObject)
         {
             _projectObject = projectObject;
             _awbProject = awbProject;
+            _invoker = invoker;
             _objectsUsingThisObject = objectsUsingThisObject;
-            WriteDataToEditor(projectObject);
+            await WriteDataToEditor(projectObject);
             UpdateProblems();
         }
 
@@ -94,7 +97,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             ServoConfigBonusEditorControl? servoConfigBonusEditorControl = null;
             if (projectObject is IServoConfig servoConfig)
             {
-                servoConfigBonusEditorControl = new ServoConfigBonusEditorControl(_awbClientsService)
+                servoConfigBonusEditorControl = new ServoConfigBonusEditorControl(_awbClientsService, _invoker)
                 {
                     ServoConfig = servoConfig,
                 };

@@ -9,10 +9,13 @@ using Awb.Core.DataPackets;
 using Awb.Core.DataPackets.ResponseDataPackets;
 using Awb.Core.Project.Servos;
 using Awb.Core.Services;
+using Awb.Core.Tools;
+using AwbStudio.Tools;
 using System;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -24,7 +27,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     public partial class ServoConfigBonusEditorControl : UserControl
     {
         private readonly IAwbClientsService _awbClientsService;
-
+        private readonly IInvoker _invoker;
         private IServoConfig _servoConfig;
 
         private DateTime _lastError = DateTime.MinValue;
@@ -32,7 +35,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private int? _newSendPositionValue = null;
         private volatile bool _sendingValueToServo = false;
 
-        public IServoConfig ServoConfig
+        private Timer _autoPlayTimer = new Timer(5000);
+        private bool _autoPlayFlipFlop = false;
+        private int _maxProjectLimitValue;
+        private int _minProjectLimitValue;
+
+        public required IServoConfig ServoConfig
         {
             get
             {
@@ -105,42 +113,57 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
         }
 
-      
-
-        public ServoConfigBonusEditorControl(IAwbClientsService awbClientsService)
+        public ServoConfigBonusEditorControl(IAwbClientsService awbClientsService, IInvoker invoker)
         {
             _awbClientsService = awbClientsService;
+            _invoker = invoker;
+            Loaded += ServoConfigBonusEditorControl_Loaded;
             InitializeComponent();
+        }
+
+        private void ServoConfigBonusEditorControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Unloaded += ServoConfigBonusEditorControl_Unloaded;
+
+            _autoPlayTimer.Stop();
+            _autoPlayTimer.AutoReset = true;
+            _autoPlayTimer.Elapsed += AutoPlayTimer_Elapsed;
+        }
+
+
+        private void ServoConfigBonusEditorControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _autoPlayTimer.Stop();
         }
 
         public void UpdateProjectLimits()
         {
-            var maxProjectLimitValue = 0;
-            var minProjectLimitValue = 0;
+            _maxProjectLimitValue = 0;
+            _minProjectLimitValue = 0;
 
             if (_servoConfig is ScsFeetechServoConfig scsFeetechServoConfig)
             {
-                minProjectLimitValue = scsFeetechServoConfig.MinValue;
-                maxProjectLimitValue = scsFeetechServoConfig.MaxValue;
+                _minProjectLimitValue = scsFeetechServoConfig.MinValue;
+                _maxProjectLimitValue = scsFeetechServoConfig.MaxValue;
             }
             else if (_servoConfig is StsFeetechServoConfig stsFeetechServoConfig)
             {
-                minProjectLimitValue = stsFeetechServoConfig.MinValue;
-                maxProjectLimitValue = stsFeetechServoConfig.MaxValue;
+                _minProjectLimitValue = stsFeetechServoConfig.MinValue;
+                _maxProjectLimitValue = stsFeetechServoConfig.MaxValue;
             }
             else if (_servoConfig is Pca9685PwmServoConfig pca9685PwmServoConfig)
             {
-                minProjectLimitValue = pca9685PwmServoConfig.MinValue;
-                maxProjectLimitValue = pca9685PwmServoConfig.MaxValue;
+                _minProjectLimitValue = pca9685PwmServoConfig.MinValue;
+                _maxProjectLimitValue = pca9685PwmServoConfig.MaxValue;
             }
 
-            if(minProjectLimitValue > maxProjectLimitValue) // swap the values if they are in the wrong order
-                (minProjectLimitValue, maxProjectLimitValue) = (maxProjectLimitValue, minProjectLimitValue);
+            if (_minProjectLimitValue > _maxProjectLimitValue) // swap the values if they are in the wrong order
+                (_minProjectLimitValue, _maxProjectLimitValue) = (_maxProjectLimitValue, _minProjectLimitValue);
 
-            SliderServoLimitPosition.Minimum = minProjectLimitValue;
-            SliderServoLimitPosition.Maximum = maxProjectLimitValue;
-            LabelLimitMinValue.Content = minProjectLimitValue.ToString();
-            LabelLimitMaxValue.Content = maxProjectLimitValue.ToString();
+            SliderServoLimitPosition.Minimum = _minProjectLimitValue;
+            SliderServoLimitPosition.Maximum = _maxProjectLimitValue;
+            LabelLimitMinValue.Content = _minProjectLimitValue.ToString();
+            LabelLimitMaxValue.Content = _maxProjectLimitValue.ToString();
         }
 
         private async void ButtonReadPosition_Click(object sender, RoutedEventArgs e)
@@ -253,10 +276,16 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 _newSendPositionValue = absolutePosition;
                 await this.SendValueToServo(ServoConfig, absolutePosition);
             }
-            if (sender != SliderServoPhysPosition) SliderServoPhysPosition.Value = e.NewValue;
-            if (sender != SliderServoLimitPosition) SliderServoLimitPosition.Value = e.NewValue;
-            LabelPhysValue.Content = ((int)e.NewValue).ToString();
-            LabelLimitValue.Content = ((int)e.NewValue).ToString();
+            await ShowActualPosition(sender, (int)e.NewValue);
+        }
+
+        private async Task ShowActualPosition(object sender, int position)
+        {
+            if (sender != SliderServoPhysPosition) SliderServoPhysPosition.Value = position;
+            if (sender != SliderServoLimitPosition) SliderServoLimitPosition.Value = position;
+            LabelPhysValue.Content = (position).ToString();
+            LabelLimitValue.Content = (position).ToString();
+            await Task.CompletedTask;
         }
 
         private async Task SendValueToServo(IServoConfig servoConfig, int absolutePosition)
@@ -325,5 +354,56 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             _lastError = DateTime.UtcNow;
             MessageBox.Show(message);
         }
+
+        #region Automove
+        private void AutoPlayTimer_Elapsed(object? sender, ElapsedEventArgs e)
+        {
+            FlipFlopAutoPlay();
+        }
+
+        private void FlipFlopAutoPlay()
+        {
+            _invoker.Invoke(async () =>
+            {
+                var newPos = _autoPlayFlipFlop ? _maxProjectLimitValue : _minProjectLimitValue;
+                await SendValueToServo(ServoConfig, newPos);
+                await ShowActualPosition(this, newPos);
+                _autoPlayFlipFlop = !_autoPlayFlipFlop;
+            });
+        }
+
+        private void CheckboxAutomove_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateAutoPlayDuration();
+            _autoPlayFlipFlop = false;
+            _autoPlayTimer.Start();
+            FlipFlopAutoPlay();
+        }
+
+        private void CheckboxAutomove_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _autoPlayTimer.Stop();
+        }
+
+        private void ComboBoxAutomoveDelay_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateAutoPlayDuration();
+        }
+
+        private void UpdateAutoPlayDuration()
+        {
+            int delaySeconds = 5;
+            if (ComboBoxAutomoveDelay.SelectedItem is ComboBoxItem selectedItem)
+            {
+                if (int.TryParse(selectedItem.Tag.ToString(), out var selectedDelaySeconds))
+                {
+                    if (selectedDelaySeconds > 0)
+                    delaySeconds = selectedDelaySeconds;
+                }
+            }
+            _autoPlayTimer.Interval = delaySeconds * 1000;
+        }
     }
+
+    #endregion // automove
 }

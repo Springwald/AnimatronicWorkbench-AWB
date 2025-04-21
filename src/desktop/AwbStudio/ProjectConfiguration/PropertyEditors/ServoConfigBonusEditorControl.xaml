@@ -33,10 +33,11 @@
             <Slider x:Name="SliderServoLimitPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
             <Separator Margin="0 10" />
             <StackPanel Orientation="Horizontal">
-                <CheckBox x:Name="CheckboxAutomove" Content="auto move between the project limits" />
-                <ComboBox x:Name="ComboBoxAutomoveDelay" Margin="10 0 0 0">
-                    <ComboBoxItem Content="delay 2 second" Tag="2"/>
-                    <ComboBoxItem Content="delay 5 seconds" Tag="5" IsSelected="True"/>
+                <CheckBox x:Name="CheckboxAutomove" Content="auto move between the project limits" Checked="CheckboxAutomove_Checked"  Unchecked="CheckboxAutomove_Unchecked" />
+                <ComboBox x:Name="ComboBoxAutomoveDelay" Margin="10 0 0 0" SelectionChanged="ComboBoxAutomoveDelay_SelectionChanged">
+                    <ComboBoxItem Content="delay 1 second" Tag="1" />
+                    <ComboBoxItem Content="delay 2 second2" Tag="2" IsSelected="True"/>
+                    <ComboBoxItem Content="delay 5 seconds" Tag="5" />
                     <ComboBoxItem Content="delay 10 seconds" Tag="10"/>
                     <ComboBoxItem Content="delay 20 seconds" Tag="20"/>
                 </ComboBox>

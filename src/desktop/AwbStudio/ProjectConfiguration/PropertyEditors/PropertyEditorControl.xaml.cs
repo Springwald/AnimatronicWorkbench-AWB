@@ -10,9 +10,11 @@ using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
+using Awb.Core.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using static AwbStudio.ProjectConfiguration.PropertyEditors.ProjectObjectGenericEditorControl;
 
@@ -25,7 +27,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     {
         private ProjectObjectGenericEditorControl? _actualEditor;
         private IProjectObjectListable? _projectObject;
-
         public EventHandler OnUpdatedData { get; set; }
         public EventHandler<DeleteObjectEventArgs> OnDeleteObject { get; set; }
 
@@ -52,7 +53,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             get => _projectObject;
         }
 
-        public bool TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject, TimelineData[] timelines)
+        public async Task<bool> TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject, TimelineData[] timelines, IInvoker invoker)
         {
             if (_projectObject != projectObject)
             {
@@ -110,7 +111,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     }
 
                     var editor = new ProjectObjectGenericEditorControl(AwbClientsService);
-                    editor.SetProjectAndObject(projectObject, awbProject, objectsUsingThisObject.ToArray());
+                    await editor.SetProjectAndObject(projectObject, awbProject, invoker, objectsUsingThisObject.ToArray());
                     ActualEditor = editor;
                     ActualEditor.OnDeleteObject += OnObjectDelete_Fired;
                     ActualEditor.OnUpdatedData += UpdatedData_Fired;
@@ -125,6 +126,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         public PropertyEditorControl()
         {
             InitializeComponent();
+            
         }
 
         private void UpdatedData_Fired(object? sender, EventArgs e)
