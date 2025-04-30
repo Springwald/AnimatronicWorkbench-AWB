@@ -80,5 +80,5 @@ void AwbRemote::loop()
 
     auto batPower = this->_axp192->GetBatVoltage();
     _display.draw_message(String(this->_wifiConfig->WlanSSID) + "\r\n" + String(joy_pos_x) + "/" + String(joy_pos_y) + "\r\nBat:" + String(batPower) + "V", 500, MSG_TYPE_INFO);
-    delay(500);
+    delay(100);
 }
