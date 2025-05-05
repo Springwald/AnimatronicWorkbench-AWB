@@ -71,6 +71,33 @@ bool Mp3PlayerYX5300Serial::playSound(int trackNo)
     return false;
 }
 
+bool Mp3PlayerYX5300Serial::setVolume(uint8_t volume)
+{
+    _mp3->volume(volume); // Set volume value (0~30).
+    auto status = _mp3->getStatus();
+
+    switch (status->code)
+    {
+    case MD_YX5300::STS_OK:
+        //_errorOccured("Mp3PlayerYX5300Manager status: STS_OK");
+        return true;
+
+    case MD_YX5300::STS_VOLUME:
+        //_errorOccured("Mp3PlayerYX5300Manager status: STS_VOLUME");
+        return true;
+
+    default:
+        _errorOccured("Mp3PlayerYX5300Serial.setVolume to " + String(volume) + ": STS_??? 0x" + String(status->code, HEX));
+        break;
+    }
+    return false;
+}
+
+bool Mp3PlayerYX5300Serial::setVolumeToMax()
+{
+    return setVolume(_mp3->volumeMax());
+}
+
 bool Mp3PlayerYX5300Serial::stopSound()
 {
     return _mp3->playStop();

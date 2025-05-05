@@ -224,7 +224,10 @@ void AwbClient::showError(String message)
     _display.draw_message(message, durationMs, MSG_TYPE_ERROR);
 
     if (_wlanConnector != nullptr)
-        _wlanConnector->logError(message);
+    {
+        String actualTimelineName = _autoPlayer == nullptr ? "AutoPlayer not loaded" : _autoPlayer->getCurrentTimelineName(true);
+        _wlanConnector->logError(message + " (" + actualTimelineName + ")");
+    }
 
     // if (_neoPixelStatus != nullptr)
     //     _neoPixelStatus->setState(NeoPixelStatusControl::STATE_ALARM, durationMs);

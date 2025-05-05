@@ -75,12 +75,23 @@ void WlanConnector::logError(String msg)
  */
 void WlanConnector::logInfo(String msg)
 {
-    _messagesCount++;
-    if (_messagesCount >= MAX_LOG_MESSAGES)
-    {
-        _messagesCount = 0;
+    if (_messagesCount < MAX_LOG_MESSAGES)
+        _messagesCount++;
+
+    for (int i = _messagesCount - 1; i > 0; i--)
+    { // shift the messages down in history
+        _messages[i] = _messages[i - 1];
+        _messageTimes[i] = _messageTimes[i - 1];
     }
-    _messages[_messagesCount] = msg;
+
+    auto ageSeconds = (millis() - _startTime) / 1000;
+    auto ageMinutes = ageSeconds / 60;
+    auto ageHours = ageMinutes / 60;
+
+    String time = String(ageHours) + "h-" + String(ageMinutes % 60) + "m-" + String(ageSeconds % 60) + "s";
+
+    _messages[0] = msg;
+    _messageTimes[0] = time;
 }
 
 /**
@@ -252,18 +263,14 @@ String WlanConnector::GetHtml()
         //  System messages
         ptr += "<div class=\"region\">\n";
         ptr += "<table>\n";
-        ptr += "<tr><th>Message</th></tr>\n";
+        ptr += "<tr><th></th><th>Message</th></tr>\n";
         int msgPos = _messagesCount;
 
         _debugging->setState(Debugging::MJ_WLAN, 48);
 
         for (int i = 0; i < MAX_LOG_MESSAGES; i++)
         {
-            // if (msgPos >= MAX_LOG_MESSAGES)
-            {
-                msgPos = i;
-            }
-            ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
+            ptr += "<tr><td>" + _messageTimes[i] + "</td><td>" + _messages[i] + "</td></tr>\n";
             msgPos++;
         }
         ptr += "</table>\n";

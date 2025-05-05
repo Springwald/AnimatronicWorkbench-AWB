@@ -23,6 +23,8 @@ public:
 
     bool playSound(int playerIndex, int trackNo);
     bool stopSound(int playerIndex);
+    bool setVolume(int playerIndex, uint8_t volume);
+    bool setVolumeToMax(int playerIndex);
     int getPlayerIndexByTitle(String playerTitle);
 };
 

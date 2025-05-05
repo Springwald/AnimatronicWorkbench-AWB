@@ -15,7 +15,7 @@
 
 using byte = unsigned char;
 
-#define MAX_LOG_MESSAGES 10
+#define MAX_LOG_MESSAGES 100
 
 /**
  * provides a webserver to control and monitor the animatronic figure
@@ -36,6 +36,7 @@ private:
     ActualStatusInformation *_actualStatusInformation; /// the actual status information of the animatronic figure
 
     String _messages[MAX_LOG_MESSAGES]; /// the log messages
+    String _messageTimes[MAX_LOG_MESSAGES]; /// the time of the log messages
     int _messagesCount = 0;             /// the number of log messages
 
     String GetHtml();                              /// get the html page for the webserver default site
