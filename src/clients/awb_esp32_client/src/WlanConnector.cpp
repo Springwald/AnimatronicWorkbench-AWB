@@ -202,7 +202,7 @@ String WlanConnector::GetHtml()
         ptr += String(this->_projectData->scsServos->size()) + " SCS-Servos, ";
         ptr += String(this->_projectData->pca9685PwmServos->size()) + " PWM-Servos</span>\n";
         ptr += "<table>\n";
-        ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th><th>fault</th><th>last</th></tr>\n";
+        ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th><th>Min/Max</th><th>fault</th><th>last</th></tr>\n";
 
         _debugging->setState(Debugging::MJ_WLAN, 36);
 
@@ -212,6 +212,7 @@ String WlanConnector::GetHtml()
             ptr += "<tr><td>STS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
                    this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
                    this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
+                   this->getTd(String(servo.minLoad) + "/" + String(servo.maxLoad), abs(servo.maxLoad) > servo.maxTorque || abs(servo.minLoad) > servo.maxTorque) +
                    this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
                    this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
         }

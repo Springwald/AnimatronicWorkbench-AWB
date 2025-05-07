@@ -120,7 +120,9 @@ String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *seri
             }
 
             servo->load = serialServoManager->readLoad(servo->channel);
-            if (abs(servo->load) > servo->maxTorque) // servo is overloaded
+            servo->maxLoad = max(servo->maxLoad, servo->load); // store max load
+            servo->minLoad = min(servo->minLoad, servo->load); // store min load
+            if (abs(servo->load) > servo->maxTorque)           // servo is overloaded
             {
                 servo->isFaultCountDownMs = 2000; // pause servo for 2 seconds
                 if (servo->globalFault == true)

@@ -31,7 +31,9 @@ public:
     int targetValue = -1; /// the target value of the actuator (should be updated in the next update cycle)
 
     int temperature = -1;         /// the temperature of the actuator
-    int load = -1;                /// the load of the actuator
+    int load = -1;                /// the actual read load of the actuator
+    int maxLoad = 0;              /// the maximum read load of the actuator
+    int minLoad = 0;              /// the minimum read load of the actuator
     int currentValue = -1;        /// the current value of the actuator (updated in the last update cycle)
     long isFaultCountDownMs = 0;  /// the time in milliseconds when the fault will be cleared
     long lastFaultMs = 0;         /// the time in milliseconds when the fault was detected
