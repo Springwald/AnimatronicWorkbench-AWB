@@ -127,6 +127,18 @@ void StScsSerialServoManager::writePositionDetailed(int id, int position, int sp
     }
 }
 
+void StScsSerialServoManager::writePositionDirectToHardware(int id, int position, int speed, int acc)
+{
+    if (this->_servoTypeIsScs)
+    {
+        _serialServo_SCS.WritePosEx(id, position, speed, acc);
+    }
+    else
+    {
+        _serialServo_STS.WritePosEx(id, position, speed, acc);
+    }
+}
+
 /**
  * write the position to the servo, using the default speed and acceleration
  */

@@ -43,3 +43,5 @@ These are:
 - M5Unit-MiniJoyC -  https://github.com/m5stack/M5Unit-MiniJoyC (MIT License)
 
 - https://github.com/m5stack/M5StickC-Plus/ - https://github.com/m5stack/M5StickC-Plus/ (MIT license)
+
+- emoji.wpf https://github.com/samhocevar/emoji.wpf (WTFPL license)

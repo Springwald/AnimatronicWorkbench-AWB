@@ -75,12 +75,23 @@ void WlanConnector::logError(String msg)
  */
 void WlanConnector::logInfo(String msg)
 {
-    _messagesCount++;
-    if (_messagesCount >= MAX_LOG_MESSAGES)
-    {
-        _messagesCount = 0;
+    if (_messagesCount < MAX_LOG_MESSAGES)
+        _messagesCount++;
+
+    for (int i = _messagesCount - 1; i > 0; i--)
+    { // shift the messages down in history
+        _messages[i] = _messages[i - 1];
+        _messageTimes[i] = _messageTimes[i - 1];
     }
-    _messages[_messagesCount] = msg;
+
+    auto ageSeconds = (millis() - _startTime) / 1000;
+    auto ageMinutes = ageSeconds / 60;
+    auto ageHours = ageMinutes / 60;
+
+    String time = String(ageHours) + "h-" + String(ageMinutes % 60) + "m-" + String(ageSeconds % 60) + "s";
+
+    _messages[0] = msg;
+    _messageTimes[0] = time;
 }
 
 /**
@@ -191,18 +202,14 @@ String WlanConnector::GetHtml()
         ptr += String(this->_projectData->scsServos->size()) + " SCS-Servos, ";
         ptr += String(this->_projectData->pca9685PwmServos->size()) + " PWM-Servos</span>\n";
         ptr += "<table>\n";
-        ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th><th>fault</th><th>last</th></tr>\n";
+        ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th><th>Min/Max</th><th>fault</th><th>last</th></tr>\n";
 
         _debugging->setState(Debugging::MJ_WLAN, 36);
 
         for (int i = 0; i < this->_projectData->stsServos->size(); i++)
         {
             auto servo = this->_projectData->stsServos->at(i);
-            ptr += "<tr><td>STS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
-                   this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
-                   this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
-                   this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
-                   this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
+            AddScsStsServoInfo(ptr, "STS", servo);
         }
 
         _debugging->setState(Debugging::MJ_WLAN, 38);
@@ -210,11 +217,7 @@ String WlanConnector::GetHtml()
         for (int i = 0; i < this->_projectData->scsServos->size(); i++)
         {
             auto servo = this->_projectData->scsServos->at(i);
-            ptr += "<tr><td>SCS " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
-                   this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
-                   this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
-                   this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
-                   this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
+            AddScsStsServoInfo(ptr, "SCS", servo);
         }
 
         _debugging->setState(Debugging::MJ_WLAN, 40);
@@ -252,18 +255,14 @@ String WlanConnector::GetHtml()
         //  System messages
         ptr += "<div class=\"region\">\n";
         ptr += "<table>\n";
-        ptr += "<tr><th>Message</th></tr>\n";
+        ptr += "<tr><th></th><th>Message</th></tr>\n";
         int msgPos = _messagesCount;
 
         _debugging->setState(Debugging::MJ_WLAN, 48);
 
         for (int i = 0; i < MAX_LOG_MESSAGES; i++)
         {
-            // if (msgPos >= MAX_LOG_MESSAGES)
-            {
-                msgPos = i;
-            }
-            ptr += "<tr><td>" + _messages[msgPos] + "</td></tr>\n";
+            ptr += "<tr><td>" + _messageTimes[i] + "</td><td>" + _messages[i] + "</td></tr>\n";
             msgPos++;
         }
         ptr += "</table>\n";
@@ -280,6 +279,16 @@ String WlanConnector::GetHtml()
     ptr += "</body>\n";
     ptr += "</html>\n";
     return ptr;
+}
+
+void WlanConnector::AddScsStsServoInfo(String &ptr, String typeTitle, StsScsServo &servo)
+{
+    ptr += "<tr><td>" + typeTitle + " " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
+           this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
+           this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
+           this->getTd(String(servo.minLoad) + "/" + String(servo.maxLoad), abs(servo.maxLoad) > servo.maxTorque || abs(servo.minLoad) > servo.maxTorque) +
+           this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
+           this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
 }
 
 String WlanConnector::getErrorTime(unsigned long errorMs)

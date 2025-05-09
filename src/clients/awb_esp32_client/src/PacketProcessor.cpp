@@ -11,15 +11,74 @@ StaticJsonDocument<1024 * 32> jsondoc;
 /**
  * process a received packet from the Animatronic Workbench Studio
  */
-void PacketProcessor::processPacket(String payload)
+String PacketProcessor::processPacket(String payload)
 {
+    boolean sendServoUpdateDirectly = true; // should the servo update directly send to the servo controller or via the project data? If set to false, the project data is used to set the target value of the servo. Servos not defined in the project data are ignored.
+
     DeserializationError error = deserializeJson(jsondoc, payload);
     if (error)
     {
         // packet content is not valid json
         //_errorOccured("json:" + String(error.c_str()));
-        return;
+        return String("json:") + String(error.c_str()) + " " + payload;
     }
+
+    // #### READ VALUES ####
+
+    if (jsondoc.containsKey("ReadValue")) // AWB studio requests a value from the client e.g. Servo Position
+    {
+        // read a value from the client
+        String typeName = jsondoc["ReadValue"]["TypeName"];
+        if (typeName == nullptr)
+        {
+            // should not happen, instead the whole ReadValue should be missing
+            _errorOccured("ReadValue?!? " + payload);
+            return String("ReadValue but no type received?!? " + payload);
+        }
+        else
+        {
+            if (typeName == "ScsServo")
+            {
+                // read a value from the SCS bus servo
+                u8 id = jsondoc["ReadValue"]["Id"];
+                if (this->_scSerialServoManager != nullptr)
+                {
+                    int value = this->_scSerialServoManager->readPosition(id);
+                    // send the value back to the AWB studio
+                    String response = "{\"ScsServo\":{\"Id\":" + String(id) + ",\"Position\":" + String(value) + "}}";
+                    return response;
+                }
+                else
+                {
+                    _errorOccured("ScsServoManager not configured!");
+                    return String("ScsServoManager not configured!");
+                }
+            }
+
+            if (typeName = "StsServo")
+            {
+                // read a value from the STS bus servo
+                u8 id = jsondoc["ReadValue"]["Id"];
+                if (this->_stSerialServoManager != nullptr)
+                {
+                    int value = this->_stSerialServoManager->readPosition(id);
+                    // send the value back to the AWB studio
+                    String response = "{\"StsServo\":{\"Id\":" + String(id) + ",\"Position\":" + String(value) + "}}";
+                    return response;
+                }
+                else
+                {
+                    _errorOccured("StsServoManager not configured!");
+                    return String("StsServoManager not configured!");
+                }
+            }
+
+            _errorOccured("ReadValue type not supported: " + typeName);
+            return String("ReadValue type not supported: " + typeName);
+        }
+    }
+
+    // #### DISPLAY MESSAGE ####
 
     if (jsondoc.containsKey("DispMsg")) // packat contains a display message
     {
@@ -38,6 +97,8 @@ void PacketProcessor::processPacket(String payload)
         }
     }
 
+    // #### RECEIVE VALUES ####
+
     if (jsondoc.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
     {
         JsonArray servos = jsondoc["Pca9685Pwm"]["Servos"];
@@ -46,7 +107,7 @@ void PacketProcessor::processPacket(String payload)
             if (this->_pca9685PwmManager == nullptr)
             {
                 _errorOccured("Pca9685Pwm not configured!");
-                return;
+                return String("Pca9685Pwm not configured!");
             }
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
@@ -68,30 +129,46 @@ void PacketProcessor::processPacket(String payload)
             if (this->_stSerialServoManager == nullptr)
             {
                 _errorOccured("STS not configured!");
-                return;
+                return String("STS not configured!");
             }
 
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
+            int speed = servos[i]["Speed"];
+            int acc = servos[i]["Acc"];
             String name = servos[i]["Name"];
 
-            bool done = false;
-
-            for (int f = 0; f < this->_projectData->stsServos->size(); f++)
+            if (sendServoUpdateDirectly)
             {
-                if (this->_projectData->stsServos->at(f).channel == channel)
+                // send the value to the STS bus servo
+                if (value < 0) // -1 means stop the servo
+                    this->_stSerialServoManager->setTorque(channel, false);
+                else
                 {
-                    // set servo target value
-                    this->_projectData->stsServos->at(f).targetValue = value;
-                    done = true;
-                    break;
+                    this->_stSerialServoManager->setTorque(channel, true);
+                    this->_stSerialServoManager->writePositionDirectToHardware(channel, value, speed, acc);
                 }
             }
-            if (!done)
-                _errorOccured("STS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+            else
+            {
+                // use the project data to set the target value
+                bool done = false;
+                for (int f = 0; f < this->_projectData->stsServos->size(); f++)
+                {
+                    if (this->_projectData->stsServos->at(f).channel == channel)
+                    {
+                        // set servo target value
+                        this->_projectData->stsServos->at(f).targetValue = value;
+                        done = true;
+                        break;
+                    }
+                }
+                if (!done)
+                    _errorOccured("STS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+            }
         }
     }
-    if (this->_stSerialServoManager != nullptr)
+    if (!sendServoUpdateDirectly && this->_stSerialServoManager != nullptr)
         _stSerialServoManager->updateActuators(false);
 
     if (jsondoc.containsKey("SCS")) // package contains SCS bus servo data
@@ -103,31 +180,50 @@ void PacketProcessor::processPacket(String payload)
             if (this->_scSerialServoManager == nullptr)
             {
                 _errorOccured("SCS not configured!");
-                return;
+                return String("SCS not configured!");
             }
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
             String name = servos[i]["Name"];
+            int speed = servos[i]["Speed"];
 
-            bool done = false;
-            for (int f = 0; f < this->_projectData->scsServos->size(); f++)
+            if (sendServoUpdateDirectly)
             {
-                if (this->_projectData->scsServos->at(f).channel == channel)
+                if (value < 0) // -1 means stop the servo
+                    this->_scSerialServoManager->setTorque(channel, false);
+                else
                 {
-                    // set servo target value
-                    this->_projectData->scsServos->at(f).targetValue = value;
-                    done = true;
-                    break;
+                    // send the value to the SCS bus servo
+                    this->_scSerialServoManager->setTorque(channel, true);
+                    this->_scSerialServoManager->writePositionDirectToHardware(channel, value, speed, 0);
                 }
             }
-            if (!done)
-                _errorOccured("SCS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+            else
+            {
+                // use the project data to set the target value
+                bool done = false;
+                for (int f = 0; f < this->_projectData->scsServos->size(); f++)
+                {
+                    if (this->_projectData->scsServos->at(f).channel == channel)
+                    {
+                        // set servo target value
+                        this->_projectData->scsServos->at(f).targetValue = value;
+                        done = true;
+                        break;
+                    }
+                }
+                if (!done)
+                    _errorOccured("SCS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+            }
         }
     }
-    if (this->_scSerialServoManager != nullptr)
+    if (!sendServoUpdateDirectly && this->_scSerialServoManager != nullptr)
         _scSerialServoManager->updateActuators(false);
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->showActivity();
 #endif
+
+    // return empty string, because no response is needed
+    return String();
 }

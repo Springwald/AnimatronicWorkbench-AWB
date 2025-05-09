@@ -1,9 +1,11 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
+
+using Awb.Core.Clients.Models;
 
 namespace Awb.Core.Clients
 {
@@ -13,7 +15,13 @@ namespace Awb.Core.Clients
 
         public string FriendlyName => throw new NotImplementedException();
 
-        public EventHandler<IAwbClient.ReceivedEventArgs> Received => throw new NotImplementedException();
+
+        public EventHandler<string>? OnError { get; set; }
+
+        public DateTime? LastErrorUtc => throw new NotImplementedException();
+
+        public EventHandler<ReceivedEventArgs>? Received { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public EventHandler<string>? PacketSending { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public async Task<bool> InitAsync()
         {
@@ -21,9 +29,13 @@ namespace Awb.Core.Clients
             throw new NotImplementedException();
         }
 
-        public async Task<IAwbClient.SendResult> Send(byte[] payload)
+        public Task<SendResult> Send(byte[] payload)
         {
-            await Task.CompletedTask;
+            throw new NotImplementedException();
+        }
+
+        public Task<SendResult> Send(byte[] payload, string? debugInfos)
+        {
             throw new NotImplementedException();
         }
     }

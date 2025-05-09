@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
 using Awb.Core.Tools;
@@ -26,14 +26,27 @@ namespace AwbStudio
     public partial class App : Application
     {
         private static string _errorMessages = string.Empty;
+        private static ServiceProvider? _serviceProvider;
 
-        private ServiceProvider serviceProvider;
         public App()
         {
             ServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
-            serviceProvider = services.BuildServiceProvider();
+            _serviceProvider = services.BuildServiceProvider();
             SetupUnhandledExceptionHandling();
+        }
+
+        /// <summary>
+        /// Gets registered service.
+        /// </summary>
+        /// <typeparam name="T">Type of the service to get.</typeparam>
+        /// <returns>Instance of the service or <see langword="null"/>.</returns>
+        public static T GetService<T>()
+            where T : class
+        {
+            if (_serviceProvider == null) throw new Exception("Service provider not ready.");
+            var service = _serviceProvider.GetService(typeof(T)) as T;
+            return service!;
         }
 
         private void ConfigureServices(ServiceCollection services)
@@ -44,7 +57,11 @@ namespace AwbStudio
             services.AddPropertyEditorVirtualInputControllerService();
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
-            services.TryAddTransient<IAwbClientsService, AwbClientsService>();
+
+            // add the AwbClientsService as a singleton of IAwbClientsService and call the InitAsync method when initializing the service
+            services.AddAwbClientService();
+
+            services.TryAddTransient<AwbClientsWindow>();
             services.TryAddTransient<DebugWindow>();
             services.TryAddTransient<ProjectManagementWindow>();
             services.TryAddTransient<ProjectConfigurationWindow>();
@@ -53,11 +70,18 @@ namespace AwbStudio
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            var projectManagementWindow = serviceProvider.GetService<ProjectManagementWindow>();
+            var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
             if (projectManagementWindow != null)
             {
                 projectManagementWindow.Show();
                 projectManagementWindow.Closed += (s, args) => Shutdown();
+            }
+
+            var awbClientWindow = _serviceProvider!.GetService<AwbClientsWindow>();
+            if (awbClientWindow != null)
+            {
+                awbClientWindow.Show();
+                // awbClientWindow.Closed += (s, args) => Shutdown();
             }
         }
 
@@ -65,7 +89,7 @@ namespace AwbStudio
         {
             // Catch exceptions from all threads in the AppDomain.
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-                ShowUnhandledException(args.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException", false);
+                ShowUnhandledException(args.ExceptionObject as Exception ?? new Exception(args.ExceptionObject?.ToString()), "AppDomain.CurrentDomain.UnhandledException", false);
 
             // Catch exceptions from each AppDomain that uses a task scheduler for async operations.
             TaskScheduler.UnobservedTaskException += (sender, args) =>
@@ -103,7 +127,7 @@ namespace AwbStudio
             var messageBoxButtons = MessageBoxButton.OK;
 
             // copy the exception message to the clipboard
-            _errorMessages+= "\r\n--------------------------------------------------\r\n" +  e.ToString(); 
+            _errorMessages += "\r\n--------------------------------------------------\r\n" + e.ToString();
             Clipboard.SetText(_errorMessages);
 
             if (promptUserForShutdown)

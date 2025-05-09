@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Clients;
 using PacketLogistics.ComPorts;
@@ -19,6 +19,13 @@ namespace Awb.Core.Services
         Task InitAsync();
 
         Esp32ComPortClient? GetClient(uint clientId);
+
+        /// <summary>
+        /// Searches for all available AWB clients on the COM ports.
+        /// </summary>
+        /// <param name="fastMode">true=use cached COM Port data; false=rescan for COM Ports (slower)</param>
+        /// <returns>Number of found clients</returns>
+        public Task<int> ScanForClients(bool fastMode);
     }
 
     public class AwbClientsService : IAwbClientsService
@@ -46,17 +53,30 @@ namespace Awb.Core.Services
             }
         }
 
-        public async Task InitAsync()
+        /// <summary>
+        /// Searches for all available AWB clients on the COM ports.
+        /// </summary>
+        /// <param name="fastMode">true=use cached COM Port data; false=rescan for COM Ports (slower)</param>
+        /// <returns>Number of found clients</returns>
+        public async Task<int> ScanForClients(bool fastMode)
         {
-            _logger?.LogAsync($"\r\nSearching clients...");
+            _logger?.LogAsync($"\r\nSearching clients (fastMode={fastMode})...");
 
             var config = new AwbEsp32ComportClientConfig();
             var clientIdScanner = new ClientIdScanner(config);
             clientIdScanner.OnLog += (s, e) => _logger?.LogAsync(e);
-            var foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
+
+            FoundClient[] foundComPortClients = [];
+
+            if (fastMode)
+            {
+                _logger?.LogAsync("Using cached COM port info...");
+                foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
+            }
+
             if (foundComPortClients.Any() == false)
             {
-                _logger?.LogAsync("No clients found with cached COM port info, trying live detection...");
+                _logger?.LogAsync("No clients found with fastMode (cached COM port info)! Trying live detection...");
                 foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
             }
 
@@ -78,8 +98,15 @@ namespace Awb.Core.Services
             _clients = clients;
             _logger?.LogAsync($"Found {_clients.Length} clients. ({string.Join(", ", _clients.Select(c => c.ClientId))})");
 
-            if (ClientsLoaded != null)
-                ClientsLoaded(this, EventArgs.Empty);
+            // call the ClientsLoaded event in a new task to avoid blocking the UI thread
+            await Task.Run(() => ClientsLoaded?.Invoke(this, EventArgs.Empty));
+
+            return _clients.Length;
+        }
+
+        public async Task InitAsync()
+        {
+            await this.ScanForClients(fastMode: true);
         }
 
         public Esp32ComPortClient? GetClient(uint clientId)

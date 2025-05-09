@@ -1,12 +1,12 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Clients.Models;
 using PacketLogistics.ComPorts;
-using static Awb.Core.Clients.IAwbClient;
 
 namespace Awb.Core.Clients
 {
@@ -14,14 +14,17 @@ namespace Awb.Core.Clients
     {
         private PacketSenderReceiverComPort _comPortReceiver;
 
-        private bool _connected;
+        public bool Connected { get; private set; } = false;
 
         public uint ClientId { get; }
 
         public string FriendlyName { get; }
 
-        public EventHandler<IAwbClient.ReceivedEventArgs>? Received { get; set; }
+        public DateTime? LastErrorUtc { get; private set; }
+
+        public EventHandler<ReceivedEventArgs>? Received { get; set; }
         public EventHandler<string>? OnError { get; set; }
+        public EventHandler<string>? PacketSending { get; set; }
 
         public Esp32ComPortClient(string comPortName, uint clientId)
         {
@@ -34,33 +37,49 @@ namespace Awb.Core.Clients
             serialPortName: comPortName,
             clientID: clientId,
             comPortCommandConfig: new AwbEsp32ComportClientConfig());
-            _comPortReceiver.ErrorOccured += (sender, args) => OnError?.Invoke(this, args.Message);
+            _comPortReceiver.ErrorOccured += (sender, args) =>
+            {
+                LastErrorUtc = DateTime.UtcNow;
+                OnError?.Invoke(this, args.Message);
+            };
         }
 
         public async Task<bool> InitAsync()
         {
             _comPortReceiver.PacketReceived += _comPortReceiver_PacketReceived;
-            _connected = await _comPortReceiver.Connect();
-            return _connected;
+            Connected = await _comPortReceiver.Connect();
+            return Connected;
         }
 
         public void Dispose()
         {
-            _connected = false;
+            Connected = false;
             _comPortReceiver.PacketReceived -= _comPortReceiver_PacketReceived;
             _comPortReceiver?.Dispose();
         }
 
-        public async Task<SendResult> Send(byte[] payload)
+        public async Task<SendResult> Send(byte[] payload, string? debugInfo)
         {
-            if (!_connected) return new SendResult(false, "not connected, please run Init() before using Esp32ComPortClient!", null);
+            if (!Connected) return new SendResult(false, errorMessage: "not connected, please run Init() before using Esp32ComPortClient!", resultPlayload: null, debugInfos: null);
+
+            if (!string.IsNullOrWhiteSpace(debugInfo))
+                this.PacketSending?.Invoke(this, $"Send packet info\r\n{debugInfo}");
+
             var result = await _comPortReceiver.SendPacket(payload);
-            return new SendResult(result.Ok, result.Message, $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
+
+            if (result.Ok == false)
+            {
+                var details = $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}";
+                OnError?.Invoke(this, $"Error sending packet: {result.Message} / {details}");
+                return new SendResult(ok: false, errorMessage: result.Message, resultPlayload: null, details);
+            }
+
+            return new SendResult(ok: true, errorMessage: null, resultPlayload: result.Message, debugInfos: $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
         }
 
         private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver.PacketReceivedEventArgs e)
         {
-            Received?.Invoke(this, new IAwbClient.ReceivedEventArgs(payload: e.Payload));
+            Received?.Invoke(this, new ReceivedEventArgs(payload: e.Payload));
         }
 
     }

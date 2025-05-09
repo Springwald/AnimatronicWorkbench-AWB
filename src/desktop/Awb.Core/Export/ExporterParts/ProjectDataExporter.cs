@@ -49,6 +49,9 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("#define hardware_config_h");
             content.AppendLine();
 
+            content.AppendLine($"#define AwbClientId {_projectData.Esp32ClientHardwareConfig.ClientId} // If you use more than one AWB-client, you have to enter different IDs per client here");
+            content.AppendLine();
+
             if (_projectData.Esp32ClientHardwareConfig.DebuggingIoPin != null)
             {
                 content.AppendLine("/* Debugging settings */");
@@ -320,7 +323,7 @@ namespace Awb.Core.Export.ExporterParts
             // add  mp3 players using the constructor:  Mp3PlayerYX5300Serial(int rxPin, int txPin, String name) 
             result.AppendLine($"\tmp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();");
             foreach (var player in players)
-                result.AppendLine($"\tmp3PlayersYX5300->push_back(Mp3PlayerYX5300Serial({player.RxPin}, {player.TxPin}, \"{player.Title}\", \"{player.Id}\"));");
+                result.AppendLine($"\tmp3PlayersYX5300->push_back(Mp3PlayerYX5300Serial({player.RxPin}, {player.TxPin}, \"{player.Title}\", \"{player.Id}\",errorOccured));");
 
             result.AppendLine();
         }

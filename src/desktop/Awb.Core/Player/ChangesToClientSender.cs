@@ -68,7 +68,7 @@ namespace Awb.Core.Player
                 };
                 var jsonStr = JsonSerializer.Serialize(packet.Content, options);
                 var payload = Encoding.ASCII.GetBytes(jsonStr);
-                var result = await client.Send(payload);
+                var result = await client.Send(payload: payload, debugInfo: jsonStr);
                 if (result.Ok)
                 {
                     // await _logger.Log($"Sent to client Id '{clientID}'. ({result.DebugInfos})");

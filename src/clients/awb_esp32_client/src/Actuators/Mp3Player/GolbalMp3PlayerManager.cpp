@@ -41,6 +41,25 @@ bool GlobalMp3PlayerManager::stopSound(String playerTitle)
     return false;
 }
 
+bool GlobalMp3PlayerManager::setVolumeToMax(String playerTitle)
+{
+    if (_mp3PlayersDfPlayerMiniManager != nullptr)
+    {
+        int index = _mp3PlayersDfPlayerMiniManager->getPlayerIndexByTitle(playerTitle);
+        if (index != -1)
+            return _mp3PlayersDfPlayerMiniManager->setVolume(index, 30); // set to max volume
+    }
+
+    if (_mp3PlayersYX5300Manager != nullptr)
+    {
+        int index = _mp3PlayersYX5300Manager->getPlayerIndexByTitle(playerTitle);
+        if (index != -1)
+            return false; // XY5300 does not support volume control
+    }
+
+    return false;
+}
+
 bool GlobalMp3PlayerManager::setVolume(String playerTitle, uint8_t volume)
 {
     if (_mp3PlayersDfPlayerMiniManager != nullptr)
@@ -54,7 +73,7 @@ bool GlobalMp3PlayerManager::setVolume(String playerTitle, uint8_t volume)
     {
         int index = _mp3PlayersYX5300Manager->getPlayerIndexByTitle(playerTitle);
         if (index != -1)
-            return false; // XY5300 does not support volume control
+            return _mp3PlayersYX5300Manager->setVolume(index, volume);
     }
 
     return false;

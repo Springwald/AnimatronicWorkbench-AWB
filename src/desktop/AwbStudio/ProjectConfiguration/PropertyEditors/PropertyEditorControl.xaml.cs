@@ -1,17 +1,20 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
+using Awb.Core.Services;
 using Awb.Core.Timelines;
+using Awb.Core.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using static AwbStudio.ProjectConfiguration.PropertyEditors.ProjectObjectGenericEditorControl;
 
@@ -24,7 +27,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
     {
         private ProjectObjectGenericEditorControl? _actualEditor;
         private IProjectObjectListable? _projectObject;
-
         public EventHandler OnUpdatedData { get; set; }
         public EventHandler<DeleteObjectEventArgs> OnDeleteObject { get; set; }
 
@@ -44,12 +46,14 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
         }
 
+        public IAwbClientsService AwbClientsService { get; set; }
+
         public IProjectObjectListable? ProjectObject
         {
             get => _projectObject;
         }
 
-        public bool TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject, TimelineData[] timelines)
+        public async Task<bool> TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject, TimelineData[] timelines, IInvoker invoker)
         {
             if (_projectObject != projectObject)
             {
@@ -106,8 +110,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                         ActualEditor.OnUpdatedData -= UpdatedData_Fired;
                     }
 
-                    var editor = new ProjectObjectGenericEditorControl();
-                    editor.SetProjectAndObject(projectObject, awbProject, objectsUsingThisObject.ToArray());
+                    var editor = new ProjectObjectGenericEditorControl(AwbClientsService);
+                    await editor.SetProjectAndObject(projectObject, awbProject, invoker, objectsUsingThisObject.ToArray());
                     ActualEditor = editor;
                     ActualEditor.OnDeleteObject += OnObjectDelete_Fired;
                     ActualEditor.OnUpdatedData += UpdatedData_Fired;
@@ -122,6 +126,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         public PropertyEditorControl()
         {
             InitializeComponent();
+            
         }
 
         private void UpdatedData_Fired(object? sender, EventArgs e)

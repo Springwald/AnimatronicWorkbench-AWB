@@ -281,12 +281,9 @@ namespace AwbStudio
                     this.ShowLoadingScreen(false);
                     return;
                 }
-                clientsService.ClientsLoaded += (s, args) =>
-                {
-                    ShowProjectTimelineEditor(clientsService, timelineControllers);
-                };
-                await clientsService.InitAsync();
+                ShowProjectTimelineEditor(clientsService, timelineControllers);
             }
+            await Task.CompletedTask;
         }
 
         private void ShowProjectTimelineEditor(IAwbClientsService clientsService, ITimelineController[] timelineControllers)

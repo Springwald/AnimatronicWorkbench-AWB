@@ -13,6 +13,7 @@
                     Grid.Column="0" FontWeight="Bold" Height="auto" 
                     Content="{Binding PropertyTitle, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                     HorizontalAlignment="Right" VerticalAlignment="Center"></Label>
+
                 <TextBlock 
                     HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center"
                     Grid.Column="1" FontStyle="Italic" Height="auto" 
@@ -20,29 +21,38 @@
                     ToolTip="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                     Text="{Binding PropertyDescription, RelativeSource={RelativeSource AncestorType=UserControl}}"></TextBlock>
             </StackPanel>
+
             <Grid Margin="8">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBox 
+                
+                <Grid  Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox 
                     x:Name="TextPropertyContentTextEditor"
                     Grid.Column="0" 
                     TextChanged="TextBoxPropertyContent_TextChanged"
                     Text="{Binding PropertyContentText, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
-                </TextBox>
-                <CheckBox
+                    </TextBox>
+                    <CheckBox
                     x:Name="CheckBoxPropertyContentBoolEditor"
                     Grid.Column="0"
                     Checked="CheckBoxPropertyContentBoolEditor_Checked"
                     Unchecked="CheckBoxPropertyContentBoolEditor_Unchecked"
                     IsChecked="{Binding PropertyContentBool, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
-                </CheckBox>
-                <TextBlock Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" 
+                    </CheckBox>
+                    <TextBlock Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" 
                        Margin="10 0 0 0"
                        HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center"
                        Text="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}"
                        ToolTip="{Binding ErrorMessagesJoined, RelativeSource={RelativeSource AncestorType=UserControl}}"></TextBlock>
+                </Grid>
+                <Button Grid.Column="1" HorizontalAlignment="Right" x:Name="ButtonTakeActualServoPosition" Content="🧲" ToolTip="Use the actual servo position" Background="Transparent" Click="ButtonTakeActualServoPosition_Click"/>
             </Grid>
         </StackPanel>
     </Border>

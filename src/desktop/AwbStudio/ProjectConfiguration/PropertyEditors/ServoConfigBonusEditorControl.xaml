@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="AwbStudio.ProjectConfiguration.PropertyEditors.ServoConfigBonusEditorControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors"
+             mc:Ignorable="d" >
+    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0,0,10,10" Background="#FF333333"  >
+        <StackPanel Margin="5,5,5,0" VerticalAlignment="Top">
+            <Label Content="Servo physical range" HorizontalAlignment="Center" FontWeight="Bold"></Label>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" x:Name="LabelPhysMinValue" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
+                <Label Grid.Column="1" x:Name="LabelPhysValue" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
+                <Label Grid.Column="2" x:Name="LabelPhysMaxValue" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
+            </Grid>
+            <Slider x:Name="SliderServoPhysPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
+            <Label Content="Servo project limitation" HorizontalAlignment="Center" FontWeight="Bold"></Label>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" x:Name="LabelLimitMinValue" Content="MIN" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
+                <Label Grid.Column="1" x:Name="LabelLimitValue" Content="VALUE" HorizontalAlignment="Center"  VerticalAlignment="Top"/>
+                <Label Grid.Column="2" x:Name="LabelLimitMaxValue" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
+            </Grid>
+            <Slider x:Name="SliderServoLimitPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
+            <Separator Margin="0 10" />
+            <StackPanel Orientation="Horizontal">
+                <CheckBox x:Name="CheckboxAutomove" Content="auto move between the project limits" Checked="CheckboxAutomove_Checked"  Unchecked="CheckboxAutomove_Unchecked" />
+                <ComboBox x:Name="ComboBoxAutomoveDelay" Margin="10 0 0 0" SelectionChanged="ComboBoxAutomoveDelay_SelectionChanged">
+                    <ComboBoxItem Content="delay 1 second" Tag="1" />
+                    <ComboBoxItem Content="delay 2 second2" Tag="2" IsSelected="True"/>
+                    <ComboBoxItem Content="delay 5 seconds" Tag="5" />
+                    <ComboBoxItem Content="delay 10 seconds" Tag="10"/>
+                    <ComboBoxItem Content="delay 20 seconds" Tag="20"/>
+                </ComboBox>
+            </StackPanel>
+            <Separator Margin="0 10" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" x:Name="CheckboxSendChangesToServo" Content="Send changes to servo" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" x:Name="ButtonReadPosition"  Content="read position" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonReadPosition_Click" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

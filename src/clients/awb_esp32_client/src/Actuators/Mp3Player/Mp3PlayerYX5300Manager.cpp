@@ -29,3 +29,23 @@ int Mp3PlayerYX5300Manager::getPlayerIndexByTitle(String playerTitle)
             return i;
     return -1;
 }
+
+bool Mp3PlayerYX5300Manager::setVolume(int playerIndex, uint8_t volume)
+{
+    if (playerIndex < _mp3Players->size())
+    {
+        auto player = _mp3Players->at(playerIndex);
+        return player.setVolume(volume);
+    }
+    return false;
+}
+
+bool Mp3PlayerYX5300Manager::setVolumeToMax(int playerIndex)
+{
+    if (playerIndex < _mp3Players->size())
+    {
+        auto player = _mp3Players->at(playerIndex);
+        return player.setVolumeToMax();
+    }
+    return false;
+}

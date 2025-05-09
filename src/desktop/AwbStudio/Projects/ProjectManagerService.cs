@@ -81,13 +81,14 @@ namespace AwbStudio.Projects
                     {
                         Directory.CreateDirectory(path);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         return false;
                     }
                 }
             }
 
+            await Task.CompletedTask;
             return true;
         }
 

@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -11,14 +11,15 @@ using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Servos
 {
-    public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable
+    public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig
     {
+
+
         public required string Id { get; set; }
 
         [Display(Name = "Title", GroupName = "General", Order = 1)]
         [Description("A descriptive title for this servo like 'left-upper eyelid'.")]
         public required string Title { get; set; }
-
 
         [Display(Name = "Client ID", GroupName = "General", Order = 2)]
         [Description("The ID of the AWB client device that controls this servo.")]
@@ -60,16 +61,19 @@ namespace Awb.Core.Project.Servos
         [Range(100, 1000)]
         public uint MaxTorque { get; set; } = 400;
 
-        [Display(Name = "Lowest value", GroupName = "Values", Order = 4)]
+        [Display(Name = "Project lowest position", GroupName = "Values", Order = 4)]
         [Description("The value when the servo curve is at its lowest point. Possibly confusing: Can be greater than the value for 'high'.")]
+        [SupportsTakeOverTheCurrentServoValue]
         public abstract int MinValue { get; set; }
 
-        [Display(Name = "Highest value", GroupName = "Values", Order = 5)]
+        [Display(Name = "Project highest position", GroupName = "Values", Order = 5)]
         [Description("The value when the servo curve is at its highest point. Possibly confusing: Can be greater than the value for 'low'.")]
+        [SupportsTakeOverTheCurrentServoValue]
         public abstract int MaxValue { get; set; }
 
         [Display(Name = "Default value", GroupName = "Values", Order = 6)]
         [Description("Must be between the highest and lowest value.")]
+        [SupportsTakeOverTheCurrentServoValue]
         public abstract int? DefaultValue { get; set; }
 
         [Display(Name = "Speed value", GroupName = "Values", Order = 7)]
@@ -80,7 +84,7 @@ namespace Awb.Core.Project.Servos
         protected IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project)
         {
             // check if the default value is between the min and max value
-            if (DefaultValue < Math.Min(MinValue,MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
+            if (DefaultValue < Math.Min(MinValue, MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
                 yield return new ProjectProblem
                 {
                     ProblemType = ProjectProblem.ProblemTypes.Error,
@@ -104,9 +108,12 @@ namespace Awb.Core.Project.Servos
         }
 
         [JsonIgnore]
-        public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"StsServo has no title set '{Id}'": Title;
+        public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"StsServo has no title set '{Id}'" : Title;
 
         [JsonIgnore]
         public string TitleDetailed => $"StsServo '{TitleShort}' (Id: {Id}, ClientId: {ClientId}, Channel: {Channel})";
+
+        [JsonIgnore]
+        public bool CanReadServoPosition => true;
     }
 }
