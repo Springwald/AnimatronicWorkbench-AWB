@@ -35,11 +35,12 @@ private:
     Debugging *_debugging;                             /// the debugging class
     ActualStatusInformation *_actualStatusInformation; /// the actual status information of the animatronic figure
 
-    String _messages[MAX_LOG_MESSAGES]; /// the log messages
+    String _messages[MAX_LOG_MESSAGES];     /// the log messages
     String _messageTimes[MAX_LOG_MESSAGES]; /// the time of the log messages
-    int _messagesCount = 0;             /// the number of log messages
+    int _messagesCount = 0;                 /// the number of log messages
 
-    String GetHtml();                              /// get the html page for the webserver default site
+    String GetHtml(); /// get the html page for the webserver default site
+    void AddScsStsServoInfo(String &ptr, String typeTitle, StsScsServo &servo);
     void handle_Default();                         /// handle the root http request
     void handle_NotFound();                        /// handle a not found http request
     void handle_remote_servo();                    /// control a servo via the webserver
