@@ -21,7 +21,9 @@ void AwbRemote::setup()
 
 #endif
 
+#ifdef RED_LED
     pinMode(RED_LED, OUTPUT); // init red led
+#endif  
 
     _display.setup(); // set up the display
 
@@ -35,7 +37,9 @@ void AwbRemote::setup()
     while (trys-- > 0 && WiFi.status() != WL_CONNECTED)
     {
         _display.draw_message(String("connect wifi\r\n") + String(this->_wifiConfig->WlanSSID) + "\r\nRetrys " + String(trys), 1000, MSG_TYPE_INFO);
+        #ifdef RED_LED
         digitalWrite(RED_LED, LOW); // turn red led on
+        #endif
         delay(1000);
     }
     if (WiFi.status() != WL_CONNECTED)
@@ -45,14 +49,17 @@ void AwbRemote::setup()
     }
     else
     {
+        #ifdef RED_LED
         digitalWrite(RED_LED, HIGH); // turn red led off
+        #ifdef RED_LED
     }
 
     _display.draw_message(WiFi.localIP().toString(), 1000, MSG_TYPE_INFO);
-    while (!(_joystick.begin(&Wire, JoyC_ADDR, 0, 26, 100000UL)))
+    trys = 10;
+    while (trys-- > 0 && !(_joystick.begin(&Wire, JoyC_ADDR, 0, 26, 100000UL)))
     {
         _display.draw_message(String("I2C Error"), 500, MSG_TYPE_ERROR);
-        delay(500);
+        delay(200);
     }
 
     this->_axp192 = new AXP192();
