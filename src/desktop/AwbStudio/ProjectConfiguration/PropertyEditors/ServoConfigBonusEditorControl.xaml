@@ -31,6 +31,7 @@
                 <Label Grid.Column="2" x:Name="LabelLimitMaxValue" Content="MAX" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
             </Grid>
             <Slider x:Name="SliderServoLimitPosition" VerticalAlignment="Center" ValueChanged="SliderServoPosition_ValueChanged"/>
+            <Label x:Name="labelErrorMsg" Content="Error Status" HorizontalAlignment="Center" FontWeight="Bold" Background="#FFAF1D1D"></Label>
             <Separator Margin="0 10" />
             <StackPanel Orientation="Horizontal">
                 <CheckBox x:Name="CheckboxAutomove" Content="auto move between the project limits" Checked="CheckboxAutomove_Checked"  Unchecked="CheckboxAutomove_Unchecked" />

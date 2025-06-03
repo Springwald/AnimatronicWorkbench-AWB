@@ -33,11 +33,13 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private volatile bool _isMoving = false;
 
         private DateTime _lastError = DateTime.MinValue;
+        private string _lastErrorMessage = string.Empty;
 
         private int? _newSendPositionValue = null;
         private volatile bool _sendingValueToServo = false;
 
         private Timer _autoPlayTimer = new Timer(5000);
+        private Timer _errorMsgTimer = new Timer(500); 
         private bool _autoPlayFlipFlop = false;
         private int _maxProjectLimitValue;
         private int _minProjectLimitValue;
@@ -130,12 +132,38 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             _autoPlayTimer.Stop();
             _autoPlayTimer.AutoReset = true;
             _autoPlayTimer.Elapsed += AutoPlayTimer_Elapsed;
+
+            _errorMsgTimer.Elapsed += (s, args) =>
+            {
+                _invoker.Invoke(() => UpdateErrorMessageVisibility());
+               
+            };  
+            _errorMsgTimer.Start();
         }
 
+        private void UpdateErrorMessageVisibility()
+        {
+            if (_lastError == DateTime.MinValue)
+            {
+                labelErrorMsg.Visibility = Visibility.Collapsed;
+                return;
+            }
+            var diff = DateTime.UtcNow - _lastError;
+            if (diff.TotalSeconds < 5)
+            {
+                labelErrorMsg.Visibility = Visibility.Visible;
+                labelErrorMsg.Content = _lastErrorMessage + $" ({diff.TotalSeconds:0.0}s ago)";
+            }
+            else
+            {
+                labelErrorMsg.Visibility = Visibility.Collapsed;
+            }
+        }
 
         private void ServoConfigBonusEditorControl_Unloaded(object sender, RoutedEventArgs e)
         {
             _autoPlayTimer.Stop();
+            _errorMsgTimer.Stop();
         }
 
         public void UpdateProjectLimits()
@@ -360,7 +388,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             var diff = DateTime.UtcNow - _lastError;
             if (diff.TotalSeconds < 5) return;
             _lastError = DateTime.UtcNow;
-            MessageBox.Show(message);
+            _lastErrorMessage = message;
         }
 
         #region Automove
