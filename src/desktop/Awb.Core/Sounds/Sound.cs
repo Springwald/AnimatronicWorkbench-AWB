@@ -90,12 +90,13 @@ namespace Awb.Core.Sounds
             byte[] data = File.ReadAllBytes(filename);
             using var memStream = new System.IO.MemoryStream(data);
             using var mpgFile = new NLayer.MpegFile(memStream);
-            mpgFile.StereoMode = NLayer.StereoMode.DownmixToMono;
-            var mulitplyr = 2; // correct for 32 bit float samples (THIS IS AN EXPLORATIVE VALUE, MAY NEED ADJUSTMENT)
-            int sampleCount = (int)(mpgFile.Length / mulitplyr);
-            var samples = new float[sampleCount];
             var chanels = mpgFile.Channels;
-            mpgFile.ReadSamples(samples, 0, sampleCount);
+
+            var samplesCount = (int)(mpgFile.Length / 2);//  explorative: 2 bytes per sample (16 bit PCM) TODO: check if this is correct for MP3 files!
+            //var samplesCount =  (int)(mpgFile.Duration.TotalSeconds * (mpgFile.SampleRate * chanels)); // alternative: calculate samples count based on duration and sample rate (NOT WORKING!)
+            mpgFile.StereoMode = NLayer.StereoMode.DownmixToMono;
+            var samples = new float[samplesCount];
+            mpgFile.ReadSamples(samples, 0, samplesCount);
             return samples;
         }
     }
