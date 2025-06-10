@@ -1,20 +1,57 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 namespace Awb.Core.Sounds
 {
     public class Sound
     {
+        public const int SamplesPerSecond = 500; // standard for MP3 files
+        public byte[] _samples;
+
         public string Mp3Filename { get; }
 
         public int Id { get; }
 
         public string Title { get; }
         public int DurationMs { get; set; }
+
+        public byte[] Samples
+        {
+            get
+            {
+                if (_samples == null)
+                {
+                    // lazy loading
+
+                    // read and rescale
+                    var samplesPure = ReadSamples();
+                    var newSamplesLength = (int)((DurationMs / 1000.0) * SamplesPerSecond);
+                    var factor = samplesPure.Length / newSamplesLength;
+                    var samples = new byte[newSamplesLength];
+
+                    for (int i = 0; i < newSamplesLength; i++)
+                    {
+                        int from = (int)(i * factor);
+                        int to = (int)((i + 1) * factor) - 1;
+                        // get  the max value from the range
+                        float max = 0f;
+                        for (int j = from; j <= to; j++)
+                        {
+                            if (j < 0 || j >= samplesPure.Length) continue;
+                            if (Math.Abs(samplesPure[j]) > max)
+                                max = Math.Abs(samplesPure[j]);
+                        }
+                        samples[i] = (byte)(max * 255); // rescale to 0..1 to 0..255
+                    }
+                    _samples = samples;
+                }
+                return _samples;
+            }
+        }
 
         public Sound(string mp3Filename)
         {
@@ -40,7 +77,26 @@ namespace Awb.Core.Sounds
             // get the duration
             TagLib.File file = TagLib.File.Create(mp3Filename);
             DurationMs = (int)file.Properties.Duration.TotalMilliseconds;
+
+
+
+
         }
 
+        private float[] ReadSamples()
+        {
+            // Load the audio file and read samples
+            var filename = Mp3Filename;
+            byte[] data = File.ReadAllBytes(filename);
+            using var memStream = new System.IO.MemoryStream(data);
+            using var mpgFile = new NLayer.MpegFile(memStream);
+            mpgFile.StereoMode = NLayer.StereoMode.DownmixToMono;
+            var mulitplyr = 2; // correct for 32 bit float samples (THIS IS AN EXPLORATIVE VALUE, MAY NEED ADJUSTMENT)
+            int sampleCount = (int)(mpgFile.Length / mulitplyr);
+            var samples = new float[sampleCount];
+            var chanels = mpgFile.Channels;
+            mpgFile.ReadSamples(samples, 0, sampleCount);
+            return samples;
+        }
     }
 }

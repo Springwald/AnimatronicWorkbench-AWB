@@ -91,6 +91,7 @@ namespace AwbStudio.TimelineValuePainters
                    
                     var durationMs = sound?.DurationMs ?? 1000;
                     label.SetWidthByDuration(_viewContext.PixelPerMs * durationMs);
+                    label.SetSoundContent(sound);
                 }
             }
         }

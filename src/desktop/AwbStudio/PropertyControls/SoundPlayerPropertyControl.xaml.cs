@@ -130,7 +130,7 @@ namespace AwbStudio.PropertyControls
                 else
                 {
                     _soundPlayer.PlaySound(sound!.Id);
-                    _windowsSoundPlayerControl.SoundToPlay(this, new SoundPlayEventArgs(sound!.Id));
+                    _windowsSoundPlayerControl.SoundToPlay(this, new SoundPlayEventArgs(sound!.Id, startTime: new System.TimeSpan()));
                 }
                 _viewContext.FocusObjectValueChanged(this);
             }

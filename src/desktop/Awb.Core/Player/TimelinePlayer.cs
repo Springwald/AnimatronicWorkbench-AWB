@@ -264,7 +264,7 @@ namespace Awb.Core.Player
                     {
                         targetSoundPlayer.PlaySound(soundPoint.SoundId);
                         targetSoundPlayer.IsDirty = true;
-                        if (OnPlaySound != null) _myInvoker.Invoke(() => OnPlaySound.Invoke(this, new SoundPlayEventArgs(soundPoint.SoundId)));
+                        if (OnPlaySound != null) _myInvoker.Invoke(() => OnPlaySound.Invoke(this, new SoundPlayEventArgs(soundPoint.SoundId, startTime: new TimeSpan())));
                     }
                 }
             }

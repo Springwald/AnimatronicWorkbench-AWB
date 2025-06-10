@@ -45,3 +45,5 @@ These are:
 - https://github.com/m5stack/M5StickC-Plus/ - https://github.com/m5stack/M5StickC-Plus/ (MIT license)
 
 - emoji.wpf https://github.com/samhocevar/emoji.wpf (WTFPL license)
+
+- NLayer https://github.com/naudio/NLayer (MIT license)

@@ -7,7 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Label x:Name="SoundPlayerLabel" Foreground="#FFDE1C1C" Width="auto" Background="AliceBlue" Padding="1" Margin="3"   HorizontalAlignment="Left"  VerticalAlignment="Top">Lorem ipsum dolor sit amet</Label>
+        <Label x:Name="SoundPlayerLabel"  BorderBrush="AliceBlue" BorderThickness="1" Foreground="#FFDE1C1C" Width="auto" Padding="01" Margin="0"  Height="80"  HorizontalAlignment="Left"  VerticalAlignment="Top">Lorem ipsum dolor sit amet
+        </Label>
+        <Image x:Name="WaveImage"  Width="auto" Margin="0"  Height="80"  HorizontalAlignment="Left"  VerticalAlignment="Top" Stretch="Fill" ></Image>
         <!--<ComboBox x:Name="ProtoTypeSoundEdit">
             <ComboBoxItem IsSelected="True">Sound 1</ComboBoxItem>
             <ComboBoxItem>Sound 2</ComboBoxItem>
