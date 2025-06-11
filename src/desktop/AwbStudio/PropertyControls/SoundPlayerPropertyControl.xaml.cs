@@ -13,6 +13,7 @@ using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -129,8 +130,8 @@ namespace AwbStudio.PropertyControls
                 }
                 else
                 {
-                    _soundPlayer.PlaySound(sound!.Id);
-                    _windowsSoundPlayerControl.SoundToPlay(this, new SoundPlayEventArgs(sound!.Id, startTime: new System.TimeSpan()));
+                    _soundPlayer.PlaySound(sound!.Id, TimeSpan.Zero);
+                    _windowsSoundPlayerControl.PlaySound(this, new SoundPlayEventArgs(sound!.Id, startTime: TimeSpan.Zero));
                 }
                 _viewContext.FocusObjectValueChanged(this);
             }

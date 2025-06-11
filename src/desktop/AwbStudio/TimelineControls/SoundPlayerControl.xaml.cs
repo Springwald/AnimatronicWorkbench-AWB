@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 
 using Awb.Core.Player;
@@ -50,7 +50,15 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public void SoundToPlay(object? sender, SoundPlayEventArgs e)
+        public void StopSound()
+        {
+            if (_mediaPlayer == null) return;
+            _mediaPlayer.Stop();
+            _lastPlayedSoundId = 0;
+            _lastPlayedSoundUtcTime = DateTime.MinValue;
+        }   
+
+        public void PlaySound(object? sender, SoundPlayEventArgs e)
         {
             if (_mediaPlayer == null) return;
             if (Sounds == null) return;
@@ -68,13 +76,28 @@ namespace AwbStudio.TimelineControls
                 }
                 else
                 {
+                    var pos = e.StartTime ?? TimeSpan.Zero;
+
                     _lastPlayedSoundId = sound.Id;
                     _lastPlayedSoundUtcTime = DateTime.UtcNow;
                     _mediaPlayer.Stop();
                     _mediaPlayer.Open(new Uri(sound.Mp3Filename));
+                    _mediaPlayer.Position = pos;
                     _mediaPlayer.Play();
                 }
             }
         }
+
+        internal Sound? SoundToRequest(int soundId)
+        {
+            if (Sounds == null) return null;
+            var sound = Sounds.FirstOrDefault(s => s.Id == soundId);
+            if (sound != null) return sound;
+            MessageBox.Show($"Sound id '{soundId}' not found.");
+            return null;
+        }
+
+
+
     }
 }

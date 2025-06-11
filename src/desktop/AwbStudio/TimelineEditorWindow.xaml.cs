@@ -98,12 +98,18 @@ namespace AwbStudio
 
             _actuatorsService = new ActuatorsService(_project, _clientsService, _awbLogger);
             _timelinePlayer = new TimelinePlayer(playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _awbLogger);
-            _timelinePlayer.OnPlaySound += SoundPlayer.SoundToPlay;
+            _timelinePlayer.PlaySoundOnDesktop = PlaySoundOnDesktop;
+            _timelinePlayer.StopSoundOnDesktop = () => SoundPlayer?.StopSound(); // stop sound on desktop
+            _timelinePlayer.SoundRequest = SoundPlayer.SoundToRequest; // the sound player will handle the sound requests 
 
 
             Loaded += TimelineEditorWindow_Loaded;
         }
 
+        private void PlaySoundOnDesktop(int soundId, TimeSpan  startTime)
+        {
+            SoundPlayer.PlaySound(this, new SoundPlayEventArgs(soundId, startTime));
+        }
 
         private async void TimelineEditorWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -175,7 +181,6 @@ namespace AwbStudio
             }
             if (_timelinePlayer != null)
             {
-                _timelinePlayer.OnPlaySound -= SoundPlayer.SoundToPlay;
                 _timelinePlayer.Dispose();
             }
             KeyDown -= TimelineEditorWindow_KeyDown;

@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - daniel@springwald.de
 // All rights reserved   -  Licensed under MIT License
 
+using Awb.Core.Sounds;
+
 namespace Awb.Core.Actuators
 {
     /// <summary>
@@ -13,7 +15,7 @@ namespace Awb.Core.Actuators
     public interface ISoundPlayer : IActuator
     {
         int? ActualSoundId { get;}
-        void PlaySound(int soundId);
+        void PlaySound(int soundId, TimeSpan startTime);
 
         void SetNoSound();
     }

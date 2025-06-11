@@ -1,12 +1,13 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project.Various;
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
 using Awb.Core.Tools;
@@ -51,13 +52,23 @@ namespace Awb.Core.Player
         private Timer? _actuatorUpdateTimer;
         private DateTime? _lastPlayUpdate;
 
+
+        // Delegate to request sound data
+        public delegate Sound? SoundRequestDelegate(int soundId);
+        public SoundRequestDelegate? SoundRequest;
+
+        // Delegate to play sounds
+        public delegate void PlaySoundInDesktopDelegate(int soundId, TimeSpan start);
+        public PlaySoundInDesktopDelegate? PlaySoundOnDesktop;
+        public delegate void StopSoundInDesktopDelegate();
+        public StopSoundInDesktopDelegate? StopSoundOnDesktop;
+
         private readonly IActuatorsService _actuatorsService;
         private readonly ITimelineDataService _timelineDataService;
         private readonly IAwbLogger _logger;
         private readonly ChangesToClientSender _sender;
         private readonly IInvoker _myInvoker;
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
-        public EventHandler<SoundPlayEventArgs>? OnPlaySound;
         private volatile TimelinePoint[]? _allPointsMerged;
         public readonly PlayPosSynchronizer PlayPosSynchronizer;
 
@@ -127,6 +138,9 @@ namespace Awb.Core.Player
         {
             PlayState = PlayStates.Nothing;
             PlayPosSynchronizer.PlayState = PlayState;
+
+            StopSoundOnDesktop!();
+
             await Task.CompletedTask;
         }
 
@@ -139,8 +153,9 @@ namespace Awb.Core.Player
                 _actuatorUpdateRequested = true;
 #pragma warning restore CS0162 // Unreachable code detected
                 await Task.CompletedTask;
-                
-            } else
+
+            }
+            else
             {
                 await UpdateActuatorsInternal();
             }
@@ -168,7 +183,7 @@ namespace Awb.Core.Player
 
             var playPos = PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped;
 
-            if (_allPointsMerged == null) 
+            if (_allPointsMerged == null)
             {
                 var allPoints = TimelineData.AllPoints.ToArray();
                 _allPointsMerged = new NestedTimelinesPointMerger(allPoints, _timelineDataService, _logger, recursionDepth: 0).MergedPoints.ToArray();
@@ -192,7 +207,8 @@ namespace Awb.Core.Player
                 if (fillUpStart)
                 {
                     point1 ??= point2;
-                } else
+                }
+                else
                 {
                     if (point1 == null) continue; // no points found for this object before or after the actual position
                 }
@@ -226,12 +242,53 @@ namespace Awb.Core.Player
                 }
             }
 
-
             // Play Sounds
             var soundPoints = _allPointsMerged.OfType<SoundPoint>().ToArray();
             var soundTargetObjectIds = soundPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
+
             foreach (var soundTargetObjectId in soundTargetObjectIds)
             {
+                var targetSoundPlayer = _actuatorsService.SoundPlayers.SingleOrDefault(o => o.Id.Equals(soundTargetObjectId));
+                if (targetSoundPlayer == null)
+                {
+                    await _logger.LogErrorAsync($"{nameof(UpdateActuatorsInternal)}: Target soundplayer object with id {soundTargetObjectId} not found.");
+                    continue;
+                }
+
+                switch (PlayState)
+                {
+                    case PlayStates.Nothing:
+                        // take exactly the point at the actual position
+                        targetSoundPlayer.SetNoSound();
+                        targetSoundPlayer.IsDirty = true;
+                        //soundPoint = soundPoints.GetPoint(playPos, soundTargetObjectId) as SoundPoint;
+                        break;
+                    case PlayStates.Playing:
+                        // take a point between the last and the actual position
+                        //soundPoint = soundPoints.GetPointsBetween<SoundPoint>(_playPosMsOnLastUpdate, playPos, soundTargetObjectId).FirstOrDefault();
+                        var playSoundArgs = GetSoundPlayerCommandForTimelinePos(soundPoints, soundTargetObjectId, playPos);
+                        if (playSoundArgs != null)
+                        {
+                            var startTime =playSoundArgs.StartTime ?? TimeSpan.Zero;
+                            targetSoundPlayer.PlaySound(playSoundArgs.SoundId,startTime: startTime);
+                            targetSoundPlayer.IsDirty = true;
+                            if (PlaySoundOnDesktop != null)PlaySoundOnDesktop(playSoundArgs.SoundId, start: startTime);
+                        }
+                        else
+                        {
+                            targetSoundPlayer.SetNoSound();
+                            targetSoundPlayer.IsDirty = true;
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");
+                }
+            }
+
+            /*
+            foreach (var soundTargetObjectId in soundTargetObjectIds)
+            {
+
                 SoundPoint? soundPoint = null;
 
                 switch (PlayState)
@@ -267,7 +324,7 @@ namespace Awb.Core.Player
                         if (OnPlaySound != null) _myInvoker.Invoke(() => OnPlaySound.Invoke(this, new SoundPlayEventArgs(soundPoint.SoundId, startTime: new TimeSpan())));
                     }
                 }
-            }
+            }*/
 
 
             // Update Nested timelines 
@@ -304,6 +361,33 @@ namespace Awb.Core.Player
             var ok = await _sender.SendChangesToClients();
             _updating = false;
             return ok;
+        }
+
+        private SoundPlayEventArgs? GetSoundPlayerCommandForTimelinePos(SoundPoint[] soundPoints, string soundTargetObjectId, int timeMs)
+        {
+            if (soundPoints == null || soundTargetObjectId == null) return null;
+            foreach (var soundPoint in soundPoints.OrderBy(s => s.TimeMs))
+            {
+                if (soundPoint.AbwObjectId == soundTargetObjectId)
+                {
+                    var durationMs = GetDurationMsForSoundId(soundPoint.SoundId, soundPoint.AbwObjectId);
+                    if (timeMs >= soundPoint.TimeMs && timeMs <= soundPoint.TimeMs + durationMs  )
+                    {
+                        return new SoundPlayEventArgs(soundPoint.SoundId, startTime: TimeSpan.FromMilliseconds(timeMs - soundPoint.TimeMs));
+                    }
+                }
+            }
+            return null;
+        }
+
+        private int GetDurationMsForSoundId(int soundId, string soundPlayerId)
+        {
+            if (SoundRequest != null)
+            {
+                var sound = SoundRequest(soundId);
+                if (sound != null) return sound.DurationMs;
+            }
+            return 500; // default duration if no sound is found
         }
 
         private void PlayTimerCallback(object? state)

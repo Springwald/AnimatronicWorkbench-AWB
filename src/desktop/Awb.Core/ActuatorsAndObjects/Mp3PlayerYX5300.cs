@@ -82,6 +82,11 @@ namespace Awb.Core.Actuators
             ActualSoundId = soundId;
         }
 
+        public void PlaySound(int soundId, TimeSpan startTime)
+        {
+            ActualSoundId = soundId;
+        }
+
         public void SetNoSound()
         {
             ActualSoundId = null;
@@ -98,6 +103,6 @@ namespace Awb.Core.Actuators
             TurnOff();
         }
 
-
+       
     }
 }
