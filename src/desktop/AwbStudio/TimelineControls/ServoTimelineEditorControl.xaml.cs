@@ -7,7 +7,9 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
+using Awb.Core.Project;
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
@@ -68,11 +70,11 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public void Init(IServo servo, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineDataService timelineDataService, IAwbLogger awbLogger)
+        public void Init(IServo servo, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineDataService timelineDataService, Sound[] projectSounds, IAwbLogger awbLogger)
         {
             _viewContext = viewContext;
             Servo = servo;
-            _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions, timelineDataService, awbLogger, dotRadius: 6);
+            _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions, timelineDataService, projectSounds: projectSounds, awbLogger, dotRadius: 6);
             _caption = timelineCaptions?.GetAktuatorCaption(servo.Id);
             HeaderControl.TimelineCaption = _caption;
             HeaderControl.MyObject = servo;

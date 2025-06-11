@@ -8,6 +8,7 @@
 using Awb.Core.LoadNSave.Timelines;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
+using Awb.Core.Timelines.Sounds;
 
 namespace Awb.Core.LoadNSave.TimelineLoadNSave
 {

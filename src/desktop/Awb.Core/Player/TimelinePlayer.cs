@@ -10,6 +10,7 @@ using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
+using Awb.Core.Timelines.Sounds;
 using Awb.Core.Tools;
 
 namespace Awb.Core.Player

@@ -7,6 +7,7 @@
 
 using Awb.Core.Project;
 using Awb.Core.Timelines.NestedTimelines;
+using Awb.Core.Timelines.Sounds;
 using System.Drawing;
 
 namespace Awb.Core.Timelines

@@ -8,6 +8,7 @@
 using Awb.Core.Actuators;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
+using Awb.Core.Timelines.Sounds;
 using AwbStudio.PropertyControls;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;

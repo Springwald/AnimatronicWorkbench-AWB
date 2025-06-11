@@ -7,8 +7,10 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
+using Awb.Core.Timelines.Sounds;
 using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;
@@ -26,16 +28,18 @@ namespace AwbStudio.TimelineValuePainters
         private readonly IServo _servo;
         private readonly TimelineCaptions _timelineCaptions;
         private readonly ITimelineDataService _timelineDataService;
+        private readonly Sound[] _projectSounds;
         private readonly IAwbLogger _awbLogger;
         private readonly OpticalGridCalculator _opticalGridCalculator;
 
-        public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineDataService timelineDataService, IAwbLogger awbLogger, double dotRadius = 3)
+        public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineDataService timelineDataService, Sound[] projectSounds ,IAwbLogger awbLogger, double dotRadius = 3)
             : base(paintControl, viewContext, timelineCaptions)
         {
             _dotRadius = dotRadius;
             _servo = servo;
             _timelineCaptions = timelineCaptions;
             _timelineDataService = timelineDataService;
+            _projectSounds = projectSounds;
             _awbLogger = awbLogger;
 
             _opticalGridCalculator = new OpticalGridCalculator(paintControl);
@@ -55,12 +59,14 @@ namespace AwbStudio.TimelineValuePainters
 
             // Update the content points and lines
             // ToDo: cache and only update on changes; or: use model binding and auto update
-
             var caption = _timelineCaptions?.GetAktuatorCaption(_servo.Id) ?? new TimelineCaption(Brushes.LightSalmon, _servo.Id, label: _servo.Title);
-            var pointMerger = new NestedTimelinesPointMerger(timelinePoints, timelineDataService: _timelineDataService, _awbLogger, recursionDepth: 0);
 
-            // Add polylines with points
-            var pointsForThisServo = pointMerger.MergedPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
+            // Add polylines with points for nested timelines and sounds
+            var pointMergerNestedTimelines = new NestedTimelinesPointMerger(timelinePoints, timelineDataService: _timelineDataService, _awbLogger);
+            var pointsWithNestedTimelinePoints = pointMergerNestedTimelines.MergedPoints;
+            var pointMergerSoundPoints = new SoundsPointMerger(pointsWithNestedTimelinePoints, timelineDataService: _timelineDataService, projectSounds:_projectSounds,  _awbLogger);
+
+            var pointsForThisServo = pointMergerSoundPoints.MergedPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
 
             // add dots
             double dotWidth = _dotRadius * 2;

@@ -12,6 +12,7 @@ using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.NestedTimelines;
+using Awb.Core.Timelines.Sounds;
 using Awb.Core.Tools;
 using AwbStudio.Exports;
 using AwbStudio.Projects;

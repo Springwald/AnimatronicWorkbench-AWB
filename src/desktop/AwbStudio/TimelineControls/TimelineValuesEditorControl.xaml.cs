@@ -91,7 +91,7 @@ namespace AwbStudio.TimelineControls
             foreach (var servoActuator in actuatorsService.Servos)
             {
                 var editorControl = new ServoTimelineEditorControl();
-                editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, timelineDataService, awbLogger);
+                editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, timelineDataService, projectSounds: projectSounds, awbLogger);
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }

@@ -92,7 +92,7 @@ namespace Awb.Core.Sounds
             using var mpgFile = new NLayer.MpegFile(memStream);
             var chanels = mpgFile.Channels;
 
-            var samplesCount = (int)(mpgFile.Length / 2);//  explorative: 2 bytes per sample (16 bit PCM) TODO: check if this is correct for MP3 files!
+            var samplesCount = (int)(mpgFile.Length / 4);//  explorative: 4 bytes per sample (16 bit PCM) TODO: check if this is correct for MP3 files!
             //var samplesCount =  (int)(mpgFile.Duration.TotalSeconds * (mpgFile.SampleRate * chanels)); // alternative: calculate samples count based on duration and sample rate (NOT WORKING!)
             mpgFile.StereoMode = NLayer.StereoMode.DownmixToMono;
             var samples = new float[samplesCount];

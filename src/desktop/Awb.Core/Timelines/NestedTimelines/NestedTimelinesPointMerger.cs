@@ -48,7 +48,7 @@ namespace Awb.Core.Timelines.NestedTimelines
             }
         }
 
-        public NestedTimelinesPointMerger(IEnumerable<TimelinePoint> rawPoints, ITimelineDataService timelineDataService, IAwbLogger awbLogger, int recursionDepth)
+        public NestedTimelinesPointMerger(IEnumerable<TimelinePoint> rawPoints, ITimelineDataService timelineDataService, IAwbLogger awbLogger, int recursionDepth = 0)
         {
             _rawPoints = rawPoints;
             _timelineDataService = timelineDataService;

@@ -97,6 +97,7 @@ namespace AwbStudio.TimelineControls
                     viewContext: _viewContext,
                     timelineCaptions: _timelineCaptions,
                     timelineDataService: timelineDataService,
+                    projectSounds: _projectSounds ?? [],
                     awbLogger: awbLogger
                     ));
             }

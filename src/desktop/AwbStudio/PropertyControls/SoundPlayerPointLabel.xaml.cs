@@ -56,7 +56,7 @@ namespace AwbStudio.PropertyControls
             var pixels = new byte[ImgHeight * stride];
 
             var samples = sound.Samples; // get the samples from the sound
-            var factor = samples.Length / (double)imgWidth / 2; // how many samples per pixel
+            var factor = samples.Length / (double)imgWidth; // how many samples per pixel
 
             for (int x = 0; x < imgWidth; x++)
             {
