@@ -1,60 +1,55 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
 
 namespace Awb.Core.Timelines.NestedTimelines
 {
-    public class NestedTimelinesPointMerger
+    public class NestedTimelinesPointMerger : IMerger
     {
         private const int MaxRecursionDepth = 10;
 
-        private readonly IEnumerable<TimelinePoint> _rawPoints;
         private readonly ITimelineDataService _timelineDataService;
         private readonly IAwbLogger _awbLogger;
-        private readonly int _recursionDepth;
 
-        public IEnumerable<TimelinePoint> MergedPoints
+        public IEnumerable<TimelinePoint> Merge(IEnumerable<TimelinePoint> rawPoints, int recursionDepth = 0)
         {
-            get
+            foreach (var point in rawPoints)
             {
-                foreach (var point in _rawPoints)
+                if (point is NestedTimelinePoint nestedTimelinePoint)
                 {
-                    if (point is NestedTimelinePoint nestedTimelinePoint)
+                    if (recursionDepth < MaxRecursionDepth)
                     {
-                        if (_recursionDepth < MaxRecursionDepth)
+                        var nestedTimelinePoints = _timelineDataService.GetTimelineData(nestedTimelinePoint.TimelineId).AllPoints;
+                        var pointsFromNestedTimeline = Merge(nestedTimelinePoints, recursionDepth + 1);
+                        foreach (var nestedPoint in pointsFromNestedTimeline)
                         {
-                            var nestedTimelinePoints = _timelineDataService.GetTimelineData(nestedTimelinePoint.TimelineId).AllPoints;
-                            var merger = new NestedTimelinesPointMerger(nestedTimelinePoints, _timelineDataService, _awbLogger, _recursionDepth + 1);
-                            foreach (var nestedPoint in merger.MergedPoints)
-                            {
-                                var clone = nestedPoint.Clone();
-                                clone.TimeMs += nestedTimelinePoint.TimeMs;
-                                clone.IsNestedTimelinePoint = true;
-                                yield return clone;
-                            }
-                        } else
-                        {
-                            _awbLogger.LogErrorAsync($"Nested timeline recursion depth exceeded " + MaxRecursionDepth + $" for timeline {nestedTimelinePoint.TimelineId}!");
+                            var clone = nestedPoint.Clone();
+                            clone.TimeMs += nestedTimelinePoint.TimeMs;
+                            clone.IsNestedTimelinePoint = true;
+                            yield return clone;
                         }
                     }
                     else
-                        yield return point;
+                    {
+                        _awbLogger.LogErrorAsync($"Nested timeline recursion depth exceeded " + MaxRecursionDepth + $" for timeline {nestedTimelinePoint.TimelineId}!");
+                    }
                 }
+                else
+                    yield return point;
             }
         }
 
-        public NestedTimelinesPointMerger(IEnumerable<TimelinePoint> rawPoints, ITimelineDataService timelineDataService, IAwbLogger awbLogger, int recursionDepth = 0)
+        public NestedTimelinesPointMerger(ITimelineDataService timelineDataService, IAwbLogger awbLogger)
         {
-            _rawPoints = rawPoints;
             _timelineDataService = timelineDataService;
             _awbLogger = awbLogger;
-            _recursionDepth = recursionDepth;
         }
+
 
     }
 }

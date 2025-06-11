@@ -88,14 +88,14 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        internal Sound? SoundToRequest(int soundId)
-        {
-            if (Sounds == null) return null;
-            var sound = Sounds.FirstOrDefault(s => s.Id == soundId);
-            if (sound != null) return sound;
-            MessageBox.Show($"Sound id '{soundId}' not found.");
-            return null;
-        }
+        //internal Sound? SoundToRequest(int soundId)
+        //{
+        //    if (Sounds == null) return null;
+        //    var sound = Sounds.FirstOrDefault(s => s.Id == soundId);
+        //    if (sound != null) return sound;
+        //    MessageBox.Show($"Sound id '{soundId}' not found.");
+        //    return null;
+        //}
 
 
 

@@ -101,7 +101,6 @@ namespace AwbStudio
             _timelinePlayer = new TimelinePlayer(playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _awbLogger);
             _timelinePlayer.PlaySoundOnDesktop = PlaySoundOnDesktop;
             _timelinePlayer.StopSoundOnDesktop = () => SoundPlayer?.StopSound(); // stop sound on desktop
-            _timelinePlayer.SoundRequest = SoundPlayer.SoundToRequest; // the sound player will handle the sound requests 
 
 
             Loaded += TimelineEditorWindow_Loaded;
@@ -223,7 +222,7 @@ namespace AwbStudio
 
             var changesAfterLoading = false;
 
-            _timelinePlayer.SetTimelineData(timelineData);
+            _timelinePlayer.SetTimelineData(timelineData, _project.Sounds);
             ValuesEditorControl.TimelineDataLoaded(timelineData);
             TimelineCaptionsViewer.TimelineDataLoaded(timelineData);
             AllInOnePreviewControl.TimelineDataLoaded(timelineData);

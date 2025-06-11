@@ -55,6 +55,7 @@ namespace AwbStudio.Exports
                         nextTimelineStateIdOnce: timelineData.NextTimelineStateIdOnce,
                         title: timelineData.Title,
                         points: timelineData.AllPoints,
+                        projectSounds: _project.Sounds,
                         timelineDataService: _project.TimelineDataService,
                         awbLogger: _awbLogger);
 

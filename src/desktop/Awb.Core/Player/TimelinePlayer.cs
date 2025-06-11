@@ -55,8 +55,8 @@ namespace Awb.Core.Player
 
 
         // Delegate to request sound data
-        public delegate Sound? SoundRequestDelegate(int soundId);
-        public SoundRequestDelegate? SoundRequest;
+       // public delegate Sound? SoundRequestDelegate(int soundId);
+        //public SoundRequestDelegate? SoundRequest;
 
         // Delegate to play sounds
         public delegate void PlaySoundInDesktopDelegate(int soundId, TimeSpan start);
@@ -71,8 +71,8 @@ namespace Awb.Core.Player
         private readonly IInvoker _myInvoker;
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
         private volatile TimelinePoint[]? _allPointsMerged;
+        private Sound[] _projectSounds;
         public readonly PlayPosSynchronizer PlayPosSynchronizer;
-
 
         /// <summary>
         /// The timeline to play
@@ -109,9 +109,10 @@ namespace Awb.Core.Player
             }
         }
 
-        public void SetTimelineData(TimelineData timelineData)
+        public void SetTimelineData(TimelineData timelineData, Sound[] projectSounds)
         {
             _allPointsMerged = null;
+            _projectSounds = projectSounds;
             if (_timelineData != null)
                 _timelineData.OnContentChanged -= TimelineContentChanged;
             _timelineData = timelineData;
@@ -187,7 +188,7 @@ namespace Awb.Core.Player
             if (_allPointsMerged == null)
             {
                 var allPoints = TimelineData.AllPoints.ToArray();
-                _allPointsMerged = new NestedTimelinesPointMerger(allPoints, _timelineDataService, _logger, recursionDepth: 0).MergedPoints.ToArray();
+                _allPointsMerged = new EverythingMerger(_timelineDataService, projectSounds: _projectSounds, awbLogger:  _logger).Merge(allPoints).ToArray();
             }
 
             _updating = true;
@@ -383,11 +384,8 @@ namespace Awb.Core.Player
 
         private int GetDurationMsForSoundId(int soundId, string soundPlayerId)
         {
-            if (SoundRequest != null)
-            {
-                var sound = SoundRequest(soundId);
-                if (sound != null) return sound.DurationMs;
-            }
+            var sound = _projectSounds.FirstOrDefault(s => s.Id == soundId);
+            if (sound != null) return sound.DurationMs;
             return 500; // default duration if no sound is found
         }
 

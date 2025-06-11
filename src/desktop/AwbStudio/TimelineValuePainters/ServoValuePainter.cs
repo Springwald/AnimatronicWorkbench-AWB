@@ -62,11 +62,8 @@ namespace AwbStudio.TimelineValuePainters
             var caption = _timelineCaptions?.GetAktuatorCaption(_servo.Id) ?? new TimelineCaption(Brushes.LightSalmon, _servo.Id, label: _servo.Title);
 
             // Add polylines with points for nested timelines and sounds
-            var pointMergerNestedTimelines = new NestedTimelinesPointMerger(timelinePoints, timelineDataService: _timelineDataService, _awbLogger);
-            var pointsWithNestedTimelinePoints = pointMergerNestedTimelines.MergedPoints;
-            var pointMergerSoundPoints = new SoundsPointMerger(pointsWithNestedTimelinePoints, timelineDataService: _timelineDataService, projectSounds:_projectSounds,  _awbLogger);
-
-            var pointsForThisServo = pointMergerSoundPoints.MergedPoints.OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
+            var merger = new EverythingMerger(_timelineDataService, _projectSounds, _awbLogger);
+            var pointsForThisServo = merger.Merge(timelinePoints).OfType<ServoPoint>().Where(p => p.ServoId == _servo.Id).OrderBy(p => p.TimeMs).ToList() ?? new List<ServoPoint>();
 
             // add dots
             double dotWidth = _dotRadius * 2;

@@ -1,13 +1,13 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
-using Awb.Core.Timelines.NestedTimelines;
 
 namespace Awb.Core.Export.ExporterParts.ExportData
 {
@@ -15,6 +15,7 @@ namespace Awb.Core.Export.ExporterParts.ExportData
     {
         public int TimelineStateId { get; set; }
         public int? NextTimelineStateOnceId { get; set; }
+
         public string Title { get; set; }
         public TimelinePoint[] Points { get; set; }
 
@@ -26,10 +27,11 @@ namespace Awb.Core.Export.ExporterParts.ExportData
             Points = points;
         }
 
-        public static TimelineExportData FromTimeline(int timelineStateId, int? nextTimelineStateIdOnce, string title, IEnumerable<TimelinePoint> points, ITimelineDataService timelineDataService, IAwbLogger awbLogger)
+        public static TimelineExportData FromTimeline(int timelineStateId, int? nextTimelineStateIdOnce, string title, IEnumerable<TimelinePoint> points, Sound[] projectSounds, ITimelineDataService timelineDataService, IAwbLogger awbLogger)
         {
-            var merger = new NestedTimelinesPointMerger(points, timelineDataService, awbLogger, recursionDepth: 0);
-            return new TimelineExportData(title: title, timelineStateId: timelineStateId, nextTimelineStateIdOnce: nextTimelineStateIdOnce, points: merger.MergedPoints.ToArray());
+            var merger = new EverythingMerger(timelineDataService, projectSounds, awbLogger);
+            var mergedPoints = merger.Merge(points);
+            return new TimelineExportData(title: title, timelineStateId: timelineStateId, nextTimelineStateIdOnce: nextTimelineStateIdOnce, points: mergedPoints.ToArray());
         }
     }
 }
