@@ -14,8 +14,7 @@
             <Label>Servo to move:</Label>
             <ComboBox x:Name="ComboBoxServoToMove" SelectionChanged="ComboBoxServoToMove_SelectionChanged" >
             </ComboBox>
-            <Label>Invert servo movement:</Label>
-            <CheckBox x:Name="CheckBoxInvertMovement" Content="CheckBox" Checked="CheckBoxInvertMovement_Checked"/>
+            <CheckBox x:Name="CheckBoxInvertMovement" Content="Invert servo movement" Checked="CheckBoxInvertMovement_Checked"/>
         </StackPanel>
     </Grid>
 </UserControl>
