@@ -1,11 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
-
-using Awb.Core.Sounds;
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 namespace Awb.Core.Actuators
 {
@@ -14,12 +12,10 @@ namespace Awb.Core.Actuators
     /// </summary>
     public interface ISoundPlayer : IActuator
     {
-        int? ActualSoundId { get;}
+        int? ActualSoundId { get; }
         string? ActualMovementServoId { get; }
         bool ActualMovementInverted { get; }
 
-        void PlaySound(int soundId, TimeSpan startTime);
-
-        void SetNoSound();
+        void SetActualSoundId(int? soundId, TimeSpan startTime);
     }
 }

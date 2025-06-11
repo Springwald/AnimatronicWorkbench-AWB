@@ -25,8 +25,7 @@ namespace Awb.Core.Timelines.Sounds
                     foreach (var servoPoint in servoPoints)
                         yield return servoPoint;
                 }
-                else
-                    yield return point;
+                yield return point; // also return the original sound point
             }
         }
 

@@ -261,9 +261,24 @@ namespace Awb.Core.Player
                 {
                     case PlayStates.Nothing:
                         // take exactly the point at the actual position
-                        targetSoundPlayer.SetNoSound();
-                        targetSoundPlayer.IsDirty = true;
-                        //soundPoint = soundPoints.GetPoint(playPos, soundTargetObjectId) as SoundPoint;
+                        var soundPoint = soundPoints.GetPoint(playPos, soundTargetObjectId) as SoundPoint;
+                        if (soundPoint == null)
+                        {
+                            if (targetSoundPlayer.ActualSoundId != null)
+                            {
+                                targetSoundPlayer.SetActualSoundId(null, TimeSpan.Zero);
+                                targetSoundPlayer.IsDirty = true;
+                            }
+                        }
+                        else
+                        {
+                            if (soundPoint.SoundId != targetSoundPlayer.ActualSoundId)
+                            {
+                                targetSoundPlayer.SetActualSoundId(soundPoint.SoundId, TimeSpan.Zero);
+                                targetSoundPlayer.IsDirty = true;
+                            }
+                        }
+                        
                         break;
                     case PlayStates.Playing:
                         // take a point between the last and the actual position
@@ -272,13 +287,13 @@ namespace Awb.Core.Player
                         if (playSoundArgs != null)
                         {
                             var startTime =playSoundArgs.StartTime ?? TimeSpan.Zero;
-                            targetSoundPlayer.PlaySound(playSoundArgs.SoundId,startTime: startTime);
+                            targetSoundPlayer.SetActualSoundId(playSoundArgs.SoundId, startTime: startTime);
                             targetSoundPlayer.IsDirty = true;
                             if (PlaySoundOnDesktop != null)PlaySoundOnDesktop(playSoundArgs.SoundId, start: startTime);
                         }
                         else
                         {
-                            targetSoundPlayer.SetNoSound();
+                            targetSoundPlayer.SetActualSoundId(null, TimeSpan.Zero);
                             targetSoundPlayer.IsDirty = true;
                         }
                         break;

@@ -83,19 +83,9 @@ namespace Awb.Core.Actuators
             Title = string.IsNullOrWhiteSpace(config.Title) ? $"MP3-{config.Id}" : config.Title;
         }
 
-        public void PlaySound(int soundId)
+        public void SetActualSoundId(int? soundId, TimeSpan startTime)
         {
             ActualSoundId = soundId;
-        }
-
-        public void PlaySound(int soundId, TimeSpan startTime)
-        {
-            ActualSoundId = soundId;
-        }
-
-        public void SetNoSound()
-        {
-            ActualSoundId = null;
         }
 
         public bool TurnOff()

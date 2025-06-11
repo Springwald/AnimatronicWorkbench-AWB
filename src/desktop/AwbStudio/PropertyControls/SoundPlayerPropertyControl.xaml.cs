@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
@@ -98,14 +98,18 @@ namespace AwbStudio.PropertyControls
                 ShowActualValue();
         }
 
-        private void ComboBoxSoundToPlay_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBoxSoundToPlay_SelectionChanged(object sender, SelectionChangedEventArgs e) => ValueChoiceChanged();
+        private void CheckBoxInvertMovement_Checked(object sender, RoutedEventArgs e){}
+        private void ComboBoxServoToMove_SelectionChanged(object sender, SelectionChangedEventArgs e) {}
+
+        private void ValueChoiceChanged()
         {
             if (_isUpdatingView) return;
 
             var index = ComboBoxSoundToPlay.SelectedIndex;
             if (index == 0)
             {
-                SetNewValue(null);
+                SetNewSoundValue(null);
             }
             else
             {
@@ -114,30 +118,29 @@ namespace AwbStudio.PropertyControls
                     MessageBox.Show("Sound index " + index + " not found!");
                     return;
                 }
-                var newSoundId = _projectSounds[index - 1];
-                SetNewValue(newSoundId);
+                var newSound = _projectSounds[index - 1];
+                SetNewSoundValue(newSound);
             }
         }
 
-        private void SetNewValue(Sound? sound)
+        private void SetNewSoundValue(Sound? sound)
         {
             _isSettingNewValue = true;
             if (_soundPlayer.ActualSoundId != sound?.Id)
             {
                 if (sound == null)
                 {
-                    _soundPlayer.SetNoSound();
+                    _soundPlayer.SetActualSoundId(null, TimeSpan.Zero);
                 }
                 else
                 {
-                    _soundPlayer.PlaySound(sound!.Id, TimeSpan.Zero);
+                    _soundPlayer.SetActualSoundId(sound!.Id, TimeSpan.Zero);
                     _windowsSoundPlayerControl.PlaySound(this, new SoundPlayEventArgs(sound!.Id, startTime: TimeSpan.Zero));
                 }
                 _viewContext.FocusObjectValueChanged(this);
             }
             _isSettingNewValue = false;
             ShowActualValue();
-
         }
 
         private void ShowActualValue()
@@ -151,6 +154,8 @@ namespace AwbStudio.PropertyControls
             if (soundId == null)
             {
                 ComboBoxSoundToPlay.SelectedIndex = 0;
+                ComboBoxServoToMove.IsEnabled = false;
+                CheckBoxInvertMovement.IsEnabled = false;
             }
             else
             {
@@ -162,9 +167,13 @@ namespace AwbStudio.PropertyControls
                         break; ;
                     }
                 }
+                ComboBoxServoToMove.IsEnabled = true;
+                CheckBoxInvertMovement.IsEnabled = true;
             }
 
             _isUpdatingView = false;
         }
+
+
     }
 }

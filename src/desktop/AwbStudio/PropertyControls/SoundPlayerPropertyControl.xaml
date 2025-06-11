@@ -11,6 +11,11 @@
             <Label>Sound to play:</Label>
             <ComboBox x:Name="ComboBoxSoundToPlay" SelectionChanged="ComboBoxSoundToPlay_SelectionChanged">
             </ComboBox>
+            <Label>Servo to move:</Label>
+            <ComboBox x:Name="ComboBoxServoToMove" SelectionChanged="ComboBoxServoToMove_SelectionChanged" >
+            </ComboBox>
+            <Label>Invert servo movement:</Label>
+            <CheckBox x:Name="CheckBoxInvertMovement" Content="CheckBox" Checked="CheckBoxInvertMovement_Checked"/>
         </StackPanel>
     </Grid>
 </UserControl>
