@@ -267,6 +267,7 @@ namespace Awb.Core.Player
                             if (targetSoundPlayer.ActualSoundId != null)
                             {
                                 targetSoundPlayer.SetActualSoundId(null, TimeSpan.Zero);
+                                targetSoundPlayer.SetMovement(null, false);
                                 targetSoundPlayer.IsDirty = true;
                             }
                         }
@@ -275,6 +276,11 @@ namespace Awb.Core.Player
                             if (soundPoint.SoundId != targetSoundPlayer.ActualSoundId)
                             {
                                 targetSoundPlayer.SetActualSoundId(soundPoint.SoundId, TimeSpan.Zero);
+                                targetSoundPlayer.IsDirty = true;
+                            }
+                            if (soundPoint.MovementServoId  != targetSoundPlayer.ActualMovementServoId || soundPoint.MovementInverted != targetSoundPlayer.ActualMovementInverted)
+                            {
+                                targetSoundPlayer.SetMovement(soundPoint.MovementServoId, soundPoint.MovementInverted);
                                 targetSoundPlayer.IsDirty = true;
                             }
                         }

@@ -66,7 +66,8 @@ namespace Awb.Core.Actuators
 
         public bool IsControllerTuneable => false;
 
-        public string? ActualMovementServoId { get; private set; }
+        public string? ActualMovementServoId { get; 
+            private set; }
 
         public bool ActualMovementInverted { get; private set; }
 
@@ -86,6 +87,12 @@ namespace Awb.Core.Actuators
         public void SetActualSoundId(int? soundId, TimeSpan startTime)
         {
             ActualSoundId = soundId;
+        }
+
+        public void SetMovement(string? movementServoId, bool movementInverted)
+        {
+            ActualMovementServoId = movementServoId;
+            ActualMovementInverted = movementInverted;
         }
 
         public bool TurnOff()

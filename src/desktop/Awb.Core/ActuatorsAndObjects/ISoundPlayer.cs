@@ -17,5 +17,6 @@ namespace Awb.Core.Actuators
         bool ActualMovementInverted { get; }
 
         void SetActualSoundId(int? soundId, TimeSpan startTime);
+        void SetMovement(string? movementServoId, bool movementInverted);
     }
 }

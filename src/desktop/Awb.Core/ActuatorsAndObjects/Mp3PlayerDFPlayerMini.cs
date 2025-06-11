@@ -92,6 +92,12 @@ namespace Awb.Core.ActuatorsAndObjects
             ActualSoundId = soundId;
         }
 
+        public void SetMovement(string? movementServoId, bool movementInverted)
+        {
+            ActualMovementServoId = movementServoId;
+            ActualMovementInverted = movementInverted;
+        }
+
         public bool TurnOff()
         {
             TargetValue = null;
@@ -103,6 +109,6 @@ namespace Awb.Core.ActuatorsAndObjects
             TurnOff();
         }
 
-      
+       
     }
 }

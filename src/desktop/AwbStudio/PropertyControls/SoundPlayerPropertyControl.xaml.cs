@@ -8,6 +8,7 @@
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
+using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
@@ -16,6 +17,7 @@ using AwbStudio.TimelineEditing;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using Windows.ApplicationModel.Background;
 
 namespace AwbStudio.PropertyControls
 {
@@ -24,6 +26,9 @@ namespace AwbStudio.PropertyControls
     /// </summary>
     public partial class SoundPlayerPropertyControl : UserControl, IPropertyEditor
     {
+        private const string NoServoTitle = "-- NO SERVO --";
+        private const string NoSoundTitle = "-- NO SOUND --";
+        private readonly IServo[] _servos;
         private readonly ISoundPlayer _soundPlayer;
         private readonly TimelineData _timelineData;
         private readonly Sound[] _projectSounds;
@@ -35,9 +40,10 @@ namespace AwbStudio.PropertyControls
 
         public IAwbObject AwbObject => _soundPlayer;
 
-        public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, Sound[] projectSounds, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer, SoundPlayerControl windowsSoundPlayerControl)
+        public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, Sound[] projectSounds, IServo[] servos, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer, SoundPlayerControl windowsSoundPlayerControl)
         {
             InitializeComponent();
+            _servos = servos ?? throw new ArgumentNullException(nameof(servos), "Servos cannot be null or empty.");
             _soundPlayer = soundPlayer;
             _projectSounds = projectSounds;
             _windowsSoundPlayerControl = windowsSoundPlayerControl;
@@ -61,9 +67,17 @@ namespace AwbStudio.PropertyControls
             Loaded -= SoundPlayerPropertyControl_Loaded;
             Unloaded += SoundPlayerPropertiesControl_Unloaded;
 
-            ComboBoxSoundToPlay.Items.Add("-- NO SOUND --");
+            // Fill sounds
+            ComboBoxSoundToPlay.Items.Add(NoSoundTitle);
             foreach (var sound in _projectSounds)
                 ComboBoxSoundToPlay.Items.Add(sound.Title);
+
+            // Fill movement servos
+            ComboBoxServoToMove.Items.Add(NoServoTitle);
+            foreach (var servo in _servos)
+            {
+                ComboBoxServoToMove.Items.Add(servo.Title);
+            }
 
             ShowActualValue();
         }
@@ -89,7 +103,8 @@ namespace AwbStudio.PropertyControls
 
         private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
-            if (e.ChangedObjectId == _soundPlayer.Id) ShowActualValue();
+            if (e.ChangedObjectId == _soundPlayer.Id)
+                ShowActualValue();
         }
 
         private void OnPlayPosChanged(object? sender, int e)
@@ -99,17 +114,32 @@ namespace AwbStudio.PropertyControls
         }
 
         private void ComboBoxSoundToPlay_SelectionChanged(object sender, SelectionChangedEventArgs e) => ValueChoiceChanged();
-        private void CheckBoxInvertMovement_Checked(object sender, RoutedEventArgs e){}
-        private void ComboBoxServoToMove_SelectionChanged(object sender, SelectionChangedEventArgs e) {}
+        private void CheckBoxInvertMovement_Checked(object sender, RoutedEventArgs e) => ValueChoiceChanged();
+        private void ComboBoxServoToMove_SelectionChanged(object sender, SelectionChangedEventArgs e) => ValueChoiceChanged();
 
         private void ValueChoiceChanged()
         {
             if (_isUpdatingView) return;
 
+            var movementInverted = CheckBoxInvertMovement.IsChecked ?? false;
+            var movementServoTitle = ComboBoxServoToMove.SelectedItem as string;
+            string? movementServoId = null;
+            if (movementServoTitle != null && movementServoTitle != NoServoTitle)
+            {
+                foreach (var servo in _servos)
+                {
+                    if (servo.Title == movementServoTitle)
+                    {
+                        movementServoId = servo.Id;
+                        break;
+                    }
+                }
+            }
+
             var index = ComboBoxSoundToPlay.SelectedIndex;
             if (index == 0)
             {
-                SetNewSoundValue(null);
+                SetNewSoundValue(null, null,false);
             }
             else
             {
@@ -119,13 +149,16 @@ namespace AwbStudio.PropertyControls
                     return;
                 }
                 var newSound = _projectSounds[index - 1];
-                SetNewSoundValue(newSound);
+                SetNewSoundValue(newSound, movementServoId, movementInverted);
             }
         }
 
-        private void SetNewSoundValue(Sound? sound)
+        private void SetNewSoundValue(Sound? sound, string? movementServoId, bool movementInverted)
         {
             _isSettingNewValue = true;
+
+            var changed = false;
+
             if (_soundPlayer.ActualSoundId != sound?.Id)
             {
                 if (sound == null)
@@ -137,8 +170,28 @@ namespace AwbStudio.PropertyControls
                     _soundPlayer.SetActualSoundId(sound!.Id, TimeSpan.Zero);
                     _windowsSoundPlayerControl.PlaySound(this, new SoundPlayEventArgs(sound!.Id, startTime: TimeSpan.Zero));
                 }
+                changed = true;
+            }
+
+            if (_soundPlayer.ActualMovementServoId != movementServoId || _soundPlayer.ActualMovementInverted != movementInverted)
+            {
+                if (sound == null)
+                {
+                    _soundPlayer.SetMovement(null, false);
+                }
+                else
+                {
+                    _soundPlayer.SetMovement(movementServoId, movementInverted);
+                }
+                changed = true;
+            }
+
+            if (changed)
+            {
+                _soundPlayer.IsDirty = true;
                 _viewContext.FocusObjectValueChanged(this);
             }
+
             _isSettingNewValue = false;
             ShowActualValue();
         }
@@ -154,8 +207,12 @@ namespace AwbStudio.PropertyControls
             if (soundId == null)
             {
                 ComboBoxSoundToPlay.SelectedIndex = 0;
+
                 ComboBoxServoToMove.IsEnabled = false;
+                ComboBoxServoToMove.SelectedIndex = 0;
+
                 CheckBoxInvertMovement.IsEnabled = false;
+                CheckBoxInvertMovement.IsChecked = false;
             }
             else
             {
@@ -167,8 +224,25 @@ namespace AwbStudio.PropertyControls
                         break; ;
                     }
                 }
+
                 ComboBoxServoToMove.IsEnabled = true;
+
+                string? actualMovementServoTitle = null;
+                if (_soundPlayer.ActualMovementServoId != null)
+                {
+                    foreach (var servo in _servos)
+                    {
+                        if (servo.Id == _soundPlayer.ActualMovementServoId)
+                        {
+                            actualMovementServoTitle = servo.Title;
+                            break;
+                        }
+                    }
+                }
+                ComboBoxServoToMove.SelectedItem = actualMovementServoTitle ?? NoServoTitle;
+
                 CheckBoxInvertMovement.IsEnabled = true;
+                CheckBoxInvertMovement.IsChecked = _soundPlayer.ActualMovementInverted;
             }
 
             _isUpdatingView = false;

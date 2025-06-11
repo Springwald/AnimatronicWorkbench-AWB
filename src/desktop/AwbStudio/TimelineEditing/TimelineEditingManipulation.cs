@@ -202,7 +202,7 @@ namespace AwbStudio.TimelineEditing
         /// <summary>
         /// Sets a sound player value at the current timeline position 
         /// </summary>
-        public void UpdateSoundPlayerValue(ISoundPlayer soundPlayer, int? soundId, string? soundTitle, string movementServoId, bool movementInverted)
+        public void UpdateSoundPlayerValue(ISoundPlayer soundPlayer, int? soundId, string? soundTitle, string? movementServoId, bool movementInverted)
         {
             var soundPoint = _timelineData?.SoundPoints.SingleOrDefault(p => p.SoundPlayerId == soundPlayer.Id && (int)p.TimeMs == _playPosSynchronizer.PlayPosMsGuaranteedSnapped); // check existing point
             if (soundId == null)
@@ -222,6 +222,8 @@ namespace AwbStudio.TimelineEditing
                 else
                 {
                     soundPoint.SoundId = soundId.Value;
+                    soundPoint.MovementServoId = movementServoId;
+                    soundPoint.MovementInverted = movementInverted;
                 }
             }
             _timelineData!.SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, soundPlayer.Id);
