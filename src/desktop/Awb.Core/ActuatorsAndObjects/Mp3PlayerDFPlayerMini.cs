@@ -72,6 +72,10 @@ namespace Awb.Core.ActuatorsAndObjects
 
         public bool IsControllerTuneable => false;
 
+        public string? ActualMovementServoId { get; private set; }
+
+        public bool ActualMovementInverted { get; private set; }
+
         public Mp3PlayerDFPlayerMini(Mp3PlayerDfPlayerMiniConfig config)
         {
             Id = config.Id;

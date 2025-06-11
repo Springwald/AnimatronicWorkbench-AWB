@@ -15,6 +15,9 @@ namespace Awb.Core.Actuators
     public interface ISoundPlayer : IActuator
     {
         int? ActualSoundId { get;}
+        string? ActualMovementServoId { get; }
+        bool ActualMovementInverted { get; }
+
         void PlaySound(int soundId, TimeSpan startTime);
 
         void SetNoSound();

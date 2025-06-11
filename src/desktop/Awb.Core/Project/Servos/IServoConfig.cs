@@ -13,5 +13,7 @@ namespace Awb.Core.Project.Servos
         /// Is this servo able to report its position?
         /// </summary>
         bool CanReadServoPosition { get; }
+
+
     }
 }

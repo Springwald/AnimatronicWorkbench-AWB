@@ -66,6 +66,10 @@ namespace Awb.Core.Actuators
 
         public bool IsControllerTuneable => false;
 
+        public string? ActualMovementServoId { get; private set; }
+
+        public bool ActualMovementInverted { get; private set; }
+
         public Mp3PlayerYX5300(Mp3PlayerYX5300Config config)
         {
             Id = config.Id;
@@ -73,6 +77,8 @@ namespace Awb.Core.Actuators
             TxPin = config.TxPin;
             RxPin = config.RxPin;
             ActualSoundId = 0;
+            ActualMovementServoId = null;
+            ActualMovementInverted = false;
             IsDirty = true;
             Title = string.IsNullOrWhiteSpace(config.Title) ? $"MP3-{config.Id}" : config.Title;
         }

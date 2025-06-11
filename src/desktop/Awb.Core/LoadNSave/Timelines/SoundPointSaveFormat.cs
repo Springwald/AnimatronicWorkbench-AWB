@@ -18,18 +18,24 @@ namespace Awb.Core.LoadNSave.Timelines
         public string Title { get; set; }
         public string? Description { get; set; }
         public int SoundId { get; set; }
+        public string? MovementServoId { get; set; }
+        public bool MovementInverted { get; set; }
 
-        public SoundPointSaveFormat(int timeMs, string targetObjectId, int soundId)
+        public SoundPointSaveFormat(int timeMs, string targetObjectId, int soundId, string? movementServoId, bool movementInverted)
         {
             TimeMs = timeMs;
             TargetObjectId = targetObjectId;
             SoundId = soundId;
+            MovementServoId = movementServoId;
+            MovementInverted = movementInverted;
         }
 
         public static SoundPointSaveFormat FromSoundPoint(SoundPoint soundPoint) => new SoundPointSaveFormat(
                 timeMs: soundPoint.TimeMs,
                 targetObjectId: soundPoint.SoundPlayerId,
-                soundId: soundPoint.SoundId
+                soundId: soundPoint.SoundId,
+                movementServoId: soundPoint.MovementServoId,
+                movementInverted: soundPoint.MovementInverted
                 )
         {
             Title = soundPoint.Title,
@@ -42,7 +48,10 @@ namespace Awb.Core.LoadNSave.Timelines
             timeMs: soundPointSaveFormat.TimeMs,
             soundPlayerId: soundPointSaveFormat.TargetObjectId,
             title: soundPointSaveFormat.Title,
-            soundId: soundPointSaveFormat.SoundId)
+            soundId: soundPointSaveFormat.SoundId,
+            movementServoId: soundPointSaveFormat.MovementServoId,
+            movementInverted: soundPointSaveFormat.MovementInverted
+            )
             {
                 Description = soundPointSaveFormat.Description,
             };

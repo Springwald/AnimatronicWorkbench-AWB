@@ -134,7 +134,7 @@ namespace AwbStudio.TimelineEditing
                     if (_viewContext?.ActualFocusObject is IServo servo)
                         TimelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     if (_viewContext?.ActualFocusObject is ISoundPlayer soundPlayer)
-                        TimelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null);
+                        TimelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null, movementServoId: soundPlayer.ActualMovementServoId, movementInverted: soundPlayer.ActualMovementInverted);
                     if (_viewContext?.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
                         TimelineEditingManipulation.UpdateNestedTimelinesValue();
                     break;
