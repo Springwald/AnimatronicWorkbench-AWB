@@ -311,48 +311,7 @@ namespace Awb.Core.Player
                 }
             }
 
-            /*
-            foreach (var soundTargetObjectId in soundTargetObjectIds)
-            {
-
-                SoundPoint? soundPoint = null;
-
-                switch (PlayState)
-                {
-                    case PlayStates.Nothing:
-                        // take exactly the point at the actual position
-                        soundPoint = soundPoints.GetPoint(playPos, soundTargetObjectId) as SoundPoint;
-                        break;
-                    case PlayStates.Playing:
-                        // take a point between the last and the actual position
-                        soundPoint = soundPoints.GetPointsBetween<SoundPoint>(_playPosMsOnLastUpdate, playPos, soundTargetObjectId).FirstOrDefault();
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException($"{nameof(PlayState)}:{PlayState}");
-                }
-
-                var targetSoundPlayer = _actuatorsService.SoundPlayers.SingleOrDefault(o => o.Id.Equals(soundTargetObjectId));
-                if (targetSoundPlayer == null)
-                {
-                    await _logger.LogErrorAsync($"{nameof(UpdateActuatorsInternal)}: Target soundplayer object with id {soundTargetObjectId} not found.");
-                }
-                else
-                {
-                    if (soundPoint == null)
-                    {
-                        targetSoundPlayer.SetNoSound();
-                        targetSoundPlayer.IsDirty = true;
-                    }
-                    else if (soundPoint.SoundId != targetSoundPlayer.ActualSoundId)
-                    {
-                        targetSoundPlayer.PlaySound(soundPoint.SoundId);
-                        targetSoundPlayer.IsDirty = true;
-                        if (OnPlaySound != null) _myInvoker.Invoke(() => OnPlaySound.Invoke(this, new SoundPlayEventArgs(soundPoint.SoundId, startTime: new TimeSpan())));
-                    }
-                }
-            }*/
-
-
+         
             // Update Nested timelines 
             NestedTimelinePoint? nestedTimelinePoint = null;
 
@@ -433,14 +392,15 @@ namespace Awb.Core.Player
                 if (PlayState == PlayStates.Playing)
                 {
                     var newPos = 0;
-                    if (PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped >= TimelineData.DurationMs)
+                    var timelineDurationMs = TimelineData.DurationMs;
+                    if (PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped >= timelineDurationMs)
                     {
                         newPos = 0;
                     }
                     else
                     {
                         newPos = PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped + (int)(diff.TotalMilliseconds * PlaybackSpeed);
-                        if (newPos > TimelineData.DurationMs) newPos = TimelineData.DurationMs;
+                        if (newPos > timelineDurationMs) newPos = timelineDurationMs;
 
                     }
                     PlayPosSynchronizer.SetNewPlayPos(newPos);

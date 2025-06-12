@@ -18,7 +18,6 @@ namespace Awb.Core.Services
         bool Exists(string timelineId);
 
         TimelineData? GetTimelineData(string timelineId);
-
         bool SaveTimelineData(TimelineData data);
     }
 }
