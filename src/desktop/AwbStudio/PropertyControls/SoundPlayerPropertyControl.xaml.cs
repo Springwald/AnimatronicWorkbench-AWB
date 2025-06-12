@@ -84,6 +84,7 @@ namespace AwbStudio.PropertyControls
         private void SoundPlayerPropertiesControl_Unloaded(object sender, RoutedEventArgs e)
         {
             Unloaded -= SoundPlayerPropertiesControl_Unloaded;
+            _timelineData.OnContentChanged -= TimelineData_OnContentChanged;
             _playPosSynchronizer.OnPlayPosChanged -= OnPlayPosChanged;
             _viewContext.Changed -= ViewContext_Changed;
         }
@@ -135,7 +136,7 @@ namespace AwbStudio.PropertyControls
             var index = ComboBoxSoundToPlay.SelectedIndex;
             var movementOffsetMs = (int)SliderMovementOffsetMs.Value;
             var movementValueScale = (int)SliderMovementValueScale.Value;
-            if (index == 0)
+            if (index <= 0)
             {
                 SetNewSoundValue(sound: null, actuatorMovementsBySound: []);
             }

@@ -12,6 +12,7 @@ namespace Awb.Core.Timelines
 {
     public interface ITimelineMetaDataService
     {
+        int GetDurationMs(TimelineData timelineData);
         int GetDurationMs(string timelineId);
         bool ExistsTimeline(string timelineId);
         void ClearCache(string timelineId);
@@ -55,6 +56,14 @@ namespace Awb.Core.Timelines
             return _allMetaDataCache;
         }
 
+
+        public int GetDurationMs(TimelineData timelineData)
+        {
+            if (_durationCache.ContainsKey(timelineData.Id)) return _durationCache[timelineData.Id];
+            var metaData = GetMetaData(timelineData);
+            _durationCache[timelineData.Id] = metaData.DurationMs;
+            return metaData.DurationMs;
+        }
         public int GetDurationMs(string timelineId)
         {
             if (_durationCache.ContainsKey(timelineId)) return _durationCache[timelineId];
@@ -67,7 +76,13 @@ namespace Awb.Core.Timelines
         {
             var data = _timelineDataService.GetTimelineData(timelineId);
             if (data == null) throw new Exception($"Timeline with id {timelineId} not found");
-            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, data.GetDurationMs(_projectSounds, _timelineDataService));
+            return GetMetaData(data);
+        }
+
+        private TimelineMetaData GetMetaData(TimelineData timelineData)
+        {
+            if (timelineData == null) throw new ArgumentNullException(nameof(timelineData), "Timeline data cannot be null");
+            return new TimelineMetaData(id: timelineData.Id, title: timelineData.Title, stateId: timelineData.TimelineStateId, timelineData.GetDurationMs(_projectSounds, _timelineDataService));
         }
     }
 

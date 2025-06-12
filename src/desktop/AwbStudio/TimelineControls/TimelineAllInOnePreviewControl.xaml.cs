@@ -146,7 +146,7 @@ namespace AwbStudio.TimelineControls
             if (_timelineData == null) return;
 
            
-            this._viewContext.DurationMs = Math.Max(20 * 1000, _timelineMetaDataService.GetDurationMs(_timelineData.Id) + 5000); // 5000ms extra for the timeline to grow beyond the duration of the last keyframe
+            this._viewContext.DurationMs = Math.Max(20 * 1000, _timelineMetaDataService.GetDurationMs(_timelineData) + 5000); // 5000ms extra for the timeline to grow beyond the duration of the last keyframe
         }
 
         private void ZoomChanged()

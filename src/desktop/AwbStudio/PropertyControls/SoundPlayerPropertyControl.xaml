@@ -18,7 +18,7 @@
             <Label x:Name="LabelMovementOffsetMs">Movement offset (ms)</Label>
             <Slider x:Name="SliderMovementOffsetMs" Maximum="2000" Minimum="0" Margin="0 0 10 0" ValueChanged="SliderMovementOffsetMs_ValueChanged"/>
             <Label x:Name="LabelMovementValueScalePercent">Movement value scale (percent):</Label>
-            <Slider x:Name="SliderMovementValueScale" Maximum="100" Minimum="0" Margin="0 0 10 0" ValueChanged="SliderMovementScale_ValueChanged"/>
+            <Slider x:Name="SliderMovementValueScale" Maximum="100" Minimum="0" Margin="0 0 10 0" Value="100" ValueChanged="SliderMovementScale_ValueChanged"/>
 
         </StackPanel>
     </Grid>
