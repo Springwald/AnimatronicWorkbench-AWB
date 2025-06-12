@@ -222,7 +222,7 @@ namespace AwbStudio
 
             var changesAfterLoading = false;
 
-            _timelinePlayer.SetTimelineData(timelineData, _project.Sounds);
+            _timelinePlayer.SetTimelineData(timelineData, _project.Sounds, _actuatorsService.Servos);
             ValuesEditorControl.TimelineDataLoaded(timelineData);
             TimelineCaptionsViewer.TimelineDataLoaded(timelineData);
             AllInOnePreviewControl.TimelineDataLoaded(timelineData);
@@ -628,7 +628,7 @@ namespace AwbStudio
                 }
             }
 
-            var exportWindow = new ExportToClientsWindow(_projectManagerService, _awbLogger);
+            var exportWindow = new ExportToClientsWindow(_projectManagerService, _actuatorsService, _awbLogger);
             exportWindow.Show();
         }
 

@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
@@ -27,9 +28,9 @@ namespace Awb.Core.Export.ExporterParts.ExportData
             Points = points;
         }
 
-        public static TimelineExportData FromTimeline(int timelineStateId, int? nextTimelineStateIdOnce, string title, IEnumerable<TimelinePoint> points, Sound[] projectSounds, ITimelineDataService timelineDataService, IAwbLogger awbLogger)
+        public static TimelineExportData FromTimeline(int timelineStateId, int? nextTimelineStateIdOnce, string title, IEnumerable<TimelinePoint> points, Sound[] projectSounds, IServo[] projectServos, ITimelineDataService timelineDataService, IAwbLogger awbLogger)
         {
-            var merger = new EverythingMerger(timelineDataService, projectSounds, awbLogger);
+            var merger = new EverythingMerger(timelineDataService, projectSounds, projectServos, awbLogger);
             var mergedPoints = merger.Merge(points);
             return new TimelineExportData(title: title, timelineStateId: timelineStateId, nextTimelineStateIdOnce: nextTimelineStateIdOnce, points: mergedPoints.ToArray());
         }

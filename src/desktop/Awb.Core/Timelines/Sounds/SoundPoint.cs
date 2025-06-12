@@ -20,31 +20,43 @@ namespace Awb.Core.Timelines.Sounds
         /// </summary>
         public string SoundPlayerId { get; set; }
 
-        public string? MovementServoId { get; set; }
-        public bool MovementInverted { get; set; } // up/down movement inverted, e.g. for a jaw servo
-
-        public int MovementOffsetMs { get; } = 0; // offset in ms to the sound start, e.g. for moving a servo before the sound starts
-        public int MovementFrequencyMs { get; } = 50; // frequency in ms tp create servo points
-
+        /// <summary>
+        /// If actuators should move in sync with the sound, this array contains the actuator movements.
+        /// </summary>
+        /// <remarks>
+        /// At the moment, only one movement per sound is supported by the visual editor.
+        /// In the future, this might change to allow multiple movements per sound, e.g. if a mouth is controlled by multiple servos.
+        /// </remarks>
+        public ActuatorMovementBySound[] ActuatorMovementsBySound { get; set; } = Array.Empty<ActuatorMovementBySound>();
 
         public override string Title { get; }
 
-
-        public override string PainterCheckSum => SoundId.ToString() + TimeMs.ToString() + SoundPlayerId.ToString();
+        public override string PainterCheckSum => $"{SoundId}-{TimeMs}-{SoundPlayerId}-{string.Join(".", ActuatorMovementsBySound.Select(a => a.PainterChecksum))}";
 
         /// <param name="soundId">The resource id of the sound to be played. What kind of resource this is depends on the implementation of the sound player.</param>
-        public SoundPoint(int timeMs, string soundPlayerId, string title, int soundId, string? movementServoId, bool movementInverted) : base(targetObjectId: soundPlayerId, timeMs: timeMs)
+        public SoundPoint(int timeMs, string soundPlayerId, string title, int soundId, ActuatorMovementBySound[] actuatorMovementsBySound) : base(targetObjectId: soundPlayerId, timeMs: timeMs)
         {
             SoundId = soundId;
             Title = title;
             SoundPlayerId = soundPlayerId;
-            MovementServoId = movementServoId;
-            MovementInverted = movementInverted;
+            ActuatorMovementsBySound = actuatorMovementsBySound;
         }
 
         public override SoundPoint Clone()
         {
-            return new SoundPoint(timeMs:TimeMs, soundPlayerId: SoundPlayerId, title: Title, soundId: SoundId, movementInverted: MovementInverted, movementServoId: MovementServoId);
+            var cloneMovements = new ActuatorMovementBySound[ActuatorMovementsBySound.Length];
+            for (int i = 0; i < ActuatorMovementsBySound.Length; i++)
+            {
+                cloneMovements[i] = new ActuatorMovementBySound
+                {
+                    ActuatorId = ActuatorMovementsBySound[i].ActuatorId,
+                    MovementInverted = ActuatorMovementsBySound[i].MovementInverted,
+                    MovementOffsetMs = ActuatorMovementsBySound[i].MovementOffsetMs,
+                    MovementFrequencyMs = ActuatorMovementsBySound[i].MovementFrequencyMs
+                };
+            }
+
+            return new SoundPoint(timeMs:TimeMs, soundPlayerId: SoundPlayerId, title: Title, soundId: SoundId, actuatorMovementsBySound: cloneMovements);
         }
 
     }

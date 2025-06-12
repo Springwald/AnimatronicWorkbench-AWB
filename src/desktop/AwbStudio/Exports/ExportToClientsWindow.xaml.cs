@@ -25,6 +25,7 @@ namespace AwbStudio.Exports
         private readonly Brush _rememberBackground;
         private readonly IAwbLogger _awbLogger;
         private readonly AwbProject _project;
+        private readonly IActuatorsService _actuatorsService;
         private readonly string _exportFolderGlobal;
 
         private WifiConfigExportData WifiConfigData => new WifiConfigExportData
@@ -56,6 +57,7 @@ namespace AwbStudio.Exports
                         title: timelineData.Title,
                         points: timelineData.AllPoints,
                         projectSounds: _project.Sounds,
+                        projectServos: _actuatorsService.Servos,
                         timelineDataService: _project.TimelineDataService,
                         awbLogger: _awbLogger);
 
@@ -79,7 +81,7 @@ namespace AwbStudio.Exports
         }
 
 
-        public ExportToClientsWindow(IProjectManagerService projectManagerService, IAwbLogger awbLogger)
+        public ExportToClientsWindow(IProjectManagerService projectManagerService, IActuatorsService actuatorsService, IAwbLogger awbLogger)
         {
             InitializeComponent();
             _rememberBackground = this.Background;
@@ -93,6 +95,7 @@ namespace AwbStudio.Exports
             }
             _project = projectManagerService.ActualProject;
 
+            _actuatorsService = actuatorsService;
             _exportFolderGlobal = System.IO.Path.Combine(_project.ProjectFolder, "Esp32Clients");
             LabelTargetFolder.Content = _exportFolderGlobal;
             LabelTargetFolderHint.Content = Directory.Exists(_exportFolderGlobal) ? "" : "Target folder does not exist yet. It will be created during export.";

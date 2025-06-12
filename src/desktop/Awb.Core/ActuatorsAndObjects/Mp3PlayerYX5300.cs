@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Project.Various;
+using Awb.Core.Timelines;
 
 namespace Awb.Core.Actuators
 {
@@ -71,6 +72,8 @@ namespace Awb.Core.Actuators
 
         public bool ActualMovementInverted { get; private set; }
 
+        public ActuatorMovementBySound[] ActuatorMovementsBySound { get; private set; }
+
         public Mp3PlayerYX5300(Mp3PlayerYX5300Config config)
         {
             Id = config.Id;
@@ -89,11 +92,6 @@ namespace Awb.Core.Actuators
             ActualSoundId = soundId;
         }
 
-        public void SetMovement(string? movementServoId, bool movementInverted)
-        {
-            ActualMovementServoId = movementServoId;
-            ActualMovementInverted = movementInverted;
-        }
 
         public bool TurnOff()
         {
@@ -106,6 +104,9 @@ namespace Awb.Core.Actuators
             TurnOff();
         }
 
-       
+        public void SetActuatorMovementBySound(ActuatorMovementBySound[] actuatorMovementsBySound)
+        {
+            ActuatorMovementsBySound = actuatorMovementsBySound;
+        }
     }
 }

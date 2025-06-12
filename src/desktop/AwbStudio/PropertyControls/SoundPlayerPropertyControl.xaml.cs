@@ -8,16 +8,15 @@
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
-using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Windows.ApplicationModel.Background;
 
 namespace AwbStudio.PropertyControls
 {
@@ -139,7 +138,7 @@ namespace AwbStudio.PropertyControls
             var index = ComboBoxSoundToPlay.SelectedIndex;
             if (index == 0)
             {
-                SetNewSoundValue(null, null,false);
+                SetNewSoundValue(sound: null, actuatorMovementsBySound: []);
             }
             else
             {
@@ -149,11 +148,22 @@ namespace AwbStudio.PropertyControls
                     return;
                 }
                 var newSound = _projectSounds[index - 1];
-                SetNewSoundValue(newSound, movementServoId, movementInverted);
+
+                var actuatorMovementsBySound = new ActuatorMovementBySound[]
+                {
+                    new ActuatorMovementBySound {
+                        ActuatorId = movementServoId,
+                        MovementInverted = movementInverted,
+                        MovementOffsetMs = 0,
+                        MovementFrequencyMs = 50, // default values for movement offset and frequency
+                    }
+                };
+
+                SetNewSoundValue(newSound, actuatorMovementsBySound);
             }
         }
 
-        private void SetNewSoundValue(Sound? sound, string? movementServoId, bool movementInverted)
+        private void SetNewSoundValue(Sound? sound, ActuatorMovementBySound[] actuatorMovementsBySound)
         {
             _isSettingNewValue = true;
 
@@ -173,15 +183,16 @@ namespace AwbStudio.PropertyControls
                 changed = true;
             }
 
-            if (_soundPlayer.ActualMovementServoId != movementServoId || _soundPlayer.ActualMovementInverted != movementInverted)
+            // todo: allow multiple movements per sound in the future; at the moment we only support one movement per sound
+            if (ActuatorMovementBySound.AreEqual(_soundPlayer.ActuatorMovementsBySound, actuatorMovementsBySound) == false)
             {
                 if (sound == null)
                 {
-                    _soundPlayer.SetMovement(null, false);
+                    _soundPlayer.SetActuatorMovementBySound([]);
                 }
                 else
                 {
-                    _soundPlayer.SetMovement(movementServoId, movementInverted);
+                    _soundPlayer.SetActuatorMovementBySound(actuatorMovementsBySound);
                 }
                 changed = true;
             }
@@ -227,22 +238,32 @@ namespace AwbStudio.PropertyControls
 
                 ComboBoxServoToMove.IsEnabled = true;
 
-                string? actualMovementServoTitle = null;
-                if (_soundPlayer.ActualMovementServoId != null)
+                var firstActuatorMovementBySound = _soundPlayer.ActuatorMovementsBySound.FirstOrDefault(); // todo: at the moment we only support one movement per sound
+
+                if (firstActuatorMovementBySound == null)
                 {
+                    // no movement defined for this sound
+                    ComboBoxServoToMove.SelectedItem = NoServoTitle;
+                    CheckBoxInvertMovement.IsEnabled = false;
+                    CheckBoxInvertMovement.IsChecked = false;
+                }
+                else
+                {
+                    // a movement is defined for this sound
+                    string? actualMovementServoTitle = null;
                     foreach (var servo in _servos)
                     {
-                        if (servo.Id == _soundPlayer.ActualMovementServoId)
+                        if (servo.Id == firstActuatorMovementBySound.ActuatorId)
                         {
                             actualMovementServoTitle = servo.Title;
                             break;
                         }
                     }
+                    ComboBoxServoToMove.SelectedItem = actualMovementServoTitle ?? NoServoTitle;
+                    CheckBoxInvertMovement.IsEnabled = true;
+                    CheckBoxInvertMovement.IsChecked = firstActuatorMovementBySound.MovementInverted;
                 }
-                ComboBoxServoToMove.SelectedItem = actualMovementServoTitle ?? NoServoTitle;
-
-                CheckBoxInvertMovement.IsEnabled = true;
-                CheckBoxInvertMovement.IsChecked = _soundPlayer.ActualMovementInverted;
+                
             }
 
             _isUpdatingView = false;

@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines.NestedTimelines;
@@ -31,14 +32,14 @@ namespace Awb.Core.Timelines
             return points;
         }
 
-        public EverythingMerger( ITimelineDataService timelineDataService, Sound[] projectSounds, IAwbLogger awbLogger)
+        public EverythingMerger( ITimelineDataService timelineDataService, Sound[] projectSounds, IServo[] projectServos, IAwbLogger awbLogger)
         {
             _timelineDataService = timelineDataService;
             _awbLogger = awbLogger;
             _mergers = new List<IMerger>
             {
                 new NestedTimelinesPointMerger( _timelineDataService, _awbLogger),
-                new SoundsPointMerger(projectSounds, _awbLogger)
+                new SoundsPointMerger(projectSounds, projectServos, _awbLogger)
             };
         }
     }

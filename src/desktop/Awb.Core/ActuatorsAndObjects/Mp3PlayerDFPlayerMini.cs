@@ -7,6 +7,7 @@
 
 using Awb.Core.Actuators;
 using Awb.Core.Project.Various;
+using Awb.Core.Timelines;
 
 namespace Awb.Core.ActuatorsAndObjects
 {
@@ -72,9 +73,7 @@ namespace Awb.Core.ActuatorsAndObjects
 
         public bool IsControllerTuneable => false;
 
-        public string? ActualMovementServoId { get; private set; }
-
-        public bool ActualMovementInverted { get; private set; }
+        public ActuatorMovementBySound[] ActuatorMovementsBySound { get; private set; }
 
         public Mp3PlayerDFPlayerMini(Mp3PlayerDfPlayerMiniConfig config)
         {
@@ -92,10 +91,9 @@ namespace Awb.Core.ActuatorsAndObjects
             ActualSoundId = soundId;
         }
 
-        public void SetMovement(string? movementServoId, bool movementInverted)
+        public void SetActuatorMovementBySound(ActuatorMovementBySound[] actuatorMovementsBySound)
         {
-            ActualMovementServoId = movementServoId;
-            ActualMovementInverted = movementInverted;
+            ActuatorMovementsBySound = actuatorMovementsBySound ;
         }
 
         public bool TurnOff()

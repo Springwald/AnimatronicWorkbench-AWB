@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Actuators;
 using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
@@ -72,6 +73,7 @@ namespace Awb.Core.Player
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
         private volatile TimelinePoint[]? _allPointsMerged;
         private Sound[] _projectSounds;
+        private IServo[] _projectServos;
         public readonly PlayPosSynchronizer PlayPosSynchronizer;
 
         /// <summary>
@@ -109,10 +111,11 @@ namespace Awb.Core.Player
             }
         }
 
-        public void SetTimelineData(TimelineData timelineData, Sound[] projectSounds)
+        public void SetTimelineData(TimelineData timelineData, Sound[] projectSounds, IServo[] projectServos)
         {
             _allPointsMerged = null;
             _projectSounds = projectSounds;
+            _projectServos = projectServos;
             if (_timelineData != null)
                 _timelineData.OnContentChanged -= TimelineContentChanged;
             _timelineData = timelineData;
@@ -188,7 +191,7 @@ namespace Awb.Core.Player
             if (_allPointsMerged == null)
             {
                 var allPoints = TimelineData.AllPoints.ToArray();
-                _allPointsMerged = new EverythingMerger(_timelineDataService, projectSounds: _projectSounds, awbLogger:  _logger).Merge(allPoints).ToArray();
+                _allPointsMerged = new EverythingMerger(_timelineDataService, projectSounds: _projectSounds, projectServos: _projectServos, awbLogger:  _logger).Merge(allPoints).ToArray();
             }
 
             _updating = true;
@@ -267,7 +270,7 @@ namespace Awb.Core.Player
                             if (targetSoundPlayer.ActualSoundId != null)
                             {
                                 targetSoundPlayer.SetActualSoundId(null, TimeSpan.Zero);
-                                targetSoundPlayer.SetMovement(null, false);
+                                targetSoundPlayer.SetActuatorMovementBySound([]);
                                 targetSoundPlayer.IsDirty = true;
                             }
                         }
@@ -278,9 +281,9 @@ namespace Awb.Core.Player
                                 targetSoundPlayer.SetActualSoundId(soundPoint.SoundId, TimeSpan.Zero);
                                 targetSoundPlayer.IsDirty = true;
                             }
-                            if (soundPoint.MovementServoId  != targetSoundPlayer.ActualMovementServoId || soundPoint.MovementInverted != targetSoundPlayer.ActualMovementInverted)
+                            if (ActuatorMovementBySound.AreEqual(soundPoint.ActuatorMovementsBySound,targetSoundPlayer.ActuatorMovementsBySound)==false)
                             {
-                                targetSoundPlayer.SetMovement(soundPoint.MovementServoId, soundPoint.MovementInverted);
+                                targetSoundPlayer.SetActuatorMovementBySound(soundPoint.ActuatorMovementsBySound);
                                 targetSoundPlayer.IsDirty = true;
                             }
                         }

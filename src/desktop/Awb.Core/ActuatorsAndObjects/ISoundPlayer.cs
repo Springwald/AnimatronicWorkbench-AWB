@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Timelines;
+
 namespace Awb.Core.Actuators
 {
     /// <summary>
@@ -13,10 +15,8 @@ namespace Awb.Core.Actuators
     public interface ISoundPlayer : IActuator
     {
         int? ActualSoundId { get; }
-        string? ActualMovementServoId { get; }
-        bool ActualMovementInverted { get; }
-
+        ActuatorMovementBySound[] ActuatorMovementsBySound { get; }
         void SetActualSoundId(int? soundId, TimeSpan startTime);
-        void SetMovement(string? movementServoId, bool movementInverted);
+        void SetActuatorMovementBySound(ActuatorMovementBySound[] actuatorMovementsBySound);
     }
 }
