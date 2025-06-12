@@ -68,18 +68,18 @@ namespace Awb.Core.Timelines.Sounds
                     continue;
                 }
 
+                int timePosMs = soundPoint.TimeMs - actuatorMovement.MovementOffsetMs;
+
                 // Start Point
-                yield return new ServoPoint(actuatorMovement.ActuatorId, actuatorMovement.MovementInverted ? 100 : 0, soundPoint.TimeMs) { IsNestedTimelinePoint = true };
+                yield return new ServoPoint(actuatorMovement.ActuatorId, actuatorMovement.MovementInverted ? 100 : 0, timePosMs) { IsNestedTimelinePoint = true };
 
                 bool useMaxValue = true; // user max or average value for servo movement?
-
                 double maxValue = 0;
                 double sampleSum = 0; // value to be collected for servo movement
                 double lastValue = 0;
                 int samples = 0;
                 var samplesPerFreqcy = (Sound.SamplesPerSecond / 1000.0) * actuatorMovement.MovementFrequencyMs; // how many samples per frequency
-                int timePosMs = soundPoint.TimeMs;
-
+                
                 foreach (var sample in sound.Samples)
                 {
                     maxValue = Math.Max(maxValue, sample); // find the max value in the samples
@@ -87,7 +87,7 @@ namespace Awb.Core.Timelines.Sounds
                     if (++samples >= samplesPerFreqcy)
                     {
                         timePosMs += actuatorMovement.MovementFrequencyMs; // move to next frequency point
-                        var collectedValue = (useMaxValue ? maxValue : (sampleSum / samples)) / 255.0 * 100; // rescale to percentage, taking min and max into account
+                        var collectedValue = (useMaxValue ? maxValue : (sampleSum / samples)) / 255.0 * actuatorMovement.MovementValueScale; // rescale to percentage, taking min and max into account
                                                                                                              //if (Math.Abs(collectedValue - lastValue) > 0.1) // only create a point if the value changed
                         {
                             if (actuatorMovement.MovementInverted)

@@ -14,7 +14,9 @@ namespace Awb.Core.Timelines
         public int MovementOffsetMs { get; set; } = 0; // offset in ms to the sound start, e.g. for moving a servo before the sound starts
         public int MovementFrequencyMs { get; set; } = 50; // frequency in ms tp create servo points
 
-        public string PainterChecksum => $"{ActuatorId}-{MovementInverted}-{MovementOffsetMs}-{MovementFrequencyMs}";
+        public int MovementValueScale { get; set; } = 100; // scale for the movement value, e.g. 100 for a full range of 0-100, 50 for a half range of 0-50
+
+        public string PainterChecksum => $"{ActuatorId}-{MovementInverted}-{MovementOffsetMs}-{MovementFrequencyMs}-{MovementValueScale}";
 
         public bool IsEqual(ActuatorMovementBySound? other)
         {
@@ -22,7 +24,8 @@ namespace Awb.Core.Timelines
             return ActuatorId == other.ActuatorId &&
                    MovementInverted == other.MovementInverted &&
                    MovementOffsetMs == other.MovementOffsetMs &&
-                   MovementFrequencyMs == other.MovementFrequencyMs;
+                   MovementFrequencyMs == other.MovementFrequencyMs &&
+                   MovementValueScale == other.MovementValueScale;
         }
 
         public static bool AreEqual(ActuatorMovementBySound[] a, ActuatorMovementBySound[] b)

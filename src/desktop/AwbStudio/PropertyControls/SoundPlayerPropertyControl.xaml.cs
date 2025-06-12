@@ -112,10 +112,7 @@ namespace AwbStudio.PropertyControls
                 ShowActualValue();
         }
 
-        private void ComboBoxSoundToPlay_SelectionChanged(object sender, SelectionChangedEventArgs e) => ValueChoiceChanged();
-        private void CheckBoxInvertMovement_Checked(object sender, RoutedEventArgs e) => ValueChoiceChanged();
-        private void ComboBoxServoToMove_SelectionChanged(object sender, SelectionChangedEventArgs e) => ValueChoiceChanged();
-
+      
         private void ValueChoiceChanged()
         {
             if (_isUpdatingView) return;
@@ -136,6 +133,8 @@ namespace AwbStudio.PropertyControls
             }
 
             var index = ComboBoxSoundToPlay.SelectedIndex;
+            var movementOffsetMs = (int)SliderMovementOffsetMs.Value;
+            var movementValueScale = (int)SliderMovementValueScale.Value;
             if (index == 0)
             {
                 SetNewSoundValue(sound: null, actuatorMovementsBySound: []);
@@ -154,7 +153,8 @@ namespace AwbStudio.PropertyControls
                     new ActuatorMovementBySound {
                         ActuatorId = movementServoId,
                         MovementInverted = movementInverted,
-                        MovementOffsetMs = 0,
+                        MovementOffsetMs = movementOffsetMs,
+                        MovementValueScale = movementValueScale,
                         MovementFrequencyMs = 50, // default values for movement offset and frequency
                     }
                 };
@@ -215,15 +215,12 @@ namespace AwbStudio.PropertyControls
 
             var soundId = _soundPlayer.ActualSoundId;
 
+            var labelValueScale = "Movement value scale";
+            var labelValueOffset = "Movement offset";
+
             if (soundId == null)
             {
-                ComboBoxSoundToPlay.SelectedIndex = 0;
-
-                ComboBoxServoToMove.IsEnabled = false;
-                ComboBoxServoToMove.SelectedIndex = 0;
-
-                CheckBoxInvertMovement.IsEnabled = false;
-                CheckBoxInvertMovement.IsChecked = false;
+                EnableEditorControls(servoChoiceEnabled: false, propertiesEnabled: false);
             }
             else
             {
@@ -243,9 +240,7 @@ namespace AwbStudio.PropertyControls
                 if (firstActuatorMovementBySound == null)
                 {
                     // no movement defined for this sound
-                    ComboBoxServoToMove.SelectedItem = NoServoTitle;
-                    CheckBoxInvertMovement.IsEnabled = false;
-                    CheckBoxInvertMovement.IsChecked = false;
+                    EnableEditorControls(servoChoiceEnabled: true, propertiesEnabled: false);
                 }
                 else
                 {
@@ -259,16 +254,48 @@ namespace AwbStudio.PropertyControls
                             break;
                         }
                     }
+
+                    EnableEditorControls(servoChoiceEnabled: true, propertiesEnabled: true);
                     ComboBoxServoToMove.SelectedItem = actualMovementServoTitle ?? NoServoTitle;
-                    CheckBoxInvertMovement.IsEnabled = true;
                     CheckBoxInvertMovement.IsChecked = firstActuatorMovementBySound.MovementInverted;
+                    SliderMovementOffsetMs.Value = firstActuatorMovementBySound.MovementOffsetMs;
+                    SliderMovementValueScale.Value = firstActuatorMovementBySound.MovementValueScale;
+                    labelValueOffset += $" ({firstActuatorMovementBySound.MovementOffsetMs} ms)";
+                    labelValueScale += $" ({firstActuatorMovementBySound.MovementValueScale}%)";
                 }
-                
             }
 
+            LabelMovementOffsetMs.Content = labelValueOffset;
+            LabelMovementValueScalePercent.Content = labelValueScale;
             _isUpdatingView = false;
         }
 
+        private void EnableEditorControls(bool servoChoiceEnabled, bool propertiesEnabled)
+        {
+            if (servoChoiceEnabled == true)
+            {
+                ComboBoxServoToMove.IsEnabled = true;
+            } else
+            {
+                ComboBoxServoToMove.SelectedIndex = 0;
+                ComboBoxServoToMove.IsEnabled = false;
+            }
+
+            CheckBoxInvertMovement.IsEnabled = propertiesEnabled;
+            if (propertiesEnabled == false)
+            {
+                CheckBoxInvertMovement.IsChecked = false;
+            }
+
+            SliderMovementOffsetMs.IsEnabled = propertiesEnabled;
+            SliderMovementValueScale.IsEnabled = propertiesEnabled;
+        }
+
+        private void ComboBoxSoundToPlay_SelectionChanged(object sender, SelectionChangedEventArgs e) => ValueChoiceChanged();
+        private void CheckBoxInvertMovement_Checked(object sender, RoutedEventArgs e) => ValueChoiceChanged();
+        private void ComboBoxServoToMove_SelectionChanged(object sender, SelectionChangedEventArgs e) => ValueChoiceChanged();
+        private void SliderMovementOffsetMs_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ValueChoiceChanged();
+        private void SliderMovementScale_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ValueChoiceChanged();
 
     }
 }

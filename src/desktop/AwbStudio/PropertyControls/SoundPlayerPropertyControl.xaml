@@ -11,10 +11,15 @@
             <Label>Sound to play:</Label>
             <ComboBox x:Name="ComboBoxSoundToPlay" SelectionChanged="ComboBoxSoundToPlay_SelectionChanged">
             </ComboBox>
-            <Label>Servo to move:</Label>
+            <Label>Actuator to move:</Label>
             <ComboBox x:Name="ComboBoxServoToMove" SelectionChanged="ComboBoxServoToMove_SelectionChanged" >
             </ComboBox>
             <CheckBox x:Name="CheckBoxInvertMovement" Content="Invert servo movement" Checked="CheckBoxInvertMovement_Checked"/>
+            <Label x:Name="LabelMovementOffsetMs">Movement offset (ms)</Label>
+            <Slider x:Name="SliderMovementOffsetMs" Maximum="2000" Minimum="0" Margin="0 0 10 0" ValueChanged="SliderMovementOffsetMs_ValueChanged"/>
+            <Label x:Name="LabelMovementValueScalePercent">Movement value scale (percent):</Label>
+            <Slider x:Name="SliderMovementValueScale" Maximum="100" Minimum="0" Margin="0 0 10 0" ValueChanged="SliderMovementScale_ValueChanged"/>
+
         </StackPanel>
     </Grid>
 </UserControl>
