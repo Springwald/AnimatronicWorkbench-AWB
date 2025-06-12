@@ -87,15 +87,6 @@ namespace AwbStudio.TimelineControls
             AllValuesEditorControlsStackPanel.Children.Add(nestedTimelineEditorControl);
             _timelineEditorControls.Add(nestedTimelineEditorControl);
 
-            // add servo painter + editors
-            foreach (var servoActuator in actuatorsService.Servos)
-            {
-                var editorControl = new ServoTimelineEditorControl();
-                editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, timelineDataService, projectSounds: projectSounds, awbLogger);
-                AllValuesEditorControlsStackPanel.Children.Add(editorControl);
-                _timelineEditorControls.Add(editorControl);
-            }
-
             // add sound painter + editors
             foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
             {
@@ -108,6 +99,17 @@ namespace AwbStudio.TimelineControls
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }
+
+            // add servo painter + editors
+            foreach (var servoActuator in actuatorsService.Servos)
+            {
+                var editorControl = new ServoTimelineEditorControl();
+                editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, timelineDataService, projectSounds: projectSounds, awbLogger);
+                AllValuesEditorControlsStackPanel.Children.Add(editorControl);
+                _timelineEditorControls.Add(editorControl);
+            }
+
+            
 
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
             _gridPainter = new GridTimePainter(OpticalTimeGrid, _viewContext);

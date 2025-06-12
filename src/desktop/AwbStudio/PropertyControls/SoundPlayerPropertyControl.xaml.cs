@@ -41,7 +41,6 @@ namespace AwbStudio.PropertyControls
 
         public SoundPlayerPropertyControl(ISoundPlayer soundPlayer, Sound[] projectSounds, IServo[] servos, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer, SoundPlayerControl windowsSoundPlayerControl)
         {
-            InitializeComponent();
             _servos = servos ?? throw new ArgumentNullException(nameof(servos), "Servos cannot be null or empty.");
             _soundPlayer = soundPlayer;
             _projectSounds = projectSounds;
@@ -57,6 +56,8 @@ namespace AwbStudio.PropertyControls
             _playPosSynchronizer.OnPlayPosChanged += OnPlayPosChanged;
 
             //LabelName.Content = "MP3 " + soundPlayer.Title;
+
+            InitializeComponent();
 
             Loaded += SoundPlayerPropertyControl_Loaded;
         }
