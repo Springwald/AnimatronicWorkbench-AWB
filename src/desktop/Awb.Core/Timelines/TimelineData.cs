@@ -9,11 +9,14 @@ using Awb.Core.Project;
 using Awb.Core.Timelines.NestedTimelines;
 using Awb.Core.Timelines.Sounds;
 using System.Drawing;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Awb.Core.Timelines
 {
     public class TimelineData
     {
+        private int? _durationMsCache;
+
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public int TimelineStateId { get; set; }
@@ -31,7 +34,14 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// What is the duration of the timeline filled with points?
         /// </summary>
-        public int DurationMs => AllPoints?.Any() == true ? AllPoints.Max(p => p.TimeMs) : 0;
+        public int GetDurationMs()
+        {
+            if (_durationMsCache .HasValue) return _durationMsCache.Value;
+
+            _durationMsCache = AllPoints.Any() ? AllPoints.Max(p => p.TimeMs) : 0;
+
+            return _durationMsCache.Value;
+        } 
 
         public IEnumerable<TimelinePoint> AllPoints => _timelinePoints.ToArray();
 
@@ -99,7 +109,10 @@ namespace Awb.Core.Timelines
         /// Announce that the content of the timeline has changed
         /// </summary>
         public void SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes changeType, string? changedObjectId)
-            => OnContentChanged?.Invoke(this, new TimelineDataChangedEventArgs(changeType, changedObjectId));
+        {
+            OnContentChanged?.Invoke(this, new TimelineDataChangedEventArgs(changeType, changedObjectId));
+            _durationMsCache = null;
+        }
 
 
         private void SetContentChangedByPoint(TimelinePoint point)

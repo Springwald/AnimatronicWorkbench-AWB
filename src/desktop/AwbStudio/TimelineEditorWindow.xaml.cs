@@ -98,7 +98,14 @@ namespace AwbStudio
             _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;
 
             _actuatorsService = new ActuatorsService(_project, _clientsService, _awbLogger);
-            _timelinePlayer = new TimelinePlayer(playPosSynchronizer: _playPosSynchronizer, actuatorsService: _actuatorsService, timelineDataService: _timelineDataService, awbClientsService: _clientsService, invokerService: _invokerService, logger: _awbLogger);
+            _timelinePlayer = new TimelinePlayer(
+                playPosSynchronizer: _playPosSynchronizer, 
+                actuatorsService: _actuatorsService, 
+                timelineDataService: _timelineDataService, 
+                timelineMetaDataService: _project.TimelineDataService.TimelineMetaDataService,
+                awbClientsService: _clientsService, 
+                invokerService: _invokerService, 
+                logger: _awbLogger);
             _timelinePlayer.PlaySoundOnDesktop = PlaySoundOnDesktop;
             _timelinePlayer.StopSoundOnDesktop = () => SoundPlayer?.StopSound(); // stop sound on desktop
 

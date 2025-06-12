@@ -65,7 +65,7 @@ namespace Awb.Core.Timelines
         {
             var data = _timelineDataService.GetTimelineData(timelineId);
             if (data == null) throw new Exception($"Timeline with id {timelineId} not found");
-            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, data.DurationMs);
+            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, data.GetDurationMs());
         }
     }
 

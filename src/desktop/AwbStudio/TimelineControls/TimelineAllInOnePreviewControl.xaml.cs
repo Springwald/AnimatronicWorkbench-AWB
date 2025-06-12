@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Player;
 using Awb.Core.Services;
@@ -13,7 +13,6 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -70,6 +69,7 @@ namespace AwbStudio.TimelineControls
             _gridPainter = new GridTimePainter(OpticalGrid, _viewContext);
             _projectSounds = projectSounds;
             _viewContext.Changed += OnViewContextChanged;
+
 
             // set up the actuator value painters and editors
             _timelineEditorControls = [];
@@ -142,7 +142,8 @@ namespace AwbStudio.TimelineControls
         {
             if (_viewContext == null) return;
             if (_timelineData == null) return;
-            this._viewContext.DurationMs = Math.Max(20 * 1000, _timelineData.DurationMs + 5000); // 5000ms extra for the timeline to grow beyond the duration of the last keyframe
+
+            this._viewContext.DurationMs = Math.Max(20 * 1000, _timelineData.GetDurationMs() + 5000); // 5000ms extra for the timeline to grow beyond the duration of the last keyframe
         }
 
         private void ZoomChanged()
@@ -217,7 +218,7 @@ namespace AwbStudio.TimelineControls
         #region mouse events
 
 
-        private async void  Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private async void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _mouseX = e.GetPosition(AllValuesGrid).X;
             await SetPlayPosByMouse(_mouseX);
@@ -227,7 +228,7 @@ namespace AwbStudio.TimelineControls
         private void Grid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (_viewContext == null) return;
-            if (_viewContext.SelectionEndMs == null)  _viewContext.SelectionStartMs = null;
+            if (_viewContext.SelectionEndMs == null) _viewContext.SelectionStartMs = null;
         }
 
         private async void Grid_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -240,7 +241,7 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-  
+
         private async Task SetSelectionEndByMouse(double mouseX)
         {
             if (_viewContext == null) return;
