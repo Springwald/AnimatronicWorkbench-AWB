@@ -33,6 +33,7 @@ namespace AwbStudio.TimelineControls
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private TimelinePlayer? _timelinePlayer;
+        private ITimelineMetaDataService _timelineMetaDataService;
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
         private double _mouseX = 0;
@@ -60,7 +61,7 @@ namespace AwbStudio.TimelineControls
             InitializeComponent();
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineDataService timelineDataService, IAwbLogger awbLogger, Sound[] projectSounds)
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineDataService timelineDataService, ITimelineMetaDataService timelineMetaDataService, IAwbLogger awbLogger, Sound[] projectSounds)
         {
             _viewContext = viewContext;
             _timelineCaptions = timelineCaptions;
@@ -69,6 +70,7 @@ namespace AwbStudio.TimelineControls
             _gridPainter = new GridTimePainter(OpticalGrid, _viewContext);
             _projectSounds = projectSounds;
             _viewContext.Changed += OnViewContextChanged;
+            _timelineMetaDataService = timelineMetaDataService;
 
 
             // set up the actuator value painters and editors
@@ -143,7 +145,8 @@ namespace AwbStudio.TimelineControls
             if (_viewContext == null) return;
             if (_timelineData == null) return;
 
-            this._viewContext.DurationMs = Math.Max(20 * 1000, _timelineData.GetDurationMs() + 5000); // 5000ms extra for the timeline to grow beyond the duration of the last keyframe
+           
+            this._viewContext.DurationMs = Math.Max(20 * 1000, _timelineMetaDataService.GetDurationMs(_timelineData.Id) + 5000); // 5000ms extra for the timeline to grow beyond the duration of the last keyframe
         }
 
         private void ZoomChanged()

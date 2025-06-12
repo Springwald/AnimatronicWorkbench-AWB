@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.LoadNSave.TimelineLoadNSave;
+using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -15,6 +16,7 @@ namespace Awb.Core.Services
     public class TimelineDataServiceByJsonFiles : ITimelineDataService
     {
         private readonly string _jsonFilesPath;
+        private readonly Sound[] _projectSounds;
         private TimelineMetaDataService? _timelineMetaDataService;
 
         private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
@@ -33,16 +35,17 @@ namespace Awb.Core.Services
         {
             get
             {
-                _timelineMetaDataService ??= new TimelineMetaDataService(this);
+                _timelineMetaDataService ??= new TimelineMetaDataService(this, _projectSounds);
                 return _timelineMetaDataService;
             }
         }
 
         public IEnumerable<string> TimelineIds => Directory.GetFiles(_jsonFilesPath, "*.awbt").Select(f => Path.GetFileNameWithoutExtension(f));
 
-        public TimelineDataServiceByJsonFiles(string jsonFilesPath)
+        public TimelineDataServiceByJsonFiles(string jsonFilesPath, Sound[] projectSounds)
         {
             _jsonFilesPath = jsonFilesPath;
+            _projectSounds = projectSounds;
             ConvertOldFilenamesIfNeeded(deleteOldFiles: true);
         }
 

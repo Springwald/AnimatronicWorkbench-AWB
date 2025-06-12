@@ -50,7 +50,7 @@ namespace Awb.Core.Project
             if (!Path.Exists(folder)) throw new DirectoryNotFoundException(folder);
             _projectFolder = folder;
             _sounds = new SoundManager(Path.Combine(_projectFolder, "audio")).Sounds;
-            _timelineDataService = new TimelineDataServiceByJsonFiles(_projectFolder);
+            _timelineDataService = new TimelineDataServiceByJsonFiles(_projectFolder,_sounds);
         }
 
 

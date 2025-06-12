@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Player;
@@ -36,6 +36,7 @@ namespace AwbStudio
         private readonly PlayPosSynchronizer _playPosSynchronizer;
         private readonly IAwbClientsService _clientsService;
         private readonly IProjectManagerService _projectManagerService;
+        private readonly ITimelineMetaDataService _timelineMetaDataService;
         private readonly AwbProject _project;
         private readonly ITimelineDataService _timelineDataService;
         private readonly ITimelineController[] _timelineControllers;
@@ -57,7 +58,13 @@ namespace AwbStudio
         private bool _isZooming;
         private TimelineKeyboardHandling? _timelineKeyboardHandling;
 
-        public TimelineEditorWindow(ITimelineController[] timelineControllers, IProjectManagerService projectManagerService, IAwbClientsService clientsService, IInvokerService invokerService, IAwbLogger awbLogger)
+        public TimelineEditorWindow(
+            ITimelineController[] timelineControllers,
+            IProjectManagerService projectManagerService,
+            IAwbClientsService clientsService,
+            ITimelineMetaDataService timelineMetaDataService,
+            IInvokerService invokerService,
+            IAwbLogger awbLogger)
         {
             InitializeComponent();
 
@@ -66,6 +73,7 @@ namespace AwbStudio
             _invokerService = invokerService;
             _clientsService = clientsService;
             _projectManagerService = projectManagerService;
+            _timelineMetaDataService = timelineMetaDataService;
 
             _awbLogger = awbLogger;
             awbLogger.OnLog += (s, args) =>
@@ -99,12 +107,11 @@ namespace AwbStudio
 
             _actuatorsService = new ActuatorsService(_project, _clientsService, _awbLogger);
             _timelinePlayer = new TimelinePlayer(
-                playPosSynchronizer: _playPosSynchronizer, 
-                actuatorsService: _actuatorsService, 
-                timelineDataService: _timelineDataService, 
-                timelineMetaDataService: _project.TimelineDataService.TimelineMetaDataService,
-                awbClientsService: _clientsService, 
-                invokerService: _invokerService, 
+                playPosSynchronizer: _playPosSynchronizer,
+                actuatorsService: _actuatorsService,
+                timelineDataService: _timelineDataService,
+                awbClientsService: _clientsService,
+                invokerService: _invokerService,
                 logger: _awbLogger);
             _timelinePlayer.PlaySoundOnDesktop = PlaySoundOnDesktop;
             _timelinePlayer.StopSoundOnDesktop = () => SoundPlayer?.StopSound(); // stop sound on desktop
@@ -113,7 +120,7 @@ namespace AwbStudio
             Loaded += TimelineEditorWindow_Loaded;
         }
 
-        private void PlaySoundOnDesktop(int soundId, TimeSpan  startTime)
+        private void PlaySoundOnDesktop(int soundId, TimeSpan startTime)
         {
             SoundPlayer.PlaySound(this, new SoundPlayEventArgs(soundId, startTime));
         }
@@ -156,7 +163,7 @@ namespace AwbStudio
             var timelineCaptions = new TimelineCaptions();
             TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _actuatorsService);
             ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds, SoundPlayer);
-            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _awbLogger, _project.Sounds);
+            AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _timelineMetaDataService, _awbLogger, _project.Sounds);
 
             // bring to front
             this.IsEnabled = true;
@@ -259,7 +266,7 @@ namespace AwbStudio
             this._timelineKeyboardHandling = new TimelineKeyboardHandling(_timelineEventHandling!, _timelinePlayer, _playPosSynchronizer, _timelineEventHandling.TimelineEditingManipulation, _viewContext);
             this._timelineKeyboardHandling.SaveTimelineData += OnSaveTimelineDataKeyboardEvent;
 
-            FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _timelineEventHandling,  _playPosSynchronizer, _timelineDataService, _project.Sounds, _actuatorsService.Servos,  SoundPlayer);
+            FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _timelineEventHandling, _playPosSynchronizer, _timelineDataService, _project.Sounds, _actuatorsService.Servos, SoundPlayer);
 
             _viewContext.ActualFocusObject = null;
 
@@ -270,7 +277,11 @@ namespace AwbStudio
             _unsavedChanges = changesAfterLoading;
         }
 
-        private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e) => _unsavedChanges = true;
+        private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
+        {
+            if (_timelineData != null) _timelineMetaDataService.ClearCache(_timelineData.Id);
+            _unsavedChanges = true;
+        }
 
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {

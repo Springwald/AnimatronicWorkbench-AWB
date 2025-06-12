@@ -58,6 +58,7 @@ namespace AwbStudio
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
 
+
             // add the AwbClientsService as a singleton of IAwbClientsService and call the InitAsync method when initializing the service
             services.AddAwbClientService();
 

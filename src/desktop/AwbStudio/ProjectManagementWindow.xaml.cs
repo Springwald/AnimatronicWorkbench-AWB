@@ -9,6 +9,7 @@ using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Project;
 using Awb.Core.Project.Various;
 using Awb.Core.Services;
+using Awb.Core.Timelines;
 using Awb.Core.Tools;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
@@ -34,7 +35,12 @@ namespace AwbStudio
         private readonly IInvokerService _invokerService;
         private readonly IAwbLogger _awbLogger;
 
-        public ProjectManagementWindow(IProjectManagerService projectManagerService, IAwbStudioSettingsService awbStudioSettingsService, IServiceProvider serviceProvider, IInvokerService invokerService, IAwbLogger awbLogger)
+        public ProjectManagementWindow(
+            IProjectManagerService projectManagerService, 
+            IAwbStudioSettingsService awbStudioSettingsService, 
+            IServiceProvider serviceProvider, 
+            IInvokerService invokerService, 
+            IAwbLogger awbLogger)
         {
             InitializeComponent();
             _projectManagerService = projectManagerService;
@@ -288,7 +294,7 @@ namespace AwbStudio
 
         private void ShowProjectTimelineEditor(IAwbClientsService clientsService, ITimelineController[] timelineControllers)
         {
-            var timelineEditorWindow = new TimelineEditorWindow(timelineControllers, _projectManagerService, clientsService, _invokerService, _awbLogger);
+            var timelineEditorWindow = new TimelineEditorWindow(timelineControllers, _projectManagerService, clientsService, _projectManagerService.ActualProject.TimelineDataService.TimelineMetaDataService, _invokerService, _awbLogger);
             if (timelineEditorWindow != null)
             {
                 // hide the loading screen

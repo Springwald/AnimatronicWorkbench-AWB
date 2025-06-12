@@ -6,6 +6,7 @@
 // All rights reserved   -  Licensed under MIT License
 
 using Awb.Core.Services;
+using Awb.Core.Sounds;
 
 namespace Awb.Core.Timelines
 {
@@ -21,13 +22,14 @@ namespace Awb.Core.Timelines
     public class TimelineMetaDataService : ITimelineMetaDataService
     {
         private readonly ITimelineDataService _timelineDataService;
-
+        private readonly Sound[] _projectSounds;
         private Dictionary<string, int> _durationCache = new Dictionary<string, int>();
         private TimelineMetaData[]? _allMetaDataCache = null;
 
-        public TimelineMetaDataService(ITimelineDataService timelineDataService)
+        public TimelineMetaDataService(ITimelineDataService timelineDataService, Sound[] projectSounds)
         {
             _timelineDataService = timelineDataService;
+            _projectSounds = projectSounds;
         }
 
         public void ClearCache(string timelineId)
@@ -65,7 +67,7 @@ namespace Awb.Core.Timelines
         {
             var data = _timelineDataService.GetTimelineData(timelineId);
             if (data == null) throw new Exception($"Timeline with id {timelineId} not found");
-            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, data.GetDurationMs());
+            return new TimelineMetaData(id: data.Id, title: data.Title, stateId: data.TimelineStateId, data.GetDurationMs(_projectSounds, _timelineDataService));
         }
     }
 

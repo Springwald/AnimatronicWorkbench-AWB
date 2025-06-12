@@ -67,7 +67,6 @@ namespace Awb.Core.Player
 
         private readonly IActuatorsService _actuatorsService;
         private readonly ITimelineDataService _timelineDataService;
-        private ITimelineMetaDataService _timelineMetaDataService;
         private readonly IAwbLogger _logger;
         private readonly ChangesToClientSender _sender;
         private readonly IInvoker _myInvoker;
@@ -94,12 +93,11 @@ namespace Awb.Core.Player
         /// to set the actuators to the initial position. Because of the async character of Play 
         /// this is not dont automatically.
         /// </remarks>
-        public TimelinePlayer(PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineDataService timelineDataService, ITimelineMetaDataService timelineMetaDataService, IAwbClientsService awbClientsService, IInvokerService invokerService, IAwbLogger logger)
+        public TimelinePlayer(PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineDataService timelineDataService, IAwbClientsService awbClientsService, IInvokerService invokerService, IAwbLogger logger)
         {
             _logger = logger;
             _actuatorsService = actuatorsService;
             _timelineDataService = timelineDataService;
-            _timelineMetaDataService = timelineMetaDataService;
             _sender = new ChangesToClientSender(actuatorsService, awbClientsService, _logger);
             _myInvoker = invokerService.GetInvoker();
 
@@ -395,7 +393,7 @@ namespace Awb.Core.Player
                 if (PlayState == PlayStates.Playing)
                 {
                     var newPos = 0;
-                    var timelineDurationMs = _timelineMetaDataService.GetDurationMs(TimelineData.Id);
+                    var timelineDurationMs = TimelineData.GetDurationMs(projectSounds:_projectSounds, timelineDataService: _timelineDataService);
                     if (PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped >= timelineDurationMs)
                     {
                         newPos = 0;
