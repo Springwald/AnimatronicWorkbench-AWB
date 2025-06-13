@@ -18,12 +18,12 @@ void AwbRemote::setup()
 #ifdef M5STICKC_PLUS2
     pinMode(4, OUTPUT);
     digitalWrite(4, HIGH);
-
 #endif
 
 #ifdef RED_LED
-    pinMode(RED_LED, OUTPUT); // init red led
-#endif  
+    pinMode(RED_LED, OUTPUT);           // init red led
+    digitalWrite(RED_LED, RED_LED_OFF); // turn red led off
+#endif
 
     _display.setup(); // set up the display
 
@@ -37,9 +37,9 @@ void AwbRemote::setup()
     while (trys-- > 0 && WiFi.status() != WL_CONNECTED)
     {
         _display.draw_message(String("connect wifi\r\n") + String(this->_wifiConfig->WlanSSID) + "\r\nRetrys " + String(trys), 1000, MSG_TYPE_INFO);
-        #ifdef RED_LED
-        digitalWrite(RED_LED, LOW); // turn red led on
-        #endif
+#ifdef RED_LED
+        digitalWrite(RED_LED, RED_LED_ON); // turn red led on
+#endif
         delay(1000);
     }
     if (WiFi.status() != WL_CONNECTED)
@@ -49,9 +49,9 @@ void AwbRemote::setup()
     }
     else
     {
-        #ifdef RED_LED
-        digitalWrite(RED_LED, HIGH); // turn red led off
-        #ifdef RED_LED
+#ifdef RED_LED
+        digitalWrite(RED_LED, RED_LED_OFF); // turn red led off
+#endif
     }
 
     _display.draw_message(WiFi.localIP().toString(), 1000, MSG_TYPE_INFO);
