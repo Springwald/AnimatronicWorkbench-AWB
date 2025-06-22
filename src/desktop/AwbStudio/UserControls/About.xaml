@@ -37,7 +37,7 @@
         
         <Label>
         <TextBlock TextWrapping="Wrap" Margin="5">
-            Copyright (c) 2024 Daniel Springwald, licensed under the MIT license.
+            Copyright (c) 2025 Daniel Springwald, licensed under the MIT license.
             Includes third party material
                 <Hyperlink NavigateUri="https://github.com/Springwald/AnimatronicWorkbench-AWB/blob/main/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">
                     - see details
