@@ -50,6 +50,7 @@ namespace AwbStudio
 
             this.KeyDown += OnKeyDown;
 
+            // show global errs and debug output
             _awbLogger.OnLog += (s, args) =>
             {
                 WpfAppInvoker.Invoke(new Action(() =>
