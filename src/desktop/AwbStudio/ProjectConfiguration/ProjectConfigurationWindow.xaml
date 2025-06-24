@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AwbStudio"
-        xmlns:ProjectConfiguration="clr-namespace:AwbStudio.ProjectConfiguration" xmlns:PropertyEditors="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors" x:Class="AwbStudio.ProjectConfigurationWindow"
+        xmlns:ProjectConfiguration="clr-namespace:AwbStudio.ProjectConfiguration" xmlns:PropertyEditors="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors" xmlns:HelpAndSupport="clr-namespace:AwbStudio.HelpAndSupport" x:Class="AwbStudio.ProjectConfigurationWindow"
         mc:Ignorable="d"
         
         Title="ProjectConfigurationWindow" Height="800" Width="900" WindowState="Maximized">
@@ -35,7 +35,10 @@
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="0" >
                     <StackPanel x:Name="StackPanelProjectObjectLists">
-                        <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
+                        <Grid>
+                            <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
+                            <HelpAndSupport:HelpButtonControl HelpTopic="Configuration" HorizontalAlignment="Right" Margin="0 0 5 5"/>
+                        </Grid>
                         <Button x:Name="EditProjectMetaDataButton" Content="Edit meta data" Click="EditProjectMetaDataButton_Click"></Button>
 
                         <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />

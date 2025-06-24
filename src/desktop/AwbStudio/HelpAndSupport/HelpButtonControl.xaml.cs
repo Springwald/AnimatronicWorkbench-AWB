@@ -25,6 +25,7 @@ namespace AwbStudio.HelpAndSupport
         {
             None,
             Projects,
+            Configuration,
         }
 
         /// <summary>
@@ -57,6 +58,7 @@ namespace AwbStudio.HelpAndSupport
             var topicPath = HelpTopic switch
             {
                 HelpTopics.Projects => "AWB-Projects",
+                HelpTopics.Configuration => "AWB-Config",
                 _ => "AWB-Docs" // Fallback to a default topic if none matches
             };
 
