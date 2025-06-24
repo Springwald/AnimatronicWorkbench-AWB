@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="AwbStudio.Projects.ProjectListItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AwbStudio.Projects"
+             mc:Ignorable="d" d:DesignWidth="400" Height="Auto">
+    <Border Margin="3" Padding="1" BorderBrush="Gray" BorderThickness="1" CornerRadius="3">
+        <Grid  Cursor="Hand" Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" x:Name="buttonLoadProject" HorizontalContentAlignment="Left" Margin="0" VerticalAlignment="Center" Click="buttonProject_Click" >Project Title</Button>
+            <Button Grid.Column="1" x:Name="buttonEditConfig"   ToolTip="edit project configuration" Margin="0" Click="buttonEditConfig_Click" >⚙️</Button>
+            <Button Grid.Column="2" x:Name="buttonRemoveProject"  ToolTip="remove from list" Margin="0" Click="buttonRemoveProject_Click" >❌</Button>
+        </Grid>
+    </Border>
+</UserControl>

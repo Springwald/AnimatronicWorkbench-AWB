@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AwbStudio"
-        xmlns:UserControls="clr-namespace:AwbStudio.UserControls" x:Class="AwbStudio.ProjectManagementWindow"
+        xmlns:UserControls="clr-namespace:AwbStudio.UserControls" xmlns:Projects="clr-namespace:AwbStudio.Projects" xmlns:HelpAndSupport="clr-namespace:AwbStudio.HelpAndSupport" x:Class="AwbStudio.ProjectManagementWindow"
         mc:Ignorable="d"
         Title="Animatronic WorkBench projects" Height="450" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Window.Icon>
@@ -25,14 +25,25 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+
                 </Grid.RowDefinitions>
-                <Button x:Name="ButtonOpenExisting" Content="Open existing project"  Grid.Row="0" Click="ButtonOpenExisting_Click"/>
-                <Label Content="Latest projects:" Grid.Row="1"/>
-                <ListBox x:Name="ListLatestProjects" Grid.Row="2" SelectionChanged="ListLatestProjects_SelectionChanged" SelectionMode="Single"/>
+                <HelpAndSupport:HelpButtonControl HelpTopic="Projects" Grid.Row="0" HorizontalAlignment="Right"/>
+                <Button x:Name="ButtonOpenExisting"   Content="Open existing project"  Grid.Row="1"  Click="ButtonOpenExisting_Click" />
+                <Label Content="Latest projects:" Grid.Row="2"/>
+                <Border Grid.Row="2" Background="Black" >
+                    <ScrollViewer  >
+                        <StackPanel x:Name="StackPanelProjectList">
+                            <!-- Project list items will be added here dynamically -->
+                            <Projects:ProjectListItem />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
                 <CheckBox Content="Open last project on start" Grid.Row="3" x:Name="ReOpenLastProjectCheckbox" Margin="5" Unchecked="ReOpenLastProjectCheckbox_Checked" Checked="ReOpenLastProjectCheckbox_Checked"/>
-                
+
                 <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="4" Click="ButtonCreateNew_Click"/>
                 <Button x:Name="ButtonEditConfigurationExisting" Content="Edit existing project configuration"  Grid.Row="5" Click="ButtonEditConfigurationExisting_Click"/>
+
             </Grid>
             <Grid x:Name="GridLoadingProject" Visibility="Collapsed" Margin="20">
                 <Grid.RowDefinitions>
@@ -44,8 +55,9 @@
                 <ProgressBar x:Name="ProgressBarLoadingProject" Grid.Row="1" IsIndeterminate="True"/>
                 <TextBox x:Name="TextBoxDebugOutput" Grid.Row="2" TextWrapping="Wrap" Text="TextBox" FontSize="12"/>
             </Grid>
+
         </Grid>
-      
+
     </Grid>
 </Window>
 

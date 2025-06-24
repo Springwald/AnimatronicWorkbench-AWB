@@ -1,15 +1,14 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.InputControllers.TimelineInputControllers;
 using Awb.Core.Project;
 using Awb.Core.Project.Various;
 using Awb.Core.Services;
-using Awb.Core.Timelines;
 using Awb.Core.Tools;
 using AwbStudio.Projects;
 using AwbStudio.StudioSettings;
@@ -19,7 +18,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace AwbStudio
@@ -36,10 +34,10 @@ namespace AwbStudio
         private readonly IAwbLogger _awbLogger;
 
         public ProjectManagementWindow(
-            IProjectManagerService projectManagerService, 
-            IAwbStudioSettingsService awbStudioSettingsService, 
-            IServiceProvider serviceProvider, 
-            IInvokerService invokerService, 
+            IProjectManagerService projectManagerService,
+            IAwbStudioSettingsService awbStudioSettingsService,
+            IServiceProvider serviceProvider,
+            IInvokerService invokerService,
             IAwbLogger awbLogger)
         {
             InitializeComponent();
@@ -51,6 +49,7 @@ namespace AwbStudio
 
             this.KeyDown += OnKeyDown;
 
+            // show global errs and debug output
             _awbLogger.OnLog += (s, args) =>
             {
                 WpfAppInvoker.Invoke(new Action(() =>
@@ -76,18 +75,7 @@ namespace AwbStudio
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             ShowLatestProjects();
-
             BringIntoView();
-
-            if (false && MainConfig.TestMode)
-            {
-                var lastProjectFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.FirstOrDefault();
-                if (lastProjectFolder != null)
-                {
-                    await OpenProjectAsync(lastProjectFolder, editConfig: true);
-                    return;
-                }
-            }
 
             if (_awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart)
             {
@@ -98,8 +86,6 @@ namespace AwbStudio
                     var ok = await OpenProjectAsync(lastProjecFolder, editConfig: false);
                 }
             }
-
-
         }
 
         private async void OnKeyDown(object sender, KeyEventArgs e)
@@ -109,9 +95,9 @@ namespace AwbStudio
                 if (e.Key >= Key.D1 && e.Key <= Key.D9)
                 {
                     var index = (int)(e.Key - Key.D1);
-                    if (index < ListLatestProjects.Items.Count)
+                    if (index < _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.Length)
                     {
-                        var projectFolder = (ListLatestProjects.Items[index] as ListBoxItem)?.ToolTip.ToString();
+                        var projectFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders[index];
                         if (!string.IsNullOrWhiteSpace(projectFolder))
                         {
                             var ok = await OpenProjectAsync(projectFolder, editConfig: false);
@@ -123,20 +109,46 @@ namespace AwbStudio
 
         private void ShowLatestProjects()
         {
-            ListLatestProjects.Items.Clear();
+            StackPanelProjectList.Children.Clear();
             int no = 1;
             foreach (var projectFolder in _awbStudioSettingsService.StudioSettings.LatestProjectsFolders)
             {
-                ListLatestProjects.Items.Add(new ListBoxItem()
+                var title = $"[{no}] {System.IO.Path.GetFileName(projectFolder)}";
+                var projectListItem = new ProjectListItem();
+                StackPanelProjectList.Children.Add(projectListItem);
+                projectListItem.Title = $"[{no}] {projectFolder.Split('\\').LastOrDefault()}";
+
+                projectListItem.OnOpenProjectClicked += async (s, args) =>
                 {
-                    Content = $"[{no}] {projectFolder.Split('\\').LastOrDefault()}",
-                    ToolTip = projectFolder,
-                    Tag = no,
-                });
+                    // open the project
+                    var ok = await OpenProjectAsync(projectFolder, editConfig: false);
+                };
+
+                projectListItem.OnConfigProjectClicked += async (s, args) =>
+                {
+                    // edit the project configuration
+                    var ok = await OpenProjectAsync(projectFolder, editConfig: true);
+                };
+
+                projectListItem.OnRemoveProjectClicked += async (s, args) =>
+                {
+                    if (MessageBox.Show($"Do you really want to remove the project '{projectFolder}'?", "Delete project", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        // remove the project folder from the list
+                        var latestProjects = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders;
+                        latestProjects = latestProjects.Where(x => x != projectFolder).ToArray();
+                        _awbStudioSettingsService.StudioSettings.LatestProjectsFolders = latestProjects;
+                        await _awbStudioSettingsService.SaveSettingsAsync();
+                        ShowLatestProjects();
+                    }
+                };
                 no++;
             }
         }
 
+        /// <summary>
+        /// Create a new project in a folder chosen by the user.
+        /// </summary>
         private async void ButtonCreateNew_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
@@ -171,6 +183,9 @@ namespace AwbStudio
             }
         }
 
+        /// <summary>
+        /// Create a new project with default settings.
+        /// </summary>
         private static AwbProject CreateNewProject(string projectPath)
         {
             var project = new AwbProject()
@@ -179,7 +194,7 @@ namespace AwbStudio
                 {
                     Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
                 },
-                TimelinesStates = new TimelineState[] { 
+                TimelinesStates = new TimelineState[] {
                     new TimelineState  { Id=1, Title ="Default", Export = true, AutoPlay = true },
                     new TimelineState  { Id=2, Title ="Dont export", Export = false, AutoPlay = false },
                 },
@@ -207,14 +222,6 @@ namespace AwbStudio
             if (folder != null) await OpenProjectAsync(folder, editConfig: true);
         }
 
-        private async void ListLatestProjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var folder = (ListLatestProjects.SelectedItem as ListBoxItem)?.ToolTip.ToString();
-            if (folder != null)
-            {
-                var ok = await OpenProjectAsync(folder, editConfig: false);
-            }
-        }
 
         private async Task<bool> OpenProjectAsync(string projectPath, bool editConfig)
         {
