@@ -26,6 +26,7 @@ namespace AwbStudio.HelpAndSupport
             None,
             Projects,
             Configuration,
+            TimelineEditor,
         }
 
         /// <summary>
@@ -59,6 +60,7 @@ namespace AwbStudio.HelpAndSupport
             {
                 HelpTopics.Projects => "AWB-Projects",
                 HelpTopics.Configuration => "AWB-Config",
+                HelpTopics.TimelineEditor => "AWB-Timelines",
                 _ => "AWB-Docs" // Fallback to a default topic if none matches
             };
 
