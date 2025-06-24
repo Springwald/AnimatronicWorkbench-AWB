@@ -5,14 +5,27 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AwbStudio.HelpAndSupport"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="100"  >
-    <Button Width="Auto"  Height="Auto" Click="Button_Click" Margin="5" Padding="2" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
-        <Border Background="#FF2A004E" CornerRadius="3" BorderBrush="Black">
-            <Label FontStyle="Italic"  >
-                ⁉️ Show help
-            </Label>
-        </Border>
+             d:DesignHeight="80" d:DesignWidth="100"  >
+    <Border 
+        CornerRadius="5" 
+        Background="#FF1A0043" 
+        Margin="1 2 1 2" 
+        Padding="0" 
+        BorderBrush="Black"
+        Cursor="Help">
+        <Label x:Name="labelHelp"
+            Width="Auto" 
+            Height="Auto" 
+            Padding="7 0 8 2"
+            Margin="0"
+            Content="⁉️ Show help" 
+            FontStyle="Italic" 
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center" 
+            Foreground="#FFEAC3FB" >
+        </Label>
+    </Border>
 
-    </Button>
+
 
 </UserControl>

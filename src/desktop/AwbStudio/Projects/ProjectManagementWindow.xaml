@@ -21,14 +21,16 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    
                 </Grid.RowDefinitions>
-               
-                <Label Content="Latest projects:" Grid.Row="1"/>
+                <HelpAndSupport:HelpButtonControl HelpTopic="Projects" Grid.Row="0" HorizontalAlignment="Right"/>
+                <Button x:Name="ButtonOpenExisting"   Content="Open existing project"  Grid.Row="1"  Click="ButtonOpenExisting_Click" />
+                <Label Content="Latest projects:" Grid.Row="2"/>
                 <ScrollViewer Grid.Row="2" >
                     <StackPanel x:Name="StackPanelProjectList">
                         <!-- Project list items will be added here dynamically -->
@@ -39,8 +41,7 @@
 
                 <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="4" Click="ButtonCreateNew_Click"/>
                 <Button x:Name="ButtonEditConfigurationExisting" Content="Edit existing project configuration"  Grid.Row="5" Click="ButtonEditConfigurationExisting_Click"/>
-                <Button x:Name="ButtonOpenExisting"   Content="Open existing project"  Grid.Row="0"  Click="ButtonOpenExisting_Click" />
-                <HelpAndSupport:HelpButtonControl HelpTopic="Projects"  Grid.Row="7" HorizontalAlignment="Right"/>
+               
             </Grid>
             <Grid x:Name="GridLoadingProject" Visibility="Collapsed" Margin="20">
                 <Grid.RowDefinitions>

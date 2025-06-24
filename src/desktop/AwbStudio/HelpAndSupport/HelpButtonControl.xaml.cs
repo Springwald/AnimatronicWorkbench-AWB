@@ -35,6 +35,16 @@ namespace AwbStudio.HelpAndSupport
         public HelpButtonControl()
         {
             InitializeComponent();
+            Loaded += HelpButtonControl_Loaded;
+        }
+
+        private void HelpButtonControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            labelHelp.MouseDown += (s, args) =>
+            {
+                // Open the help documentation when the label is clicked
+                Button_Click(s, args);
+            };
         }
 
         /// <summary>
