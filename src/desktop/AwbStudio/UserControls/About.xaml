@@ -26,7 +26,7 @@
                 <Label Margin="5">
                     There is a new version available!
                 </Label>
-                <Label x:Name="LabelNewVersion"></Label>
+                    <Label x:Name="LabelNewVersion" Margin="5"></Label>
                 <Button Width="Auto" HorizontalAlignment="Left" Margin="5" Click="DownloadButton_Click">Download now!</Button>
             </StackPanel>
             <Label>

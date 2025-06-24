@@ -5,7 +5,6 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
-using Awb.Core.Services;
 using Awb.Core.Tools;
 using AwbStudio.DependencyInjection;
 using AwbStudio.Projects;
@@ -106,19 +105,6 @@ namespace AwbStudio
                     ShowUnhandledException(args.Exception, "Dispatcher.UnhandledException", true);
                 }
             };
-
-            // Catch exceptions from the main UI dispatcher thread.
-            // Typically we only need to catch this OR the Dispatcher.UnhandledException.
-            // Handling both can result in the exception getting handled twice.
-            //Application.Current.DispatcherUnhandledException += (sender, args) =>
-            //{
-            //	// If we are debugging, let Visual Studio handle the exception and take us to the code that threw it.
-            //	if (!Debugger.IsAttached)
-            //	{
-            //		args.Handled = true;
-            //		ShowUnhandledException(args.Exception, "Application.Current.DispatcherUnhandledException", true);
-            //	}
-            //};
         }
 
         void ShowUnhandledException(Exception e, string unhandledExceptionType, bool promptUserForShutdown)
