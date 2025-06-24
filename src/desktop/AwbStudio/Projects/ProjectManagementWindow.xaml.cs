@@ -18,7 +18,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace AwbStudio
@@ -78,16 +77,6 @@ namespace AwbStudio
             ShowLatestProjects();
             BringIntoView();
 
-            if (false && MainConfig.TestMode)
-            {
-                var lastProjectFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.FirstOrDefault();
-                if (lastProjectFolder != null)
-                {
-                    await OpenProjectAsync(lastProjectFolder, editConfig: true);
-                    return;
-                }
-            }
-
             if (_awbStudioSettingsService.StudioSettings.ReOpenLastProjectOnStart)
             {
                 ReOpenLastProjectCheckbox.IsChecked = true;
@@ -106,14 +95,14 @@ namespace AwbStudio
                 if (e.Key >= Key.D1 && e.Key <= Key.D9)
                 {
                     var index = (int)(e.Key - Key.D1);
-                    //if (index < ListLatestProjects.Items.Count)
-                    //{
-                    //    var projectFolder = (ListLatestProjects.Items[index] as ListBoxItem)?.ToolTip.ToString();
-                    //    if (!string.IsNullOrWhiteSpace(projectFolder))
-                    //    {
-                    //        var ok = await OpenProjectAsync(projectFolder, editConfig: false);
-                    //    }
-                    //}
+                    if (index < _awbStudioSettingsService.StudioSettings.LatestProjectsFolders.Length)
+                    {
+                        var projectFolder = _awbStudioSettingsService.StudioSettings.LatestProjectsFolders[index];
+                        if (!string.IsNullOrWhiteSpace(projectFolder))
+                        {
+                            var ok = await OpenProjectAsync(projectFolder, editConfig: false);
+                        }
+                    }
                 }
             }
         }
@@ -135,9 +124,9 @@ namespace AwbStudio
                     var ok = await OpenProjectAsync(projectFolder, editConfig: false);
                 };
 
-                projectListItem.OnConfigProjectClicked+= async (s, args) =>
+                projectListItem.OnConfigProjectClicked += async (s, args) =>
                 {
-                    // edit the  project configuration
+                    // edit the project configuration
                     var ok = await OpenProjectAsync(projectFolder, editConfig: true);
                 };
 
@@ -153,18 +142,13 @@ namespace AwbStudio
                         ShowLatestProjects();
                     }
                 };
-
-                //ListLatestProjects.Items.Add(new ListBoxItem()
-                //{
-                //    Content = $"[{no}] {projectFolder.Split('\\').LastOrDefault()}",
-                //    ToolTip = projectFolder,
-                //    Tag = no,
-                //});
-
                 no++;
             }
         }
 
+        /// <summary>
+        /// Create a new project in a folder chosen by the user.
+        /// </summary>
         private async void ButtonCreateNew_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
@@ -199,6 +183,9 @@ namespace AwbStudio
             }
         }
 
+        /// <summary>
+        /// Create a new project with default settings.
+        /// </summary>
         private static AwbProject CreateNewProject(string projectPath)
         {
             var project = new AwbProject()
@@ -235,7 +222,7 @@ namespace AwbStudio
             if (folder != null) await OpenProjectAsync(folder, editConfig: true);
         }
 
- 
+
         private async Task<bool> OpenProjectAsync(string projectPath, bool editConfig)
         {
             if (!_projectManagerService.ExistProject(projectPath))

@@ -7,43 +7,60 @@
              xmlns:s="clr-namespace:AwbStudio.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Margin="15">
-        <Label>
-            <TextBlock TextWrapping="Wrap" Text="Animatronic WorkBench (AWB) Studio" FontSize="24" FontWeight="Bold" Margin="5"  />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+    <ScrollViewer Grid.Row="0">
+        <StackPanel Margin="5">
+            <Label>
+                <TextBlock TextWrapping="Wrap" Text="Animatronic WorkBench (AWB) Studio" FontSize="26" FontWeight="Bold" Margin="5 0"  />
             </Label>
-                <Label Content="Open source software for animatronic figures" Margin="10"/>
-        <Label Margin="10" Content="{x:Static local:About.VersionLabelInfo}"/>
-        <Label>
-            <TextBlock  Margin="5">           
-                <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB/AnimatronicWorkbench-EN" RequestNavigate="Hyperlink_RequestNavigate">
+            <Label Content="Open source software for animatronic figures" Margin="5 0"/>
+            <Label 
+            x:Name="LabelVersion"
+            Margin="5 0" >Version Info
+            </Label>
+            <StackPanel x:Name="StackPanelUpdateAvailable" Background="DarkBlue" Margin="5 0"  >
+                <Label Margin="5">
+                    There is a new version available!
+                </Label>
+                <Label x:Name="LabelNewVersion"></Label>
+                <Button Width="Auto" HorizontalAlignment="Left" Margin="5" Click="DownloadButton_Click">Download now!</Button>
+            </StackPanel>
+            <Label>
+                <TextBlock  Margin="5 0">           
+                <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB/AnimatronicWorkbench" RequestNavigate="Hyperlink_RequestNavigate">
                     Project website
                 </Hyperlink>
-            </TextBlock>
-        </Label>
-        <Label>
-            <TextBlock Margin="5">           
-                <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB/AnimatronicWorkbench-Releases-EN" RequestNavigate="Hyperlink_RequestNavigate">
+                </TextBlock>
+            </Label>
+            <Label>
+                <TextBlock Margin="5 0">           
+                <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB-Docs/AWB-Releases" RequestNavigate="Hyperlink_RequestNavigate">
                    View version history
                 </Hyperlink>
-            </TextBlock>
-        </Label>
-        <Label>
-            <TextBlock Margin="5">           
-        <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB/AnimatronicWorkbench-Setup-EN" RequestNavigate="Hyperlink_RequestNavigate">
+                </TextBlock>
+            </Label>
+            <Label>
+                <TextBlock Margin="5 0">           
+        <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB-Docs/AWB-Docs" RequestNavigate="Hyperlink_RequestNavigate">
            show setup / installation instructions
         </Hyperlink>
+                </TextBlock>
+            </Label>
+        </StackPanel>
+    </ScrollViewer>
+        <Label  Grid.Row="1">
+            <TextBlock TextWrapping="Wrap" Margin="5 0">
+Copyright (c) 2025 Daniel Springwald, licensed under the MIT license.
+Includes third party material
+    <Hyperlink NavigateUri="https://github.com/Springwald/AnimatronicWorkbench-AWB/blob/main/LICENSE.md" RequestNavigate="Hyperlink_RequestNavigate">
+        - see details
+    </Hyperlink>
             </TextBlock>
         </Label>
-        
-        <Label>
-        <TextBlock TextWrapping="Wrap" Margin="5">
-            Copyright (c) 2025 Daniel Springwald, licensed under the MIT license.
-            Includes third party material
-                <Hyperlink NavigateUri="https://github.com/Springwald/AnimatronicWorkbench-AWB/blob/main/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">
-                    - see details
-                </Hyperlink>
-        </TextBlock>
-        </Label>
-    </StackPanel>
+    </Grid>
 
 </UserControl>

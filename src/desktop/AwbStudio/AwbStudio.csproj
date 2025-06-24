@@ -21,6 +21,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="StudioSettings\Version.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="StudioSettings\Version.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
