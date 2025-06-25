@@ -1,9 +1,11 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
+
+using Awb.Core.Actuators;
 
 namespace Awb.Core.DataPackets
 {
@@ -11,6 +13,11 @@ namespace Awb.Core.DataPackets
     {
         public uint ClientId { get; }
         public DataPacketContent Content { get; }
+
+        /// <summary>
+        /// Which actuators are affected by this data packet and can be set from "isDirty" to not "isDirty" after the packet has been processed?
+        /// </summary>
+        public IActuator[] AffectedAcctuatorsToRemoveDirtyFlag { get; }
 
         public bool IsEmpty
         {
@@ -26,10 +33,11 @@ namespace Awb.Core.DataPackets
             }
         }
 
-        public ClientDataPacket(uint clientId, DataPacketContent dataPacketContent)
+        public ClientDataPacket(uint clientId, DataPacketContent dataPacketContent, IActuator[] affectedAcctuatorsToRemoveDirtyFlag)
         {
             ClientId = clientId;
             Content = dataPacketContent;
+            AffectedAcctuatorsToRemoveDirtyFlag = affectedAcctuatorsToRemoveDirtyFlag ?? Array.Empty<IActuator>();
         }
     }
 }

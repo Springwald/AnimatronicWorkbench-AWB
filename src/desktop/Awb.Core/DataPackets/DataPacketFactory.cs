@@ -21,7 +21,8 @@ namespace Awb.Core.DataPackets
                 new DataPacketContent
                 {
                     ReadValue = new ReadValueData(typeName: ReadValueData.TypeNames.StsServo, id: stsFeetechServoConfig.Channel.ToString())
-                });
+                },
+                affectedAcctuatorsToRemoveDirtyFlag: []);
             }
 
             if (servo is ScsFeetechServoConfig scsFeetechServoConfig)
@@ -30,7 +31,8 @@ namespace Awb.Core.DataPackets
                     new DataPacketContent
                     {
                         ReadValue = new ReadValueData(typeName: ReadValueData.TypeNames.ScsServo, id: scsFeetechServoConfig.Channel.ToString())
-                    });
+                    },
+                    affectedAcctuatorsToRemoveDirtyFlag: []);
             }
 
             if (servo is Pca9685PwmServoConfig pwmServoConfig)
@@ -42,9 +44,10 @@ namespace Awb.Core.DataPackets
         }
 
         /// <summary>
-        /// created a data packet to set the position of a servo
+        /// created a data packet to set the position of a servo.
+        /// The Dirty flag of the servo is not set by this method, so the caller has to set it manually.
         /// </summary>
-        public ClientDataPacket? GetDataPacketSetServoPos(IServoConfig servo, int absolutePos)
+        public ClientDataPacket? GetDataPacketSetSingleServoPos(IServoConfig servo, int absolutePos)
         {
             if (servo is StsFeetechServoConfig stsFeetechServoConfig)
             {
@@ -65,7 +68,7 @@ namespace Awb.Core.DataPackets
                              }
                          }
                     },
-                });
+                }, affectedAcctuatorsToRemoveDirtyFlag: []);
             }
             if (servo is ScsFeetechServoConfig scsFeetechServoConfig)
             {
@@ -85,7 +88,7 @@ namespace Awb.Core.DataPackets
                                 }
                             }
                         },
-                    });
+                    }, affectedAcctuatorsToRemoveDirtyFlag: []);
             }
             if (servo is Pca9685PwmServoConfig pwmServoConfig)
             {
@@ -105,7 +108,7 @@ namespace Awb.Core.DataPackets
                                 }
                             }
                         },
-                    });
+                    }, affectedAcctuatorsToRemoveDirtyFlag: []);
             }
 
             return null;
@@ -119,11 +122,13 @@ namespace Awb.Core.DataPackets
                 s => s,
                 (key, g) => new { ClientId = key, Servos = g.ToArray() });
 
+            var collectAffectedAcctuatorsToUnsetDirty = new List<IActuator>();
+
             foreach (var servosByClient in servosByClients)
             {
-                var stsServos = this.GetStsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Sts);
-                var scsServos = this.GetStsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Scs);
-                var pwmServos = this.GetPwmServoChanges(servosByClient.Servos);
+                var stsServos = this.GetStsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Sts, collectAffectedAcctuatorsToUnsetDirty);
+                var scsServos = this.GetStsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Scs, collectAffectedAcctuatorsToUnsetDirty);
+                var pwmServos = this.GetPwmServoChanges(servosByClient.Servos, collectAffectedAcctuatorsToUnsetDirty);
 
                 if (stsServos != null || pwmServos != null || scsServos != null)
                 {
@@ -135,7 +140,8 @@ namespace Awb.Core.DataPackets
                             StsServos = stsServos,
                             ScsServos = scsServos,
                             Pca9685PwmServos = pwmServos
-                        });
+                        },
+                        affectedAcctuatorsToRemoveDirtyFlag: collectAffectedAcctuatorsToUnsetDirty.ToArray());
                 }
             }
         }
@@ -164,7 +170,7 @@ namespace Awb.Core.DataPackets
             }
         }
 
-        private StsServosPacketData? GetStsServoChanges(IServo[] allServos, StsScsServo.StsScsTypes servoType)
+        private StsServosPacketData? GetStsServoChanges(IServo[] allServos, StsScsServo.StsScsTypes servoType, List<IActuator> collectAffectedAcctuatorsToUnsetDirty)
         {
             var stsServos = new List<StsServoPacketData>();
 
@@ -173,6 +179,7 @@ namespace Awb.Core.DataPackets
                 var stsServo = servo as StsScsServo;
                 if (stsServo != null && stsServo.IsDirty && stsServo.StsScsType == servoType)
                 {
+                    collectAffectedAcctuatorsToUnsetDirty.Add(stsServo);
                     stsServos.Add(new StsServoPacketData
                     {
                         Channel = stsServo.Channel,
@@ -194,7 +201,7 @@ namespace Awb.Core.DataPackets
             return null;
         }
 
-        private Pca9685PwmServosPacketData? GetPwmServoChanges(IServo[] allServos)
+        private Pca9685PwmServosPacketData? GetPwmServoChanges(IServo[] allServos, List<IActuator> collectAffectedAcctuatorsToUnsetDirty)
         {
             var pwmServos = new List<Pca9685PwmServoPacketData>();
 
@@ -203,6 +210,7 @@ namespace Awb.Core.DataPackets
                 var pwmServo = servo as Pca9685PwmServo;
                 if (pwmServo != null && pwmServo.IsDirty)
                 {
+                    collectAffectedAcctuatorsToUnsetDirty.Add(pwmServo);
                     pwmServos.Add(new Pca9685PwmServoPacketData
                     {
                         I2cAddress = pwmServo.I2cAdress,
