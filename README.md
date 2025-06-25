@@ -19,7 +19,7 @@ This is quite tedious, often looks choppy as a result and has to be recompiled a
 
 For this reason, I have developed the software "Animatronic Workbench" (AWB).
 
-This allows you to create the movements of animatronic figures on the screen without any programming knowledge. [Have a loot at some animatronics I built with it](https://daniel.springwald.de/category/Animatronics).
+This allows you to create the movements of animatronic figures on the screen without any programming knowledge. [Have a look at some animatronics I built with it](https://daniel.springwald.de/category/Animatronic).
 
 ## Lets get started!
 
@@ -27,9 +27,9 @@ For more details on the project and the usage see [the project website](https://
 
 ### Setup / Installation
 
-The installation and setup of Animatronic Workbench Studio is [described here](https://daniel.springwald.de/post/AnimatronicWorkbench-Setup).
+The installation and setup of Animatronic Workbench Studio is [described here](https://daniel.springwald.de/post/AWB-Docs/AWB-Setup).
 
 ### More information
 
-- [Version history](https://daniel.springwald.de/post/AWB/AnimatronicWorkbench-Releases)
+- [Version history](https://daniel.springwald.de/post/AWB-Docs/AWB-Releases)
 - Third party material: This project also contains modules from other authors - in unchanged or revised form. For details see [the license info](LICENSE.md).
