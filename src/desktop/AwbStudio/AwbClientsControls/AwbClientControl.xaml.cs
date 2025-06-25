@@ -15,7 +15,7 @@ using System.Windows.Controls;
 namespace AwbStudio.AwbClientsControls
 {
     /// <summary>
-    /// Interaction logic for AwbClientControl.xaml
+    /// Show the status and communication of a single AWB client
     /// </summary>
     public partial class AwbClientControl : UserControl
     {
@@ -27,12 +27,12 @@ namespace AwbStudio.AwbClientsControls
         {
             _invokerService = invokerService;
             InitializeComponent();
-            
+
             Unloaded += AwbClientControl_Unloaded;
             _updateClientInformationTimer = new Timer(UpdateClientInformation, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
         }
 
-      
+
         internal void SetClient(IAwbClient client)
         {
             UnbindClient();
@@ -63,7 +63,7 @@ namespace AwbStudio.AwbClientsControls
         private void UpdateClientInformation(object? state)
         {
             // call the update method in the UI thread
-           _invokerService.GetInvoker().Invoke(() => UpdateClientInformationInternal());
+            _invokerService.GetInvoker().Invoke(() => UpdateClientInformationInternal());
         }
 
         private void UpdateClientInformationInternal()
@@ -75,7 +75,7 @@ namespace AwbStudio.AwbClientsControls
             var maxErrorSeconds = 5;
             if (sinceLastError < TimeSpan.FromSeconds(maxErrorSeconds))
             {
-                this.LabelStatus.Text = $"🚨 {maxErrorSeconds-sinceLastError.TotalSeconds:0}";
+                this.LabelStatus.Text = $"🚨 {maxErrorSeconds - sinceLastError.TotalSeconds:0}";
             }
             else
             {
@@ -90,7 +90,7 @@ namespace AwbStudio.AwbClientsControls
             _awbClient.Received += AwbClient_Received;
             _awbClient.PacketSending += AwbClient_PacketSending;
         }
-        
+
         private void UnbindClient()
         {
             if (_awbClient != null)
@@ -104,9 +104,10 @@ namespace AwbStudio.AwbClientsControls
 
         private void AwbClient_PacketSending(object? sender, string e)
         {
+            const int maxLength = 5000;
             var old = this.TextBlockDebugLog.Text ?? string.Empty;
-            if (old.Length > 1000)
-                old = old.Substring(0, 1000);
+            if (old.Length > maxLength)
+                old = old.Substring(0, maxLength);
             var debugInfos = $"----------------------------{Environment.NewLine}📦 {e}{Environment.NewLine}{old}";
             this.TextBlockDebugLog.Text = debugInfos;
         }
