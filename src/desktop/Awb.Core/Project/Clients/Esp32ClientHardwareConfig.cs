@@ -188,13 +188,13 @@ namespace Awb.Core.Project.Clients
             {
                 if (ScsTXPin == null) yield return new ProjectProblem
                 {
-                    Message = "SCS servo TX IO pin has to be set",
+                    Message = "SC servo TX IO pin has to be set",
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };
                 if (ScsRXPin == null) yield return new ProjectProblem
                 {
-                    Message = "SCS servo RX IO pin has to be set",
+                    Message = "SC servo RX IO pin has to be set",
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };
@@ -204,13 +204,13 @@ namespace Awb.Core.Project.Clients
             {
                 if (StsTXPin == null) yield return new ProjectProblem
                 {
-                    Message = "STS servo TX IO pin has to be set",
+                    Message = "ST servo TX IO pin has to be set",
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };
                 if (StsRXPin == null) yield return new ProjectProblem
                 {
-                    Message = "STS servo RX IO pin has to be set",
+                    Message = "ST servo RX IO pin has to be set",
                     ProblemType = ProjectProblem.ProblemTypes.Error,
                     Source = TitleShort
                 };

@@ -44,10 +44,10 @@
                         <Button x:Name="EditEsp32HardwareButton" Content="Edit ESP32 hardware" Click="EditEsp32HardwareButton_Click"></Button>
 
                         <ProjectConfiguration:ProjectObjectListControl x:Name="ScsServosList" 
-                        ProjectObjects="{Binding ScsServos}" Title="SCS servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="ScsServosList_NewProjectObjectRequested"/>
+                        ProjectObjects="{Binding ScsServos}" Title="SC servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="ScsServosList_NewProjectObjectRequested"/>
 
                         <ProjectConfiguration:ProjectObjectListControl x:Name="StsServosList" 
-                        ProjectObjects="{Binding StsServos}" Title="STS servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="StsServosList_NewProjectObjectRequested"/>
+                        ProjectObjects="{Binding StsServos}" Title="ST servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="StsServosList_NewProjectObjectRequested"/>
 
                         <ProjectConfiguration:ProjectObjectListControl x:Name="Pca9685PWMServosList" 
                         ProjectObjects="{Binding Pca9685PwmServos}" Title="Pca9685 PWM servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="Pca9685PWMServosList_NewProjectObjectRequested"/>
