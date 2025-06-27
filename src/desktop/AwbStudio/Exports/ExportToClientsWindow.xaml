@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AwbStudio.Exports"
+        xmlns:local="clr-namespace:AwbStudio.Exports" xmlns:HelpAndSupport="clr-namespace:AwbStudio.HelpAndSupport"
         mc:Ignorable="d"
         Title="ExportToClientsWindow"  Height="450" Width="800">
     <Window.Icon>
@@ -11,6 +11,7 @@
     </Window.Icon>
     <DockPanel LastChildFill="true">
         <StackPanel DockPanel.Dock="Top">
+            <HelpAndSupport:HelpButtonControl HelpTopic="Export" HorizontalAlignment="Right"/>
             <Label Content="Target folder:" />
             <Label x:Name="LabelTargetFolder"  Content="LabelTargetFolder" FontWeight="Bold" MinHeight="20"/>
             <Label x:Name="LabelTargetFolderHint"  Content="LabelTargetFolderHint" MinHeight="20" FontStyle="Italic"/>
