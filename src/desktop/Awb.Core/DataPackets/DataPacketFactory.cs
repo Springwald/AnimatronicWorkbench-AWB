@@ -146,6 +146,16 @@ namespace Awb.Core.DataPackets
             }
         }
 
+        /// <summary>
+        /// If the data packet was sent to the client, this method is called to unset the dirty flag of the affected actuators.
+        /// </summary>
+        /// <param name="clientDataPacket"></param>
+        public void SetDataPacketDone(ClientDataPacket clientDataPacket)
+        {
+            foreach (var affectedActuator in clientDataPacket.AffectedAcctuatorsToRemoveDirtyFlag)
+                affectedActuator.IsDirty = false;
+        }
+
         public void SetDataPacketDone(IServo[] servos, ClientDataPacket clientDataPacket)
         {
             if (clientDataPacket.Content.StsServos?.Servos != null)
