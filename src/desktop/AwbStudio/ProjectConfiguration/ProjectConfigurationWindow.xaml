@@ -4,48 +4,50 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AwbStudio"
-        xmlns:ProjectConfiguration="clr-namespace:AwbStudio.ProjectConfiguration" xmlns:PropertyEditors="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors" x:Class="AwbStudio.ProjectConfigurationWindow"
+        xmlns:ProjectConfiguration="clr-namespace:AwbStudio.ProjectConfiguration" xmlns:PropertyEditors="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors" xmlns:HelpAndSupport="clr-namespace:AwbStudio.HelpAndSupport" x:Class="AwbStudio.ProjectConfigurationWindow"
         mc:Ignorable="d"
         
-        Title="ProjectConfigurationWindow" Height="800" Width="900" WindowState="Maximized">
+        Title="{Binding WindowTitle}" Height="800" Width="900" WindowState="Maximized">
     <Window.Icon>
         <DrawingImage />
     </Window.Icon>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="{Binding ProjectFolder}" x:Name="LabelProjectFolder" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
-        <StackPanel Grid.Row="1" x:Name="StackPanelProblems">
+        <StackPanel Grid.Row="0" x:Name="StackPanelProblems" >
         </StackPanel>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50*"/>
                 <ColumnDefinition Width="50*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0" Margin="10 10 0 0">
                 <Grid.RowDefinitions>
                     <RowDefinition  Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="0" >
                     <StackPanel x:Name="StackPanelProjectObjectLists">
-                        <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
+                        <Grid>
+                            <Label Content="Project meta data" FontSize="15" FontWeight="Bold" />
+                            <HelpAndSupport:HelpButtonControl HelpTopic="Configuration" HorizontalAlignment="Right" Margin="0 0 5 5"/>
+                        </Grid>
                         <Button x:Name="EditProjectMetaDataButton" Content="Edit meta data" Click="EditProjectMetaDataButton_Click"></Button>
 
                         <Label Content="ESP32 Hardware" FontSize="15" FontWeight="Bold" />
                         <Button x:Name="EditEsp32HardwareButton" Content="Edit ESP32 hardware" Click="EditEsp32HardwareButton_Click"></Button>
 
                         <ProjectConfiguration:ProjectObjectListControl x:Name="ScsServosList" 
-                        ProjectObjects="{Binding ScsServos}" Title="SCS servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="ScsServosList_NewProjectObjectRequested"/>
+                        ProjectObjects="{Binding ScsServos}" Title="SC servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="ScsServosList_NewProjectObjectRequested"/>
 
                         <ProjectConfiguration:ProjectObjectListControl x:Name="StsServosList" 
-                        ProjectObjects="{Binding StsServos}" Title="STS servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="StsServosList_NewProjectObjectRequested"/>
+                        ProjectObjects="{Binding StsServos}" Title="ST servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="StsServosList_NewProjectObjectRequested"/>
 
                         <ProjectConfiguration:ProjectObjectListControl x:Name="Pca9685PWMServosList" 
                         ProjectObjects="{Binding Pca9685PwmServos}" Title="Pca9685 PWM servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="Pca9685PWMServosList_NewProjectObjectRequested"/>
@@ -64,26 +66,27 @@
                     </StackPanel>
 
                 </ScrollViewer>
-                
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10 10 10 10">
-                    <Button Margin="40 0 0 0" Content="Cancel without saving" Click="ButtonCloseWithoutSaving_Click"/>
-                    <Button Margin="40 0 0 0" Content="Save and close" Click="ButtonSaveAndClose_Click"/>
-                </StackPanel>
+
+
             </Grid>
 
-            <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" CornerRadius="3" Padding="10">
-                        <PropertyEditors:PropertyEditorControl x:Name="PropertyEditor" Grid.Row="1"
+            <Grid Grid.Column="2" Margin="0 10 10 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" CornerRadius="3" Padding="10">
+                    <PropertyEditors:PropertyEditorControl x:Name="PropertyEditor" Grid.Row="1"
                                                            OnDeleteObject="PropertyEditorOnObjectDelete_Fired" 
                                                            OnUpdatedData="PropertyEditorUpdatedData_Fired"  />
-                    </Border>
-                </Grid>
-
+                </Border>
             </Grid>
-           
+
         </Grid>
+        
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 10 10 10">
+            <Button Margin="40 0 0 0" Content="Cancel without saving" Click="ButtonCloseWithoutSaving_Click"/>
+            <Button Margin="40 0 0 0" Content="Save and close" Click="ButtonSaveAndClose_Click"/>
+        </StackPanel>
+    </Grid>
 </Window>

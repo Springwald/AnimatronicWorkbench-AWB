@@ -30,15 +30,14 @@
                 </Grid.RowDefinitions>
                 <HelpAndSupport:HelpButtonControl HelpTopic="Projects" Grid.Row="0" HorizontalAlignment="Right"/>
                 <Button x:Name="ButtonOpenExisting"   Content="Open existing project"  Grid.Row="1"  Click="ButtonOpenExisting_Click" />
-                <Label Content="Latest projects:" Grid.Row="2"/>
-                <Border Grid.Row="2" Background="Black" >
+                <GroupBox Header="Latest projects" Grid.Row="2">
                     <ScrollViewer  >
                         <StackPanel x:Name="StackPanelProjectList">
                             <!-- Project list items will be added here dynamically -->
                             <Projects:ProjectListItem />
                         </StackPanel>
                     </ScrollViewer>
-                </Border>
+                </GroupBox>
                 <CheckBox Content="Open last project on start" Grid.Row="3" x:Name="ReOpenLastProjectCheckbox" Margin="5" Unchecked="ReOpenLastProjectCheckbox_Checked" Checked="ReOpenLastProjectCheckbox_Checked"/>
 
                 <Button x:Name="ButtonCreateNew" Content="Create new project" Grid.Row="4" Click="ButtonCreateNew_Click"/>

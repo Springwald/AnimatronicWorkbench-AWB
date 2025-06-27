@@ -7,17 +7,25 @@
              xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0 0 0 5" Background="#FF333333" Height="Auto"  >
-        <StackPanel>
-            <Grid>
-                <StackPanel Orientation="Horizontal">
-                    <emoji:TextBlock x:Name="LabelTitle" Text="LabelTitle" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"  Foreground="{StaticResource ForegroundBrush}"/>
-                    <emoji:TextBlock x:Name="LabelStatus" Text="LabelStatus" IsEnabled="False"  HorizontalAlignment="Left" VerticalAlignment="Top"  Foreground="{StaticResource ForegroundBrush}"/>
-                </StackPanel>
-                <Button HorizontalAlignment="Right" x:Name="ButtonDisconnect" Margin="5" Content="Disconnect" />
+    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2"  Background="#FF333333"  >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <emoji:TextBlock Grid.Column="0" x:Name="LabelTitle" Margin="5" Text="LabelTitle" IsEnabled="False"  VerticalAlignment="Top" FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}"/>
+                <emoji:TextBlock Grid.Column="1" x:Name="LabelStatus" Margin="5" Text="LabelStatus" IsEnabled="False"   VerticalAlignment="Top"  Foreground="{StaticResource ForegroundBrush}"/>
+                <Button Grid.Column="2" HorizontalAlignment="Right" x:Name="ButtonDisconnect" Margin="5" Content="Disconnect" />
             </Grid>
-            <emoji:TextBlock x:Name="TextBlockDebugLog"  IsEnabled="False" TextWrapping="Wrap" Foreground="{StaticResource ForegroundBrush}" Text="" MaxHeight="100"/>
-            <Button x:Name="btnCopyDebugToClipboard" Content="copy debug to clipboard" Click="btnCopyDebugToClipboard_Click"/>
-        </StackPanel>
+            <emoji:TextBlock x:Name="TextBlockDebugLog" Grid.Row="1" IsEnabled="False" TextWrapping="Wrap" Foreground="{StaticResource ForegroundBrush}" Text=""/>
+            <Button Grid.Row="2" x:Name="btnCopyDebugToClipboard" Content="copy debug to clipboard" Click="btnCopyDebugToClipboard_Click"/>
+        </Grid>
     </Border>
 </UserControl>

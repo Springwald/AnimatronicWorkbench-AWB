@@ -73,7 +73,7 @@ namespace Awb.Core.Player
                 {
                     // await _logger.Log($"Sent to client Id '{clientID}'. ({result.DebugInfos})");
                     // await _logger.Log(string.Join(", ", dataPackets.Select(p => string.Join("|", p.Content.StsServos?.Servos?.Select(s => s.Name + ":" + s.TargetValue)))));
-                    dataPacketFactory.SetDataPacketDone(_actuatorsService.Servos, packet);
+                    dataPacketFactory.SetDataPacketDone(packet);
                 }
                 else
                 {

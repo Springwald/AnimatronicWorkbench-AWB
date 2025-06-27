@@ -7,7 +7,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:AwbStudio"
         xmlns:Timelines="clr-namespace:Awb.Core.Timelines;assembly=Awb.Core"
-        xmlns:PropertyControls="clr-namespace:AwbStudio.PropertyControls" x:Class="AwbStudio.TimelineEditorWindow"
+        xmlns:PropertyControls="clr-namespace:AwbStudio.PropertyControls" xmlns:HelpAndSupport="clr-namespace:AwbStudio.HelpAndSupport" x:Class="AwbStudio.TimelineEditorWindow"
         mc:Ignorable="d"
         Title="TimelineEditorWindow" Height="800" Width="1150">
     <Window.Icon>
@@ -16,7 +16,7 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="4*" />
+            <RowDefinition Height="4*" MinHeight="450" />
             <!-- global timeline viewer with all timeline points -->
             <RowDefinition Height="6*" />
             <!-- the editor controls, one for each actuatator -->
@@ -111,7 +111,11 @@
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0">
                     <!-- project data and export -->
-                    <Label FontWeight="Bold" Content="Project:"/>
+                    <Grid>
+                        <Label FontWeight="Bold" Content="Project:"/>
+                        <HelpAndSupport:HelpButtonControl  HelpTopic="TimelineEditor" HorizontalAlignment="Right"/>
+                    </Grid>
+                  
                     <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 clients" Click="ButtonExportEsp32_Click" />
                     <Button x:Name="ButtonClear" Content="New Timeline" Click="ButtonClear_Click" />
                     <Label Content="Load existing timeline:" />

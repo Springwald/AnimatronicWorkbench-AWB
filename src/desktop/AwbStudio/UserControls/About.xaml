@@ -22,11 +22,11 @@
             x:Name="LabelVersion"
             Margin="5 0" >Version Info
             </Label>
-            <StackPanel x:Name="StackPanelUpdateAvailable" Background="DarkBlue" Margin="5 0"  >
+            <StackPanel x:Name="StackPanelUpdateAvailable" Margin="5 0" Background="#4C0E56DC"  >
                 <Label Margin="5">
                     There is a new version available!
                 </Label>
-                <Label x:Name="LabelNewVersion"></Label>
+                    <Label x:Name="LabelNewVersion" Margin="5"></Label>
                 <Button Width="Auto" HorizontalAlignment="Left" Margin="5" Click="DownloadButton_Click">Download now!</Button>
             </StackPanel>
             <Label>

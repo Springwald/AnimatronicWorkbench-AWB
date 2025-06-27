@@ -25,7 +25,7 @@ namespace Awb.Core.Project.Servos
         [Range(0, MaxValConst)]
         public override int? DefaultValue { get; set; }
 
-        [Description(SpeedDescriptionConst + "\r\n-1 to use SCS servo default value.")]
+        [Description(SpeedDescriptionConst + "\r\n-1 to use SC servo default value.")]
         [Range(-1, MaxSpeedConst)]
         public override int? Speed { get; set; }
 

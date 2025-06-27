@@ -13,6 +13,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using Windows.ApplicationModel.Background;
 
 namespace AwbStudio.ProjectConfiguration
 {
@@ -45,6 +46,11 @@ namespace AwbStudio.ProjectConfiguration
                 _projectFolder = value;
                 OnPropertyChanged();
             }
+        }
+
+        public string WindowTitle
+        {
+            get => $"Configuration of AWB project '{_projectFolder}'";
         }
 
         private ProjectMetaData _projectMetaData { get; set; }

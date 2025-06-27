@@ -332,7 +332,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             while (true)
             {
                 var dataPacketFactory = new DataPacketFactory();
-                var packet = dataPacketFactory.GetDataPacketSetServoPos(servoConfig, absolutePosition);
+                var packet = dataPacketFactory.GetDataPacketSetSingleServoPos(servoConfig, absolutePosition);
                 if (packet == null || packet.IsEmpty)
                 {
                     ShowError("Unable to create data packet.");

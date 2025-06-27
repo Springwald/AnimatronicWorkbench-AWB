@@ -42,7 +42,7 @@ namespace Awb.Core.Project.Servos
         public ServoRelaxRange[] RelaxRanges { get; set; } = Array.Empty<ServoRelaxRange>();
 
         [Display(Name = "Relax-range", GroupName = "Values", Order = 1)]
-        [Description("When the servo is some seconds unchanged and inside this ranges, the servo power will turned off.\r\nFormat:2000-2200\r\n Use commas to list multiple ranges.")]
+        [Description("When the servo is some seconds unchanged and inside this ranges, the servo power will turned off.\r\nFormat:2000-2200\r\nUse commas to list multiple ranges.")]
         [RegularExpression(@"(\d{1,4}[-]\d{1,4},?)*")]
         [JsonIgnore]
         public string? RelaxRangesAsString
