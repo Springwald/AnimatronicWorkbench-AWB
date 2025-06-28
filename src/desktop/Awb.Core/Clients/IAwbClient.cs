@@ -49,6 +49,6 @@ namespace Awb.Core.Clients
         /// <summary>
         /// send a payload to the client
         /// </summary>
-        Task<SendResult> Send(byte[] payload, string? debugInfos);
+        Task<SendResult> Send(String payload, string? debugInfos);
     }
 }

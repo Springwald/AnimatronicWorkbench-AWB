@@ -66,9 +66,9 @@ namespace Awb.Core.Player
                     WriteIndented = false,
                     DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
                 };
+
                 var jsonStr = JsonSerializer.Serialize(packet.Content, options);
-                var payload = Encoding.ASCII.GetBytes(jsonStr);
-                var result = await client.Send(payload: payload, debugInfo: jsonStr);
+                var result = await client.Send(payload: jsonStr, debugInfo: jsonStr);
                 if (result.Ok)
                 {
                     // await _logger.Log($"Sent to client Id '{clientID}'. ({result.DebugInfos})");

@@ -9,18 +9,24 @@ using PacketLogistics.ComPorts.ComportPackets;
 
 namespace PacketLogistics
 {
-    public abstract class PacketSenderReceiver : IDisposable
+    public abstract class PacketSenderReceiver<PayloadTypes> : IDisposable where PayloadTypes : Enum
     {
         public class PacketReceivedEventArgs : EventArgs
         {
-            public byte[] Payload { get; }
+            /// <summary>
+            /// The value content of the packet that was received or sent.
+            /// </summary>
+            public string Payload { get; }
 
-            public PacketReceivedEventArgs(byte[] payload)
+            public PacketReceivedEventArgs(string payload)
             {
                 Payload = payload;
             }
         }
 
+        /// <summary>
+        /// If an error occurs during sending or receiving packets, these arguments are passed to the ErrorOccured event.
+        /// </summary>
         public class ErrorEventArgs : EventArgs
         {
             public string Message { get; }
@@ -31,23 +37,53 @@ namespace PacketLogistics
             }
         }
 
+        /// <summary>
+        /// Is raised when a packet is received.
+        /// </summary>
         public event EventHandler<PacketReceivedEventArgs>? PacketReceived;
+
+        /// <summary>
+        /// Is raised when an error is encountered sending or receiving packets.
+        /// </summary>
         public event EventHandler<ErrorEventArgs>? ErrorOccured;
 
 
+        /// <summary>
+        /// The possible states of the PacketSenderReceiver.
+        /// </summary>
         public enum States
         {
+            /// <summary>
+            /// The PacketSenderReceiver has not yet started connecting.
+            /// </summary>
             NotStarted,
+
+            /// <summary>
+            /// The PacketSenderReceiver is currently trying to connect to the device.
+            /// </summary>
             Connecting,
+
+            /// <summary>
+            /// The PacketSenderReceiver is connected and ready to send or receive packets.
+            /// </summary>
             Idle,
+
+            /// <summary>
+            /// The PacketSenderReceiver is waiting for an answer after sending a packet.
+            /// </summary>
             WaitingForAnswer
         }
 
-
+        /// <summary>
+        /// How long to wait for a response after sending a packet till the packet is declared as failed.
+        /// </summary>
         protected TimeSpan _timeout = TimeSpan.FromSeconds(1);
 
         public Queue<string> Errors { get; protected set; } = new Queue<string>();
 
+        /// <summary>
+        /// Is the PacketSenderReceiver currently connected?
+        /// </summary>
         public bool IsConnected => this.State switch
         {
             States.Connecting => false,
@@ -57,14 +93,14 @@ namespace PacketLogistics
             _ => throw new ArgumentOutOfRangeException($"{nameof(this.State)}: {this.State.ToString()}")
         };
 
+        /// <summary>
+        /// Gets the current state of the PacketSenderReceiver.
+        /// </summary>
         public States State { get; protected set; } = States.NotStarted;
 
-        protected void Error(string message)
-        {
-            this.Errors.Enqueue(message);
-            this.ErrorOccured?.Invoke(this, new ErrorEventArgs(message));
-        }
-
+        /// <summary>
+        /// Connects the PacketSenderReceiver to the device.
+        /// </summary>
         public async Task<bool> Connect()
         {
             this.State = States.Connecting;
@@ -80,17 +116,19 @@ namespace PacketLogistics
             }
         }
 
-        public async Task<PacketSendResult> SendPacket(byte[] payload)
+        /// <summary>
+        /// Send a packet to the device.
+        /// </summary>
+        public async Task<PacketSendResult> SendPacket(PayloadTypes  payloadType, string payload) 
         {
             if (this.State == States.NotStarted)
             {
-                Error("can't send packet on not started com port!");
+                Error("can't send packet when not started!");
                 return new PacketSendResult
                 {
-                    OriginalPacketTimestampUtc = DateTime.UtcNow,
                     OriginalPacketId = null,
                     Ok = false,
-                    Message = "can't send packet on not started com port!",
+                    Message = "can't send packet when not started!",
                 };
             }
 
@@ -106,7 +144,6 @@ namespace PacketLogistics
                     Error(errMsgNotReady);
                     return new PacketSendResult
                     {
-                        OriginalPacketTimestampUtc = DateTime.UtcNow,
                         OriginalPacketId = null,
                         Ok = false,
                         Message = errMsgNotReady,
@@ -117,7 +154,7 @@ namespace PacketLogistics
             if (State == States.Idle)
             {
                 this.State = States.WaitingForAnswer;
-                var answer = await this.SendPacketInternal(payload);
+                var answer = await this.SendPacketInternal(payloadType, payload);
                 this.State = States.Idle;
                 if (answer == null)
                     return new PacketSendResult { Ok = false, Message = "Packet answer == null!" };
@@ -136,8 +173,15 @@ namespace PacketLogistics
             }
         }
 
-        protected abstract Task<bool> ConnectInternal();
-        protected abstract Task<PacketSendResult> SendPacketInternal(byte[] payload);
         public abstract void Dispose();
+
+        protected abstract Task<bool> ConnectInternal();
+        protected abstract Task<PacketSendResult> SendPacketInternal(PayloadTypes payloadType, string payload);
+
+        protected void Error(string message)
+        {
+            this.Errors.Enqueue(message);
+            this.ErrorOccured?.Invoke(this, new ErrorEventArgs(message));
+        }
     }
 }

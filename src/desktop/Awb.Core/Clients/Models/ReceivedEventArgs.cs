@@ -9,9 +9,9 @@ namespace Awb.Core.Clients.Models
 {
     public class ReceivedEventArgs : EventArgs
     {
-        public byte[] Payload { get; }
+        public string Payload { get; }
 
-        public ReceivedEventArgs(byte[] payload)
+        public ReceivedEventArgs(string payload)
         {
             Payload = payload;
         }

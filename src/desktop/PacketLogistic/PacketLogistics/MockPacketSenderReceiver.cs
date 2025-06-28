@@ -11,7 +11,7 @@ using PacketLogistics.ComPorts.ComportPackets;
 
 namespace PacketLogistics
 {
-    public class MockPacketSenderReceiver : PacketSenderReceiver
+    public class MockPacketSenderReceiver<PayloadTypes> : PacketSenderReceiver<PayloadTypes> where PayloadTypes : Enum
     {
         public override void Dispose()
         {
@@ -24,12 +24,11 @@ namespace PacketLogistics
             return true;
         }
 
-        protected override async Task<PacketSendResult> SendPacketInternal(byte[] payload)
+        protected override async Task<PacketSendResult> SendPacketInternal(PayloadTypes payloadType, string payload)
         {
             await Task.Delay(100 + new Random().Next(200));
             return new PacketSendResult
             {
-                OriginalPacketTimestampUtc = DateTime.UtcNow,
                 OriginalPacketId = null,
                 Ok = true,
                 Message = null,

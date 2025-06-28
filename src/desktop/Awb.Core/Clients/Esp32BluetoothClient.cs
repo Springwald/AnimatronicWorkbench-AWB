@@ -28,12 +28,12 @@ namespace Awb.Core.Clients
             throw new NotImplementedException();
         }
 
-        public Task<SendResult> Send(byte[] payload)
+        public Task<SendResult> Send(String payload)
         {
             throw new NotImplementedException();
         }
 
-        public Task<SendResult> Send(byte[] payload, string debugInfos)
+        public Task<SendResult> Send(String payload, string debugInfos)
         {
             throw new NotImplementedException();
         }

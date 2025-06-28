@@ -1,34 +1,33 @@
-﻿// Communicate between different devices on dotnet or arduino via COM port or Wifi
-// https://github.com/Springwald/PacketLogistics
+﻿// Animatronic WorkBench
+// https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald, Bochum Germany
-// Springwald Software  -   www.springwald.de
-// daniel@springwald.de -  +49 234 298 788 46
-// All rights reserved
-// Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
-using PacketLogistics.ComPorts.ComportPackets;
-using PacketLogistics.ComPorts.Serialization;
+using PacketLogistics.PacketPayloadWrapper;
 using PacketLogistics.Tools;
 
 namespace PacketLogistics.ComPorts
 {
-    internal class PacketReceiver
+    internal class PacketReceiver<PayloadTypes> where PayloadTypes : Enum
     {
-        public delegate void PacketReceivedDelegate(PacketBase packet);
+
+        public delegate void PacketReceivedDelegate(PacketEnvelope<PayloadTypes> packet);
         public delegate void ErrorDelegate(string errorMessage);
 
         private readonly Esp32SerialPort _esp32SerialPort;
         private readonly IComPortCommandConfig _comPortCommandConfig;
         private readonly PacketReceivedDelegate _packetReceivedDelegate;
         private readonly ErrorDelegate _errorDelegate;
-        private readonly PacketSerializer _packetSerializer;
+
         private readonly List<byte> _receiveBuffer = new();
+        private bool _insidePacketStream = false;
+
 
         public PacketReceiver(
             Esp32SerialPort esp32SerialPort,
             IComPortCommandConfig comPortCommandConfig,
-            uint clientId,
             PacketReceivedDelegate packetReceivedDelegate,
             ErrorDelegate errorDelegate)
         {
@@ -36,13 +35,10 @@ namespace PacketLogistics.ComPorts
             _comPortCommandConfig = comPortCommandConfig;
             _packetReceivedDelegate = packetReceivedDelegate;
             _errorDelegate = errorDelegate;
-            _packetSerializer = new PacketSerializer(_comPortCommandConfig);
         }
 
-        public async Task<PacketBase?> TryReceivePacket()
+        public async Task<PacketEnvelope<PayloadTypes>?> TryReceivePacket()
         {
-            PacketBase? packet = null;
-
             int bytesToRead = _esp32SerialPort.BytesToRead;
 
             if (bytesToRead == 0)
@@ -56,32 +52,70 @@ namespace PacketLogistics.ComPorts
                     byte chr = (byte)_esp32SerialPort.ReadByte();
                     _receiveBuffer.Add(chr);
 
-                    if (_receiveBuffer.EndsWith(_comPortCommandConfig.PacketHeaderBytes))
+                    if (_receiveBuffer.EndsWith(_comPortCommandConfig.PacketHeaderAsBytes))// the start of a packet stream is received
                     {
-                        var packetContent = _receiveBuffer.Take(_receiveBuffer.Count - _comPortCommandConfig.PacketHeaderBytes.Length).ToArray();
                         _receiveBuffer.Clear();
+                        _insidePacketStream = true;
+                        continue;
+                    }
+
+                    if (_receiveBuffer.EndsWith(_comPortCommandConfig.PacketFooterAsBytes)) // the end of a packet stream is received
+                    {
+                        if (_insidePacketStream == false)
+                        {
+                            // we received a packet footer without a start packet header
+                            _errorDelegate("Received packet footer without a start packet header!");
+                            _receiveBuffer.Clear();
+                            _insidePacketStream = false;
+                            continue;
+                        }
+
+                        var packetContent = _receiveBuffer.Take(_receiveBuffer.Count - _comPortCommandConfig.PacketFooterAsBytes.Length).ToArray();
+
+                        _receiveBuffer.Clear();
+                        _insidePacketStream = false;
 
                         if (packetContent.Length == 0)
                         {
+                            // Reveived an empty packet?!? ignore it
+                            _errorDelegate("Received an empty packet (only packet header and footer)!");
+                            continue;
                         }
-                        else
+
+                        // deserialize the packet content
+                        var packetWrapper = new PacketWrapper<PayloadTypes>();
+                        var packetContentAsString = _comPortCommandConfig.Encoding.GetString(packetContent);
+                        var packetUnwrapResult = packetWrapper.UnwrapPacket(packetContentAsString);
+
+                        if (packetUnwrapResult == null)
                         {
-                            packet = _packetSerializer.GetPacketFromByteArray(packetContent, out string? errMsg);
-                            if (packet == null)
-                            {
-                                _errorDelegate(errMsg ?? $"Unknown error while deserializing receive buffer '{_receiveBuffer.ToString()}'");
-                            }
-                            else
-                            {
-                                _packetReceivedDelegate(packet);
-                            }
+                            // we could not deserialize the packet content
+                            var errMsg = $"Could not deserialize packet content '{packetContentAsString}'";
+                            _errorDelegate(errMsg);
+                            continue;
                         }
+
+                        if (packetUnwrapResult.Ok == false)
+                        {
+                            // we could not deserialize the packet content
+                            var errMsg = $"Could not deserialize packet content '{packetContentAsString}' with error '{packetUnwrapResult.ErrorMessage}'";
+                            _errorDelegate(errMsg);
+                            continue;
+                        }
+
+                        var packetEnvelope = packetUnwrapResult.Packet;
+                        if (packetEnvelope == null)
+                        {
+                            var errMsg = $"PacketEnvelope is null after deserializing packet content '{packetContentAsString}'";
+                            _errorDelegate(errMsg);
+                            continue;
+                        }
+
+                        _packetReceivedDelegate(packetEnvelope);
                     }
                 }
             }
-
-            return packet;
-
+            return null;
         }
     }
 }
