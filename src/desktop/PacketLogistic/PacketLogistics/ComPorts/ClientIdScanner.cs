@@ -92,7 +92,7 @@ namespace PacketLogistics.ComPorts
                     // We just want to receive packets to detect the client ID.
                     switch (packet.PacketType)
                     {
-                        case PacketPayloadWrapper.PacketEnvelope<DummyPayloadTypes>.PacketTypes.NoSet:
+                        case PacketPayloadWrapper.PacketEnvelope<DummyPayloadTypes>.PacketTypes.NotSet:
                             OnLog?.Invoke(this, $"ClientIdScanner port {portName}: NoSet packet received, this should not happen.");
                             break;
 

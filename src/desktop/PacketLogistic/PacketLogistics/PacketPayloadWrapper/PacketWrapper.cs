@@ -95,7 +95,7 @@ namespace PacketLogistics.PacketPayloadWrapper
 
             switch (packetEnvelope.PacketType)
             {
-                case PacketEnvelope<PayloadTypes>.PacketTypes.NoSet:
+                case PacketEnvelope<PayloadTypes>.PacketTypes.NotSet:
                     return new UnwrapResult<PayloadTypes>
                     {
                         Ok = false,

@@ -17,7 +17,7 @@ namespace PacketLogistics.PacketPayloadWrapper
             /// <summary>
             /// Fallback type for unknown packets.
             /// </summary>
-            NoSet = 0,
+            NotSet = 0,
 
             /// <summary>
             /// Send by a client to by scanned by the server to check if the client is available

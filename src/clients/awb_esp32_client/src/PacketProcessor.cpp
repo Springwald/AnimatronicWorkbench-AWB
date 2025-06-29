@@ -6,7 +6,7 @@
 #include "WlanConnector.h"
 #include "PacketProcessor.h"
 
-StaticJsonDocument<1024 * 32> jsondoc;
+StaticJsonDocument<PACKET_BUFFER_SIZE> jsondocPacketProcessor;
 
 /**
  * process a received packet from the Animatronic Workbench Studio
@@ -15,7 +15,7 @@ String PacketProcessor::processPacket(String payload)
 {
     boolean sendServoUpdateDirectly = true; // should the servo update directly send to the servo controller or via the project data? If set to false, the project data is used to set the target value of the servo. Servos not defined in the project data are ignored.
 
-    DeserializationError error = deserializeJson(jsondoc, payload);
+    DeserializationError error = deserializeJson(jsondocPacketProcessor, payload);
     if (error)
     {
         // packet content is not valid json
@@ -25,10 +25,10 @@ String PacketProcessor::processPacket(String payload)
 
     // #### READ VALUES ####
 
-    if (jsondoc.containsKey("ReadValue")) // AWB studio requests a value from the client e.g. Servo Position
+    if (jsondocPacketProcessor.containsKey("ReadValue")) // AWB studio requests a value from the client e.g. Servo Position
     {
         // read a value from the client
-        String typeName = jsondoc["ReadValue"]["TypeName"];
+        String typeName = jsondocPacketProcessor["ReadValue"]["TypeName"];
         if (typeName == nullptr)
         {
             // should not happen, instead the whole ReadValue should be missing
@@ -40,7 +40,7 @@ String PacketProcessor::processPacket(String payload)
             if (typeName == "ScsServo")
             {
                 // read a value from the SCS bus servo
-                u8 id = jsondoc["ReadValue"]["Id"];
+                u8 id = jsondocPacketProcessor["ReadValue"]["Id"];
                 if (this->_scSerialServoManager != nullptr)
                 {
                     int value = this->_scSerialServoManager->readPosition(id);
@@ -58,7 +58,7 @@ String PacketProcessor::processPacket(String payload)
             if (typeName = "StsServo")
             {
                 // read a value from the STS bus servo
-                u8 id = jsondoc["ReadValue"]["Id"];
+                u8 id = jsondocPacketProcessor["ReadValue"]["Id"];
                 if (this->_stSerialServoManager != nullptr)
                 {
                     int value = this->_stSerialServoManager->readPosition(id);
@@ -80,9 +80,9 @@ String PacketProcessor::processPacket(String payload)
 
     // #### DISPLAY MESSAGE ####
 
-    if (jsondoc.containsKey("DispMsg")) // packat contains a display message
+    if (jsondocPacketProcessor.containsKey("DispMsg")) // packat contains a display message
     {
-        const char *message = jsondoc["DispMsg"]["Msg"];
+        const char *message = jsondocPacketProcessor["DispMsg"]["Msg"];
         if (message == nullptr)
         {
             // should not happen, instead the whole DispMsg should be missing
@@ -90,7 +90,7 @@ String PacketProcessor::processPacket(String payload)
         }
         else
         {
-            int duration = jsondoc["DispMsg"]["Ms"];
+            int duration = jsondocPacketProcessor["DispMsg"]["Ms"];
             if (duration < 100)
                 duration = 5000; // default duration
             _messageToShow(message, duration);
@@ -99,9 +99,9 @@ String PacketProcessor::processPacket(String payload)
 
     // #### RECEIVE VALUES ####
 
-    if (jsondoc.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
+    if (jsondocPacketProcessor.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
     {
-        JsonArray servos = jsondoc["Pca9685Pwm"]["Servos"];
+        JsonArray servos = jsondocPacketProcessor["Pca9685Pwm"]["Servos"];
         for (size_t i = 0; i < servos.size(); i++)
         {
             if (this->_pca9685PwmManager == nullptr)
@@ -120,9 +120,9 @@ String PacketProcessor::processPacket(String payload)
     if (this->_pca9685PwmManager != nullptr)
         _pca9685PwmManager->updateActuators(false);
 
-    if (jsondoc.containsKey("STS")) // package contains STS bus servo data
+    if (jsondocPacketProcessor.containsKey("STS")) // package contains STS bus servo data
     {
-        JsonArray servos = jsondoc["STS"]["Servos"];
+        JsonArray servos = jsondocPacketProcessor["STS"]["Servos"];
         int stsCount = 0;
         for (size_t i = 0; i < servos.size(); i++)
         {
@@ -171,9 +171,9 @@ String PacketProcessor::processPacket(String payload)
     if (!sendServoUpdateDirectly && this->_stSerialServoManager != nullptr)
         _stSerialServoManager->updateActuators(false);
 
-    if (jsondoc.containsKey("SCS")) // package contains SCS bus servo data
+    if (jsondocPacketProcessor.containsKey("SCS")) // package contains SCS bus servo data
     {
-        JsonArray servos = jsondoc["SCS"]["Servos"];
+        JsonArray servos = jsondocPacketProcessor["SCS"]["Servos"];
         int stsCount = 0;
         for (size_t i = 0; i < servos.size(); i++)
         {
