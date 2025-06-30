@@ -57,6 +57,8 @@ private:
      */
     void errorReceiving(String message);
 
+    uint calculateChecksumForDataPacket(String payload);
+
 public:
     PacketSenderReceiver(int clientId, String packetHeader, String packerFooter, TCallBackPacketReceived packetReceived, TCallBackErrorOccured errorOccured) : _clientId(clientId),
                                                                                                                                                                _packetHeaderString(packetHeader),

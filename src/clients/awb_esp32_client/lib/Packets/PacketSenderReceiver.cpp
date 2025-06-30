@@ -89,10 +89,20 @@ bool PacketSenderReceiver::loop()
                 uint packetType = jsondocPacketSenderReceiver["PacketType"].as<uint>();
                 String payload = jsondocPacketSenderReceiver["Payload"].as<String>();
 
+                // pure check for packetId and packetType
                 if (packetId == 0 || packetType == 0)
                 {
                     // we could not deserialize the packet content
                     auto errMsg = String("Could not deserialize packet content '") + packetContentString + "' with error 'Invalid packet content'";
+                    _errorOccured(errMsg);
+                    continue;
+                }
+
+                // check checksum
+                if (calculateChecksumForDataPacket(payload) != checksum)
+                {
+                    // checksum does not match, we have an error
+                    auto errMsg = String("Checksum ") + String(packetId) + " does not match! Expected: " + String(checksum) + ", received: " + String(calculateChecksumForDataPacket(payload));
                     _errorOccured(errMsg);
                     continue;
                 }
@@ -156,7 +166,7 @@ void PacketSenderReceiver::errorReceiving(String message)
     _errorOccured(message);
 }
 
-static int CalculateChecksumForDataPacket(String payload)
+uint PacketSenderReceiver::calculateChecksumForDataPacket(String payload)
 {
 
     int result = 0;
@@ -171,7 +181,7 @@ void PacketSenderReceiver::sendResponsePacket(unsigned int packetId, uint packet
     jsondocPacketSenderReceiver.clear();
     jsondocPacketSenderReceiver["Id"] = packetId;
     jsondocPacketSenderReceiver["ClientId"] = _clientId;
-    jsondocPacketSenderReceiver["Checksum"] = CalculateChecksumForDataPacket(message);
+    jsondocPacketSenderReceiver["Checksum"] = calculateChecksumForDataPacket(message);
     jsondocPacketSenderReceiver["PacketType"] = packetType;
     jsondocPacketSenderReceiver["Payload"] = message;
 
