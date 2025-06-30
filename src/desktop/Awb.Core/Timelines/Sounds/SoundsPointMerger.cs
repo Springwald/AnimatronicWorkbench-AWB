@@ -52,6 +52,12 @@ namespace Awb.Core.Timelines.Sounds
 
             foreach (var actuatorMovement in soundPoint.ActuatorMovementsBySound)
             {
+                if (actuatorMovement?.ActuatorId == null) 
+                {
+                    _awbLogger.LogErrorAsync($"ActuatorMovementBySound soundId '{soundPoint.SoundId}' with ActuatorId==null at {soundPoint.TimeMs}ms.").Wait();
+                    continue;
+                }
+
                 // check the actuator id is a servo id
                 if (_projectServos.Any(s => s.Id == actuatorMovement.ActuatorId) == false) continue;
 

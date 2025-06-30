@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
 using Awb.Core.Timelines;
@@ -15,15 +15,12 @@ using System.Windows.Controls;
 
 namespace AwbStudio.TimelineControls
 {
-    /// <summary>
-    /// Interaction logic for TimelineChoiceControl.xaml
-    /// </summary>
     public partial class TimelineChoiceControl : UserControl
     {
         private ITimelineDataService? _timelineDataService;
 
         public EventHandler<TimelineNameChosenEventArgs>? OnTimelineChosen;
-        private string _projectTitle;
+        private string? _projectTitle;
 
         public ITimelineDataService? FileManager
         {
@@ -34,7 +31,7 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        public string ProjectTitle
+        public required string? ProjectTitle
         {
             set
             {
@@ -66,10 +63,10 @@ namespace AwbStudio.TimelineControls
                     timelines.Add(timelineMetaData);
                 }
                 foreach (var timelineMetaData in timelines.OrderBy(t => t.TimelineStateId).ThenBy(t => t.Title))
-                { 
+                {
                     var stateName = timelineMetaData.TimelineStateId; // todo: get state name from the project  states instead
                     var button = new Button { Content = $"[{stateName}] {timelineMetaData.Title}", Tag = timelineMetaData.Id };
-                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs( timelineId: timelineMetaData.Id)); };
+                    button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs(timelineId: timelineMetaData.Id)); };
                     this.PanelNames.Children.Add(button);
                 }
             }

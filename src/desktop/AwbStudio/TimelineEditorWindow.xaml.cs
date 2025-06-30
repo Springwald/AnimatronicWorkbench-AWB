@@ -224,7 +224,7 @@ namespace AwbStudio
             }
 
             _timelineData = timelineData;
-            if (_timelineData == null) return; // No new timeline data to connect to
+            if (timelineData == null) return; // No new timeline data to connect to
 
             _timelineData.OnContentChanged += TimelineData_OnContentChanged;
 

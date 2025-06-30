@@ -10,12 +10,10 @@ namespace Awb.Core.Sounds
     public class Sound
     {
         public const int SamplesPerSecond = 500; // standard for MP3 files
-        public byte[] _samples;
-
+        public byte[]? _samples;
         public string Mp3Filename { get; }
 
         public int Id { get; }
-
         public string Title { get; }
         public int DurationMs { get; set; }
 
@@ -77,10 +75,6 @@ namespace Awb.Core.Sounds
             // get the duration
             TagLib.File file = TagLib.File.Create(mp3Filename);
             DurationMs = (int)file.Properties.Duration.TotalMilliseconds;
-
-
-
-
         }
 
         private float[] ReadSamples()

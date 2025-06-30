@@ -309,6 +309,11 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             {
                 var absolutePosition = (int)e.NewValue;
                 _newSendPositionValue = absolutePosition;
+                if (ServoConfig == null)
+                {
+                    ShowError("ServoConfig is null. Cannot send position to servo.");
+                    return;
+                }
                 await this.SendValueToServo(ServoConfig, absolutePosition);
             }
 
@@ -403,6 +408,11 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         {
             _invoker.Invoke(async () =>
             {
+                if (ServoConfig == null)
+                {
+                    ShowError("ServoConfig is null. Cannot send position to servo.");
+                    return;
+                }
                 var newPos = _autoPlayFlipFlop ? _maxProjectLimitValue : _minProjectLimitValue;
                 await SendValueToServo(ServoConfig, newPos);
                 await ShowActualPosition(this, newPos);

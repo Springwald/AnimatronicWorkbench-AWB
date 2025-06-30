@@ -250,6 +250,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 return;
             }
 
+            if (_projectObject == null)
+            {
+                MessageBox.Show("No object to delete.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             // throw delete event
             if (MessageBox.Show($"Do you really want to delete the object '{_projectObject.TitleDetailed}'?", "Delete object", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
