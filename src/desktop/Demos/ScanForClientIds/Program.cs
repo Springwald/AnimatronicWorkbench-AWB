@@ -18,8 +18,8 @@ var config = new ComPortCommandConfig(packetIdentifier: "AWB");
 
 Console.WriteLine("Scanning for clients...");
 var clientIdScanner = new ClientIdScanner(config);
-clientIdScanner.OnLog += async (s, e) => logger.LogAsync(e);
-var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
+clientIdScanner.OnLog += async (s, e) => { logger.LogAsync(e); await Task.CompletedTask; };
+    var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
 if (clients.Any() == false)
 {
     clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);

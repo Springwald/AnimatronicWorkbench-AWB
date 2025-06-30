@@ -51,8 +51,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private string[] _objectsUsingThisObject;
         private readonly IAwbClientsService _awbClientsService;
 
-        public EventHandler OnUpdatedData { get; set; }
-        public EventHandler<DeleteObjectEventArgs> OnDeleteObject { get; set; }
+        public EventHandler? OnUpdatedData { get; set; }
+        public EventHandler<DeleteObjectEventArgs>? OnDeleteObject { get; set; }
 
         public string? ActualProblems { get; set; }
 
@@ -183,6 +183,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
             else
                 TextUsageIn.Visibility = System.Windows.Visibility.Collapsed;
+
+            await Task.CompletedTask;
         }
 
         private GroupBox CreateGroupBox(string title)

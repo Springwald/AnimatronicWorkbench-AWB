@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 // Based on code from Project MIDI keyboard
 // https://github.com/millennIumAMbiguity/MIDI-Keyboard
@@ -15,8 +15,6 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        const bool chooseIdManual = true;
-
         var midi = new MidiPort();
 
         Console.WriteLine("what midi port do you whant to use");
@@ -36,18 +34,11 @@ internal class Program
         }
 
         int inChanel;
-        if (chooseIdManual)
-        {
-            Console.Write("port: ");
-            int.TryParse(Console.ReadLine(), out int resultat2);
-            Console.WriteLine("value set to " + resultat2);
-            Console.WriteLine("press ESC to exit");
-            inChanel = resultat2;
-        }
-        else
-        {
-            inChanel = 1;
-        }
+        Console.Write("port: ");
+        int.TryParse(Console.ReadLine(), out int resultat2);
+        Console.WriteLine("value set to " + resultat2);
+        Console.WriteLine("press ESC to exit");
+        inChanel = resultat2;
 
         int? outChanel = null;
         var deviceNameInput = NativeMethods.midiInGetDevCaps((IntPtr)inChanel);
@@ -67,7 +58,7 @@ internal class Program
         }
 
         var ok = midi.Open(inChanel)
-            && midi.OpenOut(outChanel.Value) 
+            && midi.OpenOut(outChanel.Value)
             && midi.Start();
 
         Console.WriteLine("Open midi " + ok);

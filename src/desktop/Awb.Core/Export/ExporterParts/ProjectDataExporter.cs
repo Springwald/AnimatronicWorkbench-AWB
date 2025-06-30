@@ -111,8 +111,10 @@ namespace Awb.Core.Export.ExporterParts
             // DAC speaker settings
             if (false)
             {
+#pragma warning disable CS0162 // Unreachable code detected
                 content.AppendLine("/* DAC speaker */");
                 content.AppendLine("// #define USE_DAC_SPEAKER");
+#pragma warning restore CS0162 // Unreachable code detected
             }
 
             // Status neopixel

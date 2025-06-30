@@ -126,7 +126,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         public PropertyEditorControl()
         {
             InitializeComponent();
-            
+
         }
 
         private void UpdatedData_Fired(object? sender, EventArgs e)

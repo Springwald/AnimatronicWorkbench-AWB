@@ -6,7 +6,6 @@
 // All rights reserved    -   Licensed under MIT License
 
 using PacketLogistics.ComPorts.ComportPackets;
-using System.Formats.Asn1;
 
 namespace PacketLogistics
 {
@@ -120,7 +119,7 @@ namespace PacketLogistics
         /// <summary>
         /// Send a packet to the device.
         /// </summary>
-        public async Task<PacketSendResult> SendPacket(PayloadTypes  payloadType, string payload) 
+        public async Task<PacketSendResult> SendPacket(PayloadTypes payloadType, string payload)
         {
             if (this.State == States.NotStarted)
             {
@@ -158,8 +157,9 @@ namespace PacketLogistics
                 var answer = await this.SendPacketInternal(payloadType, payload);
                 this.State = States.Idle;
                 if (answer == null)
-                    return new PacketSendResult { 
-                        Ok = false, 
+                    return new PacketSendResult
+                    {
+                        Ok = false,
                         ErrorMessage = "Packet answer == null!"
                     };
 

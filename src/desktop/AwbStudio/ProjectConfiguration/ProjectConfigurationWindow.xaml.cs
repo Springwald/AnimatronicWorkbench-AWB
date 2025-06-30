@@ -98,6 +98,8 @@ namespace AwbStudio
                 var control = new System.Windows.Controls.Label { Content = problem.PlaintTextDescription, Foreground = new SolidColorBrush(Colors.Red) };
                 this.StackPanelProblems.Children.Add(control);
             }
+
+            await Task.CompletedTask;
         }
 
         #region Save Project Configuration

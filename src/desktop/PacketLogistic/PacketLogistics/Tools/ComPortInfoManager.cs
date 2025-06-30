@@ -93,6 +93,7 @@ namespace PacketLogistics.Tools
                 return portsSimple.Select(p => new ComPortInfo(deviceId: p, caption: p, comPort: p)).ToArray();
             }
 
+#pragma warning disable CS0162 // Unreachable code detected
             using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity"))
             {
                 var raw = searcher.Get().Cast<ManagementBaseObject>();
@@ -108,6 +109,7 @@ namespace PacketLogistics.Tools
                 CachedOnDisk = ports;
                 return ports;
             }
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         public void ClearCache()
