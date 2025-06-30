@@ -15,15 +15,12 @@ using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
-    /// <summary>
-    /// Interaction logic for ValueEditorControl.xaml
-    /// </summary>
     public partial class SinglePropertyEditorControl : UserControl, INotifyPropertyChanged
     {
         // define a delegate to return the actual servo position
         public delegate void ActualServoPositionReceivedDelegate(int? servoPositionAbsolute);
 
-        public sealed class GetActualServoPositionEventArgs: EventArgs
+        public sealed class GetActualServoPositionEventArgs : EventArgs
         {
             public required ActualServoPositionReceivedDelegate ServoPositionReceivedDelegate { get; set; }
 
@@ -236,8 +233,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 

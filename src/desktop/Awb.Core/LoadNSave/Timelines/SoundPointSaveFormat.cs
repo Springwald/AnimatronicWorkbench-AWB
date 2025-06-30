@@ -24,15 +24,6 @@ namespace Awb.Core.LoadNSave.Timelines
 
         public MovementsActuatorsBySoundSaveFormat[]? MovementsActuatorsBySoundSaveFormats { get; set; } = Array.Empty<MovementsActuatorsBySoundSaveFormat>();
 
-        //public SoundPointSaveFormat(int timeMs, string targetObjectId, int soundId, string title, string? description, MovementsActuatorsBySoundSaveFormat[] movementsActuatorsBySoundSaveFormat) { 
-        //    TimeMs = timeMs;
-        //    TargetObjectId = targetObjectId;
-        //    Title = title;
-        //    SoundId = soundId;
-        //    Description = description;
-        //    MovementsActuatorsBySoundSaveFormats = movementsActuatorsBySoundSaveFormat;
-        //}
-
         public static SoundPointSaveFormat FromSoundPoint(SoundPoint soundPoint) => new SoundPointSaveFormat
         {
             TimeMs = soundPoint.TimeMs,

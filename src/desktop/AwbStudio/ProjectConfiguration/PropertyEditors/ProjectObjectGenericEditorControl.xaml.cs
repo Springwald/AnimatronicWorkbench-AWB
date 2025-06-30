@@ -26,15 +26,15 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
     public partial class ProjectObjectGenericEditorControl : UserControl
     {
-        public class DeleteObjectEventArgs : EventArgs
-        {
-            public IProjectObjectListable ObjectToDelete { get; private set; }
+        //public class DeleteObjectEventArgs : EventArgs
+        //{
+        //    public IProjectObjectListable ObjectToDelete { get; private set; }
 
-            public DeleteObjectEventArgs(IProjectObjectListable objectToDelete)
-            {
-                ObjectToDelete = objectToDelete;
-            }
-        }
+        //    public DeleteObjectEventArgs(IProjectObjectListable objectToDelete)
+        //    {
+        //        ObjectToDelete = objectToDelete;
+        //    }
+        //}
         private class PropertyDetails
         {
             public string Group { get; set; } = string.Empty;

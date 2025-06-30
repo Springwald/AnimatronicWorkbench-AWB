@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.InputControllers.BCF2000;
 
@@ -45,7 +45,6 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
         {
             await _bcf2000Controller.SetFaderPositionAsync((byte)(index + 1), (byte)(Math.Max(0, Math.Min(127, valueInPercent * 127 / 100.0))));
         }
-
 
         public async Task ShowPointButtonStateAsync(int index, bool pointExists)
         {
@@ -123,7 +122,5 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
             }
             await Task.CompletedTask;
         }
-
-
     }
 }

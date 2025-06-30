@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 namespace Awb.Core.Export
 {
@@ -39,7 +39,7 @@ namespace Awb.Core.Export
             if (!Directory.Exists(_sourceFolder)) return new CloneResult { ErrorMessage = $"Source folder '{_sourceFolder}' does not exist" };
             if (!Directory.Exists(_targetFolder)) return new CloneResult { ErrorMessage = $"Target folder '{_targetFolder}' does not exist" };
 
-            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n-------------------------------------" }); 
+            Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n-------------------------------------" });
             Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Clone folder '{_sourceFolder}' to '{_targetFolder}'" });
 
 
@@ -89,8 +89,12 @@ namespace Awb.Core.Export
                 var targetFile = Path.Combine(_targetFolder, relativePath);
 
                 var targetDir = Path.GetDirectoryName(targetFile);
+                if (targetDir == null)
+                {
+                    Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Error: Target directory for file '{targetFile}' is null.", State = ExporterProcessStateEventArgs.ProcessStates.Error });
+                    return new CloneResult { ErrorMessage = $"Target directory for file '{targetFile}' is null." };
+                }
                 if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
-
 
                 // copy only if the content of sourceFile and targetFile are different
                 var copy = false;
@@ -124,9 +128,9 @@ namespace Awb.Core.Export
                 }
                 else
                 {
-                    if (_deepLog)  Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it has the same last write time and size as the target file.", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
+                    if (_deepLog) Processing?.Invoke(this, new ExporterProcessStateEventArgs { Message = $"Skipping copying file '{sourceFile}' because it has the same last write time and size as the target file.", State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog });
                 }
-             
+
             }
 
             Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Clone folder '{_sourceFolder}' to '{_targetFolder}' done." });

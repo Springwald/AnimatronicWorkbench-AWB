@@ -24,7 +24,13 @@ namespace Awb.Core.Timelines.NestedTimelines
                 {
                     if (recursionDepth < MaxRecursionDepth)
                     {
-                        var nestedTimelinePoints = _timelineDataService.GetTimelineData(nestedTimelinePoint.TimelineId).AllPoints;
+                        var timelineData = _timelineDataService.GetTimelineData(nestedTimelinePoint.TimelineId);
+                        if (timelineData == null)
+                        {
+                            _awbLogger.LogErrorAsync($"Nested timeline with ID {nestedTimelinePoint.TimelineId} not found!");
+                            continue;
+                        }
+                        var nestedTimelinePoints = timelineData.AllPoints;
                         var pointsFromNestedTimeline = Merge(nestedTimelinePoints, recursionDepth + 1);
                         foreach (var nestedPoint in pointsFromNestedTimeline)
                         {
@@ -49,7 +55,5 @@ namespace Awb.Core.Timelines.NestedTimelines
             _timelineDataService = timelineDataService;
             _awbLogger = awbLogger;
         }
-
-
     }
 }

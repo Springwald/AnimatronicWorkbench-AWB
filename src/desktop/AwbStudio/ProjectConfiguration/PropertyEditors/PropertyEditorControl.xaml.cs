@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using static AwbStudio.ProjectConfiguration.PropertyEditors.ProjectObjectGenericEditorControl;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
@@ -44,12 +43,14 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
         }
 
-        public IAwbClientsService AwbClientsService { get; set; }
+        public IAwbClientsService? AwbClientsService { get; set; }
 
         public IProjectObjectListable? ProjectObject => _projectObject;
 
         public async Task<bool> TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject, TimelineData[] timelines, IInvoker invoker)
         {
+            if (AwbClientsService == null) return false;
+
             if (_projectObject != projectObject)
             {
                 if (projectObject == null)
@@ -117,17 +118,15 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         }
 
 
-
         public PropertyEditorControl()
         {
             InitializeComponent();
-
         }
 
         private void UpdatedData_Fired(object? sender, EventArgs e)
             => OnUpdatedData?.Invoke(this, new EventArgs());
 
-        private void OnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
+        private void OnObjectDelete_Fired(object? sender, DeleteObjectEventArgs e)
             => OnDeleteObject?.Invoke(this, e);
     }
 }

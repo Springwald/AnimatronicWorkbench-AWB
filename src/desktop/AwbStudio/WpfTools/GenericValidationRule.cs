@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Animatronic WorkBench
+// https://github.com/Springwald/AnimatronicWorkBench-AWB
+//
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
+
+using System;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Windows.Media.Protection.PlayReady;
 
 namespace AwbStudio.WpfTools
 {
-    //internal class ClientValidationRule : GenericValidationRule<Client> { }
-
-
     /// <summary>
     /// validates a complete class with DataAnnotations
     /// </summary>
@@ -33,6 +33,7 @@ namespace AwbStudio.WpfTools
                         if (attrib is System.ComponentModel.DataAnnotations.ValidationAttribute)
                         {
                             var validationAttribute = attrib as System.ComponentModel.DataAnnotations.ValidationAttribute;
+                            if (validationAttribute == null) continue;
                             var val = bindingGroup.GetValue(item, pi.Name);
                             if (!validationAttribute.IsValid(val))
                             {

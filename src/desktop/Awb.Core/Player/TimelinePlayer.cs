@@ -54,11 +54,6 @@ namespace Awb.Core.Player
         private Timer? _actuatorUpdateTimer;
         private DateTime? _lastPlayUpdate;
 
-
-        // Delegate to request sound data
-       // public delegate Sound? SoundRequestDelegate(int soundId);
-        //public SoundRequestDelegate? SoundRequest;
-
         // Delegate to play sounds
         public delegate void PlaySoundInDesktopDelegate(int soundId, TimeSpan start);
         public PlaySoundInDesktopDelegate? PlaySoundOnDesktop;
@@ -72,10 +67,10 @@ namespace Awb.Core.Player
         private readonly IInvoker _myInvoker;
         public EventHandler<PlayStateEventArgs>? OnPlayStateChanged;
         private volatile TimelinePoint[]? _allPointsMerged;
-        private Sound[] _projectSounds;
-        private IServo[] _projectServos;
+        private Sound[]? _projectSounds;
+        private IServo[]? _projectServos;
         public readonly PlayPosSynchronizer PlayPosSynchronizer;
-        
+
 
         /// <summary>
         /// The timeline to play
@@ -189,10 +184,21 @@ namespace Awb.Core.Player
 
             var playPos = PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped;
 
+            if (TimelineData == null)
+            {
+                await _logger.LogErrorAsync($"{nameof(UpdateActuatorsInternal)}: TimelineData is null. Cannot update actuators.");
+                return false;
+            }
+            if (_projectServos == null || _projectSounds == null)
+            {
+                await _logger.LogErrorAsync($"{nameof(UpdateActuatorsInternal)}: ProjectServos or ProjectSounds is null. Cannot update actuators.");
+                return false;
+            }
+
             if (_allPointsMerged == null)
             {
                 var allPoints = TimelineData.AllPoints.ToArray();
-                _allPointsMerged = new EverythingMerger(_timelineDataService, projectSounds: _projectSounds, projectServos: _projectServos, awbLogger:  _logger).Merge(allPoints).ToArray();
+                _allPointsMerged = new EverythingMerger(_timelineDataService, projectSounds: _projectSounds, projectServos: _projectServos, awbLogger: _logger).Merge(allPoints).ToArray();
             }
 
             _updating = true;
@@ -275,13 +281,13 @@ namespace Awb.Core.Player
                                 targetSoundPlayer.SetActualSoundId(soundPoint.SoundId, TimeSpan.Zero);
                                 targetSoundPlayer.IsDirty = true;
                             }
-                            if (ActuatorMovementBySound.AreEqual(soundPoint.ActuatorMovementsBySound,targetSoundPlayer.ActuatorMovementsBySound)==false)
+                            if (ActuatorMovementBySound.AreEqual(soundPoint.ActuatorMovementsBySound, targetSoundPlayer.ActuatorMovementsBySound) == false)
                             {
                                 targetSoundPlayer.SetActuatorMovementBySound(soundPoint.ActuatorMovementsBySound);
                                 targetSoundPlayer.IsDirty = true;
                             }
                         }
-                        
+
                         break;
                     case PlayStates.Playing:
                         // take a point between the last and the actual position
@@ -289,10 +295,10 @@ namespace Awb.Core.Player
                         var playSoundArgs = GetSoundPlayerCommandForTimelinePos(soundPoints, soundTargetObjectId, playPos);
                         if (playSoundArgs != null)
                         {
-                            var startTime =playSoundArgs.StartTime ?? TimeSpan.Zero;
+                            var startTime = playSoundArgs.StartTime ?? TimeSpan.Zero;
                             targetSoundPlayer.SetActualSoundId(playSoundArgs.SoundId, startTime: startTime);
                             targetSoundPlayer.IsDirty = true;
-                            if (PlaySoundOnDesktop != null)PlaySoundOnDesktop(playSoundArgs.SoundId, start: startTime);
+                            if (PlaySoundOnDesktop != null) PlaySoundOnDesktop(playSoundArgs.SoundId, start: startTime);
                         }
                         else
                         {
@@ -305,7 +311,7 @@ namespace Awb.Core.Player
                 }
             }
 
-         
+
             // Update Nested timelines 
             NestedTimelinePoint? nestedTimelinePoint = null;
 
@@ -350,7 +356,7 @@ namespace Awb.Core.Player
                 if (soundPoint.AbwObjectId == soundTargetObjectId)
                 {
                     var durationMs = GetDurationMsForSoundId(soundPoint.SoundId, soundPoint.AbwObjectId);
-                    if (timeMs >= soundPoint.TimeMs && timeMs <= soundPoint.TimeMs + durationMs  )
+                    if (timeMs >= soundPoint.TimeMs && timeMs <= soundPoint.TimeMs + durationMs)
                     {
                         return new SoundPlayEventArgs(soundPoint.SoundId, startTime: TimeSpan.FromMilliseconds(timeMs - soundPoint.TimeMs));
                     }
@@ -386,7 +392,7 @@ namespace Awb.Core.Player
                 if (PlayState == PlayStates.Playing)
                 {
                     var newPos = 0;
-                    var timelineDurationMs = TimelineData.GetDurationMs(projectSounds:_projectSounds, timelineDataService: _timelineDataService);
+                    var timelineDurationMs = TimelineData.GetDurationMs(projectSounds: _projectSounds, timelineDataService: _timelineDataService);
                     if (PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped >= timelineDurationMs)
                     {
                         newPos = 0;

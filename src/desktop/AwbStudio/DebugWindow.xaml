@@ -10,13 +10,7 @@
     <Window.Icon>
         <DrawingImage />
     </Window.Icon>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <TextBox x:Name="TextBoxDebugOutput"  Grid.Column="0" TextWrapping="Wrap" Text="TextBox" FontSize="12"/>
-        <UserControls:ServoStateControl Grid.Column="1"/>
-
-    </Grid>
+    </ScrollViewer>
 </Window>

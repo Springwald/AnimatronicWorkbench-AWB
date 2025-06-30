@@ -20,16 +20,13 @@ using System.Windows.Controls;
 
 namespace AwbStudio.PropertyControls
 {
-    /// <summary>
-    /// Interaction logic for FocusObjectPropertyEditor.xaml
-    /// </summary>
     public partial class FocusObjectPropertyEditor : UserControl
     {
         private Sound[]? _projectSounds;
         private IServo[]? _projectServos;
-        private SoundPlayerControl _windowsSoundPlayerControl;
+        private SoundPlayerControl? _windowsSoundPlayerControl;
         private ITimelineDataService? _timelineDataService;
-        private TimelineEventHandling _timelineEventHandling;
+        private TimelineEventHandling? _timelineEventHandling;
         private TimelineData? _timelineData;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
@@ -86,7 +83,7 @@ namespace AwbStudio.PropertyControls
                     //if (_viewContext.ActualFocusObject != _actualPropertyEditor?.AwbObject)
                     {
                         RemoveEditor();
-                        _focusObject = _viewContext.ActualFocusObject;
+                        _focusObject = _viewContext!.ActualFocusObject;
 
                         if (_focusObject == null)
                         {
@@ -99,14 +96,14 @@ namespace AwbStudio.PropertyControls
                         // cast the focus object to a property editor
                         if (_focusObject is IServo servo)
                         {
-                            _actualPropertyEditor = new ServoPropertiesControl(servo, _timelineData!, _timelineEventHandling.TimelineEditingManipulation, _viewContext, _playPosSynchronizer!);
+                            _actualPropertyEditor = new ServoPropertiesControl(servo, _timelineData!, _timelineEventHandling!.TimelineEditingManipulation, _viewContext, _playPosSynchronizer!);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }
 
                         if (_focusObject is ISoundPlayer soundPlayer)
                         {
-                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer, _projectSounds!, _projectServos!, _timelineData!, _viewContext, _playPosSynchronizer!, _windowsSoundPlayerControl);
+                            _actualPropertyEditor = new SoundPlayerPropertyControl(soundPlayer, _projectSounds!, _projectServos!, _timelineData!, _viewContext, _playPosSynchronizer!, _windowsSoundPlayerControl!);
                             this.PropertyEditorGrid.Children.Clear();
                             this.PropertyEditorGrid.Children.Add(_actualPropertyEditor as UserControl);
                         }

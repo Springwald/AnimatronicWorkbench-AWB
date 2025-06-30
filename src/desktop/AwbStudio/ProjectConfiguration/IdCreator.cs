@@ -27,7 +27,7 @@ namespace AwbStudio.ProjectConfiguration
             int id = 1;
             while (true)
             {
-                if (!_viewModel.Inputs.Select(x => x as InputConfig).Any(x => x.Id == id)) return id;
+                if (!_viewModel.Inputs.Select(ic => ic as InputConfig).Any(ic => ic?.Id == id)) return id;
                 id++;
             }
         }

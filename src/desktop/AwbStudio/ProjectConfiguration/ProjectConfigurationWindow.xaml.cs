@@ -243,7 +243,7 @@ namespace AwbStudio
             _viewModel.UnsavedChanges = true;
         }
 
-        private async void PropertyEditorOnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
+        private async void PropertyEditorOnObjectDelete_Fired(object? sender, DeleteObjectEventArgs e)
         {
             if (e.ObjectToDelete == _viewModel.ProjectMetaData)
             {
