@@ -6,6 +6,7 @@
 // All rights reserved    -   Licensed under MIT License
 
 using PacketLogistics.ComPorts.ComportPackets;
+using System.Formats.Asn1;
 
 namespace PacketLogistics
 {
@@ -128,7 +129,7 @@ namespace PacketLogistics
                 {
                     OriginalPacketId = null,
                     Ok = false,
-                    Message = "can't send packet when not started!",
+                    ErrorMessage = "can't send packet when not started!",
                 };
             }
 
@@ -146,7 +147,7 @@ namespace PacketLogistics
                     {
                         OriginalPacketId = null,
                         Ok = false,
-                        Message = errMsgNotReady,
+                        ErrorMessage = errMsgNotReady,
                     };
                 }
             }
@@ -157,7 +158,10 @@ namespace PacketLogistics
                 var answer = await this.SendPacketInternal(payloadType, payload);
                 this.State = States.Idle;
                 if (answer == null)
-                    return new PacketSendResult { Ok = false, Message = "Packet answer == null!" };
+                    return new PacketSendResult { 
+                        Ok = false, 
+                        ErrorMessage = "Packet answer == null!"
+                    };
 
                 return answer;
             }
@@ -168,7 +172,7 @@ namespace PacketLogistics
                 return new PacketSendResult
                 {
                     Ok = false,
-                    Message = errMsg
+                    ErrorMessage = errMsg
                 };
             }
         }

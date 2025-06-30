@@ -1,8 +1,15 @@
-﻿using PacketLogistics.ComPorts;
+﻿// Animatronic WorkBench
+// https://github.com/Springwald/AnimatronicWorkBench-AWB
+//
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
-var config = new ComPortCommandConfig(packetHeader: "AWB");
+using PacketLogistics.ComPorts;
+using SendDemoMessagesToAllClients;
 
 Console.WriteLine("Scanning for clients...");
+var config = new ComPortCommandConfig(packetIdentifier: "AWB");
 var clientIdScanner = new ClientIdScanner(config);
 var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
 
@@ -16,7 +23,7 @@ if (clients.Any())
     }
 
     // Now that we have a list of clients, we can send messages to them.
-    var senderReceivers = clients.Select(client => new PacketSenderReceiverComPort(client.ComPortName, client.ClientId, config)).ToArray();
+    var senderReceivers = clients.Select(client => new PacketSenderReceiverComPort<PayloadTypes>(client.ComPortName, client.ClientId, config)).ToArray();
 
     foreach (var senderReceiver in senderReceivers)
     {
@@ -37,8 +44,8 @@ if (clients.Any())
     while (Console.KeyAvailable == false)
         foreach (var senderReceiver in senderReceivers)
         {
-            var payload = ByteArrayConverter.AsciiStringToBytes($"Hello world {count++}, client {senderReceiver.ClientId}!");
-            var result = await senderReceiver.SendPacket(payload);
+            var payload = $"Hello world {count++}, client {senderReceiver.ClientId}!";
+            var result = await senderReceiver.SendPacket(payloadType: PayloadTypes.Dummy, payload: payload);
 
             if (result.Ok == false)
             {
@@ -49,7 +56,7 @@ if (clients.Any())
             {
                 ok++;
             }
-            if ((lost + ok ) % 100 == 0)
+            if ((lost + ok) % 100 == 0)
             {
                 ShowStatus(lost, ok);
             }

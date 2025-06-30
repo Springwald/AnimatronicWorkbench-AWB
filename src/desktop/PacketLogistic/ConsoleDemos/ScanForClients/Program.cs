@@ -1,6 +1,6 @@
 ﻿using PacketLogistics.ComPorts;
 
-var config = new ComPortCommandConfig(packetHeader: "AWB");
+var config = new ComPortCommandConfig(packetIdentifier: "AWB");
 
 Console.WriteLine("Scanning for clients...");
 var clientIdScanner = new ClientIdScanner(config);

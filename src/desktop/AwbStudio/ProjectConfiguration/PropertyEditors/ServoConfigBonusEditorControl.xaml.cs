@@ -10,9 +10,7 @@ using Awb.Core.DataPackets.ResponseDataPackets;
 using Awb.Core.Project.Servos;
 using Awb.Core.Services;
 using Awb.Core.Tools;
-using AwbStudio.Tools;
 using System;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
@@ -21,14 +19,11 @@ using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
-    /// <summary>
-    /// Interaction logic for ServoConfigBonusEditor.xaml
-    /// </summary>
     public partial class ServoConfigBonusEditorControl : UserControl
     {
         private readonly IAwbClientsService _awbClientsService;
         private readonly IInvoker _invoker;
-        private IServoConfig _servoConfig;
+        private IServoConfig? _servoConfig;
 
         private volatile bool _isMoving = false;
 
@@ -39,12 +34,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private volatile bool _sendingValueToServo = false;
 
         private Timer _autoPlayTimer = new Timer(5000);
-        private Timer _errorMsgTimer = new Timer(500); 
+        private Timer _errorMsgTimer = new Timer(500);
         private bool _autoPlayFlipFlop = false;
         private int _maxProjectLimitValue;
         private int _minProjectLimitValue;
 
-        public required IServoConfig ServoConfig
+        public required IServoConfig? ServoConfig
         {
             get
             {
@@ -52,6 +47,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
             init
             {
+                if (value == null) throw new ArgumentNullException("ServoConfig", "ServoConfig cannot be null.");
+
                 _servoConfig = value;
 
                 // Enable/disable the read position button
@@ -136,8 +133,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             _errorMsgTimer.Elapsed += (s, args) =>
             {
                 _invoker.Invoke(() => UpdateErrorMessageVisibility());
-               
-            };  
+
+            };
             _errorMsgTimer.Start();
         }
 
@@ -152,7 +149,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             if (diff.TotalSeconds < 5)
             {
                 labelErrorMsg.Visibility = Visibility.Visible;
-                labelErrorMsg.Content = _lastErrorMessage + $" ({diff.TotalSeconds:0.0}s ago)";
+                labelErrorMsg.Text = _lastErrorMessage + $" ({diff.TotalSeconds:0.0}s ago)";
             }
             else
             {
@@ -196,6 +193,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             LabelLimitMaxValue.Content = _maxProjectLimitValue.ToString();
         }
 
+        /// <summary>
+        /// Read the servo position from the servo from the client hardware and update the sliders and labels.
+        /// </summary>
         private async void ButtonReadPosition_Click(object sender, RoutedEventArgs e)
         {
             if (ServoConfig is null)
@@ -222,6 +222,10 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             return;
         }
 
+
+        /// <summary>
+        /// Reads the position from the servo using the client hardware packet protocol 
+        /// </summary>
         public async Task<int?> ReadPosFromServo(IServoConfig servoConfig)
         {
             var dataPacketFactory = new DataPacketFactory();
@@ -300,16 +304,16 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private async void SliderServoPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (_isMoving) return; // prevent recursive calls
-           
+
             if (CheckboxSendChangesToServo.IsChecked == true)
             {
                 var absolutePosition = (int)e.NewValue;
                 _newSendPositionValue = absolutePosition;
                 await this.SendValueToServo(ServoConfig, absolutePosition);
             }
-         
+
             await ShowActualPosition(sender, (int)e.NewValue);
-         
+
         }
 
         private async Task ShowActualPosition(object sender, int position)
@@ -432,7 +436,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 if (int.TryParse(selectedItem.Tag.ToString(), out var selectedDelaySeconds))
                 {
                     if (selectedDelaySeconds > 0)
-                    delaySeconds = selectedDelaySeconds;
+                        delaySeconds = selectedDelaySeconds;
                 }
             }
             _autoPlayTimer.Interval = delaySeconds * 1000;

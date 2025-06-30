@@ -74,11 +74,11 @@ namespace Awb.Core.Clients
             if (result.Ok == false)
             {
                 var details = $"PacketID:{result.OriginalPacketId}";
-                OnError?.Invoke(this, $"Error sending packet: {result.Message} / {details}");
-                return new SendResult(ok: false, errorMessage: result.Message, resultPlayload: null, details);
+                OnError?.Invoke(this, $"Error sending packet: {result.ErrorMessage} / {details}");
+                return new SendResult(ok: false, errorMessage: result.ErrorMessage, resultPlayload: null, details);
             }
 
-            return new SendResult(ok: true, errorMessage: null, resultPlayload: result.Message, debugInfos: $"PacketID:{result.OriginalPacketId}");
+            return new SendResult(ok: true, errorMessage: null, resultPlayload: result.ReturnPayload, debugInfos: $"PacketID:{result.OriginalPacketId}");
         }
 
         private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver<PayloadTypes>.PacketReceivedEventArgs e)

@@ -11,7 +11,8 @@ namespace PacketLogistics.ComPorts.ComportPackets
     {
         public int ClientId { get; internal set; }
         public bool Ok { get; internal set; }
-        public string? Message { get; internal set; }
+        public string? ReturnPayload { get; internal set; }
+        public string? ErrorMessage { get; internal set; }
         public uint? OriginalPacketId { get; internal set; }
     }
 }

@@ -64,7 +64,6 @@ public:
                                                                                                                                                                _packetReceived(packetReceived),
                                                                                                                                                                _errorOccured(errorOccured)
     {
-        _errorOccured("clientId: " + String(clientId) + ", header: '" + packetHeader + "' ,footer: '" + packerFooter + "'");
     }
 
     /**

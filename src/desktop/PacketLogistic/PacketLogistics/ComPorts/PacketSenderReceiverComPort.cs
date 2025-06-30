@@ -106,7 +106,7 @@ namespace PacketLogistics.ComPorts
                 {
                     OriginalPacketId = null,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
 
@@ -118,7 +118,7 @@ namespace PacketLogistics.ComPorts
                 {
                     OriginalPacketId = null,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
 
@@ -132,7 +132,7 @@ namespace PacketLogistics.ComPorts
                 {
                     OriginalPacketId = null,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
 
@@ -150,7 +150,7 @@ namespace PacketLogistics.ComPorts
 
             var packetAsBytes = _comPortCommandConfig.Encoding.GetBytes(packetEnvelope);
 
-            Debug.WriteLine("send: " + packetEnvelope);
+            //Debug.WriteLine("send: " + packetEnvelope);
 
             // Send the packetBytes to the serial port
             if (packetAsBytes == null || packetAsBytes.Length == 0)
@@ -161,7 +161,7 @@ namespace PacketLogistics.ComPorts
                 {
                     OriginalPacketId = packetId,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
 
@@ -173,7 +173,7 @@ namespace PacketLogistics.ComPorts
                 {
                     OriginalPacketId = packetId,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
 
@@ -185,15 +185,9 @@ namespace PacketLogistics.ComPorts
                 {
                     OriginalPacketId = packetId,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
-
-            // send packet byte array message
-
-            //serialPort.DiscardOutBuffer();
-
-
 
             serialPort.Write(_comPortCommandConfig.PacketHeaderAsBytes, 0, _comPortCommandConfig.PacketHeaderAsBytes.Length);
             serialPort.Write(packetAsBytes, 0, packetAsBytes.Length);
@@ -209,25 +203,12 @@ namespace PacketLogistics.ComPorts
                 {
                     if (packetReceived.Id == packetId)
                     {
-                        if (string.IsNullOrEmpty(packetReceived.Payload))
+                        return new PacketSendResult
                         {
-                            return new PacketSendResult
-                            {
-                                Ok = true,
-                                OriginalPacketId = packetReceived.Id,
-                                Message = null,
-                            };
-                        }
-                        else
-                        {
-                            return new PacketSendResult
-                            {
-                                Ok = false,
-                                OriginalPacketId = packetReceived.Id,
-                                Message = $"Problem sending packet {packetReceived.Id}: {payload}",
-                            };
-
-                        }
+                            Ok = true,
+                            OriginalPacketId = packetReceived.Id,
+                            ReturnPayload = packetReceived.Payload,
+                        };
                     }
                 }
             }
@@ -238,7 +219,7 @@ namespace PacketLogistics.ComPorts
             {
                 Ok = false,
                 OriginalPacketId = packetId,
-                Message = "Timeout",
+                ErrorMessage = "Timeout",
             };
         }
 
