@@ -83,6 +83,8 @@ namespace PacketLogistics.ComPorts
             var packetReceived = false;
             uint clientId = 0;
 
+            serialPort.Write([255], 0, 1); // send a dummy byte 255 to wake up the device to receive a alive packet
+
             var packetReceiver = new PacketReceiver<DummyPayloadTypes>(
                 serialPort,
                 _comPortCommandConfig,

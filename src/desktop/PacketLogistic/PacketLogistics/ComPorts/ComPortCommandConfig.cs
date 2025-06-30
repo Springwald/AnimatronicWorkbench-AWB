@@ -18,7 +18,6 @@ namespace PacketLogistics.ComPorts
         byte[] PacketHeaderAsBytes { get; }
         byte[] PacketFooterAsBytes { get; }
         Encoding Encoding { get; }
-
     }
 
     public class ComPortCommandConfig : IComPortCommandConfig

@@ -18,6 +18,16 @@ bool PacketSenderReceiver::loop()
         {
             char value = Serial.read();
 
+            if (value == 255) // the request for an alive packet
+            {
+                sendResponsePacket(0, PacketTypeAlivePacket, true, String(_clientId)); // send the alive packet
+                _lastTicketSentMs = millis();
+                _receiveBufferCount = 0;
+                _insidePacketStream = false;
+                continue;
+            }
+
+            // add the received byte to the receive buffer
             _receiveBuffer[_receiveBufferCount] = value;
             _receiveBufferCount++;
 
@@ -30,37 +40,17 @@ bool PacketSenderReceiver::loop()
                 continue;
             }
 
-            // check if _receiveBuffer ends with _packetHeader
-            bool recieverBufferEndsWithPacketHeader = true;
-            for (int i = 0; i < _packetHeaderString.length(); i++)
-            {
-                if (_receiveBuffer[_receiveBufferCount - 9 + i] != _packetHeaderString.charAt(i))
-                {
-                    recieverBufferEndsWithPacketHeader = false;
-                    break;
-                }
-            }
-
-            if (recieverBufferEndsWithPacketHeader)
+            if (receiveBufferEndsWith(_packetHeaderString))
             {
                 // Start of a packet stream received
+                if (_insidePacketStream)
+                    _errorOccured("Received packet header " + _packetHeaderString + " while already inside a packet stream!");
                 _receiveBufferCount = 0;
                 _insidePacketStream = true;
                 continue;
             }
 
-            bool recieverBufferEndsWithPackeFooter = false;
-            for (int i = 0; i < _packetFooterString.length(); i++)
-            {
-                auto x = _packetFooterString[i];
-                if (_receiveBuffer[_receiveBufferCount - 9 + i] != _packetFooterString[i])
-                {
-                    recieverBufferEndsWithPacketHeader = false;
-                    break;
-                }
-            }
-
-            if (recieverBufferEndsWithPackeFooter) // the end of a packet stream is received
+            if (receiveBufferEndsWith(_packetFooterString)) // the end of a packet stream is received
             {
                 if (_insidePacketStream == false)
                 {
@@ -94,9 +84,9 @@ bool PacketSenderReceiver::loop()
                     continue;
                 }
 
-                uint32_t packetId = jsondocPacketSenderReceiver["Id"];
-                uint8_t checksum = jsondocPacketSenderReceiver["Checksum"];
-                int packetType = jsondocPacketSenderReceiver["PacketType"];
+                uint packetId = jsondocPacketSenderReceiver["Id"].as<uint>();
+                uint checksum = jsondocPacketSenderReceiver["Checksum"].as<uint>();
+                uint packetType = jsondocPacketSenderReceiver["PacketType"].as<uint>();
                 String payload = jsondocPacketSenderReceiver["Payload"].as<String>();
 
                 if (packetId == 0 || packetType == 0)
@@ -112,22 +102,20 @@ bool PacketSenderReceiver::loop()
                 // switch packet type
                 switch (packetType)
                 {
-
                 case 1:                                                                              // alife packet
                     _errorOccured("Received alive packet from AWB Studio, this should not happen!"); // this should not happen, we are the client
                     break;
 
-                case 2: // data packet
+                case 2: // packet response packet
+                    _errorOccured("received response type " + String(packetType) + "; not implemented yet!");
+                    break;
+
+                case 3: // payload data packet
                     receivedPacket = true;
                     response = _packetReceived(_clientId, payload);
                     // send response packet
                     sendResponsePacket(packetId, PacketTypeResponsePacket, true, response);
                     _lastTicketSentMs = millis();
-                    break;
-
-                case 3: // packet response packet
-                    _errorOccured("received response packet from AWB Studio, not implemented yet!");
-                    ;
                     break;
 
                 case 4:  // read values packet
@@ -143,11 +131,24 @@ bool PacketSenderReceiver::loop()
 
     if (millis() > _lastTicketSentMs + 500)
     {
-        sendResponsePacket(0, PacketTypeAlivePacket, true, String(_clientId));
-        _lastTicketSentMs = millis();
+        // sendResponsePacket(0, PacketTypeAlivePacket, true, String(_clientId));
+        // _lastTicketSentMs = millis();
     }
 
     return receivedPacket;
+}
+
+bool PacketSenderReceiver::receiveBufferEndsWith(String findWhat)
+{
+    if (_receiveBufferCount < findWhat.length())
+        return false;
+
+    for (int i = 0; i < findWhat.length(); i++)
+    {
+        if (_receiveBuffer[_receiveBufferCount - i - 1] != findWhat[findWhat.length() - i - 1])
+            return false;
+    }
+    return true;
 }
 
 void PacketSenderReceiver::errorReceiving(String message)
@@ -157,6 +158,7 @@ void PacketSenderReceiver::errorReceiving(String message)
 
 static int CalculateChecksumForDataPacket(String payload)
 {
+
     int result = 0;
     // add all bytes from payload
     for (int i = 0; i < payload.length(); i++)

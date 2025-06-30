@@ -7,7 +7,7 @@
 
 using byte = unsigned char;
 
-#define PACKET_BUFFER_SIZE 6000
+#define PACKET_BUFFER_SIZE 32 * 1024
 
 /**
  * sends and receives packets over the serial port
@@ -50,6 +50,8 @@ private:
 
     unsigned long _lastTicketSentMs = millis(); /// the last time a ticket was sent to the serial port
 
+    bool receiveBufferEndsWith(String findWhat);
+
     /**
      * process a received data packet
      */
@@ -72,6 +74,7 @@ public:
                                                                                                                                                                _packetReceived(packetReceived),
                                                                                                                                                                _errorOccured(errorOccured)
     {
+        _errorOccured("clientId: " + String(clientId) + ", header: '" + packetHeader + "' ,footer: '" + packerFooter + "'");
     }
 
     /**

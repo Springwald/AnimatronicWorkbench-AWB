@@ -112,6 +112,7 @@ namespace PacketLogistics.ComPorts
                         }
 
                         _packetReceivedDelegate(packetEnvelope);
+                        return packetEnvelope;
                     }
                 }
             }

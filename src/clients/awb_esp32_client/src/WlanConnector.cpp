@@ -262,7 +262,12 @@ String WlanConnector::GetHtml()
 
         for (int i = 0; i < MAX_LOG_MESSAGES; i++)
         {
-            ptr += "<tr><td>" + _messageTimes[i] + "</td><td>" + _messages[i] + "</td></tr>\n";
+            auto messageHtmlEncode = _messages[i];
+            messageHtmlEncode.replace("<", "&lt;");
+            messageHtmlEncode.replace(">", "&gt;");
+            messageHtmlEncode.replace("&", "&amp;");
+            messageHtmlEncode.replace("\"", "&quot;");
+            ptr += "<tr><td>" + _messageTimes[i] + "</td><td>" + messageHtmlEncode + "</td></tr>\n";
             msgPos++;
         }
         ptr += "</table>\n";

@@ -5,6 +5,8 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using System.Text.Json.Serialization;
+
 namespace PacketLogistics.PacketPayloadWrapper
 {
     internal class PacketEnvelope<PayloadTypes> where PayloadTypes : Enum
@@ -35,28 +37,34 @@ namespace PacketLogistics.PacketPayloadWrapper
             PayloadPacket = 3
         }
 
+        [JsonPropertyName("PacketType")]
         public PacketTypes? PacketType { get; set; }
 
+        [JsonPropertyName("Id")]
         /// <summary>
         /// The unique identifier of this packet.
         /// </summary>
         public uint Id { get; set; }
 
+        [JsonPropertyName("ClientId")]
         /// <summary>
         /// the unique identifier of the client that sent this packet.
         /// </summary>
         public uint ClientId { get; set; }
 
+        [JsonPropertyName("PayloadType")]
         /// <summary>
         /// If this is a payload packet, what type of payload is it?
         /// </summary>
         public PayloadTypes? PayloadType { get; set; }
 
+        [JsonPropertyName("Payload")]
         /// <summary>
         /// If this is a payload packet, this is the payload
         /// </summary>
         public string? Payload { get; set; }
 
+        [JsonPropertyName("Checksum")]
         /// <summary>
         /// Gets or sets the checksum value used to verify the integrity of data in the packet.
         /// </summary>

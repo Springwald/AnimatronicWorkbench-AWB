@@ -7,6 +7,7 @@
 
 using PacketLogistics.ComPorts.ComportPackets;
 using PacketLogistics.PacketPayloadWrapper;
+using System.Diagnostics;
 
 namespace PacketLogistics.ComPorts
 {
@@ -149,6 +150,8 @@ namespace PacketLogistics.ComPorts
 
             var packetAsBytes = _comPortCommandConfig.Encoding.GetBytes(packetEnvelope);
 
+            Debug.WriteLine("send: " + packetEnvelope);
+
             // Send the packetBytes to the serial port
             if (packetAsBytes == null || packetAsBytes.Length == 0)
             {
@@ -189,7 +192,12 @@ namespace PacketLogistics.ComPorts
             // send packet byte array message
 
             //serialPort.DiscardOutBuffer();
+
+
+
+            serialPort.Write(_comPortCommandConfig.PacketHeaderAsBytes, 0, _comPortCommandConfig.PacketHeaderAsBytes.Length);
             serialPort.Write(packetAsBytes, 0, packetAsBytes.Length);
+            serialPort.Write(_comPortCommandConfig.PacketFooterAsBytes, 0, _comPortCommandConfig.PacketFooterAsBytes.Length);
 
             var timeOutDateTime = DateTime.UtcNow + base._timeout;
 

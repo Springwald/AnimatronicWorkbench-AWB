@@ -28,10 +28,17 @@ namespace AwbStudio.AwbClientsControls
             _invokerService = invokerService;
             InitializeComponent();
 
+            Loaded += AwbClientControl_Loaded;
+
             Unloaded += AwbClientControl_Unloaded;
             _updateClientInformationTimer = new Timer(UpdateClientInformation, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
         }
 
+        private void AwbClientControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            LabelStatus.Text = "Loading...";
+            LabelTitle.Text = "Loading...";
+        }
 
         internal void SetClient(IAwbClient client)
         {

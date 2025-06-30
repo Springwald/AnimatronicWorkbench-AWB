@@ -180,7 +180,7 @@ void AwbClient::setup()
         }
     };
     String packetHeader = "<awb>";
-    String packetFooter = "</awb>"; 
+    String packetFooter = "</awb>";
     this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetFooter, packetReceived, errorOccuredCallback);
 
     _debugging->setState(Debugging::MJ_SETUP, 80);
