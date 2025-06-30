@@ -18,22 +18,12 @@ class PacketSenderReceiver
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:
-    /// <summary>
-    /// Fallback type for unknown packets.
-    /// </summary>
-    const int PacketTypeNotSet = 0;
-    /// <summary>
-    /// Send by a client to by scanned by the server to check if the client is available
-    /// </summary>
-    const int PacketTypeAlivePacket = 1;
-    /// <summary>
-    /// A packet that tells the server if a packet was received successfully or not
-    /// </summary>
-    const int PacketTypeResponsePacket = 2;
-    /// <summary>
-    /// A packet that contains data to be processed by the server or client
-    /// </summary>
-    const int PacketTypePayloadPacket = 3;
+    const byte ALIVE_PACKET_REQUEST_BYTE = 0xFF; /// alive packet request byte, is sent by the studio to the client to check if the client is available
+
+    const int PacketTypeNotSet = 0;         /// Fallback type for unknown packets.
+    const int PacketTypeAlivePacket = 1;    /// Send by a client to by scanned by the server to check if the client is available
+    const int PacketTypeResponsePacket = 2; ///  A packet that tells the server if a packet was received successfully or not
+    const int PacketTypePayloadPacket = 3;  ///  A packet that contains data to be processed by the server or client
 
     unsigned int _clientId; /// the id of the client
 

@@ -18,7 +18,7 @@ bool PacketSenderReceiver::loop()
         {
             char value = Serial.read();
 
-            if (value == 255) // the request for an alive packet
+            if (value == ALIVE_PACKET_REQUEST_BYTE) // the request for an alive packet
             {
                 sendResponsePacket(0, PacketTypeAlivePacket, true, String(_clientId)); // send the alive packet
                 _lastTicketSentMs = millis();
