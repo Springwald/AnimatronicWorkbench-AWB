@@ -226,7 +226,7 @@ namespace AwbStudio
             _timelineData = timelineData;
             if (timelineData == null) return; // No new timeline data to connect to
 
-            _timelineData.OnContentChanged += TimelineData_OnContentChanged;
+            timelineData.OnContentChanged += TimelineData_OnContentChanged;
 
             var changesAfterLoading = false;
 
@@ -260,7 +260,7 @@ namespace AwbStudio
             this._timelineKeyboardHandling = new TimelineKeyboardHandling(_timelineEventHandling!, _timelinePlayer, _playPosSynchronizer, _timelineEventHandling.TimelineEditingManipulation, _viewContext);
             this._timelineKeyboardHandling.SaveTimelineData += OnSaveTimelineDataKeyboardEvent;
 
-            FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _timelineEventHandling, _playPosSynchronizer, _timelineDataService, _project.Sounds, _actuatorsService.Servos, SoundPlayer);
+            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _timelineEventHandling, _playPosSynchronizer, _timelineDataService, _project.Sounds, _actuatorsService.Servos, SoundPlayer);
 
             _viewContext.ActualFocusObject = null;
 
