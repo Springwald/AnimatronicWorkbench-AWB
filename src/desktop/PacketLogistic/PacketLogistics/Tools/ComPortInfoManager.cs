@@ -84,7 +84,7 @@ namespace PacketLogistics.Tools
 
         private ComPortInfo[] CalculatePorts()
         {
-            const bool useDirect = false; // true: slower because also scans bluetooth ports, false: slower because all port names have to be checked
+            const bool useDirect = true; // true: slower because also scans bluetooth ports, false: slower because all port names have to be checked
 
             if (useDirect)
             {

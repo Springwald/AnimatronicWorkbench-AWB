@@ -68,8 +68,6 @@ namespace AwbStudio
         {
             InitializeComponent();
 
-            DebugOutputLabel.Content = string.Empty;
-
             _invokerService = invokerService;
             _clientsService = clientsService;
             _projectManagerService = projectManagerService;
@@ -78,19 +76,19 @@ namespace AwbStudio
             _awbLogger = awbLogger;
             awbLogger.OnLog += (s, args) =>
             {
-                WpfAppInvoker.Invoke(new Action(() =>
-                {
-                    var msg = args;
-                    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: {msg}\r\n{DebugOutputLabel.Content}";
-                }), System.Windows.Threading.DispatcherPriority.Background);
+                //WpfAppInvoker.Invoke(new Action(() =>
+                //{
+                //    var msg = args;
+                //    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: {msg}\r\n{DebugOutputLabel.Content}";
+                //}), System.Windows.Threading.DispatcherPriority.Background);
             };
             awbLogger.OnError += (s, args) =>
             {
-                WpfAppInvoker.Invoke(new Action(() =>
-                {
-                    var msg = args;
-                    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: ERR: {msg}\r\n{DebugOutputLabel.Content}";
-                }), System.Windows.Threading.DispatcherPriority.Background);
+                //WpfAppInvoker.Invoke(new Action(() =>
+                //{
+                //    var msg = args;
+                //    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: ERR: {msg}\r\n{DebugOutputLabel.Content}";
+                //}), System.Windows.Threading.DispatcherPriority.Background);
             };
 
             _buttonForegroundColorBackup = ButtonSave.Foreground;
@@ -115,7 +113,6 @@ namespace AwbStudio
                 logger: _awbLogger);
             _timelinePlayer.PlaySoundOnDesktop = PlaySoundOnDesktop;
             _timelinePlayer.StopSoundOnDesktop = () => SoundPlayer?.StopSound(); // stop sound on desktop
-
 
             Loaded += TimelineEditorWindow_Loaded;
         }
@@ -156,7 +153,6 @@ namespace AwbStudio
             KeyDown += TimelineEditorWindow_KeyDown;
             KeyUp += TimelineEditorWindow_KeyUp;
 
-
             // zoomslider not working well - disable for now
             StackPanelZoom.Visibility = Visibility.Collapsed;
 
@@ -184,8 +180,6 @@ namespace AwbStudio
 
             Unloaded += TimelineEditorWindow_Unloaded;
         }
-
-
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {

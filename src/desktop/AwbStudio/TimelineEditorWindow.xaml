@@ -115,7 +115,7 @@
                         <Label FontWeight="Bold" Content="Project:"/>
                         <HelpAndSupport:HelpButtonControl  HelpTopic="TimelineEditor" HorizontalAlignment="Right"/>
                     </Grid>
-                  
+
                     <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 clients" Click="ButtonExportEsp32_Click" />
                     <Button x:Name="ButtonClear" Content="New Timeline" Click="ButtonClear_Click" />
                     <Label Content="Load existing timeline:" />
@@ -149,16 +149,7 @@
                 <TimelineControls:TimelineValuesEditorControl  x:Name="ValuesEditorControl" />
             </ScrollViewer>
 
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="7*"></RowDefinition>
-                    <RowDefinition Height="3*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <PropertyControls:FocusObjectPropertyEditor  Grid.Row="0" x:Name="FocusObjectPropertyEditorControl"  />
-                <ScrollViewer Grid.Row="1"  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                    <Label Background="Black" x:Name="DebugOutputLabel" Content="Label" HorizontalAlignment="Left" Opacity="0.3"/>
-                </ScrollViewer>
-            </Grid>
+            <PropertyControls:FocusObjectPropertyEditor  Grid.Column="2" x:Name="FocusObjectPropertyEditorControl"  />
 
         </Grid>
     </Grid>
