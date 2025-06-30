@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.LoadNSave.Timelines;
 using Awb.Core.Timelines;
@@ -14,7 +14,7 @@ namespace Awb.Core.LoadNSave.TimelineLoadNSave
 {
     public class TimelineSaveFormat
     {
-        public string Title { get; set; }
+        public required string Title { get; set; }
 
         public int TimelineStateId { get; set; }
         public int? NextTimelineStateIdOnce { get; set; }

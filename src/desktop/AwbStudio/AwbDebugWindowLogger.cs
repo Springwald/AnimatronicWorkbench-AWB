@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
 using AwbStudio.Tools;
@@ -15,15 +15,15 @@ namespace AwbStudio
 {
     internal class AwbDebugWindowLogger : IAwbLogger, IDisposable
     {
-        private DebugWindow _debugWindow;
-        private List<string> _output;
+        private DebugWindow? _debugWindow;
+        private readonly List<string> _output;
         public event EventHandler<string>? OnError;
         public event EventHandler<string>? OnLog;
 
         public AwbDebugWindowLogger(DebugWindow debugWindow)
         {
             _debugWindow = debugWindow;
-            _output = new List<string>();
+            _output = [];
         }
 
         public async Task LogErrorAsync(string message)

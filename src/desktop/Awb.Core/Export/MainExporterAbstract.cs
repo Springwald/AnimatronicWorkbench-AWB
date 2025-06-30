@@ -75,8 +75,9 @@ namespace Awb.Core.Export
             if (string.IsNullOrWhiteSpace(targetPath)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(targetPath));
 
             // Read the existing custom code in the target folder and backup it
-            CustomCodeTargetFolder = Path.Combine(targetPath, @"src", _customCodeFolderName);
-            var readAndBackupCustomCodeResult = await ReadAndBackupCustomCodeAsync();
+            var customCodeTargetFolder = Path.Combine(targetPath, @"src", _customCodeFolderName);
+            CustomCodeTargetFolder = customCodeTargetFolder;
+            var readAndBackupCustomCodeResult = await ReadAndBackupCustomCodeAsync(customCodeTargetFolder);
             if (readAndBackupCustomCodeResult.Success == false)
             {
                 await WriteLog(targetPath);
@@ -145,7 +146,7 @@ namespace Awb.Core.Export
         /// <summary>
         /// Read existing custom code in the target folder and backup it
         /// </summary>
-        protected async Task<IExporter.ExportResult> ReadAndBackupCustomCodeAsync()
+        protected async Task<IExporter.ExportResult> ReadAndBackupCustomCodeAsync(string customCodeTargetFolder)
         {
             var customCodeBackupRootBolderFolder = Path.Combine(_projectFolder, "custom_code_backup", TemplateSourceFolderRelative);
 
@@ -171,7 +172,7 @@ namespace Awb.Core.Export
             }
 
             // Check if custom code exists and backup it and read the existing custom code regions into CustomCodeRegionContent
-            var customCodeBackup = new CustomCodeBackup(customCodeTargetFolder: CustomCodeTargetFolder, customCodeBackupRootFolder: customCodeBackupRootBolderFolder);
+            var customCodeBackup = new CustomCodeBackup(customCodeTargetFolder: customCodeTargetFolder, customCodeBackupRootFolder: customCodeBackupRootBolderFolder);
             customCodeBackup.Processing += CustomCodeBackup_Processing;
             if (customCodeBackup.CustomCodeExists)
             {

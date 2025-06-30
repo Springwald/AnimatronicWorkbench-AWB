@@ -20,9 +20,6 @@ using System.Windows.Input;
 
 namespace AwbStudio.TimelineControls
 {
-    /// <summary>
-    /// Interaction logic for TimelineAllInOnePreviewControl.xaml
-    /// </summary>
     public partial class TimelineAllInOnePreviewControl : UserControl, ITimelineEditorControl
     {
         private TimelineData? _timelineData;
@@ -33,7 +30,7 @@ namespace AwbStudio.TimelineControls
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private TimelinePlayer? _timelinePlayer;
-        private ITimelineMetaDataService _timelineMetaDataService;
+        private ITimelineMetaDataService? _timelineMetaDataService;
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
         private double _mouseX = 0;
@@ -120,7 +117,7 @@ namespace AwbStudio.TimelineControls
 
         public void TimelineDataLoaded(TimelineData timelineData)
         {
-            if (!_isInitialized) throw new InvalidOperationException(Name + " not initialized");
+            if (!_isInitialized) throw new InvalidOperationException($"{Name} not initialized");
 
             this.Visibility = Visibility.Visible;
 
@@ -145,7 +142,9 @@ namespace AwbStudio.TimelineControls
             if (_viewContext == null) return;
             if (_timelineData == null) return;
 
-           
+            if (_timelineMetaDataService == null)
+                throw new InvalidOperationException("TimelineMetaDataService not set!");
+
             this._viewContext.DurationMs = Math.Max(20 * 1000, _timelineMetaDataService.GetDurationMs(_timelineData) + 5000); // 5000ms extra for the timeline to grow beyond the duration of the last keyframe
         }
 
@@ -160,7 +159,6 @@ namespace AwbStudio.TimelineControls
         {
             if (_timelineData == null) return;
             if (_viewContext == null) return;
-
 
             switch (e.ChangeType)
             {
@@ -201,14 +199,6 @@ namespace AwbStudio.TimelineControls
                 return;
             }
 
-            //if (_viewContext.SelectionEndMs < _viewContext.SelectionStartMs)
-            //{
-            //    // Dont allow backwards selection
-            //    _viewContext.SelectionEndMs = null;
-            //    SelectionRectangle.Visibility = Visibility.Hidden;
-            //    return;
-            //}
-
             var x1 = _viewContext.GetXPos(_viewContext.SelectionStartMs.Value);
             var x2 = _viewContext.GetXPos(_viewContext.SelectionEndMs.Value);
             if (x1 > x2) (x1, x2) = (x2, x1); // flip start and end if start is after end
@@ -219,7 +209,6 @@ namespace AwbStudio.TimelineControls
         }
 
         #region mouse events
-
 
         private async void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -233,7 +222,6 @@ namespace AwbStudio.TimelineControls
             if (_viewContext == null) return;
             if (_viewContext.SelectionEndMs == null) _viewContext.SelectionStartMs = null;
         }
-
         private async void Grid_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -243,7 +231,6 @@ namespace AwbStudio.TimelineControls
                 await SetSelectionEndByMouse(_mouseX);
             }
         }
-
 
         private async Task SetSelectionEndByMouse(double mouseX)
         {
@@ -290,13 +277,6 @@ namespace AwbStudio.TimelineControls
             await Task.CompletedTask;
         }
 
-        private double GetXPos(int playPosMs, bool snaped)
-        {
-            return playPosMs * _viewContext.PixelPerMs;
-        }
-
         #endregion
-
-
     }
 }

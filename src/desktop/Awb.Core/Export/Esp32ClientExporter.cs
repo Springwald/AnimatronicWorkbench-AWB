@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 
 using Awb.Core.Export.ExporterParts;
@@ -32,7 +32,7 @@ namespace Awb.Core.Export
         {
             new WifiConfigExporter(_wifiConfigData, targetFolder:  Path.Combine(targetPath , "src", "AwbDataImport")),
             new ProjectDataExporter(_projectExportData, targetFolder:  Path.Combine(targetPath, "src", "AwbDataImport")),
-            new CustomCodeExporter(customCodeRegionContent: CustomCodeRegionContent!, targetFolder:  CustomCodeTargetFolder!)
+            new CustomCodeExporter(customCodeRegionContent: CustomCodeRegionContent!, targetFolder:  CustomCodeTargetFolder ?? throw new Exception("CustomCodeTargetFolder not set"))
         };
     }
 }

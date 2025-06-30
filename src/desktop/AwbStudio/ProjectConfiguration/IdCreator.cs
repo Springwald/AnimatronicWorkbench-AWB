@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Project.Various;
@@ -37,7 +37,8 @@ namespace AwbStudio.ProjectConfiguration
             int id = 1;
             while (true)
             {
-                if (!_viewModel.TimelineStates.Select(x => x as TimelineState).Any(x => x.Id == id)) return id;
+                if (!_viewModel.TimelineStates.Select(tst => tst as TimelineState).Any(tst => tst?.Id == id))
+                    return id;
                 id++;
             }
         }
@@ -62,7 +63,5 @@ namespace AwbStudio.ProjectConfiguration
             foreach (var item in _awbProject.Mp3PlayersYX5300) yield return item.Id;
             foreach (var item in _awbProject.Mp3PlayersDFPlayerMini) yield return item.Id;
         }
-
-
     }
 }

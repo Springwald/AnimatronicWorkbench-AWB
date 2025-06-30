@@ -20,15 +20,13 @@ using static AwbStudio.ProjectConfiguration.PropertyEditors.ProjectObjectGeneric
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
-    /// <summary>
-    /// Interaction logic for PropertyEditorControl.xaml
-    /// </summary>
     public partial class PropertyEditorControl : UserControl
     {
         private ProjectObjectGenericEditorControl? _actualEditor;
         private IProjectObjectListable? _projectObject;
-        public EventHandler OnUpdatedData { get; set; }
-        public EventHandler<DeleteObjectEventArgs> OnDeleteObject { get; set; }
+
+        public EventHandler? OnUpdatedData { get; set; }
+        public EventHandler<DeleteObjectEventArgs>? OnDeleteObject { get; set; }
 
         private ProjectObjectGenericEditorControl? ActualEditor
         {
@@ -48,10 +46,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         public IAwbClientsService AwbClientsService { get; set; }
 
-        public IProjectObjectListable? ProjectObject
-        {
-            get => _projectObject;
-        }
+        public IProjectObjectListable? ProjectObject => _projectObject;
 
         public async Task<bool> TrySetProjectObject(IProjectObjectListable? projectObject, AwbProject awbProject, TimelineData[] timelines, IInvoker invoker)
         {

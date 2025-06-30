@@ -13,8 +13,8 @@ namespace Awb.Core.LoadNSave.Timelines
     public class SoundPointSaveFormat
     {
         public int TimeMs { get; set; }
-        public string TargetObjectId { get; set; }
-        public string Title { get; set; }
+        public required string TargetObjectId { get; set; }
+        public required string Title { get; set; }
         public string? Description { get; set; }
         public int SoundId { get; set; }
 
