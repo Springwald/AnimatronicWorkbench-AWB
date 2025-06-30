@@ -51,7 +51,7 @@ namespace Awb.Core.Player
         private volatile bool _actuatorUpdateRequested;
         private int _playPosMsOnLastUpdate;
         private Timer? _playTimer;
-        private Timer? _actuatorUpdateTimer;
+        private readonly Timer? _actuatorUpdateTimer;
         private DateTime? _lastPlayUpdate;
 
         // Delegate to play sounds
@@ -367,7 +367,7 @@ namespace Awb.Core.Player
 
         private int GetDurationMsForSoundId(int soundId, string soundPlayerId)
         {
-            var sound = _projectSounds.FirstOrDefault(s => s.Id == soundId);
+            var sound = _projectSounds?.FirstOrDefault(s => s.Id == soundId);
             if (sound != null) return sound.DurationMs;
             return 500; // default duration if no sound is found
         }
@@ -392,6 +392,19 @@ namespace Awb.Core.Player
                 if (PlayState == PlayStates.Playing)
                 {
                     var newPos = 0;
+
+                    if (_projectSounds == null)
+                    {
+                        _logger.LogErrorAsync("ProjectSounds is null. Cannot update play position.").Wait();
+                        _timerFiring = false;
+                        return;
+                    }
+                    if (TimelineData == null)
+                    {
+                        _logger.LogErrorAsync("TimelineData is null. Cannot update play position.").Wait();
+                        _timerFiring = false;
+                        return;
+                    }
                     var timelineDurationMs = TimelineData.GetDurationMs(projectSounds: _projectSounds, timelineDataService: _timelineDataService);
                     if (PlayPosSynchronizer.PlayPosMsAutoSnappedOrUnSnapped >= timelineDurationMs)
                     {
