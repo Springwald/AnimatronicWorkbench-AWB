@@ -50,7 +50,6 @@ namespace Awb.Core.Clients
         }
         public async Task<bool> InitAsync()
         {
-            _comPortReceiver.PacketReceived += _comPortReceiver_PacketReceived;
             Connected = await _comPortReceiver.Connect();
             return Connected;
         }
@@ -58,7 +57,6 @@ namespace Awb.Core.Clients
         public void Dispose()
         {
             Connected = false;
-            _comPortReceiver.PacketReceived -= _comPortReceiver_PacketReceived;
             _comPortReceiver?.Dispose();
         }
 

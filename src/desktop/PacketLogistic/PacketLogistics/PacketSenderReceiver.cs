@@ -38,11 +38,6 @@ namespace PacketLogistics
         }
 
         /// <summary>
-        /// Is raised when a packet is received.
-        /// </summary>
-        public event EventHandler<PacketReceivedEventArgs>? PacketReceived;
-
-        /// <summary>
         /// Is raised when an error is encountered sending or receiving packets.
         /// </summary>
         public event EventHandler<ErrorEventArgs>? ErrorOccured;
