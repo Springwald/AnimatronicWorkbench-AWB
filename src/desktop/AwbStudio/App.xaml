@@ -17,13 +17,13 @@
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             
-            <Style TargetType="Window">
+            <!--<Style TargetType="Window">
                 <Setter Property="Background" Value="#222222" />
                 <Setter Property="BorderBrush" Value="Black"/>
                 <Setter Property="BorderThickness" Value="1px"/>
-            </Style>
+            </Style>-->
 
-            <Style TargetType="local:TimelineEditorWindow" BasedOn="{StaticResource {x:Type Window}}"/>
+            <!--<Style TargetType="local:TimelineEditorWindow" BasedOn="{StaticResource {x:Type Window}}"/>
             <Style TargetType="local:ProjectConfigurationWindow" BasedOn="{StaticResource {x:Type Window}}"/>
             <Style TargetType="local:ProjectManagementWindow" BasedOn="{StaticResource {x:Type Window}}"/>
             <Style TargetType="local:DebugWindow" BasedOn="{StaticResource {x:Type Window}}"/>
@@ -32,7 +32,7 @@
             <Style TargetType="export:ExportToClientsWindow" BasedOn="{StaticResource {x:Type Window}}"/>
 
             <Style TargetType="projectConfig:ProjectObjectListControl" BasedOn="{StaticResource {x:Type UserControl}}"/>
-            <Style TargetType="UserControl" BasedOn="{StaticResource {x:Type UserControl}}"/>
+            <Style TargetType="UserControl" BasedOn="{StaticResource {x:Type UserControl}}"/>-->
             <!--<Style TargetType="local:TimelineControls.TimelineViewer" BasedOn="{StaticResource {x:Type UserControl}}"/>-->
         
         </ResourceDictionary>

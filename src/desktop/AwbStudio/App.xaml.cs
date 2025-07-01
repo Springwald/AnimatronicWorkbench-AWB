@@ -47,20 +47,21 @@ namespace AwbStudio
             SetupUnhandledExceptionHandling();
         }
 
-        public void ChangeTheme(bool dark)
+        public void ChangeTheme(bool darkMode)
         {
             var app = (App)Application.Current;
-            if (dark)
+            if (darkMode)
             {
                 app.ChangeTheme(
                 [
-                      new Uri("/Themes/MetroDark/MetroDark.MSControls.Core.Implicit.xaml", UriKind.Relative),
+                      new Uri("/Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml", UriKind.Relative),
                     //new Uri("/Themes/MetroDark/MetroDark.MSControls.Toolkit.Implicit.xaml", UriKind.Relative)
                 ]);
             }
             else
             {
-                app.ChangeTheme([new Uri("/Themes/AWB/Awb.White.Core.Implicit.xaml", UriKind.Relative),]);
+                app.ChangeTheme(
+                [new Uri("/Themes/Metro/Light/Metro.MSControls.Core.Implicit.xaml ", UriKind.Relative)]);
             }
 
         }
@@ -99,7 +100,7 @@ namespace AwbStudio
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            ChangeTheme(dark: true);
+            ChangeTheme(darkMode: true);
 
             var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
             if (projectManagementWindow != null)

@@ -20,11 +20,11 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <emoji:TextBlock Grid.Column="0" x:Name="LabelTitle" Margin="5" Text="LabelTitle" IsEnabled="False"  VerticalAlignment="Top" FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}"/>
-                <emoji:TextBlock Grid.Column="1" x:Name="LabelStatus" Margin="5" Text="LabelStatus" IsEnabled="False"   VerticalAlignment="Top"  Foreground="{StaticResource ForegroundBrush}"/>
+                <emoji:TextBlock Grid.Column="0" x:Name="LabelTitle" Margin="5" Text="LabelTitle" IsEnabled="False"  VerticalAlignment="Top" FontWeight="Bold" />
+                <emoji:TextBlock Grid.Column="1" x:Name="LabelStatus" Margin="5" Text="LabelStatus" IsEnabled="False"   VerticalAlignment="Top" />
                 <Button Grid.Column="2" HorizontalAlignment="Right" x:Name="ButtonDisconnect" Margin="5" Content="Disconnect" />
             </Grid>
-            <emoji:TextBlock x:Name="TextBlockDebugLog" Grid.Row="1" IsEnabled="False" TextWrapping="Wrap" Foreground="{StaticResource ForegroundBrush}" Text=""/>
+            <emoji:TextBlock x:Name="TextBlockDebugLog" Grid.Row="1" IsEnabled="False" TextWrapping="Wrap" Text=""/>
             <Button Grid.Row="2" x:Name="btnCopyDebugToClipboard" Content="copy debug to clipboard" Click="btnCopyDebugToClipboard_Click"/>
         </Grid>
     </Border>
