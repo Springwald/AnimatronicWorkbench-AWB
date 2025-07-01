@@ -260,7 +260,7 @@ namespace AwbStudio
             this._timelineKeyboardHandling = new TimelineKeyboardHandling(_timelineEventHandling!, _timelinePlayer, _playPosSynchronizer, _timelineEventHandling.TimelineEditingManipulation, _viewContext);
             this._timelineKeyboardHandling.SaveTimelineData += OnSaveTimelineDataKeyboardEvent;
 
-            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData, _timelineEventHandling, _playPosSynchronizer, _timelineDataService, _project.Sounds, _actuatorsService.Servos, SoundPlayer);
+            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData!, _timelineEventHandling, _playPosSynchronizer, _timelineDataService, _project.Sounds, _actuatorsService.Servos, SoundPlayer);
 
             _viewContext.ActualFocusObject = null;
 

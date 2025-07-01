@@ -33,7 +33,7 @@ namespace Awb.Core.Clients
             throw new NotImplementedException();
         }
 
-        public Task<SendResult> Send(String payload, string debugInfos)
+        public Task<SendResult> Send(String payload, string? debugInfos)
         {
             throw new NotImplementedException();
         }

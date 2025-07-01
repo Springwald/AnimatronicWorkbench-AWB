@@ -22,9 +22,6 @@ using System.Windows.Media;
 
 namespace AwbStudio
 {
-    /// <summary>
-    /// Interaction logic for ProjectConfigurationWindow.xaml
-    /// </summary>
     public partial class ProjectConfigurationWindow : Window
     {
 
@@ -41,11 +38,7 @@ namespace AwbStudio
             get
             {
                 if (_timelines == null)
-                {
-                    var ids = _awbProject.TimelineDataService.TimelineIds.ToArray();
-                    var timelines = ids.Select(id => _awbProject.TimelineDataService.GetTimelineData(id)).ToArray() ?? Array.Empty<TimelineData>();
-                    _timelines = timelines;
-                }
+                    _timelines = _awbProject.TimelineDataService.GetAllTimelinesDatas().ToArray();
                 return _timelines;
             }
         }
