@@ -17,7 +17,6 @@ using Awb.Core.Tools;
 using AwbStudio.Exports;
 using AwbStudio.Projects;
 using AwbStudio.TimelineEditing;
-using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,8 +67,6 @@ namespace AwbStudio
         {
             InitializeComponent();
 
-            DebugOutputLabel.Content = string.Empty;
-
             _invokerService = invokerService;
             _clientsService = clientsService;
             _projectManagerService = projectManagerService;
@@ -78,19 +75,19 @@ namespace AwbStudio
             _awbLogger = awbLogger;
             awbLogger.OnLog += (s, args) =>
             {
-                WpfAppInvoker.Invoke(new Action(() =>
-                {
-                    var msg = args;
-                    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: {msg}\r\n{DebugOutputLabel.Content}";
-                }), System.Windows.Threading.DispatcherPriority.Background);
+                //WpfAppInvoker.Invoke(new Action(() =>
+                //{
+                //    var msg = args;
+                //    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: {msg}\r\n{DebugOutputLabel.Content}";
+                //}), System.Windows.Threading.DispatcherPriority.Background);
             };
             awbLogger.OnError += (s, args) =>
             {
-                WpfAppInvoker.Invoke(new Action(() =>
-                {
-                    var msg = args;
-                    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: ERR: {msg}\r\n{DebugOutputLabel.Content}";
-                }), System.Windows.Threading.DispatcherPriority.Background);
+                //WpfAppInvoker.Invoke(new Action(() =>
+                //{
+                //    var msg = args;
+                //    DebugOutputLabel.Content = $"{DateTime.UtcNow.ToShortDateString()}: ERR: {msg}\r\n{DebugOutputLabel.Content}";
+                //}), System.Windows.Threading.DispatcherPriority.Background);
             };
 
             _buttonForegroundColorBackup = ButtonSave.Foreground;
@@ -115,7 +112,6 @@ namespace AwbStudio
                 logger: _awbLogger);
             _timelinePlayer.PlaySoundOnDesktop = PlaySoundOnDesktop;
             _timelinePlayer.StopSoundOnDesktop = () => SoundPlayer?.StopSound(); // stop sound on desktop
-
 
             Loaded += TimelineEditorWindow_Loaded;
         }
@@ -156,13 +152,12 @@ namespace AwbStudio
             KeyDown += TimelineEditorWindow_KeyDown;
             KeyUp += TimelineEditorWindow_KeyUp;
 
-
             // zoomslider not working well - disable for now
             StackPanelZoom.Visibility = Visibility.Collapsed;
 
             var timelineCaptions = new TimelineCaptions();
             TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _actuatorsService);
-            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds, SoundPlayer);
+            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds);
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _timelineMetaDataService, _awbLogger, _project.Sounds);
 
             // bring to front
@@ -184,8 +179,6 @@ namespace AwbStudio
 
             Unloaded += TimelineEditorWindow_Unloaded;
         }
-
-
 
         private void TimelineEditorWindow_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -230,9 +223,9 @@ namespace AwbStudio
             }
 
             _timelineData = timelineData;
-            if (_timelineData == null) return; // No new timeline data to connect to
+            if (timelineData == null) return; // No new timeline data to connect to
 
-            _timelineData.OnContentChanged += TimelineData_OnContentChanged;
+            timelineData.OnContentChanged += TimelineData_OnContentChanged;
 
             var changesAfterLoading = false;
 
@@ -266,7 +259,7 @@ namespace AwbStudio
             this._timelineKeyboardHandling = new TimelineKeyboardHandling(_timelineEventHandling!, _timelinePlayer, _playPosSynchronizer, _timelineEventHandling.TimelineEditingManipulation, _viewContext);
             this._timelineKeyboardHandling.SaveTimelineData += OnSaveTimelineDataKeyboardEvent;
 
-            FocusObjectPropertyEditorControl.Init(_viewContext, _timelineData, _timelineEventHandling, _playPosSynchronizer, _timelineDataService, _project.Sounds, _actuatorsService.Servos, SoundPlayer);
+            FocusObjectPropertyEditorControl.Init(_viewContext, timelineData!, _timelineEventHandling, _playPosSynchronizer, _timelineDataService, _project.Sounds, _actuatorsService.Servos, SoundPlayer);
 
             _viewContext.ActualFocusObject = null;
 

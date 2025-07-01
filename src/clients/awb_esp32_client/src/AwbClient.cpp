@@ -179,8 +179,9 @@ void AwbClient::setup()
             return String();
         }
     };
-    char *packetHeader = (char *)"AWB";
-    this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetReceived, errorOccuredCallback);
+    String packetHeader = "<awb>";
+    String packetFooter = "</awb>";
+    this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetFooter, packetReceived, errorOccuredCallback);
 
     _debugging->setState(Debugging::MJ_SETUP, 80);
 

@@ -26,33 +26,25 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
     public partial class ProjectObjectGenericEditorControl : UserControl
     {
-        public class DeleteObjectEventArgs : EventArgs
-        {
-            public IProjectObjectListable ObjectToDelete { get; private set; }
-
-            public DeleteObjectEventArgs(IProjectObjectListable objectToDelete)
-            {
-                ObjectToDelete = objectToDelete;
-            }
-        }
         private class PropertyDetails
         {
             public string Group { get; set; } = string.Empty;
             public string TechnicalName { get; set; } = string.Empty;
             public string Title { get; set; } = string.Empty;
             public int Order { get; set; } = 999;
-            public PropertyInfo Property { get; internal set; }
+            public required PropertyInfo Property { get; internal set; }
         }
 
-        private List<SinglePropertyEditorControl> _editors;
-        private IProjectObjectListable _projectObject;
-        private AwbProject _awbProject;
-        private IInvoker _invoker;
-        private string[] _objectsUsingThisObject;
         private readonly IAwbClientsService _awbClientsService;
 
-        public EventHandler OnUpdatedData { get; set; }
-        public EventHandler<DeleteObjectEventArgs> OnDeleteObject { get; set; }
+        private List<SinglePropertyEditorControl>? _editors;
+        private IProjectObjectListable? _projectObject;
+        private AwbProject? _awbProject;
+        private IInvoker? _invoker;
+        private string[]? _objectsUsingThisObject;
+
+        public EventHandler? OnUpdatedData { get; set; }
+        public EventHandler<DeleteObjectEventArgs>? OnDeleteObject { get; set; }
 
         public string? ActualProblems { get; set; }
 
@@ -66,7 +58,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             UpdateProblems();
         }
 
-        public IProjectObjectListable ProjectObjectToEdit
+        public IProjectObjectListable? ProjectObjectToEdit
         {
             get => _projectObject;
         }
@@ -89,9 +81,11 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private async Task WriteDataToEditor(IProjectObjectListable projectObject)
         {
             if (_editors != null) throw new System.Exception("Object to edit is already set.");
+            if (_invoker == null) throw new ArgumentNullException(nameof(_invoker), "Invoker cannot be null.");
+            if (_objectsUsingThisObject == null) throw new ArgumentNullException(nameof(_objectsUsingThisObject), "Objects using this object cannot be null.");
 
             var type = projectObject.GetType();
-            _editors = new List<SinglePropertyEditorControl>();
+            _editors = [];
 
             // add special editors for servos to tune and test the values interactively
             ServoConfigBonusEditorControl? servoConfigBonusEditorControl = null;
@@ -183,6 +177,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
             else
                 TextUsageIn.Visibility = System.Windows.Visibility.Collapsed;
+
+            await Task.CompletedTask;
         }
 
         private GroupBox CreateGroupBox(string title)
@@ -199,6 +195,13 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         private void UpdateProblems()
         {
+            if (_projectObject == null || _awbProject == null || _editors == null)
+            {
+                ActualProblems = null;
+                TextProblems.Visibility = System.Windows.Visibility.Collapsed;
+                return;
+            }
+
             var problemsText = new StringBuilder();
 
             const bool showAlsoNativeErrors = false; // true = usually results in duplicate error entries
@@ -237,9 +240,18 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         private void ButtonDelete_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+            if (_objectsUsingThisObject == null)
+                return;
+
             if (_objectsUsingThisObject.Any())
             {
                 MessageBox.Show($"This object is used in the following objects:\r\n{string.Join(",\r\n", _objectsUsingThisObject)}\r\n\r\nPlease remove the object from these usages first.", "Object is used", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (_projectObject == null)
+            {
+                MessageBox.Show("No object to delete.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 

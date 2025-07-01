@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 
 using Awb.Core.Export.ExporterParts.ExportData;
@@ -111,8 +111,10 @@ namespace Awb.Core.Export.ExporterParts
             // DAC speaker settings
             if (false)
             {
+#pragma warning disable CS0162 // Unreachable code detected
                 content.AppendLine("/* DAC speaker */");
                 content.AppendLine("// #define USE_DAC_SPEAKER");
+#pragma warning restore CS0162 // Unreachable code detected
             }
 
             // Status neopixel
@@ -227,7 +229,7 @@ namespace Awb.Core.Export.ExporterParts
 
             // timeline names
             foreach (var timeline in _projectData.TimelineData)
-                content.AppendLine(constString("TimelineName_",timeline.Title));
+                content.AppendLine(constString("TimelineName_", timeline.Title));
 
             // mp3 player names
             foreach (var mp3Player in _projectData.Mp3PlayerYX5300Configs)
@@ -274,7 +276,6 @@ namespace Awb.Core.Export.ExporterParts
                 result.AppendLine($"\ttimelineStates->push_back(TimelineState({state.Id}, String(\"{state.Title}\"), {state.AutoPlay.ToString().ToLower()}, new std::vector<int>({{ {string.Join(", ", state.PositiveInputs)} }}), new std::vector<int>({{ {string.Join(", ", state.NegativeInputs)} }})));");
             }
         }
-
         private static void ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos, StringBuilder result)
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
@@ -288,7 +289,6 @@ namespace Awb.Core.Export.ExporterParts
             }
             result.AppendLine();
         }
-
         private static void ExportStsServos(string propertyName, IEnumerable<StsFeetechServoConfig> servos, StringBuilder result)
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
@@ -316,7 +316,6 @@ namespace Awb.Core.Export.ExporterParts
 
             result.AppendLine();
         }
-
 
         private static void ExportMp3PlayerYX5300Informations(IEnumerable<Mp3PlayerYX5300Config>? mp3PlayerYX5300Configs, StringBuilder result)
         {

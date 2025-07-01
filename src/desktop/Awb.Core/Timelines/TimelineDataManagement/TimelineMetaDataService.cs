@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
 using Awb.Core.Sounds;
@@ -56,7 +56,6 @@ namespace Awb.Core.Timelines
             return _allMetaDataCache;
         }
 
-
         public int GetDurationMs(TimelineData timelineData)
         {
             if (_durationCache.ContainsKey(timelineData.Id)) return _durationCache[timelineData.Id];
@@ -85,5 +84,4 @@ namespace Awb.Core.Timelines
             return new TimelineMetaData(id: timelineData.Id, title: timelineData.Title, stateId: timelineData.TimelineStateId, timelineData.GetDurationMs(_projectSounds, _timelineDataService));
         }
     }
-
 }

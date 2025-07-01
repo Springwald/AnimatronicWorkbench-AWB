@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.LoadNSave.TimelineLoadNSave;
 using Awb.Core.Sounds;
@@ -42,6 +42,23 @@ namespace Awb.Core.Services
 
         public IEnumerable<string> TimelineIds => Directory.GetFiles(_jsonFilesPath, "*.awbt").Select(f => Path.GetFileNameWithoutExtension(f));
 
+
+        public IEnumerable<TimelineData> GetAllTimelinesDatas()
+        {
+            foreach(var id in TimelineIds)
+            {
+                var data = GetTimelineData(id);
+                if (data == null)
+                {                   
+                    throw new FileNotFoundException($"Timeline data for ID '{id}' not found in '{_jsonFilesPath}'.");
+                }
+                else
+                {
+                    yield return data;
+                }
+            }
+        }
+
         public TimelineDataServiceByJsonFiles(string jsonFilesPath, Sound[] projectSounds)
         {
             _jsonFilesPath = jsonFilesPath;
@@ -56,7 +73,7 @@ namespace Awb.Core.Services
             return LoadTimelineDataByFilename(filename, timelineId);
         }
 
- 
+
 
         public bool SaveTimelineData(TimelineData data)
         {
@@ -110,6 +127,6 @@ namespace Awb.Core.Services
             }
         }
 
-    
+      
     }
 }

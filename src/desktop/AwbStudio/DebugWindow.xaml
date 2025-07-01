@@ -6,17 +6,11 @@
         xmlns:local="clr-namespace:AwbStudio"
         xmlns:UserControls="clr-namespace:AwbStudio.UserControls" x:Class="AwbStudio.DebugWindow"
         mc:Ignorable="d"
-        Title="DebugWindow" Height="450" Width="800">
+        Title="AWB debugging output" Height="450" Width="800">
     <Window.Icon>
         <DrawingImage />
     </Window.Icon>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <TextBox x:Name="TextBoxDebugOutput"  Grid.Column="0" TextWrapping="Wrap" Text="TextBox" FontSize="12"/>
-        <UserControls:ServoStateControl Grid.Column="1"/>
-
-    </Grid>
+    </ScrollViewer>
 </Window>

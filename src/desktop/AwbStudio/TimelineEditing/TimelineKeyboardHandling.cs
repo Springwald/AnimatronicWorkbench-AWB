@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Player;
 using System;
@@ -29,12 +29,11 @@ namespace AwbStudio.TimelineEditing
             TimelineEditingManipulation timelineEditingManipulation,
             TimelineViewContext timelineViewContext)
         {
-            if (timelineEventHandling == null) throw new ArgumentNullException(nameof(timelineEventHandling));
-            if (timelinePlayer == null) throw new ArgumentNullException(nameof(timelinePlayer));
-            if (playPosSynchronizer == null) throw new ArgumentNullException(nameof(playPosSynchronizer));
-            if (timelineEditingManipulation == null) throw new ArgumentNullException(nameof(timelineEditingManipulation));
-            if (timelineViewContext == null) throw new ArgumentNullException(nameof(timelineViewContext));
-
+            ArgumentNullException.ThrowIfNull(timelineEventHandling);
+            ArgumentNullException.ThrowIfNull(timelinePlayer);
+            ArgumentNullException.ThrowIfNull(playPosSynchronizer);
+            ArgumentNullException.ThrowIfNull(timelineEditingManipulation);
+            ArgumentNullException.ThrowIfNull(timelineViewContext);
 
             _timelineEventHandling = timelineEventHandling;
             _timelinePlayer = timelinePlayer;

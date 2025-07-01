@@ -31,14 +31,12 @@ namespace Awb.Core.Timelines.Sounds
             }
         }
 
-
         public SoundsPointMerger(Sound[] projectSounds, IServo[] projectServos, IAwbLogger awbLogger)
         {
             _projectSounds = projectSounds ?? throw new ArgumentNullException(nameof(projectSounds), "Project sounds cannot be null or empty.");
             _projectServos = projectServos ?? throw new ArgumentNullException(nameof(projectServos), "Project servos cannot be null or empty.");
             _awbLogger = awbLogger;
         }
-
 
         private IEnumerable<ServoPoint> GenerateServoPoints(SoundPoint soundPoint)
         {
@@ -52,6 +50,12 @@ namespace Awb.Core.Timelines.Sounds
 
             foreach (var actuatorMovement in soundPoint.ActuatorMovementsBySound)
             {
+                if (actuatorMovement?.ActuatorId == null)
+                {
+                    _awbLogger.LogErrorAsync($"ActuatorMovementBySound soundId '{soundPoint.SoundId}' with ActuatorId==null at {soundPoint.TimeMs}ms.").Wait();
+                    continue;
+                }
+
                 // check the actuator id is a servo id
                 if (_projectServos.Any(s => s.Id == actuatorMovement.ActuatorId) == false) continue;
 
@@ -79,7 +83,7 @@ namespace Awb.Core.Timelines.Sounds
                 double lastValue = 0;
                 int samples = 0;
                 var samplesPerFreqcy = (Sound.SamplesPerSecond / 1000.0) * actuatorMovement.MovementFrequencyMs; // how many samples per frequency
-                
+
                 foreach (var sample in sound.Samples)
                 {
                     maxValue = Math.Max(maxValue, sample); // find the max value in the samples
@@ -88,7 +92,7 @@ namespace Awb.Core.Timelines.Sounds
                     {
                         timePosMs += actuatorMovement.MovementFrequencyMs; // move to next frequency point
                         var collectedValue = (useMaxValue ? maxValue : (sampleSum / samples)) / 255.0 * actuatorMovement.MovementValueScale; // rescale to percentage, taking min and max into account
-                                                                                                             //if (Math.Abs(collectedValue - lastValue) > 0.1) // only create a point if the value changed
+                                                                                                                                             //if (Math.Abs(collectedValue - lastValue) > 0.1) // only create a point if the value changed
                         {
                             if (actuatorMovement.MovementInverted)
                                 collectedValue = 100 - collectedValue; // invert value if needed
@@ -106,7 +110,5 @@ namespace Awb.Core.Timelines.Sounds
                 yield return new ServoPoint(actuatorMovement.ActuatorId, actuatorMovement.MovementInverted ? 100 : 0, timePosMs + 1) { IsNestedTimelinePoint = true };
             }
         }
-
-
     }
 }

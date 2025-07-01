@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.ActuatorsAndObjects;
 using AwbStudio.TimelineEditing;
@@ -13,14 +13,11 @@ using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {
-    /// <summary>
-    /// Interaction logic for ValueEditorHeaderControl.xaml
-    /// </summary>
     public partial class ValueEditorHeaderControl : UserControl
     {
         private TimelineCaption? _timelineCaption;
         private TimelineViewContext? _viewContext;
-        private Brush _backupBackground;
+        private Brush? _backupBackground;
 
         public ValueEditorHeaderControl()
         {
@@ -33,7 +30,7 @@ namespace AwbStudio.TimelineControls
             _backupBackground = this.Background;
         }
 
-        public IAwbObject MyObject { get; set; }
+        public IAwbObject? MyObject { get; set; }
 
         public TimelineViewContext ViewContext
         {

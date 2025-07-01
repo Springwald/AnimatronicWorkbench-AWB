@@ -13,8 +13,6 @@ namespace Awb.Core.Project.Servos
 {
     public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig
     {
-
-
         public required string Id { get; set; }
 
         [Display(Name = "Title", GroupName = "General", Order = 1)]

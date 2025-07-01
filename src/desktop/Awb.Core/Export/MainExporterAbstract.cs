@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 
 using Awb.Core.Export.ExporterParts;
@@ -12,9 +12,11 @@ using System.Text;
 
 namespace Awb.Core.Export
 {
+    /// <summary>
+    /// Exports a project for the AWB hardware client, remote controls or similar devices 
+    /// </summary>
     public abstract class MainExporterAbstract : IExporter
     {
-
         private StringBuilder _logContent = new StringBuilder();
 
         protected readonly string _projectFolder;
@@ -50,7 +52,9 @@ namespace Awb.Core.Export
             }
         }
 
-
+        /// <summary>
+        /// The title of the export target
+        /// </summary>
         public abstract string Title { get; }
 
         protected MainExporterAbstract(string projectFolder, string esp32ClientsTemplateSourceFolder)
@@ -71,8 +75,9 @@ namespace Awb.Core.Export
             if (string.IsNullOrWhiteSpace(targetPath)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(targetPath));
 
             // Read the existing custom code in the target folder and backup it
-            CustomCodeTargetFolder = Path.Combine(targetPath, @"src", _customCodeFolderName);
-            var readAndBackupCustomCodeResult = await ReadAndBackupCustomCodeAsync();
+            var customCodeTargetFolder = Path.Combine(targetPath, @"src", _customCodeFolderName);
+            CustomCodeTargetFolder = customCodeTargetFolder;
+            var readAndBackupCustomCodeResult = await ReadAndBackupCustomCodeAsync(customCodeTargetFolder);
             if (readAndBackupCustomCodeResult.Success == false)
             {
                 await WriteLog(targetPath);
@@ -99,7 +104,7 @@ namespace Awb.Core.Export
             cloner.Processing -= (sender, e) => InvokeProcessing(e);
             if (!cloneResult.Success)
             {
-                InvokeProcessing(new ExporterProcessStateEventArgs { Message = cloneResult.ErrorMessage, State = ExporterProcessStateEventArgs.ProcessStates.Error });
+                InvokeProcessing(new ExporterProcessStateEventArgs { Message = cloneResult.ErrorMessage ?? "no error message reveived", State = ExporterProcessStateEventArgs.ProcessStates.Error });
                 await WriteLog(targetPath);
                 return new IExporter.ExportResult { ErrorMessage = cloneResult.ErrorMessage };
             }
@@ -141,7 +146,7 @@ namespace Awb.Core.Export
         /// <summary>
         /// Read existing custom code in the target folder and backup it
         /// </summary>
-        protected async Task<IExporter.ExportResult> ReadAndBackupCustomCodeAsync()
+        protected async Task<IExporter.ExportResult> ReadAndBackupCustomCodeAsync(string customCodeTargetFolder)
         {
             var customCodeBackupRootBolderFolder = Path.Combine(_projectFolder, "custom_code_backup", TemplateSourceFolderRelative);
 
@@ -167,7 +172,7 @@ namespace Awb.Core.Export
             }
 
             // Check if custom code exists and backup it and read the existing custom code regions into CustomCodeRegionContent
-            var customCodeBackup = new CustomCodeBackup(customCodeTargetFolder: CustomCodeTargetFolder, customCodeBackupRootFolder: customCodeBackupRootBolderFolder);
+            var customCodeBackup = new CustomCodeBackup(customCodeTargetFolder: customCodeTargetFolder, customCodeBackupRootFolder: customCodeBackupRootBolderFolder);
             customCodeBackup.Processing += CustomCodeBackup_Processing;
             if (customCodeBackup.CustomCodeExists)
             {
@@ -175,7 +180,7 @@ namespace Awb.Core.Export
                 var customCodeBackupResult = customCodeBackup.Backup();
                 if (!customCodeBackupResult.Success || customCodeBackupResult.CustomCodeRegionContent == null)
                 {
-                    InvokeProcessing(new ExporterProcessStateEventArgs { Message = customCodeBackupResult.ErrorMsg, State = ExporterProcessStateEventArgs.ProcessStates.Error });
+                    InvokeProcessing(new ExporterProcessStateEventArgs { Message = customCodeBackupResult.ErrorMsg ?? "No error message received", State = ExporterProcessStateEventArgs.ProcessStates.Error });
                     return new IExporter.ExportResult { ErrorMessage = customCodeBackupResult.ErrorMsg };
                 }
                 // take the existing custom code regions

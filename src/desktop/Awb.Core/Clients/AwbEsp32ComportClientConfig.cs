@@ -11,8 +11,7 @@ namespace Awb.Core.Clients
 {
     internal class AwbEsp32ComportClientConfig : ComPortCommandConfig
     {
-        public AwbEsp32ComportClientConfig() :
-            base(packetHeader: "AWB")
+        public AwbEsp32ComportClientConfig() : base(packetIdentifier: "awb")
         {
         }
     }

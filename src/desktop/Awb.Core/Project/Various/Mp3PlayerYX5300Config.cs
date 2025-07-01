@@ -1,14 +1,14 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Project.Clients;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using Awb.Core.Project.Clients;
 
 namespace Awb.Core.Project.Various
 {
@@ -24,7 +24,7 @@ namespace Awb.Core.Project.Various
         [Description("The ID of the AWB client device that controls this mp3 player.")]
         [Range(1, 254)]
         public required uint ClientId { get; set; }
-        
+
         [DisplayName("RX Pin")]
         [Description("The RX pin of the serial connection to the YX5300 MP3 player.")]
         [Range(1, Esp32.MaxGpIoPortNumber)]

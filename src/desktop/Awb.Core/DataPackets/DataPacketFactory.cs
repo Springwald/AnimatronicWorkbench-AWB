@@ -12,7 +12,6 @@ namespace Awb.Core.DataPackets
 {
     public class DataPacketFactory
     {
-
         public ClientDataPacket? GetDataPacketGetServoPos(IServoConfig servo)
         {
             if (servo is StsFeetechServoConfig stsFeetechServoConfig)
@@ -77,8 +76,8 @@ namespace Awb.Core.DataPackets
                     {
                         ScsServos = new StsServosPacketData
                         {
-                            Servos = new[]
-                            {
+                            Servos =
+                            [
                                 new StsServoPacketData
                                 {
                                     Channel = scsFeetechServoConfig.Channel,
@@ -86,7 +85,7 @@ namespace Awb.Core.DataPackets
                                     Name = string.IsNullOrWhiteSpace(scsFeetechServoConfig.Title) ? $"SCS{scsFeetechServoConfig.Channel}" : scsFeetechServoConfig.Title,
                                     Speed = scsFeetechServoConfig.Speed.HasValue ? scsFeetechServoConfig.Speed.Value : 0,
                                 }
-                            }
+                            ]
                         },
                     }, affectedAcctuatorsToRemoveDirtyFlag: []);
             }
@@ -97,8 +96,8 @@ namespace Awb.Core.DataPackets
                     {
                         Pca9685PwmServos = new Pca9685PwmServosPacketData
                         {
-                            Servos = new[]
-                            {
+                            Servos =
+                            [
                                 new Pca9685PwmServoPacketData
                                 {
                                     I2cAddress = pwmServoConfig.I2cAdress,
@@ -106,7 +105,7 @@ namespace Awb.Core.DataPackets
                                     TargetValue = absolutePos,
                                     Name = string.IsNullOrWhiteSpace(pwmServoConfig.Title) ? $"PWM{pwmServoConfig.Channel}" : pwmServoConfig.Title,
                                 }
-                            }
+                            ]
                         },
                     }, affectedAcctuatorsToRemoveDirtyFlag: []);
             }

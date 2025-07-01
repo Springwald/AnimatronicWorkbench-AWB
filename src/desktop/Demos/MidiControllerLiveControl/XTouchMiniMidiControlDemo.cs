@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.InputControllers.XTouchMini;
 using Awb.Core.Player;
@@ -32,7 +32,7 @@ namespace MidiControllerLiveControl
             for (int i = 0; i <= 8; i++)
             {
                 midiController.SetKnobPosition((byte)i, 64);
-            }   
+            }
 
             var sender = new ChangesToClientSender(_actuatorsService, _awbClientsService, _logger);
 

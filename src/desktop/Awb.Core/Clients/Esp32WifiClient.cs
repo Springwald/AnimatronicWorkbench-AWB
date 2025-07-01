@@ -12,9 +12,7 @@ namespace Awb.Core.Clients
     internal class Esp32WifiClient : IAwbClient
     {
         public uint ClientId => throw new NotImplementedException();
-
         public string FriendlyName => throw new NotImplementedException();
-
 
         public EventHandler<string>? OnError { get; set; }
 
@@ -29,12 +27,12 @@ namespace Awb.Core.Clients
             throw new NotImplementedException();
         }
 
-        public Task<SendResult> Send(byte[] payload)
+        public Task<SendResult> Send(String payload)
         {
             throw new NotImplementedException();
         }
 
-        public Task<SendResult> Send(byte[] payload, string? debugInfos)
+        public Task<SendResult> Send(String payload, string? debugInfos)
         {
             throw new NotImplementedException();
         }

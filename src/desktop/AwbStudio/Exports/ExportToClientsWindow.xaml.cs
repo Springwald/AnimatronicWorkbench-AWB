@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Export;
 using Awb.Core.Export.ExporterParts.ExportData;
@@ -15,14 +15,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 
 namespace AwbStudio.Exports
 {
     public partial class ExportToClientsWindow : Window
     {
-        private readonly IProjectManagerService _projectManagerService;
-        private readonly Brush _rememberBackground;
         private readonly IAwbLogger _awbLogger;
         private readonly AwbProject _project;
         private readonly IActuatorsService _actuatorsService;
@@ -80,26 +77,15 @@ namespace AwbStudio.Exports
             }
         }
 
-
         public ExportToClientsWindow(IProjectManagerService projectManagerService, IActuatorsService actuatorsService, IAwbLogger awbLogger)
         {
             InitializeComponent();
-            _rememberBackground = this.Background;
             _awbLogger = awbLogger;
-
-            _projectManagerService = projectManagerService;
-            if (projectManagerService.ActualProject == null)
-            {
-                MessageBox.Show("No project loaded");
-                return;
-            }
-            _project = projectManagerService.ActualProject;
-
             _actuatorsService = actuatorsService;
+            _project = projectManagerService.ActualProject ?? throw new Exception("No project loaded");
             _exportFolderGlobal = System.IO.Path.Combine(_project.ProjectFolder, "Esp32Clients");
             LabelTargetFolder.Content = _exportFolderGlobal;
             LabelTargetFolderHint.Content = Directory.Exists(_exportFolderGlobal) ? "" : "Target folder does not exist yet. It will be created during export.";
-
             Loaded += ExportToClientCodeWindow_Loaded;
         }
 
@@ -107,33 +93,6 @@ namespace AwbStudio.Exports
         {
             Loaded -= ExportToClientCodeWindow_Loaded;
         }
-
-        //private async void LabelTargetFolder_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        //{
-        //    if (_projectManagerService.ActualProject == null)
-        //    {
-        //        MessageBox.Show("No project loaded");
-        //        return;
-        //    }
-
-        //    using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
-        //    {
-        //        System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-        //        if (result == System.Windows.Forms.DialogResult.OK)
-        //        {
-        //            var folder = dialog.SelectedPath;
-        //            _projectManagerService.ActualProject.Esp32ExportFolder = folder;
-        //            var saved = await _projectManagerService.SaveProjectAsync(_projectManagerService.ActualProject, _projectManagerService.ActualProject.ProjectFolder);
-        //            if (!saved)
-        //            {
-        //                MessageBox.Show("Error saving project");
-        //                return;
-        //            }
-        //            ExportFolder = folder;
-        //        }
-        //    }
-        //}
-
 
         private async void ButtonWriteToEsp32RemoteClient_Click(object sender, RoutedEventArgs e)
         {
@@ -162,11 +121,8 @@ namespace AwbStudio.Exports
             await Export(new Esp32ClientRemoteM5StickJoyCExporter(esp32ClientsTemplateSourceFolder: esp32ClientsSourceFolder, WifiConfigData, projectFolder: _project._projectFolder!));
         }
 
-
-
         private async Task Export(MainExporterAbstract exporter)
         {
-
             string projectFolder = _project.ProjectFolder;
 
             await LogAsync("-------------------------------");
@@ -229,7 +185,6 @@ namespace AwbStudio.Exports
                     throw new ArgumentOutOfRangeException(new { e.State }.ToString());
             }
         }
-
         private async Task LogAsync(string message, bool error = false)
         {
             if (error)

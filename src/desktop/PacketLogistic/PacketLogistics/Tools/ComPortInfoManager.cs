@@ -1,6 +1,4 @@
-﻿// Animatronic WorkBench
-// https://github.com/Springwald/AnimatronicWorkBench-AWB
-//
+﻿// Send and receivce data to/from ESP-32 microcontroller
 // (C) 2025 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
@@ -84,7 +82,7 @@ namespace PacketLogistics.Tools
 
         private ComPortInfo[] CalculatePorts()
         {
-            const bool useDirect = false; // true: slower because also scans bluetooth ports, false: slower because all port names have to be checked
+            const bool useDirect = true; // true: slower because also scans bluetooth ports, false: slower because all port names have to be checked
 
             if (useDirect)
             {
@@ -93,6 +91,7 @@ namespace PacketLogistics.Tools
                 return portsSimple.Select(p => new ComPortInfo(deviceId: p, caption: p, comPort: p)).ToArray();
             }
 
+#pragma warning disable CS0162 // Unreachable code detected
             using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity"))
             {
                 var raw = searcher.Get().Cast<ManagementBaseObject>();
@@ -108,6 +107,7 @@ namespace PacketLogistics.Tools
                 CachedOnDisk = ports;
                 return ports;
             }
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         public void ClearCache()

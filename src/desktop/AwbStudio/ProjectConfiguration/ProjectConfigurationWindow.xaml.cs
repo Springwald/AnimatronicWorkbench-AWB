@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
@@ -14,7 +14,6 @@ using Awb.Core.Tools;
 using AwbStudio.ProjectConfiguration;
 using AwbStudio.ProjectConfiguration.PropertyEditors;
 using AwbStudio.Projects;
-using AwbStudio.PropertyControls;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,9 +22,6 @@ using System.Windows.Media;
 
 namespace AwbStudio
 {
-    /// <summary>
-    /// Interaction logic for ProjectConfigurationWindow.xaml
-    /// </summary>
     public partial class ProjectConfigurationWindow : Window
     {
 
@@ -42,11 +38,7 @@ namespace AwbStudio
             get
             {
                 if (_timelines == null)
-                {
-                    var ids = _awbProject.TimelineDataService.TimelineIds.ToArray();
-                    var timelines = ids.Select(id => _awbProject.TimelineDataService.GetTimelineData(id)).ToArray() ?? Array.Empty<TimelineData>();
-                    _timelines = timelines;
-                }
+                    _timelines = _awbProject.TimelineDataService.GetAllTimelinesDatas().ToArray();
                 return _timelines;
             }
         }
@@ -54,7 +46,7 @@ namespace AwbStudio
         public ProjectConfigurationWindow(IProjectManagerService projectManagerService, IAwbClientsService awbClientsService, IInvokerService invokerService)
         {
             _awbClientsService = awbClientsService;
-           _invokerService = invokerService;
+            _invokerService = invokerService;
             _projectManagerService = projectManagerService;
             _awbProject = projectManagerService.ActualProject ?? throw new ArgumentNullException(nameof(projectManagerService.ActualProject));
             _viewModel = new ProjectConfigViewModel(_awbProject);
@@ -98,6 +90,8 @@ namespace AwbStudio
                 var control = new System.Windows.Controls.Label { Content = problem.PlaintTextDescription, Foreground = new SolidColorBrush(Colors.Red) };
                 this.StackPanelProblems.Children.Add(control);
             }
+
+            await Task.CompletedTask;
         }
 
         #region Save Project Configuration
@@ -241,7 +235,7 @@ namespace AwbStudio
             _viewModel.UnsavedChanges = true;
         }
 
-        private async void PropertyEditorOnObjectDelete_Fired(object? sender, ProjectObjectGenericEditorControl.DeleteObjectEventArgs e)
+        private async void PropertyEditorOnObjectDelete_Fired(object? sender, DeleteObjectEventArgs e)
         {
             if (e.ObjectToDelete == _viewModel.ProjectMetaData)
             {
@@ -279,11 +273,11 @@ namespace AwbStudio
             _viewModel.ScsServos.Add(item);
             ScsServosList.SelectedProjectObject = item;
         }
-        
+
 
         private void StsServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            var item =    new StsFeetechServoConfig
+            var item = new StsFeetechServoConfig
             {
                 Id = _idCreator.CreateNewObjectId("StsServo"),
                 Title = "",

@@ -1,8 +1,11 @@
 #include "Arduino.h"
 #include "PacketSenderReceiver.h"
 #include "ByteArrayConverter.h"
+#include <ArduinoJson.h>
 
 using byte = unsigned char;
+
+StaticJsonDocument<PACKET_BUFFER_SIZE> jsondocPacketSenderReceiver;
 
 bool PacketSenderReceiver::loop()
 {
@@ -15,83 +18,147 @@ bool PacketSenderReceiver::loop()
         {
             char value = Serial.read();
 
-            if (value == REQUEST_ALIFE_PACKET_BYTE) // request for alife packet
+            if (value == ALIVE_PACKET_REQUEST_BYTE) // the request for an alive packet
             {
-                // errorReceiving("Sent alife packet");
-
-                // send alife packet header with client id
-                byte packetType = 1; // 1 = alife packet
-                this->sendPacketStart(packetType);
-
-                // 4*2 bytes - clientId
-                byte *clientIdArrRaw = ByteArrayConverter::UintTo4Bytes(_clientId);
-                auto clientIdArr = ByteArrayConverter::SplitBytes4(clientIdArrRaw);
-                for (int i = 0; i < 8; i++)
-                    Serial.write(clientIdArr[i]);
-
-                free(clientIdArr);
-                this->sendPacketEnd();
+                sendResponsePacket(0, PacketTypeAlivePacket, true, String(_clientId)); // send the alive packet
+                _lastTicketSentMs = millis();
                 _receiveBufferCount = 0;
+                _insidePacketStream = false;
+                continue;
             }
-            else
+
+            // add the received byte to the receive buffer
+            _receiveBuffer[_receiveBufferCount] = value;
+            _receiveBufferCount++;
+
+            if (_receiveBufferCount >= _receiveBufferSize)
             {
-                // normal data received
-                _receiveBuffer[_receiveBufferCount] = value;
-                _receiveBufferCount++;
+                // buffer is full, reset it
+                _errorOccured("Receive buffer is full, resetting it!");
+                _receiveBufferCount = 0;
+                _insidePacketStream = false;
+                continue;
+            }
 
-                // check if _receiveBuffer ends with _packetHeader
-                bool recieverBufferEndsWithPacketHeader = true;
-                for (int i = 0; i < 9; i++)
+            if (receiveBufferEndsWith(_packetHeaderString))
+            {
+                // Start of a packet stream received
+                if (_insidePacketStream)
+                    _errorOccured("Received packet header " + _packetHeaderString + " while already inside a packet stream!");
+                _receiveBufferCount = 0;
+                _insidePacketStream = true;
+                continue;
+            }
+
+            if (receiveBufferEndsWith(_packetFooterString)) // the end of a packet stream is received
+            {
+                if (_insidePacketStream == false)
                 {
-                    if (_receiveBuffer[_receiveBufferCount - 9 + i] != _packetHeader[i])
-                    {
-                        recieverBufferEndsWithPacketHeader = false;
-                        break;
-                    }
-                }
-
-                if (recieverBufferEndsWithPacketHeader)
-                {
-                    // packet start/end byte found
-                    if (_receiveBufferCount <= 9)
-                    {
-                        // only packet header received
-                        _receiveBufferCount = 0;
-                        return false;
-                    }
-
-                    // get packet type
-                    byte packetType = _receiveBuffer[0];
-
-                    // switch packet type
-                    switch (packetType)
-                    {
-
-                    case 1: // alife packet
-                        break;
-
-                    case 2: // data packet
-                        // processDataPacket(_receiveBuffer.substring(1, _receiveBuffer.length() - 9)); // remove packet header and packet type
-                        processDataPacket(_receiveBufferCount - 9); // remove packet header and packet type
-                        receivedPacket = true;
-                        break;
-
-                    case 3: // packet response packet
-                        break;
-
-                    case 4: // read values packet
-
-                    default: // unknown packet type
-                        break;
-                    }
-
-                    // clear receive buffer
+                    // we received a packet footer without a start packet header
+                    _errorOccured("Received packet footer without a start packet header!");
                     _receiveBufferCount = 0;
+                    _insidePacketStream = false;
+                    continue;
                 }
+
+                String packetContentString = String(_receiveBuffer, _receiveBufferCount - _packetFooterString.length());
+
+                _receiveBufferCount = 0;
+                _insidePacketStream = false;
+
+                if (packetContentString.length() == 0)
+                {
+                    // Reveived an empty packet?!? ignore it
+                    _errorOccured("Received an empty packet (only packet header and footer)!");
+                    continue;
+                }
+
+                // load the packet content string as json
+                jsondocPacketSenderReceiver.clear();
+                DeserializationError error = deserializeJson(jsondocPacketSenderReceiver, packetContentString);
+                if (error)
+                {
+                    // we could not deserialize the packet content
+                    auto errMsg = String("Could not deserialize packet content '") + packetContentString + "' with error '" + error.c_str() + "'";
+                    _errorOccured(errMsg);
+                    continue;
+                }
+
+                uint packetId = jsondocPacketSenderReceiver["Id"].as<uint>();
+                uint checksum = jsondocPacketSenderReceiver["Checksum"].as<uint>();
+                uint packetType = jsondocPacketSenderReceiver["PacketType"].as<uint>();
+                String payload = jsondocPacketSenderReceiver["Payload"].as<String>();
+
+                // pure check for packetId and packetType
+                if (packetId == 0 || packetType == 0)
+                {
+                    // we could not deserialize the packet content
+                    auto errMsg = String("Could not deserialize packet content '") + packetContentString + "' with error 'Invalid packet content'";
+                    _errorOccured(errMsg);
+                    continue;
+                }
+
+                // check checksum
+                if (calculateChecksumForDataPacket(payload) != checksum)
+                {
+                    // checksum does not match, we have an error
+                    auto errMsg = String("Checksum ") + String(packetId) + " does not match! Expected: " + String(checksum) + ", received: " + String(calculateChecksumForDataPacket(payload));
+                    _errorOccured(errMsg);
+                    continue;
+                }
+
+                String response;
+
+                // switch packet type
+                switch (packetType)
+                {
+                case 1:                                                                              // alife packet
+                    _errorOccured("Received alive packet from AWB Studio, this should not happen!"); // this should not happen, we are the client
+                    break;
+
+                case 2: // packet response packet
+                    _errorOccured("received response type " + String(packetType) + "; not implemented yet!");
+                    break;
+
+                case 3: // payload data packet
+                    receivedPacket = true;
+                    response = _packetReceived(_clientId, payload);
+                    // send response packet
+                    sendResponsePacket(packetId, PacketTypeResponsePacket, true, response);
+                    _lastTicketSentMs = millis();
+                    break;
+
+                case 4:  // read values packet
+                default: // unknown packet type
+                    break;
+                }
+
+                // clear receive buffer
+                _receiveBufferCount = 0;
             }
         }
     }
+
+    if (millis() > _lastTicketSentMs + 500)
+    {
+        // sendResponsePacket(0, PacketTypeAlivePacket, true, String(_clientId));
+        // _lastTicketSentMs = millis();
+    }
+
     return receivedPacket;
+}
+
+bool PacketSenderReceiver::receiveBufferEndsWith(String findWhat)
+{
+    if (_receiveBufferCount < findWhat.length())
+        return false;
+
+    for (int i = 0; i < findWhat.length(); i++)
+    {
+        if (_receiveBuffer[_receiveBufferCount - i - 1] != findWhat[findWhat.length() - i - 1])
+            return false;
+    }
+    return true;
 }
 
 void PacketSenderReceiver::errorReceiving(String message)
@@ -99,151 +166,30 @@ void PacketSenderReceiver::errorReceiving(String message)
     _errorOccured(message);
 }
 
-void PacketSenderReceiver::sendPacketHeader()
+uint PacketSenderReceiver::calculateChecksumForDataPacket(String payload)
 {
-    for (int i = 0; i < 9; i++)
-        Serial.write(_packetHeader[i]); // 9 bytes - packet header
-}
 
-void PacketSenderReceiver::sendPacketStart(byte packetType)
-{
-    sendPacketHeader();
-    Serial.write(packetType); // 1 byte - packet type: 1 = alife packet, 2 = data packet, 3 = response packet
-}
-
-void PacketSenderReceiver::sendPacketEnd()
-{
-    sendPacketHeader();
-}
-
-static byte CalculateChecksumForDataPacket(byte payload[], int payloadLength, byte packetId[4])
-{
-    byte result = 0;
+    int result = 0;
     // add all bytes from payload
-    for (int i = 0; i < payloadLength; i++)
+    for (int i = 0; i < payload.length(); i++)
         result += payload[i];
-    // add all bytes from packet id
-    for (int i = 0; i < 4; i++)
-        result += packetId[i];
     return result;
 }
 
-static byte CalculateChecksumForResponsePacket(String message, byte packetId[4], bool ok)
+void PacketSenderReceiver::sendResponsePacket(unsigned int packetId, uint packetType, bool ok, String message)
 {
-    byte result = 0;
-    // add all bytes from message
-    for (int i = 0; i < message.length(); i++)
-        result += message[i];
-    // add all bytes from packet id
-    for (int i = 0; i < 4; i++)
-        result += packetId[i];
-    // add ok byte
-    result += ok ? (byte)1 : (byte)0;
-    return result;
-}
+    jsondocPacketSenderReceiver.clear();
+    jsondocPacketSenderReceiver["Id"] = packetId;
+    jsondocPacketSenderReceiver["ClientId"] = _clientId;
+    jsondocPacketSenderReceiver["Checksum"] = calculateChecksumForDataPacket(message);
+    jsondocPacketSenderReceiver["PacketType"] = packetType;
+    jsondocPacketSenderReceiver["Payload"] = message;
 
-void PacketSenderReceiver::processDataPacket(u_int length)
-{
-    if (length < 20) // sender id (4*2 bytes), packet id (4*2 bytes), checksum (1*2 byte)
-    {
-        // packet content not long enough
-        errorReceiving("Packet content not long enough");
-        return;
-    }
+    // serialize the json document to a string
+    String jsonString;
+    serializeJson(jsondocPacketSenderReceiver, jsonString);
 
-    int pos = 0;
-
-    // packet type
-    pos++; // skip packet type ( byte - packet type: 1 = alife packet, 2 = data packet, 3 = response packet)
-
-    // sender id
-    byte senderIdArrRaw[8] = {_receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++]}; // get 4*2 byte sender id
-    byte *senderIdArr = ByteArrayConverter::UnSplitBytes8(senderIdArrRaw);                                                                                                                                             // split 8 bytes to 4 bytes
-    unsigned int senderId = ByteArrayConverter::UintFrom4Bytes(senderIdArr);                                                                                                                                           // convert 4 bytes to int
-
-    // packet id
-    byte packetIdArrRaw[8] = {_receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++]}; // get 4 byte packet id
-    byte *packetIdArr = ByteArrayConverter::UnSplitBytes8(packetIdArrRaw);                                                                                                                                             // split 8 bytes to 4 bytes
-    unsigned int packetId = ByteArrayConverter::UintFrom4Bytes(packetIdArr);
-
-    // payload length
-    byte payloadLengthArrRaw[8] = {_receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++], _receiveBuffer[pos++]}; // get 4 byte payload length id
-    byte *payloadLengthArr = ByteArrayConverter::UnSplitBytes8(payloadLengthArrRaw);                                                                                                                                        // split 8 bytes to 4 bytes
-    unsigned int payloadLength = ByteArrayConverter::UintFrom4Bytes(payloadLengthArr);                                                                                                                                      // convert 4 bytes to int
-
-    // get payload
-    // get all bytes from _receiveBuffer except first bytes (header 9, client id 4*2, packet type 1, packet id 4*2 checksum * 2) till end byte
-    int payloadLengthReal = length - pos - 2;
-
-    //_errorOccured(String(packetId) + " " + String(payloadLength) + " " + String(length));
-
-    if (payloadLength != payloadLengthReal)
-    {
-        errorReceiving("payloadLength " + String(payloadLength) + "!=" + String(payloadLengthReal) + " packet " + String(packetId));
-        sendResponsePacket(packetId, false, "response " + String(packetId) + ": payloadLength " + String(payloadLength) + "!= payloadLengthReal " + String(payloadLengthReal) + " packet " + String(packetId));
-        return; // payload length not valid
-    }
-
-    byte payloadArr[payloadLength];
-    for (int i = 0; i < payloadLength; i++)
-        payloadArr[i] = _receiveBuffer[i + pos];
-
-    // get checksum
-    byte checksumRaw[2] = {_receiveBuffer[length - 2], _receiveBuffer[length - 1]};
-    byte checksum = ByteArrayConverter::UnSplitBytes2(checksumRaw);
-
-    // calculate checksum
-    byte checksumExpected = CalculateChecksumForDataPacket(payloadArr, payloadLength, packetIdArr);
-    if (checksum != checksumExpected)
-    {
-        errorReceiving("check " + String(checksum) + "!=" + String(checksumExpected) + " packet " + String(packetId));
-        sendResponsePacket(packetId, false, "response " + String(packetId) + ": check " + String(checksum) + "!=" + String(checksumExpected) + " packet " + String(packetId));
-        return; // checksum not valid
-    }
-
-    // create received data packet
-    Packet *packet = new Packet();
-    packet->senderId = senderId;
-    packet->id = packetId;
-    String packetString = String(payloadArr, payloadLength);
-
-    String response = _packetReceived(_clientId, packetString);
-
-    // if response string is empty, set it to "ok"
-    if (response.length() == 0)
-        response = "ok";
-
-    free(packet);
-
-    // send response packet
-    sendResponsePacket(packetId, true, response);
-}
-
-void PacketSenderReceiver::sendResponsePacket(unsigned int packetId, bool ok, String message)
-{
-    // send response packet header with client id
-    byte packetType = 3; // 3 = response packet
-    this->sendPacketStart(packetType);
-
-    // 4*2 bytes - packet id
-    byte *packetIdArrRaw = ByteArrayConverter::UintTo4Bytes(packetId);
-    auto packetIdArr = ByteArrayConverter::SplitBytes4(packetIdArrRaw);
-    for (int i = 0; i < 8; i++)
-        Serial.write(packetIdArr[i]);
-
-    // 1 byte - ok
-    Serial.write(ok ? (byte)1 : (byte)0);
-
-    // message
-    Serial.print(message);
-
-    // 1*2 byte - checksum
-    byte checksumRaw = CalculateChecksumForResponsePacket(message, packetIdArrRaw, ok);
-    auto checksum = ByteArrayConverter::SplitByte(checksumRaw);
-    Serial.write(checksum[0]);
-    Serial.write(checksum[1]);
-
-    free(packetIdArr);
-
-    this->sendPacketEnd();
+    Serial.write(_packetHeaderString.c_str(), _packetHeaderString.length());
+    Serial.write(jsonString.c_str(), jsonString.length());
+    Serial.write(_packetFooterString.c_str(), _packetFooterString.length());
 }

@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
@@ -17,9 +17,6 @@ using System.Windows.Controls;
 
 namespace AwbStudio.PropertyControls
 {
-    /// <summary>
-    /// Interaction logic for NestedTimelinePropertyControl.xaml
-    /// </summary>
     public partial class NestedTimelinePropertyControl : UserControl, IPropertyEditor
     {
         private readonly ITimelineMetaDataService _timelineMetaDataService;
@@ -32,7 +29,6 @@ namespace AwbStudio.PropertyControls
 
         public IAwbObject AwbObject => NestedTimelinesFakeObject.Singleton;
 
-
         public NestedTimelinePropertyControl(ITimelineMetaDataService timelineMetaDataService, TimelineData timelineData, TimelineViewContext viewContext, PlayPosSynchronizer playPosSynchronizer)
         {
             InitializeComponent();
@@ -41,7 +37,7 @@ namespace AwbStudio.PropertyControls
             _timelineData = timelineData;
             _viewContext = viewContext;
             _playPosSynchronizer = playPosSynchronizer;
-            
+
         }
 
         private void NestedTimelinePropertyControl_Loaded(object sender, RoutedEventArgs e)
@@ -64,7 +60,7 @@ namespace AwbStudio.PropertyControls
 
         private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
-            if (e.ChangedObjectId == NestedTimelinesFakeObject.Singleton.Id) 
+            if (e.ChangedObjectId == NestedTimelinesFakeObject.Singleton.Id)
                 ShowActualValue(NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId);
         }
 
@@ -116,7 +112,7 @@ namespace AwbStudio.PropertyControls
             if (NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId != timelineId)
             {
                 NestedTimelinesFakeObject.Singleton.ActualNestedTimelineId = timelineId;
-                
+
             }
             _isSettingNewValue = false;
             ShowActualValue(timelineId);
@@ -169,7 +165,6 @@ namespace AwbStudio.PropertyControls
                 }
             }
         }
-
     }
 }
 

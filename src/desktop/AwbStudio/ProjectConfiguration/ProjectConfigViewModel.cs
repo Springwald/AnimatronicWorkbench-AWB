@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Project.Clients;
@@ -13,7 +13,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using Windows.ApplicationModel.Background;
 
 namespace AwbStudio.ProjectConfiguration
 {
@@ -32,7 +31,7 @@ namespace AwbStudio.ProjectConfiguration
                 handler(this, e);
         }
 
-        public bool UnsavedChanges { get; set; } 
+        public bool UnsavedChanges { get; set; }
 
         #region project objects
 
@@ -65,7 +64,7 @@ namespace AwbStudio.ProjectConfiguration
             }
         }
 
-        private Esp32ClientHardwareConfig _esp32ClientHardwareConfig {  get; set; }
+        private Esp32ClientHardwareConfig _esp32ClientHardwareConfig { get; set; }
         public Esp32ClientHardwareConfig Esp32ClientHardwareConfig
         {
 
@@ -161,7 +160,7 @@ namespace AwbStudio.ProjectConfiguration
 
         public ProjectConfigViewModel(AwbProject awbProject)
         {
-            if (awbProject == null) throw new ArgumentNullException(nameof(awbProject));
+            ArgumentNullException.ThrowIfNull(awbProject);
 
             _projectFolder = awbProject.ProjectFolder;
             _projectMetaData = awbProject.ProjectMetaData;

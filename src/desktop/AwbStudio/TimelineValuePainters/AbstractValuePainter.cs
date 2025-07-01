@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
@@ -20,7 +20,6 @@ namespace AwbStudio.TimelineValuePainters
         protected readonly TimelineViewContext _viewContext;
         protected readonly TimelineCaptions _captions;
         protected List<UIElement> _valueControls;
-
         public Grid PaintControl { get; }
 
         public AbstractValuePainter(Grid paintControl, TimelineViewContext viewContext, TimelineCaptions captions)
@@ -71,7 +70,6 @@ namespace AwbStudio.TimelineValuePainters
             }
         }
 
-
         private void PaintControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             PaintValues(_timelineData?.AllPoints);
@@ -91,7 +89,6 @@ namespace AwbStudio.TimelineValuePainters
             }
             _valueControls.Clear();
         }
-
 
         public void Dispose()
         {

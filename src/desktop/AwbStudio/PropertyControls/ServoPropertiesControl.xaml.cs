@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
@@ -17,9 +17,6 @@ using System.Windows.Controls;
 
 namespace AwbStudio.PropertyControls
 {
-    /// <summary>
-    /// Interaction logic for ServoPropertiesControl.xaml
-    /// </summary>
     public partial class ServoPropertiesControl : UserControl, IPropertyEditor
     {
         private readonly IServo _servo;
@@ -36,7 +33,7 @@ namespace AwbStudio.PropertyControls
             InitializeComponent();
             _servo = servo;
             _timelineData = timelineData;
-            _timelineData.OnContentChanged+= TimelineData_OnContentChanged; 
+            _timelineData.OnContentChanged += TimelineData_OnContentChanged;
             _viewContext = viewContext;
             _timelineEditingManipulation = timelineEditingManipulation;
 
@@ -45,11 +42,9 @@ namespace AwbStudio.PropertyControls
             LabelName.Content = "Servo " + servo.Title;
             BtnSetToDefault.Content = $"{servo.PercentCalculator.CalculatePercent(servo.DefaultValue).ToString("0.00")}%";
             SliderValueDefault.Value = servo.PercentCalculator.CalculatePercent(servo.DefaultValue);
-           
+
             Loaded += ServoPropertiesControl_Loaded;
         }
-
-       
 
         private async void ServoPropertiesControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
@@ -61,9 +56,8 @@ namespace AwbStudio.PropertyControls
             _viewContext.Changed += ViewContext_Changed;
             ShowActualValue();
 
-            await Task.CompletedTask;   
+            await Task.CompletedTask;
         }
-
         private void ServoPropertiesControl_Unloaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Unloaded -= ServoPropertiesControl_Unloaded;
@@ -71,7 +65,6 @@ namespace AwbStudio.PropertyControls
             _playPosSynchronizer.OnPlayPosChanged -= OnPlayPosChanged;
             _viewContext.Changed -= ViewContext_Changed;
         }
-
         private void ViewContext_Changed(object? sender, ViewContextChangedEventArgs e)
         {
             switch (e.ChangeType)
@@ -83,12 +76,10 @@ namespace AwbStudio.PropertyControls
                     break;
             }
         }
-
         private void TimelineData_OnContentChanged(object? sender, TimelineDataChangedEventArgs e)
         {
             if (e.ChangedObjectId == _servo.Id) ShowActualValue();
         }
-
         private void OnPlayPosChanged(object? sender, int e)
         {
             if (_viewContext.ActualFocusObject == _servo)
@@ -130,7 +121,6 @@ namespace AwbStudio.PropertyControls
             }
             ShowActualValue();
         }
-
         private void ShowActualValue()
         {
             var percentValue = (int)_servo.PercentCalculator.CalculatePercent(_servo.TargetValue);
@@ -140,9 +130,5 @@ namespace AwbStudio.PropertyControls
             SliderValue.Value = percentValue;
             _isUpdatingView = false;
         }
-
-
-
-
     }
 }

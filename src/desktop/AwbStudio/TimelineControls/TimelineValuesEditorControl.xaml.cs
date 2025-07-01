@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
@@ -23,12 +23,9 @@ namespace AwbStudio.TimelineControls
 {
     public partial class TimelineValuesEditorControl : UserControl, ITimelineEditorControl
     {
-        private const int EditorControlsBorderThickness = 10;
-
         private bool _isInitialized;
 
         private TimelineData? _timelineData;
-        private SoundPlayerControl? _soundPlayer;
         private TimelineViewContext? _viewContext;
         private PlayPosSynchronizer? _playPosSynchronizer;
         private PlayPosPainter? _playPosPainter;
@@ -69,10 +66,8 @@ namespace AwbStudio.TimelineControls
             _gridPainter = null;
         }
 
-        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, ITimelineDataService timelineDataService, IAwbLogger awbLogger, Sound[] projectSounds, SoundPlayerControl soundPlayer)
+        public void Init(TimelineViewContext viewContext, TimelineCaptions timelineCaptions, PlayPosSynchronizer playPosSynchronizer, IActuatorsService actuatorsService, ITimelineMetaDataService timelineMetaDataService, ITimelineDataService timelineDataService, IAwbLogger awbLogger, Sound[] projectSounds)
         {
-            _soundPlayer = soundPlayer;
-
             _viewContext = viewContext;
             _playPosSynchronizer = playPosSynchronizer;
             _viewContext.Changed += OnViewContextChanged;
@@ -108,8 +103,6 @@ namespace AwbStudio.TimelineControls
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }
-
-            
 
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
             _gridPainter = new GridTimePainter(OpticalTimeGrid, _viewContext);
@@ -184,7 +177,6 @@ namespace AwbStudio.TimelineControls
             return null;
         }
 
-
         private void OnViewContextChanged(object? sender, ViewContextChangedEventArgs e)
         {
             if (_timelineData == null) return;
@@ -213,6 +205,5 @@ namespace AwbStudio.TimelineControls
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
         }
-
     }
 }

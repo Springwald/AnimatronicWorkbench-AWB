@@ -22,9 +22,6 @@ using System.Windows.Input;
 
 namespace AwbStudio
 {
-    /// <summary>
-    /// Interaction logic for ProjectManagementWindow.xaml
-    /// </summary>
     public partial class ProjectManagementWindow : Window
     {
         private readonly IProjectManagerService _projectManagerService;
@@ -301,7 +298,22 @@ namespace AwbStudio
 
         private void ShowProjectTimelineEditor(IAwbClientsService clientsService, ITimelineController[] timelineControllers)
         {
-            var timelineEditorWindow = new TimelineEditorWindow(timelineControllers, _projectManagerService, clientsService, _projectManagerService.ActualProject.TimelineDataService.TimelineMetaDataService, _invokerService, _awbLogger);
+            var actualProject = _projectManagerService.ActualProject;
+            if (actualProject == null)
+            {
+                MessageBox.Show("No project loaded");
+                ShowLoadingScreen(false);
+                return;
+            }
+
+            var timelineEditorWindow = new TimelineEditorWindow(
+                timelineControllers,
+                _projectManagerService,
+                clientsService,
+                actualProject.TimelineDataService.TimelineMetaDataService,
+                _invokerService,
+                _awbLogger);
+
             if (timelineEditorWindow != null)
             {
                 // hide the loading screen

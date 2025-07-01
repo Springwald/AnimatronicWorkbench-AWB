@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace AwbStudio.DependencyInjection
 {
-
     internal static class AddAwbClientServiceCollectionExtension
     {
         public static void AddAwbClientService(this IServiceCollection services)

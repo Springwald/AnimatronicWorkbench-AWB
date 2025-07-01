@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.Project.Various;
@@ -15,8 +15,8 @@ namespace AwbStudio.TimelineEditing
 {
     public class TimelineCaptions
     {
-        private Brush[] _brushes = new[]
-{
+        private Brush[] _brushes =  
+        [
             new SolidColorBrush(Colors.White),
             new SolidColorBrush(Colors.LightBlue),
             new SolidColorBrush(Colors.LightGreen),
@@ -33,7 +33,7 @@ namespace AwbStudio.TimelineEditing
             new SolidColorBrush(Colors.LightPink),
             new SolidColorBrush(Colors.LightSteelBlue),
             new SolidColorBrush(Colors.LemonChiffon),
-        };
+        ];
 
         private Brush _brushBlack = new SolidColorBrush(Colors.Black);
 
@@ -112,7 +112,5 @@ namespace AwbStudio.TimelineEditing
             }
             if (_brushIndex >= _brushes.Length) _brushIndex = 0; // start with first color again
         }
-
     }
-
 }

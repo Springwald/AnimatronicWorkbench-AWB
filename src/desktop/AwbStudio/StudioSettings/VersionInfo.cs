@@ -68,7 +68,7 @@ namespace AwbStudio.StudioSettings
                 throw new InvalidOperationException($"Embedded JSON file '{EmbeddedJsonFileName}' not found.");
             using var reader = new System.IO.StreamReader(json);
             var content = reader.ReadToEnd();
-            return System.Text.Json.JsonSerializer.Deserialize<VersionInfo>(content) 
+            return System.Text.Json.JsonSerializer.Deserialize<VersionInfo>(content)
                    ?? throw new InvalidOperationException("Failed to deserialize version info from embedded JSON.");
         }
     }

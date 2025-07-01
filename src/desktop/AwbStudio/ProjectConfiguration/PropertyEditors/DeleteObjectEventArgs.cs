@@ -5,18 +5,13 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
-using Awb.Core.Project.Various;
-using System.Windows.Controls;
+using Awb.Core.Project;
+using System;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
-    public partial class ProjectMetaDataEditorControl : UserControl
+    public class DeleteObjectEventArgs(IProjectObjectListable objectToDelete) : EventArgs
     {
-        public ProjectMetaDataEditorControl()
-        {
-            InitializeComponent();
-        }
-
-        public ProjectMetaData ProjectMetaData { get; internal set; }
+        public IProjectObjectListable ObjectToDelete { get; private set; } = objectToDelete;
     }
 }

@@ -15,8 +15,7 @@ namespace AwbStudio.UserControls
 {
     public partial class About : UserControl
     {
-
-        public string VersionLabelInfo
+        public static string VersionLabelInfo
         {
             get
             {

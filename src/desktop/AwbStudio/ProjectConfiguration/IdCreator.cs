@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Project.Various;
@@ -12,22 +12,17 @@ using System.Linq;
 
 namespace AwbStudio.ProjectConfiguration
 {
-    internal class IdCreator
+    internal class IdCreator(ProjectConfigViewModel projectConfigViewModel, AwbProject awbProject)
     {
-        private readonly ProjectConfigViewModel _viewModel;
-        private readonly AwbProject _awbProject;
+        private readonly ProjectConfigViewModel _viewModel = projectConfigViewModel;
+        private readonly AwbProject _awbProject = awbProject;
 
-        public IdCreator(ProjectConfigViewModel projectConfigViewModel, AwbProject awbProject)
-        {
-            _viewModel = projectConfigViewModel;
-            _awbProject = awbProject;
-        }
         public int GetNewInputId()
         {
             int id = 1;
             while (true)
             {
-                if (!_viewModel.Inputs.Select(x => x as InputConfig).Any(x => x.Id == id)) return id;
+                if (!_viewModel.Inputs.Select(ic => ic as InputConfig).Any(ic => ic?.Id == id)) return id;
                 id++;
             }
         }
@@ -37,7 +32,8 @@ namespace AwbStudio.ProjectConfiguration
             int id = 1;
             while (true)
             {
-                if (!_viewModel.TimelineStates.Select(x => x as TimelineState).Any(x => x.Id == id)) return id;
+                if (!_viewModel.TimelineStates.Select(tst => tst as TimelineState).Any(tst => tst?.Id == id))
+                    return id;
                 id++;
             }
         }
@@ -62,7 +58,5 @@ namespace AwbStudio.ProjectConfiguration
             foreach (var item in _awbProject.Mp3PlayersYX5300) yield return item.Id;
             foreach (var item in _awbProject.Mp3PlayersDFPlayerMini) yield return item.Id;
         }
-
-
     }
 }

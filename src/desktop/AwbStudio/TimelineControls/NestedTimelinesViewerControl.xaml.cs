@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
@@ -18,9 +18,6 @@ using System.Windows.Controls;
 
 namespace AwbStudio.TimelineControls
 {
-    /// <summary>
-    /// Interaction logic for NestedTimelinesViewerControl.xaml
-    /// </summary>
     public partial class NestedTimelinesViewerControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
 
@@ -65,7 +62,7 @@ namespace AwbStudio.TimelineControls
             _caption = timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id);
             HeaderControl.MyObject = NestedTimelinesFakeObject.Singleton;
             HeaderControl.TimelineCaption = _caption;
-            HeaderControl.ViewContext   = viewContext;
+            HeaderControl.ViewContext = viewContext;
 
             _isInitialized = true;
         }

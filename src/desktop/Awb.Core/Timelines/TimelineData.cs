@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Services;
@@ -11,7 +11,6 @@ using Awb.Core.Sounds;
 using Awb.Core.Timelines.NestedTimelines;
 using Awb.Core.Timelines.Sounds;
 using System.Drawing;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Awb.Core.Timelines
 {
@@ -36,15 +35,15 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// What is the duration of the timeline filled with points?
         /// </summary>
-        public int GetDurationMs(Sound[] projectSounds, ITimelineDataService timelineDataService, int recursionDepth=0)
+        public int GetDurationMs(Sound[] projectSounds, ITimelineDataService timelineDataService, int recursionDepth = 0)
         {
-            if (_durationMsCache .HasValue) return _durationMsCache.Value;
+            if (_durationMsCache.HasValue) return _durationMsCache.Value;
 
             recursionDepth++;
 
             var duration = 0;
 
-            foreach(var point in _timelinePoints)
+            foreach (var point in _timelinePoints)
             {
                 if (point.TimeMs > duration)
                 {
@@ -57,7 +56,7 @@ namespace Awb.Core.Timelines
                             if (recursionDepth > 10)
                             {
                                 // prevent infinite recursion
-                               duration = point.TimeMs + 1000; // add a default duration of 1 second
+                                duration = point.TimeMs + 1000; // add a default duration of 1 second
                             }
                             else
                             {
@@ -74,18 +73,18 @@ namespace Awb.Core.Timelines
                     else if (point is SoundPoint soundPoint)
                     {
                         // if this is a sound point, we need to get the duration of the sound
-                        var sound = projectSounds.FirstOrDefault(s => s.Id == soundPoint.SoundId);  
+                        var sound = projectSounds.FirstOrDefault(s => s.Id == soundPoint.SoundId);
                         var soundDuration = sound?.DurationMs ?? 0;
                         duration = Math.Max(duration, point.TimeMs + soundDuration);
-                    } else 
+                    }
+                    else
                         duration = Math.Max(duration, point.TimeMs);
                 }
             }
 
             _durationMsCache = duration;
-
             return duration;
-        } 
+        }
 
         public IEnumerable<TimelinePoint> AllPoints => _timelinePoints.ToArray();
 
@@ -133,7 +132,8 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// removes a point from the timeline
         /// </summary>
-        public bool RemovePoint(int timeMs, string awbObjectId)         {
+        public bool RemovePoint(int timeMs, string awbObjectId)
+        {
             var point = AllPoints.GetPoint(timeMs, awbObjectId);
             return RemovePoint(point);
         }
@@ -157,7 +157,6 @@ namespace Awb.Core.Timelines
             OnContentChanged?.Invoke(this, new TimelineDataChangedEventArgs(changeType, changedObjectId));
             _durationMsCache = null;
         }
-
 
         private void SetContentChangedByPoint(TimelinePoint point)
         {

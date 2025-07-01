@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.Sounds;
@@ -15,24 +15,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace AwbStudio.TimelineValuePainters
 {
-    class SoundValuePainter : AbstractValuePainter
+    class SoundValuePainter(ISoundPlayer soundPlayer, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, Sound[] projectSounds) 
+        : AbstractValuePainter(paintControl, viewContext, timelineCaptions)
     {
         private const int _paintMarginTopBottom = 0;
-        private readonly ISoundPlayer _soundPlayer;
-        private readonly TimelineCaptions _timelineCaptions;
-        private readonly Sound[] _projectSounds;
-
-        public SoundValuePainter(ISoundPlayer soundPlayer, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, Sound[] projectSounds) :
-            base(paintControl, viewContext, timelineCaptions)
-        {
-            _soundPlayer = soundPlayer;
-            _timelineCaptions = timelineCaptions;
-            _projectSounds = projectSounds;
-        }
+        private readonly ISoundPlayer _soundPlayer = soundPlayer;
+        private readonly TimelineCaptions _timelineCaptions = timelineCaptions;
+        private readonly Sound[] _projectSounds = projectSounds;
 
         protected override void TimelineDataLoadedInternal()
         {
@@ -85,11 +77,11 @@ namespace AwbStudio.TimelineValuePainters
                         },
                     };
 
-                    _valueControls.Add(label);  
+                    _valueControls.Add(label);
                     PaintControl.Children.Add(label);
 
                     // set the with to the duration of the sound if available
-                   
+
                     var durationMs = sound?.DurationMs ?? 1000;
                     label.SetWidthByDuration(_viewContext.PixelPerMs * durationMs);
                     label.SetSoundContent(sound);

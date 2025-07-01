@@ -48,7 +48,7 @@ namespace AwbStudio
             return service!;
         }
 
-        private void ConfigureServices(ServiceCollection services)
+        private static void ConfigureServices(ServiceCollection services)
         {
             services.AddILoggerServices();
             services.TryAddSingleton<IInvokerService, WpfAppInvokerService>();
@@ -56,7 +56,6 @@ namespace AwbStudio
             services.AddPropertyEditorVirtualInputControllerService();
             services.AddInputControllerServices();
             services.TryAddSingleton<IProjectManagerService, ProjectManagerService>();
-
 
             // add the AwbClientsService as a singleton of IAwbClientsService and call the InitAsync method when initializing the service
             services.AddAwbClientService();
@@ -107,7 +106,7 @@ namespace AwbStudio
             };
         }
 
-        void ShowUnhandledException(Exception e, string unhandledExceptionType, bool promptUserForShutdown)
+        static void ShowUnhandledException(Exception e, string unhandledExceptionType, bool promptUserForShutdown)
         {
             var messageBoxTitle = $"Unexpected Error Occurred: {unhandledExceptionType}";
             var messageBoxMessage = $"The following exception occurred and has been copied into the clipboard:\n\n{e}";
@@ -129,6 +128,5 @@ namespace AwbStudio
                 Application.Current.Shutdown();
             }
         }
-
     }
 }

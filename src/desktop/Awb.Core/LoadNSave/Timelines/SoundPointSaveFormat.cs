@@ -13,8 +13,8 @@ namespace Awb.Core.LoadNSave.Timelines
     public class SoundPointSaveFormat
     {
         public int TimeMs { get; set; }
-        public string TargetObjectId { get; set; }
-        public string Title { get; set; }
+        public required string TargetObjectId { get; set; }
+        public required string Title { get; set; }
         public string? Description { get; set; }
         public int SoundId { get; set; }
 
@@ -22,16 +22,7 @@ namespace Awb.Core.LoadNSave.Timelines
         [JsonIgnore]
         public string SoundPlayerId => TargetObjectId;
 
-        public MovementsActuatorsBySoundSaveFormat[]? MovementsActuatorsBySoundSaveFormats { get; set; } = Array.Empty<MovementsActuatorsBySoundSaveFormat>();
-
-        //public SoundPointSaveFormat(int timeMs, string targetObjectId, int soundId, string title, string? description, MovementsActuatorsBySoundSaveFormat[] movementsActuatorsBySoundSaveFormat) { 
-        //    TimeMs = timeMs;
-        //    TargetObjectId = targetObjectId;
-        //    Title = title;
-        //    SoundId = soundId;
-        //    Description = description;
-        //    MovementsActuatorsBySoundSaveFormats = movementsActuatorsBySoundSaveFormat;
-        //}
+        public MovementsActuatorsBySoundSaveFormat[] MovementsActuatorsBySoundSaveFormats { get; set; } = Array.Empty<MovementsActuatorsBySoundSaveFormat>();
 
         public static SoundPointSaveFormat FromSoundPoint(SoundPoint soundPoint) => new SoundPointSaveFormat
         {

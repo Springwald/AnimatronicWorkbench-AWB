@@ -1,6 +1,11 @@
-﻿using PacketLogistics.ComPorts;
+﻿// Send and receivce data to/from ESP-32 microcontroller
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
-var config = new ComPortCommandConfig(packetHeader: "AWB");
+using PacketLogistics.ComPorts;
+
+var config = new ComPortCommandConfig(packetIdentifier: "AWB");
 
 Console.WriteLine("Scanning for clients...");
 var clientIdScanner = new ClientIdScanner(config);

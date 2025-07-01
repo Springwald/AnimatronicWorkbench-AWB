@@ -1,25 +1,20 @@
-﻿// Animatronic WorkBench
-// https://github.com/Springwald/AnimatronicWorkBench-AWB
-//
+﻿// Send and receivce data to/from ESP-32 microcontroller
 // (C) 2025 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
 using PacketLogistics.ComPorts.ComportPackets;
-using PacketLogistics.ComPorts.Serialization;
-using System.Collections.Concurrent;
+using PacketLogistics.PacketPayloadWrapper;
 
 namespace PacketLogistics.ComPorts
 {
-    public class PacketSenderReceiverComPort : PacketSenderReceiver
+    public class PacketSenderReceiverComPort<PayloadTypes> : PacketSenderReceiver<PayloadTypes> where PayloadTypes : Enum
     {
         private Esp32SerialPort? _serialPort;
         private readonly string _serialPortName;
         private uint _actualPacketId = 1;
         private readonly IComPortCommandConfig _comPortCommandConfig;
-        private readonly DataPacketSerializer _packetSerializer;
-        private ConcurrentBag<PacketBase> _receivedPackets = new();
-        private PacketReceiver? _packetReceiver;
+        private PacketReceiver<PayloadTypes>? _packetReceiver;
 
         public uint ClientId { get; }
 
@@ -30,7 +25,6 @@ namespace PacketLogistics.ComPorts
             _serialPortName = serialPortName;
             this.ClientId = clientID;
             _comPortCommandConfig = comPortCommandConfig;
-            _packetSerializer = new DataPacketSerializer(_comPortCommandConfig);
         }
 
         public override void Dispose()
@@ -48,15 +42,17 @@ namespace PacketLogistics.ComPorts
             }
         }
 
+        /// <summary>
+        /// Connects to the serial port
+        /// </summary>
         protected override async Task<bool> ConnectInternal()
         {
             _serialPort = new Esp32SerialPort(_serialPortName);
             try
             {
                 _serialPort.Open();
-                _packetReceiver = new PacketReceiver(esp32SerialPort: _serialPort,
+                _packetReceiver = new PacketReceiver<PayloadTypes>(esp32SerialPort: _serialPort,
                     comPortCommandConfig: _comPortCommandConfig,
-                   clientId: this.ClientId,
                    packetReceivedDelegate: this.PacketReceiverPacketReceived,
                    errorDelegate: (string errMsg) => { base.Error(errMsg); });
                 return true;
@@ -74,18 +70,18 @@ namespace PacketLogistics.ComPorts
             return false;
         }
 
-        private void PacketReceiverPacketReceived(PacketBase packet)
+        private void PacketReceiverPacketReceived(PacketEnvelope<PayloadTypes> packet)
         {
             switch (packet?.PacketType)
             {
-                case PacketBase.PacketTypes.DataPacket:
+                case PacketEnvelope<PayloadTypes>.PacketTypes.PayloadPacket:
                     throw new NotImplementedException();
 
-                case PacketBase.PacketTypes.ResponsePacket:
+                case PacketEnvelope<PayloadTypes>.PacketTypes.ResponsePacket:
                     // handled in packet sending method
                     break;
 
-                case PacketBase.PacketTypes.AlifePacket:
+                case PacketEnvelope<PayloadTypes>.PacketTypes.AlivePacket:
                     // only needed when connecting
                     break;
 
@@ -96,7 +92,8 @@ namespace PacketLogistics.ComPorts
             }
         }
 
-        protected override async Task<PacketSendResult> SendPacketInternal(byte[] payload)
+
+        protected override async Task<PacketSendResult> SendPacketInternal(PayloadTypes payloadType, string payload)
         {
             if (_serialPort == null)
             {
@@ -104,10 +101,9 @@ namespace PacketLogistics.ComPorts
                 base.Error(errMsg);
                 return new PacketSendResult
                 {
-                    OriginalPacketTimestampUtc = DateTime.UtcNow,
                     OriginalPacketId = null,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
 
@@ -117,10 +113,9 @@ namespace PacketLogistics.ComPorts
                 base.Error(errMsg);
                 return new PacketSendResult
                 {
-                    OriginalPacketTimestampUtc = DateTime.UtcNow,
                     OriginalPacketId = null,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
 
@@ -132,50 +127,68 @@ namespace PacketLogistics.ComPorts
                 base.Error(errMsg);
                 return new PacketSendResult
                 {
-                    OriginalPacketTimestampUtc = DateTime.UtcNow,
                     OriginalPacketId = null,
                     Ok = false,
-                    Message = errMsg,
+                    ErrorMessage = errMsg,
                 };
             }
 
             _actualPacketId++;
             if (_actualPacketId >= uint.MaxValue) _actualPacketId = 0;
 
-            var packet = new DataPacket(id: _actualPacketId)
+            var packetId = _actualPacketId;
+
+            var envelopeWrapper = new PacketWrapper<PayloadTypes>();
+            var packetEnvelope = envelopeWrapper.WrapDataPacket(
+                packetId: packetId,
+                packetType: PacketEnvelope<PayloadTypes>.PacketTypes.PayloadPacket,
+                payLoadType: payloadType,
+                payload: payload);
+
+            var packetAsBytes = _comPortCommandConfig.Encoding.GetBytes(packetEnvelope);
+
+            //Debug.WriteLine("send: " + packetEnvelope);
+
+            // Send the packetBytes to the serial port
+            if (packetAsBytes == null || packetAsBytes.Length == 0)
             {
-                Payload = payload,
-                TimestampUtc = DateTime.UtcNow
-            };
-
-
-            // send packet
-            var message = _packetSerializer.DataPacket2ByteArray(packet, this.ClientId);
-
-            foreach (var b in message)
-            {
-                for (int i = 0; i < _comPortCommandConfig.CommandBytes.Length; i++)
+                var errMsg = $"Error serializing packet {packetId} to byte array!";
+                base.Error(errMsg);
+                return new PacketSendResult
                 {
-                    if (b == _comPortCommandConfig.CommandBytes[i])
-                    {
-                        base.Error($"Packet contains command byte {b}!");
-                        return new PacketSendResult
-                        {
-                            Ok = false,
-                            OriginalPacketId = packet.Id,
-                            OriginalPacketTimestampUtc = packet.TimestampUtc,
-                            Message = $"Packet contains command byte {b}!",
-                        };
-                    }
-                }
+                    OriginalPacketId = packetId,
+                    Ok = false,
+                    ErrorMessage = errMsg,
+                };
             }
 
+            if (packetAsBytes.IndexOf(_comPortCommandConfig.PacketHeaderAsBytes) != -1)
+            {
+                var errMsg = $"Packet {packetId} does contain packet header bytes!";
+                base.Error(errMsg);
+                return new PacketSendResult
+                {
+                    OriginalPacketId = packetId,
+                    Ok = false,
+                    ErrorMessage = errMsg,
+                };
+            }
 
-            //serialPort.DiscardOutBuffer();
-            serialPort.Write(_comPortCommandConfig.PacketHeaderBytes, 0, _comPortCommandConfig.PacketHeaderBytes.Length);
-            serialPort.Write(message, 0, message.Length);
-            var x = string.Join(", ", message.Select(b => b.ToString()));
-            serialPort.Write(_comPortCommandConfig.PacketHeaderBytes, 0, _comPortCommandConfig.PacketHeaderBytes.Length);
+            if (packetAsBytes.IndexOf(_comPortCommandConfig.PacketFooterAsBytes) != -1)
+            {
+                var errMsg = $"Packet {packetId} does contain packet footer bytes!";
+                base.Error(errMsg);
+                return new PacketSendResult
+                {
+                    OriginalPacketId = packetId,
+                    Ok = false,
+                    ErrorMessage = errMsg,
+                };
+            }
+
+            serialPort.Write(_comPortCommandConfig.PacketHeaderAsBytes, 0, _comPortCommandConfig.PacketHeaderAsBytes.Length);
+            serialPort.Write(packetAsBytes, 0, packetAsBytes.Length);
+            serialPort.Write(_comPortCommandConfig.PacketFooterAsBytes, 0, _comPortCommandConfig.PacketFooterAsBytes.Length);
 
             var timeOutDateTime = DateTime.UtcNow + base._timeout;
 
@@ -183,31 +196,30 @@ namespace PacketLogistics.ComPorts
             {
                 var packetReceived = await _packetReceiver.TryReceivePacket();
 
-                if (packetReceived?.PacketType == PacketBase.PacketTypes.ResponsePacket)
+                if (packetReceived?.PacketType == PacketEnvelope<PayloadTypes>.PacketTypes.ResponsePacket)
                 {
-                    var responsePacket = (ResponsePacket)packetReceived;
-                    if (responsePacket.Id == packet.Id)
+                    if (packetReceived.Id == packetId)
                     {
                         return new PacketSendResult
                         {
-                            Ok = responsePacket.Ok,
-                            OriginalPacketId = packet.Id,
-                            OriginalPacketTimestampUtc = packet.TimestampUtc,
-                            Message = responsePacket.Message,
+                            Ok = true,
+                            OriginalPacketId = packetReceived.Id,
+                            ReturnPayload = packetReceived.Payload,
                         };
                     }
                 }
             }
 
-            base.Error($"Timeout sending packet {packet.Id} to {_serialPortName}");
+            base.Error($"Timeout sending packet {packetId} to {_serialPortName}");
 
             return new PacketSendResult
             {
                 Ok = false,
-                OriginalPacketId = packet.Id,
-                OriginalPacketTimestampUtc = packet.TimestampUtc,
-                Message = "Timeout",
+                OriginalPacketId = packetId,
+                ErrorMessage = "Timeout",
             };
         }
+
+
     }
 }

@@ -10,7 +10,7 @@ using Awb.Core.Sounds;
 
 namespace Awb.Core.Player
 {
-    public class SoundRequestEventArgs: EventArgs
+    public class SoundRequestEventArgs : EventArgs
     {
         public int SoundId { get; set; }
         public Sound? Sound { get; set; } = null;

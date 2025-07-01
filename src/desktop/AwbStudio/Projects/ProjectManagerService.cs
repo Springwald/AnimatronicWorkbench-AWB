@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using AwbStudio.StudioSettings;
@@ -11,37 +11,22 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static AwbStudio.Projects.IProjectManagerService;
 
 namespace AwbStudio.Projects
 {
     public interface IProjectManagerService
     {
-        public record OpenProjectResult
-        {
-            public required bool Success { get; init; }
-            public required string[] ErrorMessages { get; init; }
-
-            public static OpenProjectResult SuccessResult => new() { Success = true, ErrorMessages = [] };
-            public static OpenProjectResult ErrorResult(string[] errorMessages) => new() { Success = false, ErrorMessages = errorMessages };
-        }
-
         AwbProject? ActualProject { get; }
         bool ExistProject(string projectPath);
         Task<OpenProjectResult> OpenProjectAsync(string projectFolder);
         Task<bool> SaveProjectAsync(AwbProject project, string projectFolder);
     }
 
-    public class ProjectManagerService : IProjectManagerService
+    public class ProjectManagerService(IAwbStudioSettingsService awbStudioSettingsService) : IProjectManagerService
     {
-        private readonly IAwbStudioSettingsService _awbStudioSettingsService;
+        private readonly IAwbStudioSettingsService _awbStudioSettingsService = awbStudioSettingsService;
 
         public AwbProject? ActualProject { get; private set; }
-
-        public ProjectManagerService(IAwbStudioSettingsService awbStudioSettingsService)
-        {
-            _awbStudioSettingsService = awbStudioSettingsService;
-        }
 
         public bool ExistProject(string projectFolder)
         {
@@ -68,7 +53,7 @@ namespace AwbStudio.Projects
             return true;
         }
 
-        public async Task<bool> CreateProjectSubDirectories(string projectFolder)
+        public static async Task<bool> CreateProjectSubDirectories(string projectFolder)
         {
             var folders = new[] { @"audio\SDCard\01", "custom_code_backup" };
 

@@ -12,7 +12,12 @@ namespace Awb.Core.Clients
 {
     public class Esp32ComPortClient : IAwbClient, IDisposable
     {
-        private PacketSenderReceiverComPort _comPortReceiver;
+        public enum PayloadTypes
+        {
+            JsonData
+        }
+
+        private PacketSenderReceiverComPort<PayloadTypes> _comPortReceiver;
 
         public bool Connected { get; private set; } = false;
 
@@ -33,7 +38,7 @@ namespace Awb.Core.Clients
             this.ClientId = clientId;
             this.FriendlyName = $"com:{comPortName}:{clientId}";
 
-            _comPortReceiver = new PacketSenderReceiverComPort(
+            _comPortReceiver = new PacketSenderReceiverComPort<PayloadTypes>(
             serialPortName: comPortName,
             clientID: clientId,
             comPortCommandConfig: new AwbEsp32ComportClientConfig());
@@ -43,41 +48,36 @@ namespace Awb.Core.Clients
                 OnError?.Invoke(this, args.Message);
             };
         }
-
         public async Task<bool> InitAsync()
         {
-            _comPortReceiver.PacketReceived += _comPortReceiver_PacketReceived;
             Connected = await _comPortReceiver.Connect();
             return Connected;
         }
-
         public void Dispose()
         {
             Connected = false;
-            _comPortReceiver.PacketReceived -= _comPortReceiver_PacketReceived;
             _comPortReceiver?.Dispose();
         }
 
-        public async Task<SendResult> Send(byte[] payload, string? debugInfo)
+        public async Task<SendResult> Send(string payload, string? debugInfo)
         {
             if (!Connected) return new SendResult(false, errorMessage: "not connected, please run Init() before using Esp32ComPortClient!", resultPlayload: null, debugInfos: null);
 
             if (!string.IsNullOrWhiteSpace(debugInfo))
                 this.PacketSending?.Invoke(this, $"Send packet info\r\n{debugInfo}");
 
-            var result = await _comPortReceiver.SendPacket(payload);
+            var result = await _comPortReceiver.SendPacket(payloadType: PayloadTypes.JsonData, payload: payload);
 
             if (result.Ok == false)
             {
-                var details = $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}";
-                OnError?.Invoke(this, $"Error sending packet: {result.Message} / {details}");
-                return new SendResult(ok: false, errorMessage: result.Message, resultPlayload: null, details);
+                var details = $"PacketID:{result.OriginalPacketId}";
+                OnError?.Invoke(this, $"Error sending packet: {result.ErrorMessage} / {details}");
+                return new SendResult(ok: false, errorMessage: result.ErrorMessage, resultPlayload: null, details);
             }
 
-            return new SendResult(ok: true, errorMessage: null, resultPlayload: result.Message, debugInfos: $"PacketID:{result.OriginalPacketId};Time:{result.OriginalPacketTimestampUtc}");
+            return new SendResult(ok: true, errorMessage: null, resultPlayload: result.ReturnPayload, debugInfos: $"PacketID:{result.OriginalPacketId}");
         }
-
-        private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver.PacketReceivedEventArgs e)
+        private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver<PayloadTypes>.PacketReceivedEventArgs e)
         {
             Received?.Invoke(this, new ReceivedEventArgs(payload: e.Payload));
         }
