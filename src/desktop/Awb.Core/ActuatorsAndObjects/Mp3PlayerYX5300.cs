@@ -71,7 +71,7 @@ namespace Awb.Core.Actuators
 
         public bool ActualMovementInverted { get; private set; }
 
-        public ActuatorMovementBySound[]? ActuatorMovementsBySound { get; private set; }
+        public ActuatorMovementBySound[] ActuatorMovementsBySound { get; private set; } = [];
 
         public Mp3PlayerYX5300(Mp3PlayerYX5300Config config)
         {

@@ -19,9 +19,9 @@ namespace Awb.Core.InputControllers.TimelineInputControllers
         public Bcf2000TimelineController(Bcf2000Controller bcf2000Controller)
         {
             _bcf2000Controller = bcf2000Controller;
-            if (_bcf2000Controller != null)
+            if (bcf2000Controller != null)
             {
-                _bcf2000Controller.ActionReceived += Bcf2000Controller_ActionReceived;
+                bcf2000Controller.ActionReceived += Bcf2000Controller_ActionReceived;
             }
         }
 

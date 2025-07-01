@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Project.Servos;
@@ -14,7 +14,6 @@ using Awb.Core.Tools;
 using AwbStudio.ProjectConfiguration;
 using AwbStudio.ProjectConfiguration.PropertyEditors;
 using AwbStudio.Projects;
-using AwbStudio.PropertyControls;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,7 +53,7 @@ namespace AwbStudio
         public ProjectConfigurationWindow(IProjectManagerService projectManagerService, IAwbClientsService awbClientsService, IInvokerService invokerService)
         {
             _awbClientsService = awbClientsService;
-           _invokerService = invokerService;
+            _invokerService = invokerService;
             _projectManagerService = projectManagerService;
             _awbProject = projectManagerService.ActualProject ?? throw new ArgumentNullException(nameof(projectManagerService.ActualProject));
             _viewModel = new ProjectConfigViewModel(_awbProject);
@@ -281,11 +280,11 @@ namespace AwbStudio
             _viewModel.ScsServos.Add(item);
             ScsServosList.SelectedProjectObject = item;
         }
-        
+
 
         private void StsServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            var item =    new StsFeetechServoConfig
+            var item = new StsFeetechServoConfig
             {
                 Id = _idCreator.CreateNewObjectId("StsServo"),
                 Title = "",

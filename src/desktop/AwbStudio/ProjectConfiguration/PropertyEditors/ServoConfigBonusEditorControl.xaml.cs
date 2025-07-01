@@ -256,6 +256,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             {
                 var resultPayloadJsonStr = result.ResultPayload;
 
+                if (string.IsNullOrWhiteSpace(resultPayloadJsonStr))
+                {
+                    ShowError($"Unable to read position from servo. Result payload is empty for client Id '{clientID}'");
+                    return null;
+                }
+
                 ReadValueResponseDataPacket? resultDataPacket = null;
                 try
                 {

@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.Project.Various;
@@ -73,7 +73,7 @@ namespace Awb.Core.ActuatorsAndObjects
 
         public bool IsControllerTuneable => false;
 
-        public ActuatorMovementBySound[] ActuatorMovementsBySound { get; private set; }
+        public ActuatorMovementBySound[] ActuatorMovementsBySound { get; private set; } = [];
 
         public Mp3PlayerDFPlayerMini(Mp3PlayerDfPlayerMiniConfig config)
         {
@@ -93,7 +93,7 @@ namespace Awb.Core.ActuatorsAndObjects
 
         public void SetActuatorMovementBySound(ActuatorMovementBySound[] actuatorMovementsBySound)
         {
-            ActuatorMovementsBySound = actuatorMovementsBySound ;
+            ActuatorMovementsBySound = actuatorMovementsBySound;
         }
 
         public bool TurnOff()
@@ -107,6 +107,6 @@ namespace Awb.Core.ActuatorsAndObjects
             TurnOff();
         }
 
-       
+
     }
 }

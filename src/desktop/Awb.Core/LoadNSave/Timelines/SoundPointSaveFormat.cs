@@ -22,7 +22,7 @@ namespace Awb.Core.LoadNSave.Timelines
         [JsonIgnore]
         public string SoundPlayerId => TargetObjectId;
 
-        public MovementsActuatorsBySoundSaveFormat[]? MovementsActuatorsBySoundSaveFormats { get; set; } = Array.Empty<MovementsActuatorsBySoundSaveFormat>();
+        public MovementsActuatorsBySoundSaveFormat[] MovementsActuatorsBySoundSaveFormats { get; set; } = Array.Empty<MovementsActuatorsBySoundSaveFormat>();
 
         public static SoundPointSaveFormat FromSoundPoint(SoundPoint soundPoint) => new SoundPointSaveFormat
         {
