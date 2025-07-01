@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace AwbStudio
+namespace AwbStudio.UserControls
 {
     internal class AwbDebugWindowLogger(DebugWindow debugWindow) : IAwbLogger, IDisposable
     {

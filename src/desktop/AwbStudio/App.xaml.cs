@@ -19,13 +19,25 @@ using System.Windows;
 
 namespace AwbStudio
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         private static string _errorMessages = string.Empty;
         private static ServiceProvider? _serviceProvider;
+
+        public ResourceDictionary ThemeDictionary
+        {
+            // You could probably get it via its name with some query logic as well.
+            get { return Resources.MergedDictionaries[0]; }
+        }
+
+        public void ChangeTheme(Uri[] uris)
+        {
+            ThemeDictionary.MergedDictionaries.Clear();
+
+            foreach (var uri in uris)
+                ThemeDictionary.MergedDictionaries.Add(new ResourceDictionary() { Source = uri });
+
+        }
 
         public App()
         {
@@ -33,6 +45,24 @@ namespace AwbStudio
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
             SetupUnhandledExceptionHandling();
+        }
+
+        public void ChangeTheme(bool dark)
+        {
+            var app = (App)Application.Current;
+            if (dark)
+            {
+                app.ChangeTheme(
+                [
+                      new Uri("/Themes/MetroDark/MetroDark.MSControls.Core.Implicit.xaml", UriKind.Relative),
+                    //new Uri("/Themes/MetroDark/MetroDark.MSControls.Toolkit.Implicit.xaml", UriKind.Relative)
+                ]);
+            }
+            else
+            {
+                app.ChangeTheme([new Uri("/Themes/AWB/Awb.White.Core.Implicit.xaml", UriKind.Relative),]);
+            }
+
         }
 
         /// <summary>
@@ -69,6 +99,8 @@ namespace AwbStudio
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
+            ChangeTheme(dark: true);
+
             var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
             if (projectManagementWindow != null)
             {
