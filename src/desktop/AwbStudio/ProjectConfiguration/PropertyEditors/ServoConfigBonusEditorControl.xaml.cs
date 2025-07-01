@@ -33,8 +33,8 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
         private int? _newSendPositionValue = null;
         private volatile bool _sendingValueToServo = false;
 
-        private Timer _autoPlayTimer = new Timer(5000);
-        private Timer _errorMsgTimer = new Timer(500);
+        private Timer _autoPlayTimer = new(5000);
+        private Timer _errorMsgTimer = new(500);
         private bool _autoPlayFlipFlop = false;
         private int _maxProjectLimitValue;
         private int _minProjectLimitValue;
@@ -324,7 +324,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             }
 
             await ShowActualPosition(sender, (int)e.NewValue);
-
         }
 
         private async Task ShowActualPosition(object sender, int position)

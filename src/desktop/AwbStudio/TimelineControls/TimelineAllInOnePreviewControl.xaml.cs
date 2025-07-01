@@ -48,7 +48,6 @@ namespace AwbStudio.TimelineControls
                 _timelinePlayer = value;
                 if (_timelinePlayer != null)
                 {
-
                 }
             }
         }
@@ -68,7 +67,6 @@ namespace AwbStudio.TimelineControls
             _projectSounds = projectSounds;
             _viewContext.Changed += OnViewContextChanged;
             _timelineMetaDataService = timelineMetaDataService;
-
 
             // set up the actuator value painters and editors
             _timelineEditorControls = [];
@@ -100,7 +98,6 @@ namespace AwbStudio.TimelineControls
                     awbLogger: awbLogger
                     ));
             }
-
 
             ZoomChanged();
 

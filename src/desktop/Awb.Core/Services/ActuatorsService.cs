@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
@@ -17,7 +17,7 @@ namespace Awb.Core.Services
 
         ISoundPlayer[] SoundPlayers { get; }
 
-         string[] AllIds { get; }
+        string[] AllIds { get; }
         IActuator[] AllActuators { get; }
     }
 
@@ -82,10 +82,10 @@ namespace Awb.Core.Services
             var soundPlayers = new List<ISoundPlayer>();
             if (projectConfig.Mp3PlayersYX5300 != null) soundPlayers.AddRange(projectConfig.Mp3PlayersYX5300.Select(p => new Mp3PlayerYX5300(p)));
             if (projectConfig.Mp3PlayersDFPlayerMini != null) soundPlayers.AddRange(projectConfig.Mp3PlayersDFPlayerMini.Select(p => new Mp3PlayerDFPlayerMini(p)));
-            SoundPlayers = soundPlayers.ToArray();  
-            
+            SoundPlayers = soundPlayers.ToArray();
+
             var allActuators = new List<IActuator>();
-            allActuators.AddRange(servos);    
+            allActuators.AddRange(servos);
             allActuators.AddRange(SoundPlayers);
             AllActuators = allActuators.ToArray();
 

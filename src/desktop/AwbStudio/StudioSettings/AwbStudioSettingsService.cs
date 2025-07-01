@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using System;
 using System.IO;
@@ -25,6 +25,8 @@ namespace AwbStudio.StudioSettings
 
         // set SettingsFilename to the path inside the user document folder
         private string SettingsFilename => System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AwbStudio", "AwbStudioSettings.json");
+
+        public AwbStudioSettings StudioSettings => _studioSettings;
 
         public AwbStudioSettingsService()
         {
@@ -66,7 +68,5 @@ namespace AwbStudio.StudioSettings
             return true;
         }
 
-
-        public AwbStudioSettings StudioSettings => _studioSettings;
     }
 }

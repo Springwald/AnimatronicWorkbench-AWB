@@ -10,12 +10,8 @@ using System;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
 {
-    public class DeleteObjectEventArgs : EventArgs
+    public class DeleteObjectEventArgs(IProjectObjectListable objectToDelete) : EventArgs
     {
-        public IProjectObjectListable ObjectToDelete { get; private set; }
-        public DeleteObjectEventArgs(IProjectObjectListable objectToDelete)
-        {
-            ObjectToDelete = objectToDelete;
-        }
+        public IProjectObjectListable ObjectToDelete { get; private set; } = objectToDelete;
     }
 }

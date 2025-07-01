@@ -49,7 +49,6 @@ namespace Awb.Core.Timelines.NestedTimelines
                     yield return point;
             }
         }
-
         public NestedTimelinesPointMerger(ITimelineDataService timelineDataService, IAwbLogger awbLogger)
         {
             _timelineDataService = timelineDataService;

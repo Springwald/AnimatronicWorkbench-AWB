@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Timelines;
 
@@ -31,10 +31,10 @@ namespace Awb.Core.LoadNSave.Timelines
                 targetObjectId: servoPoint.AbwObjectId,
                 valuePercent: ((ServoPoint)servoPoint).ValuePercent,
                 servoId: ((ServoPoint)servoPoint).ServoId)
-                    {
-                        Title = servoPoint.Title,
-                        Description = servoPoint.Description,
-                    };
+        {
+            Title = servoPoint.Title,
+            Description = servoPoint.Description,
+        };
 
         public static ServoPoint ToServoPoint(ServoPointSaveFormat servoPoint) =>
                 new ServoPoint(servoId: servoPoint.ServoId, valuePercent: servoPoint.ValuePercent, timeMs: servoPoint.TimeMs)

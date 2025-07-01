@@ -1,14 +1,14 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Project.Clients;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using Awb.Core.Project.Clients;
 
 namespace Awb.Core.Project.Various
 {

@@ -7,11 +7,14 @@
 
 using System.Text.Json.Serialization;
 
-namespace Awb.Core.DataPackets
+namespace Awb.Core.DataPackets.ResponseDataPackets
 {
-    public class StsServosPacketData
+    public class FeetechServoReadValueResult
     {
-        [JsonPropertyName("Servos")]
-        public StsServoPacketData[]? Servos { get; set; }
+        [JsonPropertyName("Id")]
+        public uint Id { get; set; }
+
+        [JsonPropertyName("Position")]
+        public int Position { get; set; }
     }
 }

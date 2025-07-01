@@ -17,9 +17,6 @@ using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {
-    /// <summary>
-    /// Interaction logic for SoundPlayerControl.xaml
-    /// </summary>
     public partial class SoundPlayerControl : UserControl
     {
         private int _lastPlayedSoundId;
@@ -56,7 +53,7 @@ namespace AwbStudio.TimelineControls
             _mediaPlayer.Stop();
             _lastPlayedSoundId = 0;
             _lastPlayedSoundUtcTime = DateTime.MinValue;
-        }   
+        }
 
         public void PlaySound(object? sender, SoundPlayEventArgs e)
         {
@@ -87,17 +84,5 @@ namespace AwbStudio.TimelineControls
                 }
             }
         }
-
-        //internal Sound? SoundToRequest(int soundId)
-        //{
-        //    if (Sounds == null) return null;
-        //    var sound = Sounds.FirstOrDefault(s => s.Id == soundId);
-        //    if (sound != null) return sound;
-        //    MessageBox.Show($"Sound id '{soundId}' not found.");
-        //    return null;
-        //}
-
-
-
     }
 }

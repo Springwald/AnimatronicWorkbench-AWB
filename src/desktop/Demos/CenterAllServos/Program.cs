@@ -20,7 +20,7 @@ var config = new AwbProject
     {
         ProjectTitle = "demo"
     },
-    StsServos = Enumerable.Range(1, 2).Select(id =>
+    StsServos = [.. Enumerable.Range(1, 2).Select(id =>
             new StsFeetechServoConfig
             {
                 Id = $"servo {id}",
@@ -30,7 +30,7 @@ var config = new AwbProject
                 MinValue = 1,
                 MaxValue = 4096,
                 DefaultValue = 2048
-            }).ToArray(),
+            })],
 };
 IActuatorsService actuatorsService = new ActuatorsService(config, clientService, logger);
 var stsServoReset = new StsServoCenter(actuatorsService, clientService, logger);

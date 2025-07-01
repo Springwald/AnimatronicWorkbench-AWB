@@ -1,17 +1,14 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
-using Awb.Core.Timelines.NestedTimelines;
-using Awb.Core.Timelines.Sounds;
-using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +29,7 @@ namespace AwbStudio.TimelineValuePainters
         private readonly IAwbLogger _awbLogger;
         private readonly OpticalGridCalculator _opticalGridCalculator;
 
-        public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineDataService timelineDataService, Sound[] projectSounds ,IAwbLogger awbLogger, double dotRadius = 3)
+        public ServoValuePainter(IServo servo, Grid paintControl, TimelineViewContext viewContext, TimelineCaptions timelineCaptions, ITimelineDataService timelineDataService, Sound[] projectSounds, IAwbLogger awbLogger, double dotRadius = 3)
             : base(paintControl, viewContext, timelineCaptions)
         {
             _dotRadius = dotRadius;

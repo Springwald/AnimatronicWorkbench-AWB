@@ -5,12 +5,12 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
-namespace Awb.Core.InputControllers.BCF2000
+namespace Awb.Core.Export.ExporterParts.CustomCode
 {
-    public enum LedState
+    public class CustomCodeBackupResult
     {
-        Off = 0,
-        On = 1,
-        Blinking = 2
+        public required bool Success { get; init; }
+        public CustomCodeRegionContent? CustomCodeRegionContent { get; init; }
+        public string? ErrorMsg { get; init; }
     }
 }

@@ -20,9 +20,6 @@ using System.Windows.Controls;
 
 namespace AwbStudio.PropertyControls
 {
-    /// <summary>
-    /// Interaction logic for SoundPlayerPropertyControl.xaml
-    /// </summary>
     public partial class SoundPlayerPropertyControl : UserControl, IPropertyEditor
     {
         private const string NoServoTitle = "-- NO SERVO --";
@@ -114,7 +111,6 @@ namespace AwbStudio.PropertyControls
                 ShowActualValue();
         }
 
-      
         private void ValueChoiceChanged()
         {
             if (_isUpdatingView) return;
@@ -145,7 +141,7 @@ namespace AwbStudio.PropertyControls
             {
                 if (_projectSounds.Length < index)
                 {
-                    MessageBox.Show("Sound index " + index + " not found!");
+                    MessageBox.Show($"Sound index {index} not found!");
                     return;
                 }
                 var newSound = _projectSounds[index - 1];
@@ -277,7 +273,8 @@ namespace AwbStudio.PropertyControls
             if (servoChoiceEnabled == true)
             {
                 ComboBoxServoToMove.IsEnabled = true;
-            } else
+            }
+            else
             {
                 ComboBoxServoToMove.SelectedIndex = 0;
                 ComboBoxServoToMove.IsEnabled = false;

@@ -1,15 +1,14 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Player;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineControls;
 using AwbStudio.TimelineEditing;
-using AwbStudio.Tools;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -103,7 +102,6 @@ namespace AwbStudio.TimelineValuePainters
             _playPosSynchronizer.OnPlayPosChanged -= OnPlayPosChanged;
             _viewContext.Changed -= OnViewContextChanged;
             _paintControl.SizeChanged -= OnPaintControlSizeChanged;
-
         }
     }
 }

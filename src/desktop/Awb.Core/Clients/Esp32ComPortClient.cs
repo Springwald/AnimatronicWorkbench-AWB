@@ -14,7 +14,7 @@ namespace Awb.Core.Clients
     {
         public enum PayloadTypes
         {
-            Data
+            JsonData
         }
 
         private PacketSenderReceiverComPort<PayloadTypes> _comPortReceiver;
@@ -53,7 +53,6 @@ namespace Awb.Core.Clients
             Connected = await _comPortReceiver.Connect();
             return Connected;
         }
-
         public void Dispose()
         {
             Connected = false;
@@ -67,7 +66,7 @@ namespace Awb.Core.Clients
             if (!string.IsNullOrWhiteSpace(debugInfo))
                 this.PacketSending?.Invoke(this, $"Send packet info\r\n{debugInfo}");
 
-            var result = await _comPortReceiver.SendPacket(payloadType: PayloadTypes.Data, payload: payload);
+            var result = await _comPortReceiver.SendPacket(payloadType: PayloadTypes.JsonData, payload: payload);
 
             if (result.Ok == false)
             {
@@ -78,7 +77,6 @@ namespace Awb.Core.Clients
 
             return new SendResult(ok: true, errorMessage: null, resultPlayload: result.ReturnPayload, debugInfos: $"PacketID:{result.OriginalPacketId}");
         }
-
         private void _comPortReceiver_PacketReceived(object? sender, PacketLogistics.PacketSenderReceiver<PayloadTypes>.PacketReceivedEventArgs e)
         {
             Received?.Invoke(this, new ReceivedEventArgs(payload: e.Payload));

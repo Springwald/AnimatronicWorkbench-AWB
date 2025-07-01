@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.InputControllers.TimelineInputControllers;
@@ -27,7 +27,7 @@ namespace AwbStudio.TimelineEditing
         private readonly ITimelineController[] _timelineControllers;
         private readonly TimelineControllerPlayViewPos _timelineControllerPlayViewPos;
         private readonly TimelineViewContext _viewContext;
-        
+
         private readonly IActuator[] _allActuators;
         private readonly IActuator[] _controllerTuneableActuators;
 
@@ -64,7 +64,7 @@ namespace AwbStudio.TimelineEditing
             _timelineControllers = timelineControllers;
             _timelineControllerPlayViewPos = timelineControllerPlayViewPos;
 
-            TimelineEditingManipulation = new TimelineEditingManipulation(timelineData, copyNPasteBufferHolder,playPosSynchronizer);
+            TimelineEditingManipulation = new TimelineEditingManipulation(timelineData, copyNPasteBufferHolder, playPosSynchronizer);
 
             _playPosSynchronizer = playPosSynchronizer;
             _playPosSynchronizer.OnPlayPosChanged += PlayPos_Changed;
@@ -91,7 +91,7 @@ namespace AwbStudio.TimelineEditing
                 case TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged:
                 case TimelineDataChangedEventArgs.ChangeTypes.CopyNPaste:
                     await _timelinePlayer.RequestActuatorUpdate();
-                    if (!_updatingByTimelineController && myCounter  == _timelineData_ContentChangedCounter)
+                    if (!_updatingByTimelineController && myCounter == _timelineData_ContentChangedCounter)
                     {
                         if (sender is ITimelineController timelineController)
                             ShowActuatorValuesOnTimelineInputController(dontUpdateThisController: timelineController);
@@ -134,7 +134,7 @@ namespace AwbStudio.TimelineEditing
                     if (_viewContext?.ActualFocusObject is IServo servo)
                         TimelineEditingManipulation.UpdateServoValue(servo, servo.PercentCalculator.CalculatePercent(servo.TargetValue));
                     if (_viewContext?.ActualFocusObject is ISoundPlayer soundPlayer)
-                        TimelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null, actuatorMovementBySound:soundPlayer.ActuatorMovementsBySound);
+                        TimelineEditingManipulation.UpdateSoundPlayerValue(soundPlayer, soundPlayer.ActualSoundId, soundTitle: null, actuatorMovementBySound: soundPlayer.ActuatorMovementsBySound);
                     if (_viewContext?.ActualFocusObject == NestedTimelinesFakeObject.Singleton)
                         TimelineEditingManipulation.UpdateNestedTimelinesValue();
                     break;
@@ -166,9 +166,9 @@ namespace AwbStudio.TimelineEditing
 
             // get the actuator referenced by the event
             IActuator? actuator = null;
-            if (e.ActuatorIndex_ != -1)
+            if (e.ActuatorIndex != -1)
             {
-                int actuatorIndexAbsolute = e.ActuatorIndex_ + _viewContext.BankIndex * _viewContext.ItemsPerBank;
+                int actuatorIndexAbsolute = e.ActuatorIndex + _viewContext.BankIndex * _viewContext.ItemsPerBank;
                 if (actuatorIndexAbsolute < _controllerTuneableActuators.Length)
                     actuator = _controllerTuneableActuators[actuatorIndexAbsolute];
             }
@@ -338,7 +338,6 @@ namespace AwbStudio.TimelineEditing
 
         public void Dispose()
         {
-
             _playPosSynchronizer.OnPlayPosChanged -= PlayPos_Changed;
             _timelineData.OnContentChanged -= TimelineData_ContentChanged;
 
@@ -348,6 +347,5 @@ namespace AwbStudio.TimelineEditing
             }
         }
     }
-
 }
 

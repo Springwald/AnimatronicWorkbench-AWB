@@ -1,6 +1,4 @@
-﻿// Animatronic WorkBench
-// https://github.com/Springwald/AnimatronicWorkBench-AWB
-//
+﻿// Send and receivce data to/from ESP-32 microcontroller
 // (C) 2025 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
@@ -28,10 +26,10 @@ namespace PacketLogistics.ComPorts
         public byte[] PacketFooterAsBytes { get; init; }
         public Encoding Encoding { get; init; }
 
-        public ComPortCommandConfig(string packetIdentifier = "pct") : this(encoding: Encoding.ASCII, packetIdentifier: packetIdentifier) 
+        public ComPortCommandConfig(string packetIdentifier = "pct") : this(encoding: Encoding.ASCII, packetIdentifier: packetIdentifier)
         { }
 
-        public ComPortCommandConfig( Encoding encoding, string packetIdentifier = "pct")
+        public ComPortCommandConfig(Encoding encoding, string packetIdentifier = "pct")
         {
             if (string.IsNullOrWhiteSpace(packetIdentifier))
                 throw new System.ArgumentNullException(nameof(packetIdentifier), "must not be null or empty");

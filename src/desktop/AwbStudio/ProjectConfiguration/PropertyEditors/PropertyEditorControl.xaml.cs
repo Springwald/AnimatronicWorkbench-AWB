@@ -117,7 +117,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             return true;
         }
 
-
         public PropertyEditorControl()
         {
             InitializeComponent();

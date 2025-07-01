@@ -42,9 +42,9 @@ namespace AwbStudio.AwbClientsControls
             tabsClients.SelectionChanged += (s, args) =>
             {
                 // when the selected tab changes, we need to update the client control
-                if (tabsClients.SelectedItem is TabItem selectedTab )
+                if (tabsClients.SelectedItem is TabItem selectedTab)
                 {
-                    foreach(AwbClientControl clientControl in gridClients.Children)
+                    foreach (AwbClientControl clientControl in gridClients.Children)
                     {
                         var isSelected = clientControl == selectedTab.Tag as AwbClientControl;
                         clientControl.Visibility = isSelected ? Visibility.Visible : Visibility.Collapsed;
@@ -80,7 +80,7 @@ namespace AwbStudio.AwbClientsControls
                         };
                         this.tabsClients.Items.Add(tabItem);
                     }
-                    if (tabsClients.Items.Count > 0)    
+                    if (tabsClients.Items.Count > 0)
                         this.tabsClients.SelectedIndex = 0; // select the first tab by default
 
                     labelClientCount.Content = $"{clients.Length} clients found";
@@ -88,19 +88,9 @@ namespace AwbStudio.AwbClientsControls
             });
         }
 
-
         private async void ButtonRescan_Click(object sender, RoutedEventArgs e)
         {
             var result = await _awbClientsService.ScanForClients(false);
-            if (result > 0)
-            {
-                labelClientCount.Content = $"{result} clients found";
-            }
-            else
-            {
-                labelClientCount.Content = "No clients found";
-            }
-            await ShowClients();
         }
     }
 }

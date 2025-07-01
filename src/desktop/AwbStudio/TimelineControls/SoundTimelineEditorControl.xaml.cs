@@ -1,14 +1,12 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
-using Awb.Core.Player;
-using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
 using AwbStudio.TimelineEditing;
@@ -16,19 +14,11 @@ using AwbStudio.TimelineValuePainters;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineControls
 {
-    /// <summary>
-    /// Interaction logic for SoundValueViewerControl.xaml
-    /// </summary>
     public partial class SoundTimelineEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
-        private const double _paintMarginTopBottom = 30;
-        private readonly Brush _gridLineBrush = new SolidColorBrush(Color.FromRgb(60, 60, 100));
-
         private TimelineViewContext? _viewContext;
         private ISoundPlayer? _soundPlayer;
         private SoundValuePainter? _soundValuePainter;

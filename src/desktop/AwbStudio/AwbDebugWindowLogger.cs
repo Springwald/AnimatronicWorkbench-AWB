@@ -13,18 +13,12 @@ using System.Threading.Tasks;
 
 namespace AwbStudio
 {
-    internal class AwbDebugWindowLogger : IAwbLogger, IDisposable
+    internal class AwbDebugWindowLogger(DebugWindow debugWindow) : IAwbLogger, IDisposable
     {
-        private DebugWindow? _debugWindow;
-        private readonly List<string> _output;
+        private DebugWindow? _debugWindow = debugWindow;
+        private readonly List<string> _output = [];
         public event EventHandler<string>? OnError;
         public event EventHandler<string>? OnLog;
-
-        public AwbDebugWindowLogger(DebugWindow debugWindow)
-        {
-            _debugWindow = debugWindow;
-            _output = [];
-        }
 
         public async Task LogErrorAsync(string message)
         {

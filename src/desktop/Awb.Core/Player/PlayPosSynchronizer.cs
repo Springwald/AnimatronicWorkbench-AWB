@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Tools;
 using System.Timers;
@@ -47,7 +47,7 @@ namespace Awb.Core.Player
         /// <summary>
         /// Snap the given millisecond value to the next snap position
         /// </summary>
-        public static int Snap(int ms) => (ms / SnapMs) * SnapMs;  
+        public static int Snap(int ms) => (ms / SnapMs) * SnapMs;
 
         public PlayPosSynchronizer(IInvoker invoker)
         {

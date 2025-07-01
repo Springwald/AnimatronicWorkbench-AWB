@@ -22,9 +22,6 @@ using System.Windows.Input;
 
 namespace AwbStudio
 {
-    /// <summary>
-    /// Interaction logic for ProjectManagementWindow.xaml
-    /// </summary>
     public partial class ProjectManagementWindow : Window
     {
         private readonly IProjectManagerService _projectManagerService;
@@ -310,11 +307,11 @@ namespace AwbStudio
             }
 
             var timelineEditorWindow = new TimelineEditorWindow(
-                timelineControllers, 
+                timelineControllers,
                 _projectManagerService,
                 clientsService,
                 actualProject.TimelineDataService.TimelineMetaDataService,
-                _invokerService, 
+                _invokerService,
                 _awbLogger);
 
             if (timelineEditorWindow != null)

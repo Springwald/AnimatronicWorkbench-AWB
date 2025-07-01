@@ -21,4 +21,4 @@ ECHO .
 ECHO .
 
 cd src\desktop\AwbStudio
-dotnet run 
+dotnet run --property WarningLevel=2

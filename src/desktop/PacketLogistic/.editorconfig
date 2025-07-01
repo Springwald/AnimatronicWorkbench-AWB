@@ -1,0 +1,19 @@
+# Remove the true-line below if you want to inherit .editorconfig settings from higher directories
+root = true
+
+#### Core EditorConfig Options ####
+
+# Indentation and spacing
+indent_size = 4
+indent_style = space
+tab_width = 4
+
+# New line preferences
+end_of_line = crlf
+insert_final_newline = false
+
+# C# files
+[*.cs]
+
+file_header_template =Send and receivce data to/from ESP-32 microcontroller\r\n(C) 2025 Daniel Springwald      -     Bochum, Germany\r\nhttps://daniel.springwald.de - segfault@springwald.de\r\nAll rights reserved    -   Licensed under MIT License
+

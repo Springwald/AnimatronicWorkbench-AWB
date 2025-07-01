@@ -14,14 +14,9 @@ using System.Windows.Media.Imaging;
 
 namespace AwbStudio.PropertyControls
 {
-    /// <summary>
-    /// Interaction logic for SoundPlayerPointLabel.xaml
-    /// </summary>
     public partial class SoundPlayerPointLabel : UserControl
     {
         private const int ImgHeight = 100;
-
-
         public string? LabelText
         {
             get => SoundPlayerLabel.Content?.ToString();
@@ -37,7 +32,7 @@ namespace AwbStudio.PropertyControls
             WaveImage.Source = imageSource;
         }
 
-        private ImageSource GetSoundWaveImage(Sound? sound)
+        private static ImageSource GetSoundWaveImage(Sound? sound)
         {
             var imgWidth = sound?.DurationMs / 5 ?? 1000;
             var bitmap = new WriteableBitmap(pixelWidth: imgWidth, pixelHeight: ImgHeight, 96, 96, PixelFormats.Bgra32, null);
@@ -45,7 +40,7 @@ namespace AwbStudio.PropertyControls
             return bitmap;
         }
 
-        private void FillBitmap(WriteableBitmap bitmap, Sound? sound)
+        private static void FillBitmap(WriteableBitmap bitmap, Sound? sound)
         {
             if (sound == null) return;
 
@@ -92,7 +87,6 @@ namespace AwbStudio.PropertyControls
             bitmap.Freeze(); // make it immutable for performance
         }
 
-
         public void SetWidthByDuration(double widthInPixel)
         {
             SoundPlayerLabel.Width = widthInPixel;
@@ -103,8 +97,5 @@ namespace AwbStudio.PropertyControls
         {
             InitializeComponent();
         }
-
-
-
     }
 }

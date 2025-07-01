@@ -1,25 +1,30 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 namespace Awb.Core.Timelines
 {
-    public abstract class TimelinePoint
+    public abstract class TimelinePoint(string targetObjectId, int timeMs)
     {
         /// <summary>
         /// The time in the timeline when this point should be reached, counted from the start of the timeline
         /// </summary>
-        public int TimeMs { get; set; }
+        public int TimeMs { get; set; } = timeMs;
+
+        /// <summary>
+        /// The id of the servo or display or other actuators
+        /// </summary>
+        public string AbwObjectId { get; set; } = targetObjectId;
 
         public bool IsNestedTimelinePoint { get; set; }
 
         /// <summary>
         /// The title of this point
         /// </summary>
-        public abstract string Title { get;  }
+        public abstract string Title { get; }
 
         /// <summary>
         /// A description of this point, e.g. for documentation 
@@ -32,17 +37,5 @@ namespace Awb.Core.Timelines
         public abstract string PainterCheckSum { get; }
 
         public abstract TimelinePoint Clone();
-
-
-        /// <summary>
-        /// The id of the servo or display or other actuators
-        /// </summary>
-        public string AbwObjectId { get; set; }
-
-        public TimelinePoint(string targetObjectId, int timeMs)
-        {
-            AbwObjectId = targetObjectId;
-            TimeMs = timeMs;
-        }
     }
 }

@@ -146,7 +146,5 @@ namespace AwbStudio.PropertyControls
                 _actualPropertyEditor = null;
             }
         }
-
-
     }
 }

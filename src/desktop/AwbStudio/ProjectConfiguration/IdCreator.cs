@@ -12,16 +12,11 @@ using System.Linq;
 
 namespace AwbStudio.ProjectConfiguration
 {
-    internal class IdCreator
+    internal class IdCreator(ProjectConfigViewModel projectConfigViewModel, AwbProject awbProject)
     {
-        private readonly ProjectConfigViewModel _viewModel;
-        private readonly AwbProject _awbProject;
+        private readonly ProjectConfigViewModel _viewModel = projectConfigViewModel;
+        private readonly AwbProject _awbProject = awbProject;
 
-        public IdCreator(ProjectConfigViewModel projectConfigViewModel, AwbProject awbProject)
-        {
-            _viewModel = projectConfigViewModel;
-            _awbProject = awbProject;
-        }
         public int GetNewInputId()
         {
             int id = 1;

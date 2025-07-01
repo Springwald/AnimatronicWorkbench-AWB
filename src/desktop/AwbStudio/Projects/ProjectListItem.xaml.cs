@@ -10,9 +10,6 @@ using System.Windows.Controls;
 
 namespace AwbStudio.Projects
 {
-    /// <summary>
-    /// Interaction logic for ProjectListItem.xaml
-    /// </summary>
     public partial class ProjectListItem : UserControl
     {
         public EventHandler? OnOpenProjectClicked;

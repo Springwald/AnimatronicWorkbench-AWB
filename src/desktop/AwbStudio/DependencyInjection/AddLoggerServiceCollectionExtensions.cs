@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,11 +23,12 @@ namespace AwbStudio.DependencyInjection
                 {
                     debugWindow.Show();
                     return new AwbDebugWindowLogger(debugWindow);
-                } else
+                }
+                else
                 {
                     return new AwbLoggerConsole(throwWhenInDebugMode: false);
                 }
-                
+
             });
         }
     }

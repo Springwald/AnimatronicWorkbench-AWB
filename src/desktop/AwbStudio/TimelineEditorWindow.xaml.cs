@@ -17,7 +17,6 @@ using Awb.Core.Tools;
 using AwbStudio.Exports;
 using AwbStudio.Projects;
 using AwbStudio.TimelineEditing;
-using AwbStudio.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -158,7 +157,7 @@ namespace AwbStudio
 
             var timelineCaptions = new TimelineCaptions();
             TimelineCaptionsViewer.Init(_viewContext, timelineCaptions, _actuatorsService);
-            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds, SoundPlayer);
+            ValuesEditorControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _timelineDataService.TimelineMetaDataService, _project.TimelineDataService, _awbLogger, _project.Sounds);
             AllInOnePreviewControl.Init(_viewContext, timelineCaptions, _playPosSynchronizer, _actuatorsService, _project.TimelineDataService, _timelineMetaDataService, _awbLogger, _project.Sounds);
 
             // bring to front

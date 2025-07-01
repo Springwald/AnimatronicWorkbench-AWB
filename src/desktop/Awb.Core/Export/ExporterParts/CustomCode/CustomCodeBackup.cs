@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 namespace Awb.Core.Export.ExporterParts.CustomCode
 {
@@ -13,13 +13,6 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
         private readonly string _customCodeBackupRootFolder;
 
         public event EventHandler<ExporterProcessStateEventArgs>? Processing;
-
-        public class BackupResult
-        {
-            public required bool Success { get; init; }
-            public CustomCodeRegionContent? CustomCodeRegionContent { get; init; }
-            public string? ErrorMsg { get; init; }
-        }
 
         public CustomCodeBackup(string customCodeTargetFolder, string customCodeBackupRootFolder)
         {
@@ -34,9 +27,9 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
 
         public bool CustomCodeExists => Directory.Exists(_customCodeFolder);
 
-        public BackupResult Backup()
+        public CustomCodeBackupResult Backup()
         {
-            if (!CustomCodeExists) return new BackupResult { Success = false, ErrorMsg = "No custom code found" };
+            if (!CustomCodeExists) return new CustomCodeBackupResult { Success = false, ErrorMsg = "No custom code found" };
             var customCodeRegionContent = new CustomCodeRegionContent();
 
             var backupFolder = Path.Combine(_customCodeBackupRootFolder, "Backup_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
@@ -55,7 +48,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                     case ".h":
                         break;
                     default:
-                        return new BackupResult { Success = false, ErrorMsg = "Unsupported custom code file extension: " + fileInfo.Extension };
+                        return new CustomCodeBackupResult { Success = false, ErrorMsg = "Unsupported custom code file extension: " + fileInfo.Extension };
                 }
 
                 // read the regions from the file
@@ -63,7 +56,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                 Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"\r\n----------------------------------------------------" });
                 Processing?.Invoke(this, new ExporterProcessStateEventArgs { State = ExporterProcessStateEventArgs.ProcessStates.OnlyLog, Message = $"## Opening file '{file}'" });
                 var regionsReadResult = customCodeReaderWriter.ReadRegions(filename: fileInfo.Name, content: fileContent);
-                if (regionsReadResult.ErrorMsg != null) return new BackupResult { Success = false, ErrorMsg = regionsReadResult.ErrorMsg };
+                if (regionsReadResult.ErrorMsg != null) return new CustomCodeBackupResult { Success = false, ErrorMsg = regionsReadResult.ErrorMsg };
 
                 // save the regions in the custom code region content result
                 foreach (var region in regionsReadResult.Regions)
@@ -74,7 +67,7 @@ namespace Awb.Core.Export.ExporterParts.CustomCode
                 File.WriteAllText(backupFilename, fileContent);
             }
 
-            return new BackupResult { Success = true, CustomCodeRegionContent = customCodeRegionContent };
+            return new CustomCodeBackupResult { Success = true, CustomCodeRegionContent = customCodeRegionContent };
         }
 
         private void CustomCodeReaderWriter_Processing(object? sender, ExporterProcessStateEventArgs e) => Processing?.Invoke(this, e);

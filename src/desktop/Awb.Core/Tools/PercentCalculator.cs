@@ -1,22 +1,16 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 namespace Awb.Core.Tools
 {
-    public class PercentCalculator
+    public class PercentCalculator(double min, double max)
     {
-        public PercentCalculator(double min, double max)
-        {
-            Min = min;
-            Max = max;
-        }
-
-        public double Min { get; }
-        public double Max { get; }
+        public double Min { get; } = min;
+        public double Max { get; } = max;
 
         public double CalculatePercent(double value)
         {

@@ -9,22 +9,12 @@ using System.Text.Json.Serialization;
 
 namespace Awb.Core.DataPackets.ResponseDataPackets
 {
-
-    public class FeetechServoConfig
-    {
-        [JsonPropertyName("Id")]
-        public uint Id { get; set; }
-
-        [JsonPropertyName("Position")]
-        public int Position { get; set; }
-    }
-
     public class ReadValueResponseDataPacket
     {
         [JsonPropertyName("StsServo")]
-        public FeetechServoConfig? StsServo { get; set; }
+        public FeetechServoReadValueResult? StsServo { get; set; }
 
         [JsonPropertyName("ScsServo")]
-        public FeetechServoConfig? ScsServo { get; set; }
+        public FeetechServoReadValueResult? ScsServo { get; set; }
     }
 }

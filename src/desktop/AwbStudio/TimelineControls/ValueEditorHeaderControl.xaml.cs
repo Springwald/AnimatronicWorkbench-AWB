@@ -13,9 +13,6 @@ using System.Windows.Media;
 
 namespace AwbStudio.TimelineControls
 {
-    /// <summary>
-    /// Interaction logic for ValueEditorHeaderControl.xaml
-    /// </summary>
     public partial class ValueEditorHeaderControl : UserControl
     {
         private TimelineCaption? _timelineCaption;

@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -15,7 +15,6 @@ namespace Awb.Core.Tools.Validation
         private readonly object _targetObject;
         private readonly string _propertyName;
         private readonly PropertyInfo _prop;
-
         public bool IsNullable
         {
             get
@@ -66,7 +65,7 @@ namespace Awb.Core.Tools.Validation
             {
                 var objType = _targetObject.GetType();
                 var errors = ValidateProperty(objType, value, _propertyName);
-                if (errors.Any())   return string.Join("; ", errors);
+                if (errors.Any()) return string.Join("; ", errors);
             }
             return null;
         }
@@ -81,7 +80,7 @@ namespace Awb.Core.Tools.Validation
             {
                 if (isNullable)
                 {
-                    if (setTheValue)  _prop.SetValue(_targetObject, null);
+                    if (setTheValue) _prop.SetValue(_targetObject, null);
                     return null;
                 }
                 else
@@ -136,6 +135,5 @@ namespace Awb.Core.Tools.Validation
                 if (!va.IsValid(propertyValue))
                     yield return va.FormatErrorMessage(string.Empty);
         }
-
     }
 }

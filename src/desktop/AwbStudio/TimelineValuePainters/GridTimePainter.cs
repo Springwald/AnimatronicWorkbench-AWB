@@ -1,9 +1,9 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using AwbStudio.TimelineEditing;
 using System;
@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineValuePainters
 {
-    class GridTimePainter: IDisposable
+    class GridTimePainter : IDisposable
     {
         private readonly Brush _gridLine1000msBrush = new SolidColorBrush(Color.FromRgb(60, 60, 60));
         private readonly Brush _gridLine500msBrush = new SolidColorBrush(Color.FromRgb(40, 40, 40));
@@ -55,7 +55,7 @@ namespace AwbStudio.TimelineValuePainters
                 {
                     var color = ms % 1000 == 0 ? _gridLine1000msBrush : _gridLine500msBrush;
                     _opticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = height - _paintMarginTopBottom, Stroke = color });
-                    _opticalGrid.Children.Add(new Label { Content = (ms / 1000d).ToString("0.0"), BorderThickness = new Thickness(left: x-15, top: height - 30, right: 0, bottom: 0) });
+                    _opticalGrid.Children.Add(new Label { Content = (ms / 1000d).ToString("0.0"), BorderThickness = new Thickness(left: x - 15, top: height - 30, right: 0, bottom: 0) });
                 }
             }
         }

@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2023 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using System.Globalization;
 
@@ -59,24 +59,28 @@ namespace Awb.Core.InputControllers.XTouchMini
                 if (inputHex.EndsWith("9A") || inputHex.EndsWith("8A")) // Knob press or  Button down / up
                 {
                     var indexHex = inputHex.Substring(0, 2);
-                    if (int.TryParse(indexHex, NumberStyles.HexNumber, null, out int index)) 
+                    if (int.TryParse(indexHex, NumberStyles.HexNumber, null, out int index))
                     {
                         if (index > 15)
                         {
                             InputType = InputTypes.ButtonBottomLine;
                             InputIndex = index - 15;
 
-                        } else if (index > 7)
+                        }
+                        else if (index > 7)
                         {
                             InputType = InputTypes.ButtonTopLine;
                             InputIndex = index - 7;
 
-                        }else
+                        }
+                        else
                         {
                             InputType = InputTypes.KnobPress;
-                            InputIndex = index+1;
+                            InputIndex = index + 1;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         InputIndex = -1;
                     }
                     return;

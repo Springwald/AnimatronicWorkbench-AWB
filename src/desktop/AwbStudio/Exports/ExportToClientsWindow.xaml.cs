@@ -77,7 +77,6 @@ namespace AwbStudio.Exports
             }
         }
 
-
         public ExportToClientsWindow(IProjectManagerService projectManagerService, IActuatorsService actuatorsService, IAwbLogger awbLogger)
         {
             InitializeComponent();

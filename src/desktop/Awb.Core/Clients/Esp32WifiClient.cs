@@ -12,9 +12,7 @@ namespace Awb.Core.Clients
     internal class Esp32WifiClient : IAwbClient
     {
         public uint ClientId => throw new NotImplementedException();
-
         public string FriendlyName => throw new NotImplementedException();
-
 
         public EventHandler<string>? OnError { get; set; }
 

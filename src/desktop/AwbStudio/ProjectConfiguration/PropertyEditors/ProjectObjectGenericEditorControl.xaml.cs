@@ -37,13 +37,12 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         private readonly IAwbClientsService _awbClientsService;
 
-
         private List<SinglePropertyEditorControl>? _editors;
         private IProjectObjectListable? _projectObject;
         private AwbProject? _awbProject;
         private IInvoker? _invoker;
         private string[]? _objectsUsingThisObject;
-        
+
         public EventHandler? OnUpdatedData { get; set; }
         public EventHandler<DeleteObjectEventArgs>? OnDeleteObject { get; set; }
 
@@ -241,7 +240,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
 
         private void ButtonDelete_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (_objectsUsingThisObject == null )
+            if (_objectsUsingThisObject == null)
                 return;
 
             if (_objectsUsingThisObject.Any())

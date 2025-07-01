@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -15,7 +15,7 @@ namespace Awb.Core.Project.Clients
     {
         #region Main
 
-        [Display(Name = "Client ID", GroupName ="General", Order = 1)]
+        [Display(Name = "Client ID", GroupName = "General", Order = 1)]
         [Description("The ID of this ESP32 client device.")]
         [Range(1, 254)]
         public required uint ClientId { get; set; } = 1;
@@ -175,7 +175,7 @@ namespace Awb.Core.Project.Clients
             }
 
             if (Display_M5Stack == true && Display_Ssd1306 == true)
-                {
+            {
                 yield return new ProjectProblem
                 {
                     Message = "Only one display can be used at a time",

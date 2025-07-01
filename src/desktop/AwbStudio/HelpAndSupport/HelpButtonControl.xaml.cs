@@ -76,7 +76,5 @@ namespace AwbStudio.HelpAndSupport
             };
             System.Diagnostics.Process.Start(sInfo);
         }
-
-
     }
 }
