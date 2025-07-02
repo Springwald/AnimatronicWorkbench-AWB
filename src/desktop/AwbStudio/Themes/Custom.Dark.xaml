@@ -27,5 +27,11 @@
         <Setter Property="Background" Value="Black" />
     </Style>
 
+    <Style TargetType="tlc:TimelineValuesEditorControl">
+        <Setter Property="Background" Value="Black" />
+    </Style>
+
+    
+
 
 </ResourceDictionary>

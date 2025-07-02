@@ -130,7 +130,7 @@ namespace AwbStudio
 
             this.IsEnabled = false;
             this.SizeChanged += TimelineEditorWindow_SizeChanged;
-            CalculateSizeAndPixelPerMs();
+          
 
             AllInOnePreviewControl.Timelineplayer = _timelinePlayer;
             SoundPlayer.Sounds = _project.Sounds;
@@ -174,6 +174,8 @@ namespace AwbStudio
                 // create a new timeline
                 : CreateNewTimelineData("");
             await SetupChangedTimelineData(newTimelineData);
+
+            CalculateSizeAndPixelPerMs();
 
             _unsavedChanges = false;
 

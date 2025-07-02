@@ -10,4 +10,8 @@
         <Setter Property="Background" Value="#CCCCCC" />
     </Style>
 
+    <Style TargetType="tlc:TimelineValuesEditorControl">
+        <Setter Property="Background" Value="#CCCCCC" />
+    </Style>
+
 </ResourceDictionary>

@@ -10,6 +10,7 @@
         PreviewMouseLeftButtonDown="Grid_PreviewMouseLeftButtonDown"
         PreviewMouseLeftButtonUp="Grid_PreviewMouseLeftButtonUp"
         PreviewMouseMove="Grid_PreviewMouseMove"
+        Background="#02FFFFFF"
       >
         <Grid x:Name="OpticalGrid" IsHitTestVisible="False"></Grid>
         <Grid x:Name="AllValuesGrid"></Grid>

@@ -9,61 +9,22 @@ using Awb.Core.Actuators;
 using Awb.Core.Project.Various;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Windows.Media;
 
 namespace AwbStudio.TimelineEditing
 {
     public class TimelineCaptions
     {
-        private Brush[] _brushes =
-        (App.Current as AwbStudio.App)!.DarkMode ?
-            [
-                new SolidColorBrush(Colors.White),
-                new SolidColorBrush(Colors.LightBlue),
-                new SolidColorBrush(Colors.LightGreen),
-                new SolidColorBrush(Colors.Salmon),
-                new SolidColorBrush(Colors.Magenta),
-                new SolidColorBrush(Colors.Orange),
-                new SolidColorBrush(Colors.Pink),
-                new SolidColorBrush(Colors.Yellow),
-                new SolidColorBrush(Colors.Beige),
-                new SolidColorBrush(Colors.Tomato),
-                new SolidColorBrush(Colors.SkyBlue),
-                new SolidColorBrush(Colors.MintCream),
-                new SolidColorBrush(Colors.LightGoldenrodYellow),
-                new SolidColorBrush(Colors.LightPink),
-                new SolidColorBrush(Colors.LightSteelBlue),
-                new SolidColorBrush(Colors.LemonChiffon),
-            ] :
-            [
-                new SolidColorBrush(Colors.Black),
-                new SolidColorBrush(Colors.Blue),
-                new SolidColorBrush(Colors.Green),
-                new SolidColorBrush(Colors.Red),
-                new SolidColorBrush(Colors.Magenta),
-                new SolidColorBrush(Colors.Orange),
-                new SolidColorBrush(Colors.Pink),
-                new SolidColorBrush(Colors.Yellow),
-                new SolidColorBrush(Colors.Beige),
-                new SolidColorBrush(Colors.Tomato),
-                new SolidColorBrush(Colors.SkyBlue),
-                new SolidColorBrush(Colors.MintCream),
-                new SolidColorBrush(Colors.LightGoldenrodYellow),
-                new SolidColorBrush(Colors.LightPink),
-                new SolidColorBrush(Colors.LightSteelBlue),
-                new SolidColorBrush(Colors.LemonChiffon),
-            ];
-
-        private Brush _brushBlack = new SolidColorBrush(Colors.Black);
-
         private int _brushIndex = 0;
-
         private List<TimelineCaption> _captions = new List<TimelineCaption>();
+        private readonly TimelineColors _timelineBrushes;
 
         public TimelineCaption[] Captions => _captions.ToArray();
 
         public TimelineCaptions()
         {
+            _timelineBrushes = new TimelineColors();
         }
 
         public void AddAktuator(IActuator actuator)
@@ -113,23 +74,29 @@ namespace AwbStudio.TimelineEditing
 
         public void AddCaption(string id, string label, bool objectIsControllerTuneable, bool inverse)
         {
+            var brushes = _timelineBrushes.TimelineBrushes;
+
             if (inverse)
             {
-                _captions.Add(new TimelineCaption(foregroundColor: _brushBlack, id: id, label: label)
+                var brush = brushes[_brushIndex++]!;
+                var contrastBrush = _timelineBrushes.GetContrastBrush(brush);
+
+                _captions.Add(new TimelineCaption(foregroundColor: contrastBrush, id: id, label: label)
                 {
                     ObjectIsControllerTuneable = objectIsControllerTuneable,
-                    BackgroundColor = _brushes[_brushIndex++],
+                    BackgroundColor = brush,
                 });
             }
             else
             {
-                _captions.Add(new TimelineCaption(foregroundColor: _brushes[_brushIndex++], id: id, label: label)
+                _captions.Add(new TimelineCaption(foregroundColor: brushes[_brushIndex++], id: id, label: label)
                 {
                     ObjectIsControllerTuneable = objectIsControllerTuneable,
-                    BackgroundColor = null,
+                    BackgroundColor = _timelineBrushes.CaptionBackgroundBrush(inverse),
                 });
             }
-            if (_brushIndex >= _brushes.Length) _brushIndex = 0; // start with first color again
+            if (_brushIndex >= brushes.Length) _brushIndex = 0; // start with first color again
         }
+
     }
 }
