@@ -38,7 +38,6 @@ namespace AwbStudio
 
             foreach (var uri in uris)
                 ThemeDictionary.MergedDictionaries.Add(new ResourceDictionary() { Source = uri });
-
         }
 
         public App()
@@ -51,7 +50,7 @@ namespace AwbStudio
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            ChangeTheme(darkMode: false);
+            ChangeTheme(darkMode: true);
 
             var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
             if (projectManagementWindow != null)

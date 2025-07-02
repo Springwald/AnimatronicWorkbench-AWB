@@ -13,8 +13,15 @@
     </Style>
 
 
+    <Style TargetType="TabControl">
+        <Setter Property="Foreground" Value="LightGray" />
+        <Setter Property="Background" Value="#222222" />
+    </Style>
+
+
     <Style TargetType="emoji:TextBlock">
         <Setter Property="Foreground" Value="LightGray" />
+        <Setter Property="Background" Value="#222222" />
     </Style>
 
 

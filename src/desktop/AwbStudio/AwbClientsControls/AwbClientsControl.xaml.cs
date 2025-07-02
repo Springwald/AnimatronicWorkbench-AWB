@@ -11,6 +11,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Windows.UI.Text;
 
 namespace AwbStudio.AwbClientsControls
 {
@@ -39,20 +40,7 @@ namespace AwbStudio.AwbClientsControls
         private async void AwbClientsService_ClientsLoaded(object? sender, EventArgs e)
         {
             await ShowClients();
-            tabsClients.SelectionChanged += (s, args) =>
-            {
-                // when the selected tab changes, we need to update the client control
-                if (tabsClients.SelectedItem is TabItem selectedTab)
-                {
-                    foreach (AwbClientControl clientControl in gridClients.Children)
-                    {
-                        var isSelected = clientControl == selectedTab.Tag as AwbClientControl;
-                        clientControl.Visibility = isSelected ? Visibility.Visible : Visibility.Collapsed;
-                    }
-                }
-            };
         }
-
 
         private async Task ShowClients()
         {
@@ -62,20 +50,18 @@ namespace AwbStudio.AwbClientsControls
                 Dispatcher.Invoke(() =>
                 {
                     var clients = _awbClientsService.ComPortClients;
-                    this.gridClients.Children.Clear();
                     this.tabsClients.Items.Clear();
                     foreach (var client in clients)
                     {
                         // add the client
                         var clientControl = new AwbClientControl(_invokerService);
-                        this.gridClients.Children.Add(clientControl);
                         clientControl.SetClient(client);
 
                         // create a new tab for each client
                         var tabItem = new TabItem
                         {
                             Header = client.FriendlyName,
-                            Content = new TextBlock { Text = $"Client '{client.FriendlyName}'" },
+                            Content = clientControl, // new TextBlock { Text = $"Client '{client.FriendlyName}'" },
                             Tag = clientControl
                         };
                         this.tabsClients.Items.Add(tabItem);
