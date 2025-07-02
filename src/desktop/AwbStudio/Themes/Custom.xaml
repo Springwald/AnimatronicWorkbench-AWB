@@ -1,0 +1,23 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:local="clr-namespace:AwbStudio"
+                    xmlns:export="clr-namespace:AwbStudio.Exports"
+                    xmlns:projectConfig="clr-namespace:AwbStudio.ProjectConfiguration"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    mc:Ignorable="d">
+
+    <Style TargetType="local:TimelineEditorWindow" BasedOn="{StaticResource {x:Type Window}}"/>
+    <Style TargetType="local:ProjectConfigurationWindow" BasedOn="{StaticResource {x:Type Window}}"/>
+    <Style TargetType="local:ProjectManagementWindow" BasedOn="{StaticResource {x:Type Window}}"/>
+    <Style TargetType="local:DebugWindow" BasedOn="{StaticResource {x:Type Window}}"/>
+    <Style TargetType="local:AwbClientsWindow" BasedOn="{StaticResource {x:Type Window}}"/>
+
+    <Style TargetType="export:ExportToClientsWindow" BasedOn="{StaticResource {x:Type Window}}"/>
+
+    <Style TargetType="projectConfig:ProjectObjectListControl" BasedOn="{StaticResource {x:Type UserControl}}"/>
+    <Style TargetType="UserControl" BasedOn="{StaticResource {x:Type UserControl}}"/>
+
+    <!--<Style TargetType="local:TimelineControls.TimelineViewer" BasedOn="{StaticResource {x:Type UserControl}}"/>-->
+
+</ResourceDictionary>

@@ -13,9 +13,12 @@ using AwbStudio.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace AwbStudio
 {
@@ -30,7 +33,7 @@ namespace AwbStudio
             get { return Resources.MergedDictionaries[0]; }
         }
 
-        public void ChangeTheme(Uri[] uris)
+        public void ChangeTheme(IEnumerable<Uri> uris)
         {
             ThemeDictionary.MergedDictionaries.Clear();
 
@@ -50,20 +53,25 @@ namespace AwbStudio
         public void ChangeTheme(bool darkMode)
         {
             var app = (App)Application.Current;
+
+            List<string> styleUris = [
+                    "/Themes/Custom.xaml"
+                ];
+
             if (darkMode)
             {
-                app.ChangeTheme(
-                [
-                      new Uri("/Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml", UriKind.Relative),
-                    //new Uri("/Themes/MetroDark/MetroDark.MSControls.Toolkit.Implicit.xaml", UriKind.Relative)
-                ]);
+                styleUris.Add("/Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml");
+                styleUris.Add("/Themes/Custom.Dark.xaml");
             }
             else
             {
-                app.ChangeTheme(
-                [new Uri("/Themes/Metro/Light/Metro.MSControls.Core.Implicit.xaml ", UriKind.Relative)]);
+                styleUris.Add("/Themes/Metro/Light/Metro.MSControls.Core.Implicit.xaml");
+                styleUris.Add("/Themes/Custom.Light.xaml");
             }
 
+            app.ChangeTheme(
+                    styleUris.Select(u => new Uri(u, UriKind.Relative))
+                );
         }
 
         /// <summary>
@@ -100,7 +108,7 @@ namespace AwbStudio
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            ChangeTheme(darkMode: true);
+            ChangeTheme(darkMode: false);
 
             var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
             if (projectManagementWindow != null)
