@@ -188,7 +188,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 Header = title,
                 Margin = new System.Windows.Thickness(left: 5, top: 0, right: 5, bottom: 10),
                 Padding = new System.Windows.Thickness(left: 10, top: 10, right: 5, bottom: 10),
-                Background = new SolidColorBrush(Color.FromRgb(25, 25, 25))
+                Background = new SolidColorBrush(Color.FromArgb(10,0,0,0))
             };
 
         }

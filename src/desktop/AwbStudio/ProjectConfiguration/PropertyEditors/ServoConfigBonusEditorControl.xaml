@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AwbStudio.ProjectConfiguration.PropertyEditors"
              mc:Ignorable="d" >
-    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0,0,10,10" Background="#FF333333"  >
+    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="2" Margin="0,0,10,10"   >
         <StackPanel Margin="5,5,5,0" VerticalAlignment="Top">
             <Label Content="Servo physical range" HorizontalAlignment="Center" FontWeight="Bold"></Label>
             <Grid>
