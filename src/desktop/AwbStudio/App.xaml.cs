@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -26,19 +25,19 @@ namespace AwbStudio
         private static string _errorMessages = string.Empty;
         private static ServiceProvider? _serviceProvider;
 
-        public ResourceDictionary ThemeDictionary
+        private bool _darkModeBackingField = true;
+        private ResourceDictionary ThemeDictionary => Resources.MergedDictionaries[0];   // You could probably get it via its name with some query logic as well.
+
+        public bool DarkMode
         {
-            // You could probably get it via its name with some query logic as well.
-            get { return Resources.MergedDictionaries[0]; }
+            get => _darkModeBackingField;
+            set
+            {
+                _darkModeBackingField = value;
+                ChangeTheme(_darkModeBackingField);
+            }
         }
 
-        public void ChangeTheme(IEnumerable<Uri> uris)
-        {
-            ThemeDictionary.MergedDictionaries.Clear();
-
-            foreach (var uri in uris)
-                ThemeDictionary.MergedDictionaries.Add(new ResourceDictionary() { Source = uri });
-        }
 
         public App()
         {
@@ -50,7 +49,7 @@ namespace AwbStudio
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            ChangeTheme(darkMode: true);
+            this.DarkMode = true;
 
             var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
             if (projectManagementWindow != null)
@@ -67,12 +66,10 @@ namespace AwbStudio
             }
         }
 
-        public void ChangeTheme(bool darkMode)
+        private void ChangeTheme(bool darkMode)
         {
-            var app = (App)Application.Current;
-
             List<string> styleUris = [];
-                
+
             if (darkMode)
             {
                 styleUris.Add("/Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml");
@@ -86,9 +83,10 @@ namespace AwbStudio
 
             styleUris.Add("/Themes/Custom.xaml");
 
-            app.ChangeTheme(
-                    styleUris.Select(u => new Uri(u, UriKind.Relative))
-                );
+            ThemeDictionary.MergedDictionaries.Clear();
+            foreach (var uri in styleUris)
+                ThemeDictionary.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri(uri, UriKind.Relative) });
+
         }
 
         /// <summary>
@@ -122,8 +120,6 @@ namespace AwbStudio
             services.TryAddTransient<ProjectConfigurationWindow>();
             services.TryAddTransient<TimelineEditorWindow>();
         }
-
-      
 
         private void SetupUnhandledExceptionHandling()
         {
