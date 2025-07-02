@@ -18,7 +18,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
 
 namespace AwbStudio
 {
@@ -50,14 +49,31 @@ namespace AwbStudio
             SetupUnhandledExceptionHandling();
         }
 
+        private void OnStartup(object sender, StartupEventArgs e)
+        {
+            ChangeTheme(darkMode: false);
+
+            var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
+            if (projectManagementWindow != null)
+            {
+                projectManagementWindow.Show();
+                projectManagementWindow.Closed += (s, args) => Shutdown();
+            }
+
+            var awbClientWindow = _serviceProvider!.GetService<AwbClientsWindow>();
+            if (awbClientWindow != null)
+            {
+                awbClientWindow.Show();
+                // awbClientWindow.Closed += (s, args) => Shutdown();
+            }
+        }
+
         public void ChangeTheme(bool darkMode)
         {
             var app = (App)Application.Current;
 
-            List<string> styleUris = [
-                    "/Themes/Custom.xaml"
-                ];
-
+            List<string> styleUris = [];
+                
             if (darkMode)
             {
                 styleUris.Add("/Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml");
@@ -68,6 +84,8 @@ namespace AwbStudio
                 styleUris.Add("/Themes/Metro/Light/Metro.MSControls.Core.Implicit.xaml");
                 styleUris.Add("/Themes/Custom.Light.xaml");
             }
+
+            styleUris.Add("/Themes/Custom.xaml");
 
             app.ChangeTheme(
                     styleUris.Select(u => new Uri(u, UriKind.Relative))
@@ -106,24 +124,7 @@ namespace AwbStudio
             services.TryAddTransient<TimelineEditorWindow>();
         }
 
-        private void OnStartup(object sender, StartupEventArgs e)
-        {
-            ChangeTheme(darkMode: false);
-
-            var projectManagementWindow = _serviceProvider!.GetService<ProjectManagementWindow>();
-            if (projectManagementWindow != null)
-            {
-                projectManagementWindow.Show();
-                projectManagementWindow.Closed += (s, args) => Shutdown();
-            }
-
-            var awbClientWindow = _serviceProvider!.GetService<AwbClientsWindow>();
-            if (awbClientWindow != null)
-            {
-                awbClientWindow.Show();
-                // awbClientWindow.Closed += (s, args) => Shutdown();
-            }
-        }
+      
 
         private void SetupUnhandledExceptionHandling()
         {
