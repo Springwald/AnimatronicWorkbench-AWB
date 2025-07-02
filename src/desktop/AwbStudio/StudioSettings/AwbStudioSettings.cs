@@ -16,6 +16,12 @@ namespace AwbStudio.StudioSettings
         /// </summary>
         public bool ReOpenLastProjectOnStart { get; set; } = false;
 
+
+        /// <summary>
+        /// Use dark mode for the UI
+        /// </summary>
+        public bool DarkMode { get; set; } = true;
+
         /// <summary>
         /// Which projects were opened last
         /// </summary>

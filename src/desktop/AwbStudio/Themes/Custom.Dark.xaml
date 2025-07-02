@@ -3,6 +3,7 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:tlc="clr-namespace:AwbStudio.TimelineControls"
                     mc:Ignorable="d">
 
 
@@ -12,16 +13,18 @@
         <Setter Property="BorderThickness" Value="1px"/>
     </Style>
 
-
     <Style TargetType="TabControl">
         <Setter Property="Foreground" Value="LightGray" />
         <Setter Property="Background" Value="#222222" />
     </Style>
 
-
     <Style TargetType="emoji:TextBlock">
         <Setter Property="Foreground" Value="LightGray" />
         <Setter Property="Background" Value="#222222" />
+    </Style>
+
+    <Style TargetType="tlc:TimelineAllInOnePreviewControl">
+        <Setter Property="Background" Value="Black" />
     </Style>
 
 

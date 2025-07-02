@@ -11,48 +11,50 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-    <ScrollViewer Grid.Row="0">
-        <StackPanel Margin="5">
-            <Label>
-                <TextBlock TextWrapping="Wrap" Text="Animatronic WorkBench (AWB) Studio" FontSize="26" FontWeight="Bold" Margin="5 0"  />
-            </Label>
-            <Label Content="Open source software for animatronic figures" Margin="5 0"/>
-            <Label 
+        <ScrollViewer Grid.Row="0">
+            <StackPanel Margin="5">
+                <Label>
+                    <TextBlock TextWrapping="Wrap" Text="Animatronic WorkBench (AWB) Studio" FontSize="26" FontWeight="Bold" Margin="5 0"  />
+                </Label>
+                <Label Content="Open source software for animatronic figures" Margin="5 0"/>
+                <Label 
             x:Name="LabelVersion"
             Margin="5 0" >Version Info
-            </Label>
-            <StackPanel x:Name="StackPanelUpdateAvailable" Margin="5 0" Background="#4C0E56DC"  >
-                <Label Margin="5">
-                    There is a new version available!
                 </Label>
+                <StackPanel x:Name="StackPanelUpdateAvailable" Margin="5 0" Background="#4C0E56DC"  >
+                    <Label Margin="5">
+                        There is a new version available!
+                    </Label>
                     <Label x:Name="LabelNewVersion" Margin="5"></Label>
-                <Button Width="Auto" HorizontalAlignment="Left" Margin="5" Click="DownloadButton_Click">Download now!</Button>
-            </StackPanel>
-            <Label>
-                <TextBlock  Margin="5 0">           
+                    <Button Width="Auto" HorizontalAlignment="Left" Margin="5" Click="DownloadButton_Click">Download now!</Button>
+                </StackPanel>
+                <Label>
+                    <TextBlock  Margin="5 0">           
                 <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB/AnimatronicWorkbench" RequestNavigate="Hyperlink_RequestNavigate">
                     Project website
                 </Hyperlink>
-                </TextBlock>
-            </Label>
-            <Label>
-                <TextBlock Margin="5 0">           
+                    </TextBlock>
+                </Label>
+                <Label>
+                    <TextBlock Margin="5 0">           
                 <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB-Docs/AWB-Releases" RequestNavigate="Hyperlink_RequestNavigate">
                    View version history
                 </Hyperlink>
-                </TextBlock>
-            </Label>
-            <Label>
-                <TextBlock Margin="5 0">           
+                    </TextBlock>
+                </Label>
+                <Label>
+                    <TextBlock Margin="5 0">           
         <Hyperlink NavigateUri="https://daniel.springwald.de/post/AWB-Docs/AWB-Docs" RequestNavigate="Hyperlink_RequestNavigate">
            show setup / installation instructions
         </Hyperlink>
-                </TextBlock>
-            </Label>
-        </StackPanel>
-    </ScrollViewer>
-        <Label  Grid.Row="1">
+                    </TextBlock>
+                </Label>
+            </StackPanel>
+        </ScrollViewer>
+        <CheckBox x:Name="CheckboxDarkMode" Grid.Row="1" Content=" DarkMode" HorizontalAlignment="Left" Margin="5" Unchecked="CheckboxDarkMode_Checked" Checked="CheckboxDarkMode_Checked" />
+        <Label  Grid.Row="2">
             <TextBlock TextWrapping="Wrap" Margin="5 0">
 Copyright (c) 2025 Daniel Springwald, licensed under the MIT license.
 Includes third party material
