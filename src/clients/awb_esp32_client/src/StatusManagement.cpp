@@ -13,8 +13,9 @@ void StatusManagement::setDebugStatus(String state)
 
 void StatusManagement::update()
 {
+
     auto diff = millis() - _millisLastDisplayChange;
-    if (diff < 1000)
+    if (diff < durationPerDisplayState)
         return;
 
     _millisLastDisplayChange = millis();
@@ -43,7 +44,7 @@ String StatusManagement::getDebugInfos()
 {
     int freeMemory = getFreeMemory();
 
-    String message = "";
+    String message = "AWB Client " + String(_clientId);
 
     long lostMemory = _freeMemoryOnStart - freeMemory;
     String memoryInfo = "mem:" + String(freeMemory / 1024) + "k lost:" + String(lostMemory / 1024) + "." + String((lostMemory % 1024) / 100) + "k";

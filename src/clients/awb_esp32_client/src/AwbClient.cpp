@@ -187,7 +187,7 @@ void AwbClient::setup()
 
     // set up the status management
     showSetupMsg("setup status management");
-    _statusManagement = new StatusManagement(_projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback);
+    _statusManagement = new StatusManagement(this->_clientId, _projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback);
 
     _debugging->setState(Debugging::MJ_SETUP, 85);
 

@@ -26,6 +26,9 @@ class StatusManagement
     using TCallBackMessageToShowWithDuration = std::function<void(String, int)>;
 
 private:
+    const int durationPerDisplayState = 2000; // 2 seconds per display state
+
+    int _clientId = 0;       /// The client id
     AwbDisplay *_awbDisplay; /// The display, oled or lcd
     ProjectData *_projectData;
     StScsSerialServoManager *_stSerialServoManager;
@@ -54,8 +57,8 @@ private:
     int getFreeMemory();
 
 public:
-    StatusManagement(ProjectData *projectData, AwbDisplay *awbDisplay, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured)
-        : _projectData(projectData), _awbDisplay(awbDisplay), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured)
+    StatusManagement(int clientId, ProjectData *projectData, AwbDisplay *awbDisplay, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured)
+        : _clientId(clientId), _projectData(projectData), _awbDisplay(awbDisplay), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured)
     {
         resetDebugInfos();
     }
