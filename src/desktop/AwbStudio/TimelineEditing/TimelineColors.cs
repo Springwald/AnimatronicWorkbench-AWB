@@ -6,7 +6,6 @@
 // All rights reserved    -   Licensed under MIT License
 
 using System;
-using System.Globalization;
 using System.Windows.Media;
 
 namespace AwbStudio.TimelineEditing
@@ -23,19 +22,48 @@ namespace AwbStudio.TimelineEditing
         /// </summary>
         public SolidColorBrush[] TimelineBrushes { get; }
 
-        public Brush CaptionBackgroundBrush(bool inverted) {
-            return DarkMode
-                ? (Brush)(inverted ? Brushes.White : Brushes.Black)
-                : (Brush)(inverted ? Brushes.Black : Brushes.White);
-        }
+
+        /// <summary>
+        /// horizontal grid line primary
+        /// </summary>
+        public Brush GridLineHorizontalBrushPrimary { get; }
+
+        /// <summary>
+        /// horizontal grid line secondary
+        /// </summary>
+        public Brush GridLineHorizontalBrushSecondary { get; }
+
+        /// <summary>
+        /// vertical grid line primary
+        /// </summary>
+        public Brush GridLineVertical1000msBrush { get; }
+
+        /// <summary>
+        /// vertical grid line secondary
+        /// </summary>
+        public Brush GridLineVertical500msBrush { get; }
+
+
+        public Brush CaptionBackgroundBrush { get; }
 
         public TimelineColors()
         {
-            this.DarkMode = (App.Current as AwbStudio.App)!.DarkMode;
-            this.TimelineBrushes = this.DarkMode ?
-            [
-                // Colors for DarkMode
-                new SolidColorBrush(Colors.White),
+            DarkMode = (App.Current as AwbStudio.App)!.DarkMode;
+
+            CaptionBackgroundBrush = DarkMode ? Brushes.Black : Brushes.White;
+
+            var horizontalGridColor = DarkMode ? Colors.DeepSkyBlue : Colors.Blue;
+            GridLineHorizontalBrushPrimary = new SolidColorBrush(horizontalGridColor) { Opacity = 0.5 };
+            GridLineHorizontalBrushSecondary = new SolidColorBrush(horizontalGridColor) { Opacity = 0.25 };
+
+            var verticalGridColor = DarkMode ? Colors.White: Colors.Black;
+            GridLineVertical1000msBrush = new SolidColorBrush(verticalGridColor) { Opacity = 0.3 };
+            GridLineVertical500msBrush = new SolidColorBrush(verticalGridColor) { Opacity = 0.15 };
+
+            TimelineBrushes = DarkMode ?
+                [
+                    // Colors for DarkMode
+                    new SolidColorBrush(Colors.White),
                 new SolidColorBrush(Colors.LightBlue),
                 new SolidColorBrush(Colors.LightGreen),
                 new SolidColorBrush(Colors.Salmon),
@@ -52,9 +80,9 @@ namespace AwbStudio.TimelineEditing
                 new SolidColorBrush(Colors.LightSteelBlue),
                 new SolidColorBrush(Colors.LemonChiffon),
             ] :
-            [
-                // Colors for LightMode
-                new SolidColorBrush(Colors.Black),
+                [
+                    // Colors for LightMode
+                    new SolidColorBrush(Colors.Black),
                 new SolidColorBrush(Colors.Blue),
                 new SolidColorBrush(Colors.Green),
                 new SolidColorBrush(Colors.Red),

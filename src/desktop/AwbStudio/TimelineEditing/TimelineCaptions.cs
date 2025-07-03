@@ -92,7 +92,7 @@ namespace AwbStudio.TimelineEditing
                 _captions.Add(new TimelineCaption(foregroundColor: brushes[_brushIndex++], id: id, label: label)
                 {
                     ObjectIsControllerTuneable = objectIsControllerTuneable,
-                    BackgroundColor = _timelineBrushes.CaptionBackgroundBrush(inverse),
+                    BackgroundColor = _timelineBrushes.CaptionBackgroundBrush,
                 });
             }
             if (_brushIndex >= brushes.Length) _brushIndex = 0; // start with first color again

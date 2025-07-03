@@ -9,17 +9,16 @@ using AwbStudio.TimelineEditing;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace AwbStudio.TimelineValuePainters
 {
     class GridTimePainter : IDisposable
     {
-        private readonly Brush _gridLine1000msBrush = new SolidColorBrush(Color.FromRgb(60, 60, 60));
-        private readonly Brush _gridLine500msBrush = new SolidColorBrush(Color.FromRgb(40, 40, 40));
+
         private readonly Grid _opticalGrid;
         private readonly TimelineViewContext _viewContext;
+        private readonly TimelineColors _timelineColors;
 
         public GridTimePainter(Grid opticalGrid, TimelineViewContext viewContext)
         {
@@ -27,6 +26,8 @@ namespace AwbStudio.TimelineValuePainters
             _viewContext = viewContext;
 
             _opticalGrid.SizeChanged += OnSizeChanged;
+
+            _timelineColors  = new TimelineColors();
 
             PaintGrid();
         }
@@ -53,7 +54,7 @@ namespace AwbStudio.TimelineValuePainters
                 var x = _viewContext.GetXPos(ms);
                 if (x > 0 && x < width)
                 {
-                    var color = ms % 1000 == 0 ? _gridLine1000msBrush : _gridLine500msBrush;
+                    var color = ms % 1000 == 0 ? _timelineColors.GridLineVertical1000msBrush : _timelineColors.GridLineVertical500msBrush;
                     _opticalGrid.Children.Add(new Line { X1 = x, X2 = x, Y1 = _paintMarginTopBottom, Y2 = height - _paintMarginTopBottom, Stroke = color });
                     _opticalGrid.Children.Add(new Label { Content = (ms / 1000d).ToString("0.0"), BorderThickness = new Thickness(left: x - 15, top: height - 30, right: 0, bottom: 0) });
                 }

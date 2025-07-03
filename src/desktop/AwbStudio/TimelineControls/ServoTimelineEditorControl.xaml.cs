@@ -24,9 +24,6 @@ namespace AwbStudio.TimelineControls
 {
     public partial class ServoTimelineEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
-        private readonly Brush _gridLineBrushPrimary = new SolidColorBrush(Color.FromRgb(100, 100, 200));
-        private readonly Brush _gridLineBrushSecondary = new SolidColorBrush(Color.FromRgb(60, 60, 100));
-
         private TimelineViewContext? _viewContext;
         private TimelineCaption? _caption;
         private bool _isInitialized;
@@ -34,6 +31,7 @@ namespace AwbStudio.TimelineControls
         private volatile bool _isDrawing;
         private int _paintCounter = 0;
         private OpticalGridCalculator? _opticalGridCalculator;
+        private readonly TimelineColors _timelineColors;
 
         public IServo? Servo { get; private set; }
 
@@ -44,6 +42,7 @@ namespace AwbStudio.TimelineControls
         {
             InitializeComponent();
             Loaded += ServoValueViewerControl_Loaded;
+            _timelineColors = new TimelineColors();
         }
         private void ServoValueViewerControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -123,7 +122,7 @@ namespace AwbStudio.TimelineControls
                     X2 = _opticalGridCalculator.PaintGridAreaWidth,
                     Y1 = y,
                     Y2 = y,
-                    Stroke = new[] { 0, 50, 100 }.Contains(valuePercent) ? _gridLineBrushPrimary : _gridLineBrushSecondary
+                    Stroke = new[] { 0, 50, 100 }.Contains(valuePercent) ? _timelineColors.GridLineHorizontalBrushPrimary : _timelineColors.GridLineHorizontalBrushSecondary
                 });
             }
 
