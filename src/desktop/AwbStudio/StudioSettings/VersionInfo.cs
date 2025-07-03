@@ -37,7 +37,7 @@ namespace AwbStudio.StudioSettings
         /// Gets the URL of the GitHub resource containing the actual version information for the application.
         /// </summary>
         private static string GitHubAcutalVersionUrl =>
-            "https://raw.githubusercontent.com/Springwald/AnimatronicWorkbench-AWB/refs/heads/main/src/desktop/AwbStudio/StudioSettings/Version.json";
+            $"https://raw.githubusercontent.com/Springwald/AnimatronicWorkbench-AWB/refs/heads/main/src/desktop/AwbStudio/StudioSettings/Version.json?rnd={DateTime.UtcNow.Ticks}";
 
         /// <summary>
         /// Retrieves version information from a predefined GitHub URL.
@@ -47,16 +47,16 @@ namespace AwbStudio.StudioSettings
             try
             {
                 // Reads the version information from a GitHub URL and returns a VersionInfo object.
-                using var client = new System.Net.Http.HttpClient();
+                using var client = new System.Net.Http.HttpClient()
+                {
+                };
                 var response = client.GetStringAsync(GitHubAcutalVersionUrl).Result;
                 return System.Text.Json.JsonSerializer.Deserialize<VersionInfo>(response)
                        ?? throw new InvalidOperationException("Failed to deserialize version info from GitHub.");
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it as needed.
-                Console.WriteLine($"Error reading version info from GitHub: {ex.Message}");
-                return null;
+                throw new InvalidOperationException("Error reading version info from GitHub:" + ex.Message, ex);
             }
         }
         public static VersionInfo ReadFromEmbeddedJson()
