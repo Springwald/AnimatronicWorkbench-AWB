@@ -87,7 +87,7 @@ String StatusManagement::updateActuatorsStatuses(unsigned long diffMs)
 
     if (actualActuatorsStateInfo == "")
     {
-        return "All actuators OK";
+        return "No actuators infos.";
     }
 
     return actualActuatorsStateInfo;
