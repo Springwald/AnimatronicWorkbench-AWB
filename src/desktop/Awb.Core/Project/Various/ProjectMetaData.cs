@@ -20,13 +20,13 @@ namespace Awb.Core.Project.Various
         public string ProjectTitle { get; set; } = string.Empty;
 
         [DisplayName("Info description")]
-        public string? Info { get; set; }
+        public string? Info { get; set; } = string.Empty;
 
         public string WifiSsid => $"AWB-{ProjectTitle}";
 
         [DisplayName("Wifi password")]
         [Length(8, 32)]
-        public string WifiPassword { get; set; } = "awb12345";
+        public string WifiPassword { get; set; } = $"awb{new Random().Next(10000,99999)}";
 
         public IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {

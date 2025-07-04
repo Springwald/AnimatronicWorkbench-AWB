@@ -187,10 +187,7 @@ namespace AwbStudio
         {
             var project = new AwbProject()
             {
-                ProjectMetaData = new ProjectMetaData
-                {
-                    Info = "Animatronic Workbench Project | https://daniel.springwald.de/post/AWB/AnimatronicWorkbench",
-                },
+                ProjectMetaData = new ProjectMetaData(),
                 TimelinesStates = new TimelineState[] {
                     new TimelineState  { Id=1, Title ="Default", Export = true, AutoPlay = true },
                     new TimelineState  { Id=2, Title ="Dont export", Export = false, AutoPlay = false },
