@@ -36,16 +36,11 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <Grid  Margin="0 5 0 0">
-                    <Label Grid.Row="0" FontWeight="Bold" >Actual Timeline:</Label>
-                </Grid>
-
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="auto"/>
@@ -64,7 +59,7 @@
                     <Button  Grid.Column="1" x:Name="ButtonSave" Content="💾 Save" HorizontalAlignment="Right"  Click="ButtonSave_Click" />
                 </Grid>
 
-                <Grid Grid.Row="2">
+                <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="auto"/>
@@ -74,15 +69,15 @@
                 </Grid>
 
                 <!-- global timeline viewer-->
-                <ScrollViewer  Grid.Row="3" x:Name="timelineAllValuesScrollViewer" 
+                <ScrollViewer  Grid.Row="2" x:Name="timelineAllValuesScrollViewer" 
                      HorizontalScrollBarVisibility="Visible" 
-                     VerticalScrollBarVisibility="Hidden"
+                     VerticalScrollBarVisibility="Disabled"
                      ScrollChanged="timelineScrollValueChanged"
                      Background="Transparent">
-                    <TimelineControls:TimelineAllInOnePreviewControl x:Name="AllInOnePreviewControl" />
+                    <TimelineControls:TimelineAllInOnePreviewControl  x:Name="AllInOnePreviewControl" />
                 </ScrollViewer>
 
-                <Grid Grid.Row="4" Margin="0 6 0 6">
+                <Grid Grid.Row="3" Margin="0 6 0 6">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="5*"/>
                         <ColumnDefinition Width="3*"/>
@@ -91,7 +86,6 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel x:Name="StackPanelZoom" Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Center">
-
                         <Label Content="🔎"/>
                         <Slider x:Name="ZoomSlider" Width="120" Value="200" Minimum="100" Maximum="350" HorizontalAlignment="Center" VerticalAlignment="Center" ValueChanged="ZoomSlider_ValueChanged" />
                     </StackPanel>
@@ -109,15 +103,13 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
+
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0">
                     <!-- project data and export -->
-                    <Grid>
-                        <Label FontWeight="Bold" Content="Project:"/>
                         <HelpAndSupport:HelpButtonControl  HelpTopic="TimelineEditor" HorizontalAlignment="Right"/>
-                    </Grid>
 
-                    <Button x:Name="ButtonExportEsp32" Content="Export to Esp32 clients" Click="ButtonExportEsp32_Click" />
+                    <Button x:Name="ButtonExportEsp32" Content="Export project to ESP32" Click="ButtonExportEsp32_Click" Margin="0 0 0 20" />
                     <Button x:Name="ButtonClear" Content="New Timeline" Click="ButtonClear_Click" />
                     <Label Content="Load existing timeline:" />
                 </StackPanel>

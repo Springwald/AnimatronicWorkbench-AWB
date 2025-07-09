@@ -7,11 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid  PreviewMouseDown="Grid_PreviewMouseDown">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <local:ValueEditorHeaderControl x:Name="HeaderControl" Grid.Row="0"/>
         <Grid Grid.Row="1" Background="Transparent" >
             <Grid x:Name="OpticalGrid">
             </Grid>

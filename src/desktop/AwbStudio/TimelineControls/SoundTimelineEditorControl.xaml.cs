@@ -22,7 +22,6 @@ namespace AwbStudio.TimelineControls
         private TimelineViewContext? _viewContext;
         private ISoundPlayer? _soundPlayer;
         private SoundValuePainter? _soundValuePainter;
-        private TimelineCaption? _caption;
         private bool _isInitialized;
 
         public IAwbObject? AwbObject => _soundPlayer;
@@ -54,11 +53,6 @@ namespace AwbStudio.TimelineControls
             _viewContext = viewContext;
             _soundPlayer = soundPlayer;
             _soundValuePainter = new SoundValuePainter(soundPlayer, AllValuesGrid, _viewContext, timelineCaptions, projectSounds);
-            _caption = timelineCaptions?.GetAktuatorCaption(soundPlayer.Id);
-            HeaderControl.TimelineCaption = _caption;
-            HeaderControl.MyObject = soundPlayer;
-            HeaderControl.ViewContext = viewContext;
-
             _isInitialized = true;
         }
 

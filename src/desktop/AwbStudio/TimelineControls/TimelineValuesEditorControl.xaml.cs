@@ -8,6 +8,7 @@
 using Awb.Core.Actuators;
 using Awb.Core.ActuatorsAndObjects;
 using Awb.Core.Player;
+using Awb.Core.Project.Various;
 using Awb.Core.Services;
 using Awb.Core.Sounds;
 using Awb.Core.Timelines;
@@ -15,9 +16,11 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;
+using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace AwbStudio.TimelineControls
 {
@@ -79,6 +82,10 @@ namespace AwbStudio.TimelineControls
             // add nested timelines painter + editors
             var nestedTimelineEditorControl = new NestedTimelinesViewerControl();
             nestedTimelineEditorControl.Init(viewContext, timelineCaptions, playPosSynchronizer, actuatorsService, timelineMetaDataService);
+            // add the label
+            var label = GetValueEditorHeaderControl(NestedTimelinesFakeObject.Singleton, timelineCaptions, viewContext);
+            AllValuesEditorControlsStackPanel.Children.Add(label);
+            // add the editor
             AllValuesEditorControlsStackPanel.Children.Add(nestedTimelineEditorControl);
             _timelineEditorControls.Add(nestedTimelineEditorControl);
 
@@ -91,6 +98,10 @@ namespace AwbStudio.TimelineControls
                     viewContext,
                     timelineCaptions,
                     projectSounds: projectSounds);
+                // add the label
+                var sndLabel = GetValueEditorHeaderControl(soundPlayerActuator, timelineCaptions, viewContext);
+                AllValuesEditorControlsStackPanel.Children.Add(sndLabel);
+                // add the editor
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }
@@ -100,6 +111,10 @@ namespace AwbStudio.TimelineControls
             {
                 var editorControl = new ServoTimelineEditorControl();
                 editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, timelineDataService, projectSounds: projectSounds, awbLogger);
+                // add the label
+                var servoLabel = GetValueEditorHeaderControl(servoActuator, timelineCaptions, viewContext);
+                AllValuesEditorControlsStackPanel.Children.Add(servoLabel);
+                // add the editor
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
             }
@@ -125,6 +140,16 @@ namespace AwbStudio.TimelineControls
             }
 
             _isInitialized = true;
+        }
+
+        private ValueEditorHeaderControl GetValueEditorHeaderControl(IActuator acturator, TimelineCaptions timelineCaptions, TimelineViewContext viewContext)
+        {
+            var caption = timelineCaptions?.GetAktuatorCaption(acturator.Id);
+            var headerControl = new ValueEditorHeaderControl();
+            headerControl.TimelineCaption = caption;
+            headerControl.MyObject = acturator;
+            headerControl.ViewContext = viewContext;
+            return headerControl;
         }
 
         public void TimelineDataLoaded(TimelineData timelineData)

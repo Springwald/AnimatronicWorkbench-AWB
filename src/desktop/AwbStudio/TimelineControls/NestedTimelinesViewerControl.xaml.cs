@@ -23,7 +23,6 @@ namespace AwbStudio.TimelineControls
 
         private TimelineViewContext? _viewContext;
         private NestedTimelineValuePainter? _nestedTimelineValuePainter;
-        private TimelineCaption? _caption;
         private bool _isInitialized;
 
         public IAwbObject? AwbObject => NestedTimelinesFakeObject.Singleton;
@@ -59,11 +58,6 @@ namespace AwbStudio.TimelineControls
                 _nestedTimelineValuePainter = null;
             }
             _nestedTimelineValuePainter = new NestedTimelineValuePainter(AllValuesGrid, _viewContext, timelineCaptions, timelineMetaDataService);
-            _caption = timelineCaptions?.GetAktuatorCaption(NestedTimelinesFakeObject.Singleton.Id);
-            HeaderControl.MyObject = NestedTimelinesFakeObject.Singleton;
-            HeaderControl.TimelineCaption = _caption;
-            HeaderControl.ViewContext = viewContext;
-
             _isInitialized = true;
         }
 

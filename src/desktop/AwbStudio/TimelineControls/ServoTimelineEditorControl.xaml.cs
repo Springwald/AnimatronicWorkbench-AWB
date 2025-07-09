@@ -25,7 +25,6 @@ namespace AwbStudio.TimelineControls
     public partial class ServoTimelineEditorControl : UserControl, ITimelineEditorControl, IAwbObjectControl
     {
         private TimelineViewContext? _viewContext;
-        private TimelineCaption? _caption;
         private bool _isInitialized;
         private ServoValuePainter? _servoValuePainter;
         private volatile bool _isDrawing;
@@ -66,11 +65,6 @@ namespace AwbStudio.TimelineControls
             _viewContext = viewContext;
             Servo = servo;
             _servoValuePainter = new ServoValuePainter(servo, AllValuesGrid, _viewContext, timelineCaptions, timelineDataService, projectSounds: projectSounds, awbLogger, dotRadius: 6);
-            _caption = timelineCaptions?.GetAktuatorCaption(servo.Id);
-            HeaderControl.TimelineCaption = _caption;
-            HeaderControl.MyObject = servo;
-            HeaderControl.ViewContext = viewContext;
-
             _isInitialized = true;
         }
 
