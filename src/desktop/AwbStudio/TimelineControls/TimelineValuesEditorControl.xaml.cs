@@ -35,6 +35,7 @@ namespace AwbStudio.TimelineControls
         private GridTimePainter? _gridPainter;
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
+        private List<ValueEditorHeaderControl>? _timelineEditorLabels;
 
         private double _zoomVerticalHeightPerValueEditorBackingField = 180; // pixel per value editor
 
@@ -79,12 +80,15 @@ namespace AwbStudio.TimelineControls
             _timelineEditorControls = [];
             _timelineValuePainters = [];
 
+            _timelineEditorLabels = new List<ValueEditorHeaderControl>();
+
             // add nested timelines painter + editors
             var nestedTimelineEditorControl = new NestedTimelinesViewerControl();
             nestedTimelineEditorControl.Init(viewContext, timelineCaptions, playPosSynchronizer, actuatorsService, timelineMetaDataService);
             // add the label
             var label = GetValueEditorHeaderControl(NestedTimelinesFakeObject.Singleton, timelineCaptions, viewContext);
             AllValuesEditorControlsStackPanel.Children.Add(label);
+            _timelineEditorLabels.Add(label);
             // add the editor
             AllValuesEditorControlsStackPanel.Children.Add(nestedTimelineEditorControl);
             _timelineEditorControls.Add(nestedTimelineEditorControl);
@@ -101,6 +105,7 @@ namespace AwbStudio.TimelineControls
                 // add the label
                 var sndLabel = GetValueEditorHeaderControl(soundPlayerActuator, timelineCaptions, viewContext);
                 AllValuesEditorControlsStackPanel.Children.Add(sndLabel);
+                _timelineEditorLabels.Add(sndLabel);
                 // add the editor
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
@@ -114,6 +119,7 @@ namespace AwbStudio.TimelineControls
                 // add the label
                 var servoLabel = GetValueEditorHeaderControl(servoActuator, timelineCaptions, viewContext);
                 AllValuesEditorControlsStackPanel.Children.Add(servoLabel);
+                _timelineEditorLabels.Add(servoLabel);
                 // add the editor
                 AllValuesEditorControlsStackPanel.Children.Add(editorControl);
                 _timelineEditorControls.Add(editorControl);
@@ -142,6 +148,9 @@ namespace AwbStudio.TimelineControls
             _isInitialized = true;
         }
 
+        /// <summary>
+        /// Creates the header label for a actuator value editor control.
+        /// </summary>
         private ValueEditorHeaderControl GetValueEditorHeaderControl(IActuator acturator, TimelineCaptions timelineCaptions, TimelineViewContext viewContext)
         {
             var caption = timelineCaptions?.GetAktuatorCaption(acturator.Id);
@@ -181,7 +190,6 @@ namespace AwbStudio.TimelineControls
                         editorControl.Height = _zoomVerticalHeightPerValueEditorBackingField;
                     }
                 }
-
         }
 
         public double? GetScrollPosForEditorControl(IAwbObject? awbObject)
@@ -216,6 +224,11 @@ namespace AwbStudio.TimelineControls
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
+                    // set the left margin of the AllValuesEditorControlsStackPanel to the scroll position
+                    foreach (var label in _timelineEditorLabels!)
+                        label.Margin = new Thickness(_viewContext.ScrollPositionPx, 0, 0, 0);
+                    break;
+
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
                 case ViewContextChangedEventArgs.ChangeTypes.FocusObjectValue:
                     break;
