@@ -9,16 +9,15 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TabControl x:Name="tabsClients" Grid.Row="0">
-            <TabItem Header="TabItem">
-                <Grid Background="#FFE5E5E5"/>
-            </TabItem>
-            <TabItem Header="TabItem">
-                <Grid Background="#FFE5E5E5"/>
+            <TabItem Header="Client scan">
+                <TextBox Grid.Column="1" x:Name="TextBoxProgress" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="5,0,5,0"/>
             </TabItem>
         </TabControl>
+
         <Grid  Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50*"></ColumnDefinition>
@@ -28,4 +27,5 @@
             <Button Grid.Column="1" x:Name="ButtonRescan" Content="Rescan" HorizontalAlignment="Right"   VerticalAlignment="Center" Click="ButtonRescan_Click" />
         </Grid>
     </Grid>
+
 </UserControl>

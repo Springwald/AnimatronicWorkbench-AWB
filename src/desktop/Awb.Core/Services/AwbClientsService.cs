@@ -12,6 +12,8 @@ namespace Awb.Core.Services
 {
     public interface IAwbClientsService
     {
+        EventHandler<string>? OnScanningProgressMessage { get; set; }
+
         Esp32ComPortClient[] ComPortClients { get; }
 
         event EventHandler? ClientsLoaded;
@@ -32,6 +34,8 @@ namespace Awb.Core.Services
     {
         private Esp32ComPortClient[]? _clients;
         private readonly IAwbLogger? _logger;
+
+        public EventHandler<string>? OnScanningProgressMessage { get; set; }
 
         public event EventHandler? ClientsLoaded;
 
@@ -71,16 +75,17 @@ namespace Awb.Core.Services
             if (fastMode)
             {
                 _logger?.LogAsync("Using cached COM port info...");
-                foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
+                foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true, scanningProgressMessageHandler: (string msg) => OnScanningProgressMessage?.Invoke(this,msg));
             }
 
             if (foundComPortClients.Any() == false)
             {
                 _logger?.LogAsync("No clients found with fastMode (cached COM port info)! Trying live detection...");
-                foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
+                foundComPortClients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false, scanningProgressMessageHandler: (string msg) => OnScanningProgressMessage?.Invoke(this, msg));
             }
 
             var clients = foundComPortClients.Select(c => new Esp32ComPortClient(c.ComPortName, c.ClientId)).ToArray();
+
             var clientTasks = clients.Select(async c =>
             {
                 _logger?.LogAsync("Init client " + c.ClientId + "/" + c.FriendlyName);
@@ -106,7 +111,7 @@ namespace Awb.Core.Services
 
         public async Task InitAsync()
         {
-            await this.ScanForClients(fastMode: true);
+            await Task.CompletedTask;
         }
 
         public Esp32ComPortClient? GetClient(uint clientId)

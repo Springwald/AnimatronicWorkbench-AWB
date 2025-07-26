@@ -11,6 +11,9 @@ namespace PacketLogistics.ComPorts
     {
         private readonly IComPortCommandConfig _comPortCommandConfig;
 
+
+        public delegate void ScanningProgressMessageHandler(string message);
+
         private enum DummyPayloadTypes
         {
             Dummy = 1
@@ -23,8 +26,12 @@ namespace PacketLogistics.ComPorts
             _comPortCommandConfig = comPortCommandConfig;
         }
 
-        public async Task<FoundClient[]> FindAllClientsAsync(bool useComPortCache)
+        public async Task<FoundClient[]> FindAllClientsAsync(bool useComPortCache, ScanningProgressMessageHandler scanningProgressMessageHandler)
         {
+
+            scanningProgressMessageHandler("ClientIdScanner: Starting to scan for clients...");
+            scanningProgressMessageHandler("Use ComPortCache: " + useComPortCache);
+
             var clients = new List<FoundClient>();
             var portInfoManager = new ComPortInfoManager();
             if (!useComPortCache) portInfoManager.ClearCache();
@@ -42,21 +49,43 @@ namespace PacketLogistics.ComPorts
                             comPortName: port.ComPort,
                             caption: port.Caption,
                             deviceId: port.DeviceId));
+                        scanningProgressMessageHandler($"ClientIdScanner: Found client with ID {clientId} on port {port.ComPort}");
+                    }
+                    else
+                    {
+                        scanningProgressMessageHandler($"ClientIdScanner: No client found on port {port.ComPort}");
                     }
                 }
             }).ToArray();
-            await Task.WhenAll(portTasks);
+
+            var parallel = true;
+            if (parallel)
+            {
+                // run all tasks in parallel
+                await Task.WhenAll(portTasks);
+            }
+            else
+            {
+                // run tasks sequentially
+                foreach (var task in portTasks)
+                    await task;
+            }
+
+            scanningProgressMessageHandler($"ClientIdScanner: Scanning completed. Found {clients.Count} clients.");
 
             return clients.ToArray();
         }
 
         private async Task<uint?> DetectClientIdOnPortAsync(string portName)
         {
-
-            TimeSpan timeout = TimeSpan.FromSeconds(1);
+            TimeSpan timeout = TimeSpan.FromMilliseconds(500);
 
             OnLog?.Invoke(this, $"ClientIdScanner: Scanning port {portName}");
+
             var serialPort = new Esp32SerialPort(portName);
+            serialPort.WriteTimeout = (int)timeout.TotalMilliseconds;
+            serialPort.ReadTimeout = (int)timeout.TotalMilliseconds;
+
             OnLog?.Invoke(this, $"ClientIdScanner open port {portName}");
 
             try
@@ -81,7 +110,16 @@ namespace PacketLogistics.ComPorts
             var packetReceived = false;
             uint clientId = 0;
 
-            serialPort.Write([255], 0, 1); // send a dummy byte 255 to wake up the device to receive a alive packet
+            try
+            {
+                serialPort.Write([255], 0, 1); // send a dummy byte 255 to wake up the device to receive a alive packet
+            }
+            catch (Exception ex)
+            {
+                OnLog?.Invoke(this, $"ClientIdScanner port {portName} could not send data: {ex.Message}");
+                serialPort.Close();
+                return null;
+            }
 
             var packetReceiver = new PacketReceiver<DummyPayloadTypes>(
                 serialPort,

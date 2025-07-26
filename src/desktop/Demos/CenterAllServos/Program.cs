@@ -14,6 +14,7 @@ using ResetAllServos;
 var logger = new AwbLoggerConsole(throwWhenInDebugMode: false);
 var clientService = new AwbClientsService(logger);
 await clientService.InitAsync();
+await clientService.ScanForClients(fastMode: true);
 var config = new AwbProject
 {
     ProjectMetaData = new ProjectMetaData

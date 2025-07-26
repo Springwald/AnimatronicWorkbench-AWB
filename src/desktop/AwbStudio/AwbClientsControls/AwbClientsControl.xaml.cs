@@ -34,6 +34,12 @@ namespace AwbStudio.AwbClientsControls
         private async void AwbClientsControl_Loaded(object sender, RoutedEventArgs e)
         {
             _awbClientsService.ClientsLoaded += AwbClientsService_ClientsLoaded;
+            _awbClientsService.OnScanningProgressMessage += (sender, message) =>
+            {
+                Dispatcher.Invoke(() => TextBoxProgress.Text = $"{DateTime.Now:T}: {message}\r\n{TextBoxProgress.Text}");
+            };
+
+            await _awbClientsService.ScanForClients(fastMode: true);
             if (_awbClientsService.ComPortClients != null) await ShowClients();
         }
 
@@ -50,7 +56,13 @@ namespace AwbStudio.AwbClientsControls
                 Dispatcher.Invoke(() =>
                 {
                     var clients = _awbClientsService.ComPortClients;
-                    this.tabsClients.Items.Clear();
+                    while(this.tabsClients.Items.Count > 1)
+                    {
+                        // remove all existing tabs except the first one (which is the "protocoll" tab)
+                        this.tabsClients.Items.RemoveAt(1);
+                    }
+                    if (tabsClients.Items.Count > 0)
+                        this.tabsClients.SelectedIndex = 0; // select the first tab "protocoll" by default
                     foreach (var client in clients)
                     {
                         // add the client
@@ -66,8 +78,8 @@ namespace AwbStudio.AwbClientsControls
                         };
                         this.tabsClients.Items.Add(tabItem);
                     }
-                    if (tabsClients.Items.Count > 0)
-                        this.tabsClients.SelectedIndex = 0; // select the first tab by default
+                    if (tabsClients.Items.Count > 1)
+                        this.tabsClients.SelectedIndex = 1; // select the first tab by default
 
                     labelClientCount.Content = $"{clients.Length} clients found";
                 });
@@ -76,7 +88,7 @@ namespace AwbStudio.AwbClientsControls
 
         private async void ButtonRescan_Click(object sender, RoutedEventArgs e)
         {
-            var result = await _awbClientsService.ScanForClients(false);
+            _ = await _awbClientsService.ScanForClients(fastMode: true);
         }
     }
 }

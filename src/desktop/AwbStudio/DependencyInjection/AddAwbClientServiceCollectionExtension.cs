@@ -21,7 +21,9 @@ namespace AwbStudio.DependencyInjection
             services.TryAddSingleton<IAwbClientsService>(sp =>
             {
                 var service = new AwbClientsService(sp.GetService<IAwbLogger>());
-                Task.Run(() => service.InitAsync());
+                Task.Run(async () => { 
+                    await service.InitAsync(); 
+                });
                 return service;
             });
 

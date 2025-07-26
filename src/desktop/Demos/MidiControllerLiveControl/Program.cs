@@ -12,6 +12,7 @@ var logger = new AwbLoggerConsole(throwWhenInDebugMode: false);
 
 var clientService = new AwbClientsService(logger);
 await clientService.InitAsync();
+await clientService.ScanForClients(fastMode: true);
 var config = MockConfig.ConfigDemoPuppetTest;
 IActuatorsService actuatorsService = new ActuatorsService(config, clientService, logger);
 
