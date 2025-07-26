@@ -1,5 +1,7 @@
 # Animatronic WorkBench (AWB)
 
+![Animatronic WorkBench](https://daniel.springwald.de/post/AWB/AnimatronicWorkbench-DE.jpg)
+
 ## Great animatronics without programming knowledge
 
 - Manual control **and** 24/7 automatic animatronic movements
