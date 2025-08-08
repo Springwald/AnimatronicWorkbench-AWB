@@ -1,5 +1,3 @@
-#define M5STICKC_PLUS2 1 // M5StickC Plus2 has a different power on/off mechanism
-
 #include <Arduino.h>
 #include <AwbRemote.h>
 #include <WiFi.h>
