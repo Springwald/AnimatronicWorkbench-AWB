@@ -27,6 +27,9 @@ void AwbRemote::setup()
 
     _display.setup(); // set up the display
 
+    this->_axp192 = new AXP192();
+    this->_axp192->begin();
+
     _wifiConfig = new WifiConfig();
 
     _display.draw_message(String("connect wifi\r\n") + String(this->_wifiConfig->WlanSSID), 1500, MSG_TYPE_INFO);
@@ -36,6 +39,9 @@ void AwbRemote::setup()
     int trys = 10;
     while (trys-- > 0 && WiFi.status() != WL_CONNECTED)
     {
+        _lastBatteryCheckMs = millis();
+        _batPower = this->_axp192->GetBatVoltage();
+
         _display.draw_message(String("connect wifi\r\n") + String(this->_wifiConfig->WlanSSID) + "\r\nRetrys " + String(trys), 1000, MSG_TYPE_INFO);
 #ifdef RED_LED
         digitalWrite(RED_LED, RED_LED_ON); // turn red led on
@@ -58,12 +64,9 @@ void AwbRemote::setup()
     trys = 10;
     while (trys-- > 0 && !(_joystick.begin(&Wire, JoyC_ADDR, 0, 26, 100000UL)))
     {
-        _display.draw_message(String("I2C Error"), 500, MSG_TYPE_ERROR);
-        delay(200);
+        _display.draw_message(String("Joystick not found\r\nRetrying... ") + String(trys), 500, MSG_TYPE_ERROR);
+        delay(500);
     }
-
-    this->_axp192 = new AXP192();
-    this->_axp192->begin();
 
     pinMode(BUTTON2, INPUT);
     pinMode(BUTTON3, INPUT);
@@ -85,7 +88,21 @@ void AwbRemote::loop()
 
     this->_customCode->loop(joy_pos_x, joy_pos_y, joyButton, button2, button3);
 
-    auto batPower = this->_axp192->GetBatVoltage();
-    _display.draw_message(String(this->_wifiConfig->WlanSSID) + "\r\n" + String(joy_pos_x) + "/" + String(joy_pos_y) + "\r\nBat:" + String(batPower) + "V", 500, MSG_TYPE_INFO);
+    auto timeSinceLastBatteryCheck = millis() - _lastBatteryCheckMs;
+    if (timeSinceLastBatteryCheck > 20000)
+    {
+        _lastBatteryCheckMs = millis();
+        _batPower = this->_axp192->GetBatVoltage();
+    }
+
+    _display.draw_message(String(this->_wifiConfig->WlanSSID) + "\r\nConnected:" + String(WiFi.isConnected()) + "\r\n" + String(joy_pos_x) + "/" + String(joy_pos_y) + "\r\nBat: " + String(_batPower) + "V\r\n" + String(BatteryPercent(_batPower)) + "%", 500, MSG_TYPE_INFO);
+
     delay(100);
+}
+
+float AwbRemote::BatteryPercent(float batPower)
+{
+    // Calculate the battery percentage based on the voltage
+    float percent = max(0.0f, batPower - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE) * 100;
+    return constrain(percent, 0, 100); // Ensure the percentage is between 0 and 100
 }

@@ -20,8 +20,11 @@ protected:
     WifiConfig *_wifiConfig;
     CustomCode *_customCode;
     CommandSender *_commandSender;
+    ulong _lastBatteryCheckMs = 0; // Last time the battery was checked
+    float _batPower = 0.0;         // Battery power in volts
 
     void sendCommand(String command);
+    float BatteryPercent(float batPower);
 
 public:
     AwbRemote()
