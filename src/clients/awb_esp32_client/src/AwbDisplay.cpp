@@ -9,6 +9,11 @@
 #include <LovyanGFX.hpp>
 #include <LGFX_AUTODETECT.hpp>
 
+// Define DISPLAY_AVAILABLE if DISPLAY_SSD1306 OR DISPLAY_M5STACK is defined
+#if defined(DISPLAY_SSD1306) || defined(DISPLAY_M5STACK)
+#define DISPLAY_AVAILABLE
+#endif
+
 #ifdef DISPLAY_SSD1306
 
 class LGFX_SSD1306 : public lgfx::LGFX_Device
@@ -49,9 +54,12 @@ static LGFX_SSD1306 lcd; // Create an instance of LGFX_SSD1306 (class LGFX_SSD13
 static LGFX lcd;
 #endif
 
+#ifdef DISPLAY_AVAILABLE
 static LGFX_Sprite topBarSprite(&lcd);
 static LGFX_Sprite primarySprite(&lcd);
 static LGFX_Sprite debugStateSprite(&lcd);
+#endif // DISPLAY_AVAILABLE
+
 static const lgfx::IFont *font = nullptr;
 
 /**
@@ -59,6 +67,7 @@ static const lgfx::IFont *font = nullptr;
  */
 void AwbDisplay::setup(int clientId)
 {
+#ifdef DISPLAY_AVAILABLE
     lcd.init();
     _isSmallScreen = lcd.height() <= 64 || lcd.width() <= 290;
 
@@ -139,6 +148,7 @@ void AwbDisplay::setup(int clientId)
         // on small screen we don't have enough space for the top bar, so it's only shown fullscreen for a short time at startup
         // delay(3000);
     }
+#endif // DISPLAY_AVAILABLE
 }
 
 void AwbDisplay::set_actual_status_info(String infos)
@@ -148,6 +158,7 @@ void AwbDisplay::set_actual_status_info(String infos)
 
 void AwbDisplay::showTopBar(String message)
 {
+#ifdef DISPLAY_AVAILABLE
     topBarSprite.fillSprite(0xCC3300U);
     topBarSprite.setTextColor(0xFFFFFFU);
     topBarSprite.setTextDatum(middle_center);
@@ -155,6 +166,7 @@ void AwbDisplay::showTopBar(String message)
     topBarSprite.setColor(0, 0, 0);
     topBarSprite.drawFastHLine(0, topBarSprite.height() - 1, lcd.width());
     topBarSprite.pushSprite(0, 0);
+#endif // DISPLAY_AVAILABLE
 }
 
 void AwbDisplay::clear()
@@ -163,6 +175,7 @@ void AwbDisplay::clear()
 
 void AwbDisplay::loop()
 {
+#ifdef DISPLAY_AVAILABLE
     int diff = millis() - _last_loop;
     _last_loop = millis();
 
@@ -192,6 +205,7 @@ void AwbDisplay::loop()
         draw_string(_actualStatusInfo, 0x000000U);
     }
     draw_debuggingState();
+#endif // DISPLAY_AVAILABLE
 }
 
 bool AwbDisplay::isShowingMessage()
@@ -212,11 +226,13 @@ void AwbDisplay::draw_debuggingState()
     if (_debuggingActive == false)
         return;
 
+#ifdef DISPLAY_AVAILABLE
     debugStateSprite.fillSprite(0x000000U);
     debugStateSprite.setTextDatum(top_left);
     auto debugState = String(_debugStateMajor) + "-" + String(_debugStateMinor);
     debugStateSprite.drawString(debugState, 0, 0);
     debugStateSprite.pushSprite(lcd.width() - debugStateSprite.width(), lcd.height() - debugStateSprite.height());
+#endif // DISPLAY_AVAILABLE
 }
 
 void AwbDisplay::draw_message(String message, int durationMs, int msgType)
@@ -245,6 +261,7 @@ void AwbDisplay::draw_message(String message, int durationMs, int msgType)
 /// @brief draw a fullscreen info text
 void AwbDisplay::draw_string(String message, int backCol)
 {
+#ifdef DISPLAY_AVAILABLE
     primarySprite.setTextColor(0xFFFFFFU, backCol);
     primarySprite.fillScreen(backCol);
     primarySprite.setTextDatum(top_center);
@@ -294,6 +311,7 @@ void AwbDisplay::draw_string(String message, int backCol)
 
     primarySprite.pushSprite(0, _primarySpriteTop);
     draw_debuggingState();
+#endif // DISPLAY_AVAILABLE
 }
 
 String AwbDisplay::getNextLine(String input, uint maxLineLength, std::vector<char> splitChars, bool forceFirstSplit)
