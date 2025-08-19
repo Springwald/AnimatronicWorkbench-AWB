@@ -52,7 +52,8 @@ void AwbRemote::setup()
         digitalWrite(RED_LED, RED_LED_ON); // turn red led on
 #endif
 #ifdef BUZZER
-        analogWrite(BUZZER, 255 - trys * 24);
+        if (trys < 5)
+            analogWrite(BUZZER, 255 - trys * 24);
 #endif
         delay(100);
 #ifdef BUZZER
