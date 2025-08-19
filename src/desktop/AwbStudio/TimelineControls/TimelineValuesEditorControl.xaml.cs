@@ -153,6 +153,8 @@ namespace AwbStudio.TimelineControls
                 };
             }
 
+            AlignEditorLabels();
+
             _isInitialized = true;
         }
 
@@ -258,6 +260,7 @@ namespace AwbStudio.TimelineControls
 
         private void AlignEditorLabels()
         {
+            if (_viewContext == null) return;
             foreach (var label in _timelineEditorLabels!)
                 label.Margin = new Thickness(_viewContext.ScrollPositionPx, 0, 0, 0);
             return;
