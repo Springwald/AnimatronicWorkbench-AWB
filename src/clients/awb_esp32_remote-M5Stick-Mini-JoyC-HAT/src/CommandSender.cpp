@@ -38,7 +38,9 @@ bool CommandSender::sendCommand(String command)
 
         if (httpResponseCode > 0)
         {
+#ifdef RED_LED
             digitalWrite(RED_LED, HIGH); // turn red led off
+#endif
             String payload = http.getString();
             _display.draw_message(payload, 1500, MSG_TYPE_INFO);
             delay(1500);
@@ -46,20 +48,37 @@ bool CommandSender::sendCommand(String command)
         }
         else
         {
+#ifdef BUZZER
+            analogWrite(BUZZER, 255);
+#endif
+
+#ifdef RED_LED
             digitalWrite(RED_LED, LOW); // turn red led on
+#endif
             _display.draw_message("Error code: " + httpResponseCode, 1500, MSG_TYPE_ERROR);
             delay(1500);
         }
         // Free resources
         http.end();
+#ifdef RED_LED
         digitalWrite(RED_LED, HIGH); // turn red led off
+#endif
     }
     else
     {
+#ifdef RED_LED
         digitalWrite(RED_LED, LOW); // turn red led on
+#endif
+#ifdef BUZZER
+        analogWrite(BUZZER, 255);
+#endif
         _display.draw_message("WiFi Disconnected", 1500, MSG_TYPE_ERROR);
         delay(1500);
     }
+
+#ifdef BUZZER
+    analogWrite(BUZZER, 0);
+#endif
 
     return success;
 }

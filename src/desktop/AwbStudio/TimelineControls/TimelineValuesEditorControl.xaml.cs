@@ -58,12 +58,20 @@ namespace AwbStudio.TimelineControls
 
         private void TimelineValuesEditorControl_Loaded(object sender, RoutedEventArgs e)
         {
+            SizeChanged += TimelineValuesEditorControl_SizeChanged;
             Loaded -= TimelineValuesEditorControl_Loaded;
             Unloaded += OnUnloaded;
         }
 
+        private void TimelineValuesEditorControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            AlignEditorLabels();
+        }
+
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
+            SizeChanged -= TimelineValuesEditorControl_SizeChanged;
+
             _playPosPainter?.Dispose();
             _playPosPainter = null;
             _gridPainter?.Dispose();
@@ -174,11 +182,14 @@ namespace AwbStudio.TimelineControls
                 valuePainter.TimelineDataLoaded(timelineData);
 
             _playPosPainter!.TimelineDataLoaded(timelineData);
+
+            AlignEditorLabels();
         }
 
         private void UpdateZoom()
         {
             if (_timelineEditorControls != null)
+            {
                 foreach (UserControl editorControl in _timelineEditorControls)
                 {
                     if (editorControl is NestedTimelinesViewerControl || editorControl is SoundTimelineEditorControl)
@@ -190,6 +201,8 @@ namespace AwbStudio.TimelineControls
                         editorControl.Height = _zoomVerticalHeightPerValueEditorBackingField;
                     }
                 }
+                AlignEditorLabels();
+            }
         }
 
         public double? GetScrollPosForEditorControl(IAwbObject? awbObject)
@@ -225,8 +238,7 @@ namespace AwbStudio.TimelineControls
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     // set the left margin of the AllValuesEditorControlsStackPanel to the scroll position
-                    foreach (var label in _timelineEditorLabels!)
-                        label.Margin = new Thickness(_viewContext.ScrollPositionPx, 0, 0, 0);
+                    AlignEditorLabels();
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
@@ -242,6 +254,13 @@ namespace AwbStudio.TimelineControls
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(e.ChangeType)}:{e.ChangeType}");
             }
+        }
+
+        private void AlignEditorLabels()
+        {
+            foreach (var label in _timelineEditorLabels!)
+                label.Margin = new Thickness(_viewContext.ScrollPositionPx, 0, 0, 0);
+            return;
         }
     }
 }

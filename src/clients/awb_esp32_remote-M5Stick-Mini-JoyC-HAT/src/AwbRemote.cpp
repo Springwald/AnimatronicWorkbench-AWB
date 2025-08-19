@@ -13,14 +13,21 @@ void AwbRemote::setup()
 {
 
 // especially for the M5StickC Plus2 (what a monster name): we need to hold the power on by setting the GPIO pin G4 to HIGH
-#ifdef M5STICKC_PLUS2
-    pinMode(4, OUTPUT);
-    digitalWrite(4, HIGH);
+#ifdef SET_HIGH_ON_START_TO_HOLD_POWER_ON_PIN
+    pinMode(SET_HIGH_ON_START_TO_HOLD_POWER_ON_PIN, OUTPUT);
+    digitalWrite(SET_HIGH_ON_START_TO_HOLD_POWER_ON_PIN, HIGH);
 #endif
 
 #ifdef RED_LED
     pinMode(RED_LED, OUTPUT);           // init red led
     digitalWrite(RED_LED, RED_LED_OFF); // turn red led off
+#endif
+
+#ifdef BUZZER
+    analogWriteResolution(10);
+    analogWriteFrequency(4000);
+    pinMode(BUZZER, OUTPUT);
+    analogWrite(BUZZER, 0);
 #endif
 
     _display.setup(); // set up the display
@@ -44,11 +51,20 @@ void AwbRemote::setup()
 #ifdef RED_LED
         digitalWrite(RED_LED, RED_LED_ON); // turn red led on
 #endif
-        delay(1000);
+#ifdef BUZZER
+        analogWrite(BUZZER, 255 - trys * 24);
+#endif
+        delay(100);
+#ifdef BUZZER
+        analogWrite(BUZZER, 0);
+#endif
     }
     if (WiFi.status() != WL_CONNECTED)
     {
         _display.draw_message(String("connect wifi\r\n") + String(this->_wifiConfig->WlanSSID) + "\r\nFailed", 1000, MSG_TYPE_ERROR);
+#ifdef BUZZER
+        analogWrite(BUZZER, 255);
+#endif
         delay(1000);
     }
     else
@@ -58,10 +74,16 @@ void AwbRemote::setup()
 #endif
     }
 
+#ifdef BUZZER
+    analogWrite(BUZZER, 0);
+#endif
+
     _display.draw_message(WiFi.localIP().toString(), 1000, MSG_TYPE_INFO);
     trys = 10;
-    while (trys-- > 0 && !(_joystick.begin(&Wire, JoyC_ADDR, 0, 26, 100000UL)))
+    _joystickAvailable = false;
+    while (trys-- > 0 && !(_joystickAvailable))
     {
+        _joystickAvailable = _joystick.begin(&Wire, JoyC_ADDR, 0, 26, 100000UL);
         _display.draw_message(String("Joystick not found\r\nRetrying... ") + String(trys), 500, MSG_TYPE_ERROR);
         delay(500);
     }
@@ -77,10 +99,10 @@ void AwbRemote::setup()
  */
 void AwbRemote::loop()
 {
-    int8_t joy_pos_x = _joystick.getPOSValue(POS_X, _8bit);
-    int8_t joy_pos_y = _joystick.getPOSValue(POS_Y, _8bit);
+    int8_t joy_pos_x = _joystickAvailable ? _joystick.getPOSValue(POS_X, _8bit) : 0;
+    int8_t joy_pos_y = _joystickAvailable ? _joystick.getPOSValue(POS_Y, _8bit) : 0;
 
-    bool joyButton = _joystick.getButtonStatus() == false;
+    bool joyButton = _joystickAvailable ? _joystick.getButtonStatus() == false : false;
     bool button2 = digitalRead(BUTTON2) == LOW;
     bool button3 = digitalRead(BUTTON3) == LOW;
 
