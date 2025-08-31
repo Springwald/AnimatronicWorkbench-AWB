@@ -4,13 +4,17 @@
 // All rights reserved    -   Licensed under MIT License
 
 using PacketLogistics.ComPorts;
+using static PacketLogistics.ComPorts.ClientIdScanner;
 
 var config = new ComPortCommandConfig(packetIdentifier: "AWB");
+
+ScanningProgressMessageHandler scanningProgressMessageHandler = (message) => Console.WriteLine(message);
+
 
 Console.WriteLine("Scanning for clients...");
 var clientIdScanner = new ClientIdScanner(config);
 clientIdScanner.OnLog += (s, e) => Console.WriteLine(e);
-var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
+var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false, scanningProgressMessageHandler: scanningProgressMessageHandler);
 
 Console.WriteLine($"Scanning for clients done. Found {clients.Length} clients.");
 foreach (var client in clients)

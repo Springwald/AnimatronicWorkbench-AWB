@@ -11,17 +11,23 @@ using PacketLogistics.ComPorts;
 using PacketLogistics.ComPorts.ComportPackets;
 using ScanForClientIds;
 using System.Text.Json;
+using static PacketLogistics.ComPorts.ClientIdScanner;
 
 var logger = new AwbLoggerConsole(throwWhenInDebugMode: false);
 var config = new ComPortCommandConfig(packetIdentifier: "AWB");
 
+ScanningProgressMessageHandler scanningProgressMessageHandler = (message) =>
+{
+    Console.WriteLine(message);
+};
+
 Console.WriteLine("Scanning for clients...");
 var clientIdScanner = new ClientIdScanner(config);
 clientIdScanner.OnLog += async (s, e) => { await logger.LogAsync(e); await Task.CompletedTask; };
-var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true);
+var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: true, scanningProgressMessageHandler: scanningProgressMessageHandler);
 if (clients.Any() == false)
 {
-    clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
+    clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false, scanningProgressMessageHandler: scanningProgressMessageHandler);
 }
 
 Console.WriteLine($"Scanning for clients done. Found {clients.Length} clients.");

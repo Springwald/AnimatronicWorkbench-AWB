@@ -5,11 +5,14 @@
 
 using PacketLogistics.ComPorts;
 using SendDemoMessagesToAllClients;
+using static PacketLogistics.ComPorts.ClientIdScanner;
+
+ScanningProgressMessageHandler scanningProgressMessageHandler = (message) => Console.WriteLine(message);
 
 Console.WriteLine("Scanning for clients...");
 var config = new ComPortCommandConfig(packetIdentifier: "AWB");
 var clientIdScanner = new ClientIdScanner(config);
-var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false);
+var clients = await clientIdScanner.FindAllClientsAsync(useComPortCache: false, scanningProgressMessageHandler: scanningProgressMessageHandler);
 
 Console.WriteLine($"Scanning for clients done. Found {clients.Length} clients.");
 

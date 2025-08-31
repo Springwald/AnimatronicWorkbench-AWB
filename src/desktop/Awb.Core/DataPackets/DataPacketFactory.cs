@@ -155,29 +155,39 @@ namespace Awb.Core.DataPackets
                 affectedActuator.IsDirty = false;
         }
 
-        public void SetDataPacketDone(IServo[] servos, ClientDataPacket clientDataPacket)
-        {
-            if (clientDataPacket.Content.StsServos?.Servos != null)
-            {
-                foreach (var servoPacketData in clientDataPacket.Content.StsServos.Servos)
-                {
-                    var stsServo = servos.Select(s => s as StsScsServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId);
-                    {
-                        if (stsServo != null) stsServo.IsDirty = false;
-                    }
-                }
-            }
-            if (clientDataPacket.Content.Pca9685PwmServos?.Servos != null)
-            {
-                foreach (var servoPacketData in clientDataPacket.Content.Pca9685PwmServos.Servos)
-                {
-                    var pwmServo = servos.Select(s => s as Pca9685PwmServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId && s.I2cAdress == servoPacketData.I2cAddress);
-                    {
-                        if (pwmServo != null) pwmServo.IsDirty = false;
-                    }
-                }
-            }
-        }
+        //public void SetDataPacketDone(IServo[] servos, ClientDataPacket clientDataPacket)
+        //{
+        //    if (clientDataPacket.Content.StsServos?.Servos != null)
+        //    {
+        //        foreach (var servoPacketData in clientDataPacket.Content.StsServos.Servos)
+        //        {
+        //            var stsServo = servos.Select(s => s as StsScsServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId);
+        //            {
+        //                if (stsServo != null) stsServo.IsDirty = false;
+        //            }
+        //        }
+        //    }
+        //    if (clientDataPacket.Content.ScsServos?.Servos != null)
+        //    {
+        //        foreach (var servoPacketData in clientDataPacket.Content.ScsServos.Servos)
+        //        {
+        //            var scsServo = servos.Select(s => s as StsScsServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId);
+        //            {
+        //                if (scsServo != null) scsServo.IsDirty = false;
+        //            }
+        //        }
+        //    }
+        //    if (clientDataPacket.Content.Pca9685PwmServos?.Servos != null)
+        //    {
+        //        foreach (var servoPacketData in clientDataPacket.Content.Pca9685PwmServos.Servos)
+        //        {
+        //            var pwmServo = servos.Select(s => s as Pca9685PwmServo).FirstOrDefault(s => s?.Channel == servoPacketData.Channel && s.ClientId == clientDataPacket.ClientId && s.I2cAdress == servoPacketData.I2cAddress);
+        //            {
+        //                if (pwmServo != null) pwmServo.IsDirty = false;
+        //            }
+        //        }
+        //    }
+        //}
 
         private StsServosPacketData? GetStsServoChanges(IServo[] allServos, StsScsServo.StsScsTypes servoType, List<IActuator> collectAffectedAcctuatorsToUnsetDirty)
         {
