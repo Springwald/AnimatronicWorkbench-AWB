@@ -311,8 +311,11 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine($"   {propertyName} = new std::vector<Pca9685PwmServo>();");
 
             foreach (var servo in pca9685PwmServos)
-                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.DefaultValue}));");
+            // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
+            {
+                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
+                result.AppendLine($"   {propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {defaultValue}));");
+            }
 
             result.AppendLine();
         }

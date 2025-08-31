@@ -153,7 +153,7 @@ void AwbClient::setup()
 
     // setup the packet processor to process packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet processor");
-    this->_packetProcessor = new PacketProcessor(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback, packetProcessorMessageToShow);
+    this->_packetProcessor = new PacketProcessor(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback, packetProcessorMessageToShow, _debugging);
 
     _debugging->setState(Debugging::MJ_SETUP, 75);
 

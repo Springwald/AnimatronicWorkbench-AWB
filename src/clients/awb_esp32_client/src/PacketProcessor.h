@@ -31,6 +31,7 @@ private:
     Pca9685PwmManager *_pca9685PwmManager;
     TCallBackErrorOccured _errorOccured;
     TCallBackMessageToShowWithDuration _messageToShow;
+    Debugging *_debugging = nullptr;
 
     /**
      * Update the actuators
@@ -38,7 +39,8 @@ private:
     // void updateActuators();
 
 public:
-    PacketProcessor(ProjectData *projectData, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured, TCallBackMessageToShowWithDuration messageToShow) : _projectData(projectData), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured), _messageToShow(messageToShow)
+    PacketProcessor(ProjectData *projectData, StScsSerialServoManager *stSerialServoManager, StScsSerialServoManager *scSerialServoManager, Pca9685PwmManager *pca9685PwmManager, TCallBackErrorOccured errorOccured, TCallBackMessageToShowWithDuration messageToShow, Debugging *debugging)
+        : _projectData(projectData), _stSerialServoManager(stSerialServoManager), _scSerialServoManager(scSerialServoManager), _pca9685PwmManager(pca9685PwmManager), _errorOccured(errorOccured), _messageToShow(messageToShow), _debugging(debugging)
     {
     }
 

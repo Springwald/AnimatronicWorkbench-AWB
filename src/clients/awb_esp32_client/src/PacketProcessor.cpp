@@ -13,15 +13,23 @@ StaticJsonDocument<PACKET_BUFFER_SIZE> jsondocPacketProcessor;
  */
 String PacketProcessor::processPacket(String payload)
 {
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 0);
+
     boolean sendServoUpdateDirectly = true; // should the servo update directly send to the servo controller or via the project data? If set to false, the project data is used to set the target value of the servo. Servos not defined in the project data are ignored.
 
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 1);
+
     DeserializationError error = deserializeJson(jsondocPacketProcessor, payload);
+
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 2);
     if (error)
     {
         // packet content is not valid json
         //_errorOccured("json:" + String(error.c_str()));
         return String("json:") + String(error.c_str()) + " " + payload;
     }
+
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 3);
 
     // #### READ VALUES ####
 
@@ -78,6 +86,8 @@ String PacketProcessor::processPacket(String payload)
         }
     }
 
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 10);
+
     // #### DISPLAY MESSAGE ####
 
     if (jsondocPacketProcessor.containsKey("DispMsg")) // packat contains a display message
@@ -99,6 +109,8 @@ String PacketProcessor::processPacket(String payload)
 
     // #### RECEIVE VALUES ####
 
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 20);
+
     if (jsondocPacketProcessor.containsKey("Pca9685Pwm")) // packet contains Pca9685 PWM driver data
     {
         JsonArray servos = jsondocPacketProcessor["Pca9685Pwm"]["Servos"];
@@ -113,12 +125,19 @@ String PacketProcessor::processPacket(String payload)
             int value = servos[i]["TVal"];
             String name = servos[i]["Name"];
 
+            _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 27);
+
             // store the method showMsg in an anonymous function
             _pca9685PwmManager->setTargetValue(channel, value, name);
+
+            _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 28);
         }
     }
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 29);
     if (this->_pca9685PwmManager != nullptr)
         _pca9685PwmManager->updateActuators(false);
+
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 30);
 
     if (jsondocPacketProcessor.containsKey("STS")) // package contains STS bus servo data
     {
@@ -171,6 +190,8 @@ String PacketProcessor::processPacket(String payload)
     if (!sendServoUpdateDirectly && this->_stSerialServoManager != nullptr)
         _stSerialServoManager->updateActuators(false);
 
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 40);
+
     if (jsondocPacketProcessor.containsKey("SCS")) // package contains SCS bus servo data
     {
         JsonArray servos = jsondocPacketProcessor["SCS"]["Servos"];
@@ -217,12 +238,15 @@ String PacketProcessor::processPacket(String payload)
             }
         }
     }
+
     if (!sendServoUpdateDirectly && this->_scSerialServoManager != nullptr)
         _scSerialServoManager->updateActuators(false);
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->showActivity();
 #endif
+
+    _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 99);
 
     // return empty string, because no response is needed
     return String();
