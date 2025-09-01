@@ -79,4 +79,5 @@ bool Mp3PlayerDfPlayerMiniSerial::checkOk()
         }
         return true;
     }
+    return false;
 }

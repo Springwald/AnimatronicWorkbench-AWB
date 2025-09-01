@@ -204,7 +204,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
             Pca9685PwmServoPoint *point1 = nullptr;
             Pca9685PwmServoPoint *point2 = nullptr;
 
-            for (int iPoint = 0; iPoint < actualTimelineData.scsServoPoints->size(); iPoint++)
+            for (int iPoint = 0; iPoint < actualTimelineData.pca9685PwmPoints->size(); iPoint++)
             {
                 Pca9685PwmServoPoint *point = &actualTimelineData.pca9685PwmPoints->at(iPoint);
                 if (point->channel == servoChannel)

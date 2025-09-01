@@ -7,7 +7,7 @@
 
 using byte = unsigned char;
 
-#define PACKET_BUFFER_SIZE 32 * 1024
+#define PACKET_BUFFER_SIZE 4 * 1024
 
 /**
  * sends and receives packets over the serial port
@@ -60,11 +60,14 @@ private:
     uint calculateChecksumForDataPacket(String payload);
 
 public:
-    PacketSenderReceiver(int clientId, String packetHeader, String packerFooter, TCallBackPacketReceived packetReceived, TCallBackErrorOccured errorOccured) : _clientId(clientId),
-                                                                                                                                                               _packetHeaderString(packetHeader),
-                                                                                                                                                               _packetFooterString(packerFooter),
-                                                                                                                                                               _packetReceived(packetReceived),
-                                                                                                                                                               _errorOccured(errorOccured)
+    PacketSenderReceiver(unsigned int clientId, String packetHeader, String packerFooter, TCallBackPacketReceived packetReceived, TCallBackErrorOccured errorOccured) : _clientId(clientId),
+                                                                                                                                                                        _packetHeaderString(packetHeader),
+                                                                                                                                                                        _packetFooterString(packerFooter),
+                                                                                                                                                                        _packetReceived(packetReceived),
+                                                                                                                                                                        _errorOccured(errorOccured)
+    {
+    }
+    PacketSenderReceiver()
     {
     }
 

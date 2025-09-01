@@ -151,45 +151,52 @@ void AwbClient::setup()
 
     _debugging->setState(Debugging::MJ_SETUP, 70);
 
+    // set up the status management
+    showSetupMsg("setup status management");
+    _statusManagement = new StatusManagement(this->_clientId, _projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback);
+
+    _debugging->setState(Debugging::MJ_SETUP, 71);
+
     // setup the packet processor to process packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet processor");
     this->_packetProcessor = new PacketProcessor(_projectData, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback, packetProcessorMessageToShow, _debugging);
 
-    _debugging->setState(Debugging::MJ_SETUP, 75);
+    _debugging->setState(Debugging::MJ_SETUP, 73);
 
     // set up the packet sender receiver to receive packets from the Animatronic Workbench Studio
     showSetupMsg("setup AWB studio packet receiver");
     const TCallBackPacketReceived packetReceived = [this](unsigned int clientId, String payload) -> String
     {
+        _debugging->setState(Debugging::MJ_SETUP, 74);
         // process the packet
         if (clientId == this->_clientId)
         {
+            _debugging->setState(Debugging::MJ_SETUP, 75);
             if (this->_statusManagement->getIsAnyGlobalFaultActuatorInCriticalState())
             {
+                _debugging->setState(Debugging::MJ_SETUP, 76);
                 showError("Packet received, but dropped because at least one actuator is in critical state!");
                 return String("Packet received, but dropped because at least one actuator is in critical state!");
             }
 
+            _debugging->setState(Debugging::MJ_SETUP, 77);
             String resultString = this->_packetProcessor->processPacket(payload);
             return resultString;
         }
-        else
-        {
-            // packet is not for this client, so ignore it
-            return String();
-        }
+
+        // packet is not for this client, so ignore it
+        _debugging->setState(Debugging::MJ_SETUP, 78);
+        return "";
     };
-    String packetHeader = "<awb>";
-    String packetFooter = "</awb>";
-    this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetFooter, packetReceived, errorOccuredCallback);
 
     _debugging->setState(Debugging::MJ_SETUP, 80);
+    String packetHeader = String("<awb>");
+    String packetFooter = String("</awb>");
+    _debugging->setState(Debugging::MJ_SETUP, 81);
 
-    // set up the status management
-    showSetupMsg("setup status management");
-    _statusManagement = new StatusManagement(this->_clientId, _projectData, &_display, _stSerialServoManager, _scSerialServoManager, _pca9685pwmManager, errorOccuredCallback);
+    this->_packetSenderReceiver = new PacketSenderReceiver(this->_clientId, packetHeader, packetFooter, packetReceived, errorOccuredCallback);
 
-    _debugging->setState(Debugging::MJ_SETUP, 85);
+    _debugging->setState(Debugging::MJ_SETUP, 84);
 
     if (this->_dacSpeaker != nullptr)
     {

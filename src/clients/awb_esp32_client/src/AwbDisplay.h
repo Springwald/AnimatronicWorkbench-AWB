@@ -17,7 +17,6 @@ private:
   int _debugStateMinor;  /// The minor debug state
   bool _debuggingActive; /// The debug state is active
 
-
   String _actualStatusInfo; /// The actual status message
   unsigned long _last_loop; /// The last time the loop was called
   bool _isSmallScreen;      /// The screen is small (e.g. 128x32)
@@ -29,8 +28,7 @@ private:
   float _textSizePx;         /// The text size for the font in pixel
   float _textSizeLineHeight; /// The text size for the font in line height
 
-  int _primarySpriteTop;      /// The top position of the primary sprite
-  int _statusFooterSpriteTop; /// The top position of the status footer sprite
+  int _primarySpriteTop; /// The top position of the primary sprite
 
   String _values[100];       /// The actuator values to show
   int _valuesCount = 0;      /// The count of values to show
@@ -51,7 +49,7 @@ public:
   /**
    * Set up the display
    */
-  void setup(int clientId);
+  void setup(unsigned int clientId);
 
   /**
    * Loop the display

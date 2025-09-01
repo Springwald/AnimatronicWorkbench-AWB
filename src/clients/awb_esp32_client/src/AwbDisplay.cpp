@@ -65,7 +65,7 @@ static const lgfx::IFont *font = nullptr;
 /**
  * Setup the display
  */
-void AwbDisplay::setup(int clientId)
+void AwbDisplay::setup(unsigned int clientId)
 {
 #ifdef DISPLAY_AVAILABLE
     lcd.init();
@@ -135,7 +135,7 @@ void AwbDisplay::setup(int clientId)
 
         // set up the primary sprite
         _primarySpriteTop = topBarSprite.height();
-        primarySprite.createSprite(lcd.width(), _statusFooterSpriteTop - _primarySpriteTop);
+        primarySprite.createSprite(lcd.width(), lcd.height() - _primarySpriteTop);
     }
 
     lcd.setColorDepth(colorDepth);

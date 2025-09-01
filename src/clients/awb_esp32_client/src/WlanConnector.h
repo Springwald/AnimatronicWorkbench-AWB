@@ -25,7 +25,7 @@ class WlanConnector
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:
-    int _clientId;                                     /// the id of the client
+    unsigned int _clientId;                            /// the id of the client
     TCallBackErrorOccured _errorOccured;               /// callback function to call if an error occured
     bool _liveDebuggingActive;                         /// the live debugging is active or not
     WifiConfig *_wifiConfig;                           /// the wifi configuration
@@ -63,7 +63,7 @@ public:
     int stsServoCannelToSet; /// the channel of the sts servo to set by remote control
     int stsServoValueToSet;  /// the value of the sts servo to set by remote control (in percent)
 
-    WlanConnector(int clientId, ProjectData *projectData, ActualStatusInformation *actualStatusInformation, Debugging *debugging, TCallBackErrorOccured errorOccured)
+    WlanConnector(unsigned int clientId, ProjectData *projectData, ActualStatusInformation *actualStatusInformation, Debugging *debugging, TCallBackErrorOccured errorOccured)
         : _errorOccured(errorOccured), _projectData(projectData), _clientId(clientId), _actualStatusInformation(actualStatusInformation), _debugging(debugging)
     {
         timelineNameToPlay = new String();

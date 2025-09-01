@@ -18,7 +18,6 @@
 class CustomCode
 {
     using TCallBackErrorOccured = std::function<void(String)>;
-
 protected:
     TCallBackErrorOccured _errorOccured;            // the error occured callback
     ProjectData *_projectData;                      // the project data exported by Animatronic Workbench Studio
