@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <String.h>
 #include <vector>
+#include "RelaxRange.h"
 #include <string>
 #include "Servo.h"
 
@@ -25,6 +26,8 @@ public:
     int defaultSpeed;        /// the speed of the servo
     bool globalFault;        /// if this servo is to hot or overloaded, should all servos stop?
 
+    std::vector<RelaxRange> *relaxRanges; // the relax ranges of the servo
+
     // actual states of the servo
     int targetSpeed = -1; /// the speed of the actuator (should be updated in the next update cycle)
     int targetAcc = -1;   /// the acceleration of the actuator (should be updated in the next update cycle)
@@ -39,7 +42,7 @@ public:
     long lastFaultMs = 0;         /// the time in milliseconds when the fault was detected
     String lastFaultMessage = ""; /// the message of the last fault
 
-    StsScsServo(int channel, String const title, int minValue, int maxValue, int maxTemp, int maxTorque, int defaultValue, int defaultAcceleration, int defaultSpeed, bool globalFault) : channel(channel), title(title), minValue(minValue), maxValue(maxValue), maxTemp(maxTemp), maxTorque(maxTorque), defaultValue(defaultValue), defaultAcceleration(defaultAcceleration), defaultSpeed(defaultSpeed), globalFault(globalFault)
+    StsScsServo(int channel, String const title, int minValue, int maxValue, int maxTemp, int maxTorque, int defaultValue, int defaultAcceleration, int defaultSpeed, bool globalFault, std::vector<RelaxRange> *relaxRanges) : channel(channel), title(title), minValue(minValue), maxValue(maxValue), maxTemp(maxTemp), maxTorque(maxTorque), defaultValue(defaultValue), defaultAcceleration(defaultAcceleration), defaultSpeed(defaultSpeed), globalFault(globalFault), relaxRanges(relaxRanges)
     {
         targetValue = defaultValue;
         targetSpeed = defaultSpeed;

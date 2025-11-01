@@ -5,13 +5,14 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Project.Actuators;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Servos
 {
-    public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig
+    public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig, ISupportsRelaxRanges
     {
         public required string Id { get; set; }
 

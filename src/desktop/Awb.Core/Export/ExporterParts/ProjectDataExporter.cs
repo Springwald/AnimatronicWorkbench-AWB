@@ -7,6 +7,7 @@
 
 
 using Awb.Core.Export.ExporterParts.ExportData;
+using Awb.Core.Project.Actuators;
 using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
@@ -276,6 +277,7 @@ namespace Awb.Core.Export.ExporterParts
                 result.AppendLine($"\ttimelineStates->push_back(TimelineState({state.Id}, String(\"{state.Title}\"), {state.AutoPlay.ToString().ToLower()}, new std::vector<int>({{ {string.Join(", ", state.PositiveInputs)} }}), new std::vector<int>({{ {string.Join(", ", state.NegativeInputs)} }})));");
             }
         }
+
         private static void ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos, StringBuilder result)
         {
             result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
@@ -284,6 +286,8 @@ namespace Awb.Core.Export.ExporterParts
                 var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
                 var speed = servo.Speed ?? 0;
                 var acceleration = 0; // scs servos have no acceleration
+                var relaxRangesName = $"{propertyName}_relaxRanges";
+                ExportRelaxRanges(relaxRangeObject: servo, listName: relaxRangesName, result);
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
                 result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));");
             }
@@ -297,10 +301,20 @@ namespace Awb.Core.Export.ExporterParts
                 var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
                 var acceleration = servo.Acceleration ?? 0;
                 var speed = servo.Speed ?? 0;
-                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));");
+                var relaxRangesName = $"{propertyName}_relaxRanges";
+                ExportRelaxRanges(relaxRangeObject: servo,listName: relaxRangesName, result);
+                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault, vector<RelaxRange> relaxRanges
+                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()}, {relaxRangesName} ));");
             }
             result.AppendLine();
+        }
+
+        private static void ExportRelaxRanges(ISupportsRelaxRanges relaxRangeObject, string listName, StringBuilder result)
+        {
+            var relaxRanges = relaxRangeObject.RelaxRanges;
+            result .AppendLine($"  auto {listName}= new vector<RelaxRange>();");
+            foreach (var range in relaxRanges)
+                result.AppendLine($"  {listName}->push_back(RelaxRange({range.MinValue}, {range.MaxValue}));");
         }
 
         private static void ExportPCS9685PwmServos(IEnumerable<Pca9685PwmServoConfig> pca9685PwmServoConfigs, StringBuilder result)
