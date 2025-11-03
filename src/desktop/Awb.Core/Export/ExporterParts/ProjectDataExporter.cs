@@ -7,12 +7,11 @@
 
 
 using Awb.Core.Export.ExporterParts.ExportData;
-using Awb.Core.Project.Actuators;
-using Awb.Core.Project.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.Sounds;
 using System.Text;
+using TagLib.IFD.Tags;
 
 namespace Awb.Core.Export.ExporterParts
 {
@@ -189,22 +188,27 @@ namespace Awb.Core.Export.ExporterParts
             content.AppendLine("ProjectData(TCallBackErrorOccured errorOccured)");
             content.AppendLine("{");
             content.AppendLine();
-            ExportScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs, content);
-            ExportStsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs, content);
-            ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs, content);
+
+            // Export the servos
+            var servoExporter = new ServoExporter();
+            content.AppendLines(servoExporter.ExportScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs));
+            content.AppendLines(servoExporter.ExportStsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs));
+            content.AppendLines(servoExporter.ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs));
+            
+            // Export sound player
             ExportMp3PlayerYX5300Informations(_projectData.Mp3PlayerYX5300Configs, content);
             ExportMp3PlayerDfPlayerMiniInformations(_projectData.Mp3PlayerDfPlayerMiniConfigs, content);
+            
+            // Export timelines states
             ExportTimelineStates(_projectData.TimelineStates, content);
             content.AppendLine();
             content.AppendLine("\taddTimelines();");
             content.AppendLine();
             content.AppendLine("}");
 
-            // Add timelines
-
+            // Export timelines
             content.AppendLine();
             content.AppendLine("void addTimelines() {");
-
             content.AppendLine("\ttimelines = new std::vector<Timeline>();");
             content.AppendLine();
 
@@ -276,62 +280,6 @@ namespace Awb.Core.Export.ExporterParts
                 // add line in using this format:  timelineStates->push_back(TimelineState(1, String("InBag"), true, new std::vector<int>({1}), new std::vector<int>({0}))); 
                 result.AppendLine($"\ttimelineStates->push_back(TimelineState({state.Id}, String(\"{state.Title}\"), {state.AutoPlay.ToString().ToLower()}, new std::vector<int>({{ {string.Join(", ", state.PositiveInputs)} }}), new std::vector<int>({{ {string.Join(", ", state.NegativeInputs)} }})));");
             }
-        }
-
-        private static void ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos, StringBuilder result)
-        {
-            result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
-            foreach (var servo in servos)
-            {
-                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
-                var speed = servo.Speed ?? 0;
-                var acceleration = 0; // scs servos have no acceleration
-                var relaxRangesName = $"{propertyName}_relaxRanges";
-                ExportRelaxRanges(relaxRangeObject: servo, listName: relaxRangesName, result);
-                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));");
-            }
-            result.AppendLine();
-        }
-        private static void ExportStsServos(string propertyName, IEnumerable<StsFeetechServoConfig> servos, StringBuilder result)
-        {
-            result.AppendLine($"   {propertyName} = new std::vector<StsScsServo>();");
-            foreach (var servo in servos)
-            {
-                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
-                var acceleration = servo.Acceleration ?? 0;
-                var speed = servo.Speed ?? 0;
-                var relaxRangesName = $"{propertyName}_relaxRanges";
-                ExportRelaxRanges(relaxRangeObject: servo,listName: relaxRangesName, result);
-                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault, vector<RelaxRange> relaxRanges
-                result.AppendLine($"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()}, {relaxRangesName} ));");
-            }
-            result.AppendLine();
-        }
-
-        private static void ExportRelaxRanges(ISupportsRelaxRanges relaxRangeObject, string listName, StringBuilder result)
-        {
-            var relaxRanges = relaxRangeObject.RelaxRanges;
-            result .AppendLine($"  auto {listName}= new vector<RelaxRange>();");
-            foreach (var range in relaxRanges)
-                result.AppendLine($"  {listName}->push_back(RelaxRange({range.MinValue}, {range.MaxValue}));");
-        }
-
-        private static void ExportPCS9685PwmServos(IEnumerable<Pca9685PwmServoConfig> pca9685PwmServoConfigs, StringBuilder result)
-        {
-            var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Pca9685PwmServoConfig>();
-
-            var propertyName = "pca9685PwmServos";
-            result.AppendLine($"   {propertyName} = new std::vector<Pca9685PwmServo>();");
-
-            foreach (var servo in pca9685PwmServos)
-            // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-            {
-                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
-                result.AppendLine($"   {propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {defaultValue}));");
-            }
-
-            result.AppendLine();
         }
 
         private static void ExportMp3PlayerYX5300Informations(IEnumerable<Mp3PlayerYX5300Config>? mp3PlayerYX5300Configs, StringBuilder result)
@@ -468,7 +416,6 @@ namespace Awb.Core.Export.ExporterParts
                     return $"Soundplayer id '{soundPoint.SoundPlayerId}' not found in project config!";
                 }
 
-
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineStateReference({state.Id}, String(\"{state.Title}\"));");
                 result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId ?? -1}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo}, mp3PlayerDfPlayerMiniPoints{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
@@ -479,6 +426,15 @@ namespace Awb.Core.Export.ExporterParts
             }
             return null;
         }
+    }
+    public static class ExportStringBuilderExtensions
+    {
+        public static void AppendLines(this StringBuilder stringBuilder, IEnumerable<string> lines)
+        {
+            foreach (var line in lines)
+                stringBuilder.AppendLine(line);
 
+            stringBuilder.AppendLine();
+        }
     }
 }
