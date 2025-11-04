@@ -12,6 +12,10 @@
 #include "../ProjectData/Servos/Pca9685PwmServoPoint.h"
 #include "../ProjectData/Servos/StsScsServo.h"
 #include "../ProjectData/Servos/Pca9685PwmServo.h"
+#include "../ProjectData/Servos/Servo.h"
+#include "../ProjectData/Servos/ServoState.h"
+#include "../ProjectData/Servos/ServoConfig.h"
+#include "../ProjectData/Servos/RelaxRange.h"
 
 #include "../ProjectData/Mp3Player/Mp3PlayerYX5300Serial.h"
 #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniSerial.h"
@@ -26,62 +30,65 @@
 class ProjectData
 {
 
-using TCallBackErrorOccured = std::function<void(String)>;
+	using TCallBackErrorOccured = std::function<void(String)>;
 
 public:
-   const char *ProjectName = "AWB-Demo-Board";
+	const char *ProjectName = "AWB-Demo-Board";
 
-   const int returnToAutoModeAfterMinutes  = -1 ;
+	const int returnToAutoModeAfterMinutes = -1;
 
-   /* Names as const to prevent magic strings in custom code: */
+	/* Names as const to prevent magic strings in custom code: */
 
-   const String ScsServoName_Servoleft ="Servo left";
-   const String ScsServoName_Servoright ="Servo right";
+	const String ScsServoName_Servoleft = "Servo left";
+	const String ScsServoName_Servoright = "Servo right";
 
-
+	std::vector<Servo> *allServos;
 	std::vector<StsScsServo> *scsServos;
 	std::vector<StsScsServo> *stsServos;
 	std::vector<Pca9685PwmServo> *pca9685PwmServos;
-	std::vector<TimelineState>* timelineStates;
-	std::vector<Timeline>* timelines;
+	std::vector<TimelineState> *timelineStates;
+	std::vector<Timeline> *timelines;
 	std::vector<Mp3PlayerYX5300Serial> *mp3PlayersYX5300;
 	std::vector<Mp3PlayerDfPlayerMiniSerial> *mp3PlayersDfPlayerMini;
 
 	int inputIds[0] = {};
 	String inputNames[0] = {};
-	uint8_t  inputIoPins[0] = {};
+	uint8_t inputIoPins[0] = {};
 	int inputCount = 0;
 
+	ProjectData(TCallBackErrorOccured errorOccured)
+	{
 
-ProjectData(TCallBackErrorOccured errorOccured)
-{
+		allServos = new std::vector<Servo>();
 
-   scsServos = new std::vector<StsScsServo>();
-   scsServos->push_back(StsScsServo(1, "Servo left", 0, 512, 55, 400, 256, 0, 200, false ));
-   scsServos->push_back(StsScsServo(2, "Servo right", 0, 0, 55, 400, 0, 0, 0, false ));
+		std::vector<RelaxRange> *relaxRangesServo1 = new std::vector<RelaxRange>();
+		relaxRangesServo1->push_back(RelaxRange(100, 150, 5));
+		ServoConfig *servoConfig = new ServoConfig(ServoConfig::ServoTypes::SCS_SERVO, 1, 0, 512, 55, 400, 256, 0, 200, false, relaxRangesServo1);
+		Servo servo = Servo("servo_1", "Servo left", servoConfig);
+		allServos->push_back(servo);
 
-   stsServos = new std::vector<StsScsServo>();
+		scsServos = new std::vector<StsScsServo>();
+		scsServos->push_back(StsScsServo(1, "Servo left", 0, 512, 55, 400, 256, 0, 200, false));
+		scsServos->push_back(StsScsServo(2, "Servo right", 0, 0, 55, 400, 0, 0, 0, false));
 
-   pca9685PwmServos = new std::vector<Pca9685PwmServo>();
+		stsServos = new std::vector<StsScsServo>();
 
-	mp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();
+		pca9685PwmServos = new std::vector<Pca9685PwmServo>();
 
-	mp3PlayersDfPlayerMini = new std::vector<Mp3PlayerDfPlayerMiniSerial>();
+		mp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();
 
-	timelineStates = new std::vector<TimelineState>();
-	timelineStates->push_back(TimelineState(1, String("Default"), true, new std::vector<int>({  }), new std::vector<int>({  })));
+		mp3PlayersDfPlayerMini = new std::vector<Mp3PlayerDfPlayerMiniSerial>();
 
-	addTimelines();
+		timelineStates = new std::vector<TimelineState>();
+		timelineStates->push_back(TimelineState(1, String("Default"), true, new std::vector<int>({}), new std::vector<int>({})));
 
-}
+		addTimelines();
+	}
 
-void addTimelines() {
-	timelines = new std::vector<Timeline>();
-
-
-}
-
+	void addTimelines()
+	{
+		timelines = new std::vector<Timeline>();
+	}
 };
 
 #endif // _PROJECTDATA_H_
-

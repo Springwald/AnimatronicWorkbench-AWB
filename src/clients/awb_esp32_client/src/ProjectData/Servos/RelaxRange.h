@@ -8,10 +8,11 @@ class RelaxRange
 {
 protected:
 public:
-    int minValue; // lower bound of the relax range
-    int maxValue; // upper bound of the relax range
+    int minValue;  // lower bound of the relax range
+    int maxValue;  // upper bound of the relax range
+    int tolerance; // tolerance when the relaxed servo is moved inside the relax range
 
-    RelaxRange(int min, int max) : minValue(min), maxValue(max)
+    RelaxRange(int minValue, int maxValue, int tolerance) : minValue(minValue), maxValue(maxValue), tolerance(tolerance)
     {
     }
 

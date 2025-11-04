@@ -24,7 +24,7 @@ namespace Awb.Core.Export.ExporterParts
         public override async Task<IExporter.ExportResult> ExportAsync()
         {
             var content = new StringBuilder();
-            content.AppendLine(GetHeader(className: "WifiConfig", includes: string.Empty));
+            content.AppendLine(GetHeader(className: "WifiConfig"));
 
             content.AppendLine("public:");
             content.AppendLine($"   const char *WlanSSID = \"{_wifiConfigData.WlanSSID}\";");

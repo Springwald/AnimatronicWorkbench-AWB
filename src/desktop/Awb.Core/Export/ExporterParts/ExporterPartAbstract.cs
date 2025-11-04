@@ -17,16 +17,16 @@ namespace Awb.Core.Export.ExporterParts
 
         public void InvokeProcessing(ExporterProcessStateEventArgs e) => Processing?.Invoke(this, e);
 
-        protected string GetHeader(string className, string includes)
+        protected string Get_H_Header(string className) =>
+                $"#ifndef _{className.ToUpper()}_H_" + Environment.NewLine +
+                $"#define _{className.ToUpper()}_H_";
+
+        protected string GetHeader(string className)
         {
             var content = new StringBuilder();
-            content.AppendLine($"#ifndef _{className.ToUpper()}_H_");
-            content.AppendLine($"#define _{className.ToUpper()}_H_");
-            content.AppendLine();
-            content.AppendLine(includes);
             content.AppendLine();
             content.AppendLine("// Created with Animatronic Workbench Studio");
-            content.AppendLine("// https://daniel.springwald.de/post/AnimatronicWorkbench");
+            content.AppendLine("// https://daniel.springwald.de/post/AWB/AnimatronicWorkbench");
             content.AppendLine();
             content.AppendLine($"// Created on {DateTime.Now}");
             content.AppendLine();

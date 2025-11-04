@@ -107,7 +107,6 @@ namespace Awb.Core.Export.ExporterParts
                 content.AppendLine();
             }
 
-
             // DAC speaker settings
             if (false)
             {
@@ -134,11 +133,21 @@ namespace Awb.Core.Export.ExporterParts
             return IExporter.ExportResult.SuccessResult;
         }
 
+
         private async Task<IExporter.ExportResult> WriteProjectDataHAsync(string folder)
         {
             var content = new StringBuilder();
+            const string className = "ProjectData";
+            const string servoListName = "allServos";
+            var servoExporter = new ServoExporter(servoListName: servoListName);
+            var timelineExporter = new TimelineDataExporter();
+            var timelineExportData = timelineExporter.ExportTimelineData(_projectData);
 
-            var includes = """
+            if (timelineExportData.ErrorMessage != null)
+                return new IExporter.ExportResult { ErrorMessage = timelineExportData.ErrorMessage };
+
+            content.AppendLine(
+                $$"""
                 #include <Arduino.h>
                 #include <String.h>
                 #include "../ProjectData/Timeline.h"
@@ -155,101 +164,90 @@ namespace Awb.Core.Export.ExporterParts
                 #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniSerial.h"
                 #include "../ProjectData/Mp3Player/Mp3PlayerYX5300Point.h"
                 #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniPoint.h"
-                """;
 
-            content.AppendLine(GetHeader(className: "ProjectData", includes: includes));
+                {{Get_H_Header(className: className)}}
 
-            content.AppendLine("using TCallBackErrorOccured = std::function<void(String)>;");
-            content.AppendLine();
-            content.AppendLine("public:");
-            content.AppendLine($"   const char *ProjectName = \"{_projectData.ProjectName}\";");
-            content.AppendLine();
+                {{GetHeader(className: className)}}
 
-            content.AppendLine($"   const int returnToAutoModeAfterMinutes  = {_projectData.Esp32ClientHardwareConfig.AutoPlayAfter ?? -1} ;");
-            content.AppendLine();
+                using TCallBackErrorOccured = std::function<void(String)>;
 
+                public:
+                    const char *ProjectName = \"{{_projectData.ProjectName}}\";
+                    const int returnToAutoModeAfterMinutes  = {{_projectData.Esp32ClientHardwareConfig.AutoPlayAfter ?? -1}} ;");
 
-            ExportKnownNamesAsConsts(content);
+                {{ExportKnownNamesAsConsts()}}
 
-            content.AppendLine();
-            content.AppendLine($"\tstd::vector<StsScsServo> *scsServos;");
-            content.AppendLine($"\tstd::vector<StsScsServo> *stsServos;");
-            content.AppendLine($"\tstd::vector<Pca9685PwmServo> *pca9685PwmServos;");
-            content.AppendLine($"\tstd::vector<TimelineState>* timelineStates;");
-            content.AppendLine($"\tstd::vector<Timeline>* timelines;");
-            content.AppendLine($"\tstd::vector<Mp3PlayerYX5300Serial> *mp3PlayersYX5300;");
-            content.AppendLine($"\tstd::vector<Mp3PlayerDfPlayerMiniSerial> *mp3PlayersDfPlayerMini;");
+                std::vector<Servo> *{{servoListName}};
 
-            content.AppendLine();
+                std::vector<TimelineState>* timelineStates;
+                std::vector<Timeline>* timelines;
+                std::vector<Mp3PlayerYX5300Serial> *mp3PlayersYX5300;
+                std::vector<Mp3PlayerDfPlayerMiniSerial> *mp3PlayersDfPlayerMini;
 
-            ExportInputs(inputConfigs: _projectData.InputConfigs, content);
-            content.AppendLine();
+                {{ExportInputs(inputConfigs: _projectData.InputConfigs)}}
 
-            content.AppendLine("ProjectData(TCallBackErrorOccured errorOccured)");
-            content.AppendLine("{");
-            content.AppendLine();
+                ProjectData(TCallBackErrorOccured errorOccured)
+                {
+                    // the servos
+                    allServos = new std::vector<Servo>();
+                    {{servoExporter.ExportServos(servoConfigs: _projectData.ScsServoConfigs)}}
+                    {{servoExporter.ExportServos(servoConfigs: _projectData.StsServoConfigs)}}
+                    {{servoExporter.ExportServos(servoConfigs: _projectData.Pca9685PwmServoConfigs)}}
+                
+                    // sound player
+                    {{ExportMp3PlayerYX5300Informations(_projectData.Mp3PlayerYX5300Configs)}}
+                    {{ExportMp3PlayerDfPlayerMiniInformations(_projectData.Mp3PlayerDfPlayerMiniConfigs)}}
 
-            // Export the servos
-            var servoExporter = new ServoExporter();
-            content.AppendLines(servoExporter.ExportScsServos(propertyName: "scsServos", servos: _projectData.ScsServoConfigs));
-            content.AppendLines(servoExporter.ExportStsServos(propertyName: "stsServos", servos: _projectData.StsServoConfigs));
-            content.AppendLines(servoExporter.ExportPCS9685PwmServos(_projectData.Pca9685PwmServoConfigs));
+                    // timelines states
+                    {{ExportTimelineStates(_projectData.TimelineStates)}}    
+
+                    addTimelines();
+                }
+
+                // timelines
+                void addTimelines() 
+                {
+                    timelines = new std::vector<Timeline>();
+                    {{timelineExportData.Content}}
+                }
+
+                {{GetFooter("ProjectData")}}
             
-            // Export sound player
-            ExportMp3PlayerYX5300Informations(_projectData.Mp3PlayerYX5300Configs, content);
-            ExportMp3PlayerDfPlayerMiniInformations(_projectData.Mp3PlayerDfPlayerMiniConfigs, content);
-            
-            // Export timelines states
-            ExportTimelineStates(_projectData.TimelineStates, content);
-            content.AppendLine();
-            content.AppendLine("\taddTimelines();");
-            content.AppendLine();
-            content.AppendLine("}");
-
-            // Export timelines
-            content.AppendLine();
-            content.AppendLine("void addTimelines() {");
-            content.AppendLine("\ttimelines = new std::vector<Timeline>();");
-            content.AppendLine();
-
-            var errMsg = ExportTimelineData(_projectData, content);
-            if (errMsg != null)
-                return new IExporter.ExportResult { ErrorMessage = errMsg };
-
-            content.AppendLine();
-            content.AppendLine("}");
-
-            content.AppendLine(GetFooter("ProjectData"));
+            """
+            );
 
             await File.WriteAllTextAsync(Path.Combine(folder, "ProjectData.h"), content.ToString());
             return IExporter.ExportResult.SuccessResult;
         }
 
-        private void ExportKnownNamesAsConsts(StringBuilder content)
+        private string ExportKnownNamesAsConsts()
         {
-            content.AppendLine($"   /* Names as const to prevent magic strings in custom code: */");
-            content.AppendLine();
+            StringBuilder result = new StringBuilder();
+            result.AppendLine($"   /* Names as const to prevent magic strings in custom code: */");
+            result.AppendLine();
 
             var constString = (string praefix, string s) => $"   const String {praefix}{CleanUpName(s)} =\"{s}\";";
 
             // timeline names
             foreach (var timeline in _projectData.TimelineData)
-                content.AppendLine(constString("TimelineName_", timeline.Title));
+                result.AppendLine(constString("TimelineName_", timeline.Title));
 
             // mp3 player names
             foreach (var mp3Player in _projectData.Mp3PlayerYX5300Configs)
-                content.AppendLine(constString("Mp3PlayerName_", mp3Player.Title));
+                result.AppendLine(constString("Mp3PlayerName_", mp3Player.Title));
             foreach (var mp3Player in _projectData.Mp3PlayerDfPlayerMiniConfigs)
-                content.AppendLine(constString("Mp3PlayerName_", mp3Player.Title));
+                result.AppendLine(constString("Mp3PlayerName_", mp3Player.Title));
 
             // servo names
             foreach (var servo in _projectData.ScsServoConfigs)
-                content.AppendLine(constString("ScsServoName_", servo.Title));
+                result.AppendLine(constString("ScsServoName_", servo.Title));
             foreach (var servo in _projectData.StsServoConfigs)
-                content.AppendLine(constString("StsServoName_", servo.Title));
+                result.AppendLine(constString("StsServoName_", servo.Title));
             foreach (var servo in _projectData.Pca9685PwmServoConfigs)
-                content.AppendLine(constString("Pca9685PwmServoName_", servo.Title));
-            content.AppendLine();
+                result.AppendLine(constString("Pca9685PwmServoName_", servo.Title));
+            result.AppendLine();
+
+            return result.ToString();
         }
 
         private static string CleanUpName(string name)
@@ -260,8 +258,10 @@ namespace Awb.Core.Export.ExporterParts
             return name;
         }
 
-        private static void ExportInputs(IEnumerable<InputConfig> inputConfigs, StringBuilder result)
+        private static string ExportInputs(IEnumerable<InputConfig> inputConfigs)
         {
+            StringBuilder result = new StringBuilder();
+
             // export the inputs
             var exportInputs = inputConfigs ?? Array.Empty<InputConfig>();
             result.AppendLine($"\tint inputIds[{exportInputs.Count()}] = {{{string.Join(", ", exportInputs.Select(i => i.Id.ToString()))}}};");
@@ -269,10 +269,13 @@ namespace Awb.Core.Export.ExporterParts
             result.AppendLine($"\tuint8_t  inputIoPins[{exportInputs.Count()}] = {{{string.Join(", ", exportInputs.Select(s => s.IoPin.ToString()))}}};");
             result.AppendLine($"\tint inputCount = {exportInputs.Count()};");
             result.AppendLine();
+
+            return result.ToString();
         }
 
-        private static void ExportTimelineStates(IEnumerable<TimelineState> timelineStates, StringBuilder result)
+        private static string ExportTimelineStates(IEnumerable<TimelineState> timelineStates)
         {
+             StringBuilder result = new StringBuilder();
             var exportStates = timelineStates?.Where(s => s.Export).ToArray() ?? Array.Empty<TimelineState>();
             result.AppendLine($"\ttimelineStates = new std::vector<TimelineState>();");
             foreach (var state in exportStates)
@@ -280,10 +283,13 @@ namespace Awb.Core.Export.ExporterParts
                 // add line in using this format:  timelineStates->push_back(TimelineState(1, String("InBag"), true, new std::vector<int>({1}), new std::vector<int>({0}))); 
                 result.AppendLine($"\ttimelineStates->push_back(TimelineState({state.Id}, String(\"{state.Title}\"), {state.AutoPlay.ToString().ToLower()}, new std::vector<int>({{ {string.Join(", ", state.PositiveInputs)} }}), new std::vector<int>({{ {string.Join(", ", state.NegativeInputs)} }})));");
             }
+            result.AppendLine();
+            return result.ToString();
         }
 
-        private static void ExportMp3PlayerYX5300Informations(IEnumerable<Mp3PlayerYX5300Config>? mp3PlayerYX5300Configs, StringBuilder result)
+        private static string ExportMp3PlayerYX5300Informations(IEnumerable<Mp3PlayerYX5300Config>? mp3PlayerYX5300Configs)
         {
+            StringBuilder result = new StringBuilder();
             var players = mp3PlayerYX5300Configs ?? Array.Empty<Mp3PlayerYX5300Config>();
             // add  mp3 players using the constructor:  Mp3PlayerYX5300Serial(int rxPin, int txPin, String name) 
             result.AppendLine($"\tmp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();");
@@ -291,10 +297,12 @@ namespace Awb.Core.Export.ExporterParts
                 result.AppendLine($"\tmp3PlayersYX5300->push_back(Mp3PlayerYX5300Serial({player.RxPin}, {player.TxPin}, \"{player.Title}\", \"{player.Id}\",errorOccured));");
 
             result.AppendLine();
+            return result.ToString();
         }
 
-        private static void ExportMp3PlayerDfPlayerMiniInformations(IEnumerable<Mp3PlayerDfPlayerMiniConfig>? mp3PlayerDfPlayerMiniConfigs, StringBuilder result)
+        private static string ExportMp3PlayerDfPlayerMiniInformations(IEnumerable<Mp3PlayerDfPlayerMiniConfig>? mp3PlayerDfPlayerMiniConfigs)
         {
+            StringBuilder result = new StringBuilder();
             var players = mp3PlayerDfPlayerMiniConfigs ?? Array.Empty<Mp3PlayerDfPlayerMiniConfig>();
             // add  mp3 players using the constructor:  Mp3PlayerDfPlayerMiniConfig(int rxPin, int txPin, int volume, String name) 
             result.AppendLine($"\tmp3PlayersDfPlayerMini = new std::vector<Mp3PlayerDfPlayerMiniSerial>();");
@@ -302,130 +310,11 @@ namespace Awb.Core.Export.ExporterParts
                 result.AppendLine($"\tmp3PlayersDfPlayerMini->push_back(Mp3PlayerDfPlayerMiniSerial({player.RxPin}, {player.TxPin}, {player.Volume}, \"{player.Title}\", \"{player.Id}\", errorOccured));");
 
             result.AppendLine();
+            return result.ToString();
         }
 
         /// <returns>null=ok, else the error message</returns>
-        private static string? ExportTimelineData(ProjectExportData projectData, StringBuilder result)
-        {
-            int timelineNo = 1;
-            var timelines = projectData.TimelineData.OrderBy(t => t.TimelineStateId).ThenBy(t => t.Title).ToArray();
-            foreach (var timeline in timelines)
-            {
-                var state = projectData.TimelineStates?.SingleOrDefault(x => x.Id == timeline.TimelineStateId);
-
-                if (state == null)
-                    return $"Timeline '{timeline.Title}' uses an undefined timelineStateId '{timeline.TimelineStateId}";
-
-                if (state.Export == false) continue;
-
-                result.AppendLine($"\t\tauto *stsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
-                result.AppendLine($"\t\tauto *scsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
-                result.AppendLine($"\t\tauto *pca9685PwmServoPoints{timelineNo} = new std::vector<Pca9685PwmServoPoint>();");
-                result.AppendLine($"\t\tauto *mp3PlayerYX5300Points{timelineNo} = new std::vector<Mp3PlayerYX5300Point>();");
-                result.AppendLine($"\t\tauto *mp3PlayerDfPlayerMiniPoints{timelineNo} = new std::vector<Mp3PlayerDfPlayerMiniPoint>();");
-
-                // Export Servo-Points
-                foreach (var servoPoint in timeline.Points.OfType<ServoPoint>().OrderBy(p => p.TimeMs))
-                {
-                    // find STS servo
-                    var stsServo = projectData.StsServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
-                    if (stsServo != null)
-                    {
-                        var value = (int)(stsServo.MinValue + servoPoint.ValuePercent * (stsServo.MaxValue - stsServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tstsServoPoints{timelineNo}->push_back(StsServoPoint({stsServo.Channel},{servoPoint.TimeMs},{value}));");
-                        continue;
-                    }
-
-                    // find SCS servo
-                    var scsServo = projectData.ScsServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
-                    if (scsServo != null)
-                    {
-                        var value = (int)(scsServo.MinValue + servoPoint.ValuePercent * (scsServo.MaxValue - scsServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tscsServoPoints{timelineNo}->push_back(StsServoPoint({scsServo.Channel},{servoPoint.TimeMs},{value}));");
-                        continue;
-                    }
-
-                    // find pwm servo
-                    var pwmServo = projectData.Pca9685PwmServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
-                    if (pwmServo != null)
-                    {
-                        var value = (int)(pwmServo.MinValue + servoPoint.ValuePercent * (pwmServo.MaxValue - pwmServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tpca9685PwmServoPoints{timelineNo}->push_back(Pca9685PwmServoPoint({pwmServo.I2cAdress},{pwmServo.Channel},{servoPoint.TimeMs},{value}));");
-                        continue;
-                    }
-
-                    // todo: find other servos
-
-                    // servo id not sound
-                    return $"Servo id '{servoPoint.ServoId}' not found in project config!";
-                }
-
-                // Export YX5300 Sound-Points
-                foreach (var soundPoint in timeline.Points.OfType<SoundPoint>().OrderBy(p => p.TimeMs))
-                {
-                    if (projectData.Mp3PlayerYX5300Configs != null)
-                    {
-                        // find Mp3PlayerYX5300 soundplayer
-                        var soundPlayerIndex = -1;
-                        for (int i = 0; i < projectData.Mp3PlayerYX5300Configs?.Count(); i++)
-                        {
-                            if (projectData.Mp3PlayerYX5300Configs.ElementAt(i).Id == soundPoint.SoundPlayerId)
-                            {
-                                soundPlayerIndex = i;
-                                break;
-                            }
-                        }
-                        if (soundPlayerIndex != -1)
-                        {
-                            var soundPlayer = projectData.Mp3PlayerYX5300Configs!.ElementAt(soundPlayerIndex);
-                            if (soundPlayer != null)
-                            {
-                                result.AppendLine($"\t\tmp3PlayerYX5300Points{timelineNo}->push_back(Mp3PlayerYX5300Point({soundPoint.SoundId}, {soundPlayerIndex}, {soundPoint.TimeMs}));");
-                                continue;
-                            }
-                        }
-                    }
-
-
-                    if (projectData.Mp3PlayerDfPlayerMiniConfigs != null)
-                    {
-                        // find Mp3PlayerDfPlayerMini soundplayer
-                        var soundPlayerIndex = -1;
-                        for (int i = 0; i < projectData.Mp3PlayerDfPlayerMiniConfigs?.Count(); i++)
-                        {
-                            if (projectData.Mp3PlayerDfPlayerMiniConfigs.ElementAt(i).Id == soundPoint.SoundPlayerId)
-                            {
-                                soundPlayerIndex = i;
-                                break;
-                            }
-                        }
-                        if (soundPlayerIndex != -1)
-                        {
-                            var soundPlayer = projectData.Mp3PlayerDfPlayerMiniConfigs!.ElementAt(soundPlayerIndex);
-                            if (soundPlayer != null)
-                            {
-                                result.AppendLine($"\t\tmp3PlayerDfPlayerMiniPoints{timelineNo}->push_back(Mp3PlayerDfPlayerMiniPoint({soundPoint.SoundId}, {soundPlayerIndex}, {soundPoint.TimeMs}));");
-                                continue;
-                            }
-                        }
-                    }
-
-                    // todo: find other sound player
-
-                    // servo id not sound
-                    return $"Soundplayer id '{soundPoint.SoundPlayerId}' not found in project config!";
-                }
-
-                result.AppendLine($"\t\tauto state{timelineNo} = new TimelineStateReference({state.Id}, String(\"{state.Title}\"));");
-                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId ?? -1}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo}, mp3PlayerDfPlayerMiniPoints{timelineNo});");
-                result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
-
-                result.AppendLine();
-
-                timelineNo++;
-            }
-            return null;
-        }
+     
     }
     public static class ExportStringBuilderExtensions
     {
@@ -435,6 +324,14 @@ namespace Awb.Core.Export.ExporterParts
                 stringBuilder.AppendLine(line);
 
             stringBuilder.AppendLine();
+        }
+
+        public static string ToLines(this IEnumerable<string> lines)
+        {
+            var stringBuilder = new StringBuilder();
+            foreach (var line in lines)
+                stringBuilder.AppendLine(line);
+            return stringBuilder.ToString();
         }
     }
 }
