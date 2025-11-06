@@ -5,8 +5,7 @@
 #include <String.h>
 #include <vector>
 #include <string>
-#include "../ProjectData/Servos/StsServoPoint.h"
-#include "../ProjectData/Servos/Pca9685PwmServoPoint.h"
+#include "../ProjectData/Servos/ServoPoint.h"
 #include "../ProjectData/TimelineStateReference.h"
 #include "../AwbDataImport/ProjectData.h"
 #include "../Actuators/Servos/StScsSerialServoManager.h"
@@ -47,7 +46,7 @@ protected:
     int *_timeLineStateForcedOnceByRemoteOrCustomCodeId = nullptr;      // Here the globale timeline state can be overwritten by custom code a single time. Buttons and other inputs defined in AWB Studio will be ignored.
     int *_timeLineStateForcedPermanentByRemoteOrCustomCodeId = nullptr; // Here the globale timeline state can be overwritten by custom code permanent. Buttons and other inputs defined in AWB Studio will be ignored.
 
-    int calculateServoValueFromTimeline(u8 servoChannel, std::vector<StsServoPoint> *servoPoints);
+    int calculateServoValueFromTimeline(u8 servoChannel, std::vector<ServoPoint> *servoPoints);
 
 public:
     AutoPlayer(

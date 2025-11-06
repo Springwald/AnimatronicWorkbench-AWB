@@ -8,7 +8,7 @@ class ServoPoint
 {
 protected:
 public:
-    String servoId; // id of the target servo
+    String servoId; // the project wide unique id of the target servo
     int ms;         // time position in milliseconds
     int value;      // value of the target servo
 

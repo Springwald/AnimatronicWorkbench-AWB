@@ -5,8 +5,11 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.Project;
 using Awb.Core.Project.Actuators;
 using Awb.Core.Project.Servos;
+using Awb.Core.Timelines;
+using System.CodeDom;
 using System.Text;
 
 namespace Awb.Core.Export.ExporterParts
@@ -30,13 +33,16 @@ namespace Awb.Core.Export.ExporterParts
             _servoListName = servoListName;
         }
 
+        public static string ServoExportLine(IDeviceConfig servoConfig, int milliSeconds, int value)
+            => $"ServoPoint(\"{servoConfig.Id}\", {milliSeconds}, {value})";
+
         /// <summary>
         /// Export the given servos into C++ code.
         /// </summary>
         public string ExportServos(IEnumerable<IServoConfig> servoConfigs)
         {
             var result = new StringBuilder();
-            result.AppendLine($"   {_servoListName} = new std::vector<Servo*>();");
+            //result.AppendLine($"\t\t\t\t{_servoListName} = new std::vector<Servo*>();");
 
             int servoIndex = 0;
             foreach (var servoConfig in servoConfigs)
@@ -53,17 +59,28 @@ namespace Awb.Core.Export.ExporterParts
         {
             var result = new StringBuilder();
 
-            // export relax ranges for this servo
-            var relaxRangesName = $"{servoVariableName}_relaxRanges";
+            string id = string.Empty;
+
+            if (servoConfig is IDeviceConfig deviceConfig)
+            {
+                // add comment with servo ID
+                id = deviceConfig.Id;
+            } else
+            {
+                throw new NotSupportedException($"Exporting servo of type {servoConfig.GetType().FullName} is not supported because it does not implement IDeviceConfig.");
+            }
+
+                // export relax ranges for this servo
+                var relaxRangesName = $"\t\t\t\t{servoVariableName}_relaxRanges";
             if (servoConfig is ISupportsRelaxRanges relaxRangeObject)
             {
-                result.AppendLine($"std::vector<RelaxRange> *{relaxRangesName} = new std::vector<RelaxRange>();");
+                result.AppendLine($"\t\t\t\tstd::vector<RelaxRange> *{relaxRangesName} = new std::vector<RelaxRange>();");
                 foreach (var relaxRangeLine in ExportRelaxRanges(relaxRangeObject: relaxRangeObject, listName: relaxRangesName))
                     result.AppendLine(relaxRangeLine);
             }
             else
             {
-                result.AppendLine($"std::vector<RelaxRange> *{relaxRangesName} = nullptr;");
+                result.AppendLine($"\t\t\t\tstd::vector<RelaxRange> *{relaxRangesName} = nullptr;");
             }
 
             // define the variables for the servo parameters
@@ -105,8 +122,10 @@ namespace Awb.Core.Export.ExporterParts
                     throw new NotSupportedException($"Exporting servo of type {servoConfig.GetType().FullName} is not supported.");
             }
 
-            result.Append($"    {_servoListName}->push_back(new ServoConfig(");
-            result.Append($"ServoConfig::ServoTypes::{nameof(servoExportType)}, "); // the servo type
+           
+
+            result.Append($"\t\t\t\t{_servoListName}->push_back(Servo(\"{id}\", new ServoConfig(");
+            result.Append($"ServoConfig::ServoTypes::{servoExportType.ToString()}, "); // the servo type
             result.Append($"\"{servoConfig.Title}\", "); // the servo title
             result.Append($"{channel}, "); // chanel for e.g. PWM servo or bus ID for bus servo
             result.Append($"{i2cAdress}, "); // I2C adress if supported when e.g. PWM servo
@@ -117,9 +136,9 @@ namespace Awb.Core.Export.ExporterParts
             result.Append($"{defaultValue}, ");
             result.Append($"{acceleration}, "); // default acceleration
             result.Append($"{speed}, "); // default speed
-            result.Append($"{globalFault}, ");
+            result.Append($"{globalFault.ToString().ToLower()}, ");
             result.Append($"{relaxRangesName}"); // relax ranges 
-            result.AppendLine(");");
+            result.AppendLine(")));");
             
             return result.ToString();
         }
@@ -127,35 +146,35 @@ namespace Awb.Core.Export.ExporterParts
 
         public IEnumerable<string> ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos)
         {
-            yield return $"   {propertyName} = new std::vector<StsScsServo>();";
+            yield return $"\t\t\t\t{propertyName} = new std::vector<StsScsServo>();";
             foreach (var servo in servos)
             {
                 var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
                 var speed = servo.Speed ?? 0;
                 var acceleration = 0; // scs servos have no acceleration
-                var relaxRangesName = $"{propertyName}_relaxRanges";
+                var relaxRangesName = $"\t\t\t\t{propertyName}_relaxRanges";
 
                 foreach (var relaxRangeLine in ExportRelaxRanges(relaxRangeObject: servo, listName: relaxRangesName))
                     yield return relaxRangeLine;
 
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                yield return $"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));";
+                yield return $"\t\t\t\t{propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));";
             }
         }
 
         public IEnumerable<string> ExportStsServos(string propertyName, IEnumerable<StsFeetechServoConfig> servos)
         {
-            yield return $"   {propertyName} = new std::vector<StsScsServo>();";
+            yield return $"\t\t\t\t{propertyName} = new std::vector<StsScsServo>();";
             foreach (var servo in servos)
             {
                 var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
                 var acceleration = servo.Acceleration ?? 0;
                 var speed = servo.Speed ?? 0;
-                var relaxRangesName = $"{propertyName}_relaxRanges";
+                var relaxRangesName = $"\t\t\t\t{propertyName}_relaxRanges";
                 foreach (var relaxRangeLine in ExportRelaxRanges(relaxRangeObject: servo, listName: relaxRangesName))
                     yield return relaxRangeLine;
                 // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault, vector<RelaxRange> relaxRanges
-                yield return $"   {propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()}, {relaxRangesName} ));";
+                yield return $"\t\t\t\t{propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()}, {relaxRangesName} ));";
             }
         }
 
@@ -164,7 +183,7 @@ namespace Awb.Core.Export.ExporterParts
             var relaxRanges = relaxRangeObject.RelaxRanges;
             //yield return $"  auto {listName}= new vector<RelaxRange>();";
             foreach (var range in relaxRanges)
-                yield return $"  {listName}->push_back(RelaxRange({range.MinValue}, {range.MaxValue}));";
+                yield return $"\t\t\t\t{listName}->push_back(RelaxRange({range.MinValue}, {range.MaxValue}));";
         }
 
         public IEnumerable<string> ExportPCS9685PwmServos(IEnumerable<Pca9685PwmServoConfig> pca9685PwmServoConfigs)
@@ -172,13 +191,13 @@ namespace Awb.Core.Export.ExporterParts
             var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Pca9685PwmServoConfig>();
 
             var propertyName = "pca9685PwmServos";
-            yield return $"   {propertyName} = new std::vector<Pca9685PwmServo>();";
+            yield return $"\t\t\t\t{propertyName} = new std::vector<Pca9685PwmServo>();";
 
             foreach (var servo in pca9685PwmServos)
             // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
             {
                 var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
-                yield return $"   {propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {defaultValue}));";
+                yield return $"\t\t\t\t{propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {defaultValue}));";
             }
         }
     }

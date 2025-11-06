@@ -24,6 +24,7 @@ namespace Awb.Core.Export.ExporterParts
         public override async Task<IExporter.ExportResult> ExportAsync()
         {
             var content = new StringBuilder();
+            content.AppendLine(Get_H_Header(className: "WifiConfig"));
             content.AppendLine(GetHeader(className: "WifiConfig"));
 
             content.AppendLine("public:");

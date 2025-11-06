@@ -138,7 +138,7 @@ namespace Awb.Core.Export.ExporterParts
         {
             var content = new StringBuilder();
             const string className = "ProjectData";
-            const string servoListName = "allServos";
+            const string servoListName = "servos";
             var servoExporter = new ServoExporter(servoListName: servoListName);
             var timelineExporter = new TimelineDataExporter();
             var timelineExportData = timelineExporter.ExportTimelineData(_projectData);
@@ -148,6 +148,9 @@ namespace Awb.Core.Export.ExporterParts
 
             content.AppendLine(
                 $$"""
+
+                {{Get_H_Header(className: className)}}
+
                 #include <Arduino.h>
                 #include <String.h>
                 #include "../ProjectData/Timeline.h"
@@ -155,25 +158,21 @@ namespace Awb.Core.Export.ExporterParts
                 #include "../ProjectData/TimelineState.h"
                 #include "../ProjectData/TimelineStateReference.h"
 
-                #include "../ProjectData/Servos/StsServoPoint.h"
-                #include "../ProjectData/Servos/Pca9685PwmServoPoint.h"
-                #include "../ProjectData/Servos/StsScsServo.h"
-                #include "../ProjectData/Servos/Pca9685PwmServo.h"
+                #include "../ProjectData/Servos/ServoPoint.h"
+                #include "../ProjectData/Servos/Servo.h"
 
                 #include "../ProjectData/Mp3Player/Mp3PlayerYX5300Serial.h"
                 #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniSerial.h"
                 #include "../ProjectData/Mp3Player/Mp3PlayerYX5300Point.h"
                 #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniPoint.h"
 
-                {{Get_H_Header(className: className)}}
-
                 {{GetHeader(className: className)}}
 
                 using TCallBackErrorOccured = std::function<void(String)>;
 
                 public:
-                    const char *ProjectName = \"{{_projectData.ProjectName}}\";
-                    const int returnToAutoModeAfterMinutes  = {{_projectData.Esp32ClientHardwareConfig.AutoPlayAfter ?? -1}} ;");
+                    const char *ProjectName = "{{_projectData.ProjectName}}";
+                    const int returnToAutoModeAfterMinutes  = {{_projectData.Esp32ClientHardwareConfig.AutoPlayAfter ?? -1}};
 
                 {{ExportKnownNamesAsConsts()}}
 
@@ -189,7 +188,7 @@ namespace Awb.Core.Export.ExporterParts
                 ProjectData(TCallBackErrorOccured errorOccured)
                 {
                     // the servos
-                    allServos = new std::vector<Servo>();
+                    {{servoListName}} = new std::vector<Servo>();
                     {{servoExporter.ExportServos(servoConfigs: _projectData.ScsServoConfigs)}}
                     {{servoExporter.ExportServos(servoConfigs: _projectData.StsServoConfigs)}}
                     {{servoExporter.ExportServos(servoConfigs: _projectData.Pca9685PwmServoConfigs)}}

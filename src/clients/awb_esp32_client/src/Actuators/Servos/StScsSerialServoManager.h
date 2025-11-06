@@ -14,7 +14,7 @@ class StScsSerialServoManager
     using TCallBackErrorOccured = std::function<void(String)>;
 
 private:
-    std::vector<StsScsServo> *_servos;   /// The sts / scs servos
+    std::vector<Servo> *_servos;         /// The sts / scs servos
     TCallBackErrorOccured _errorOccured; /// callback functio to call if an error occured
     int _gpioRxd;                        /// the gpio pin for the rxd communication to the sts / scs servos
     int _gpioTxd;                        /// the gpio pin for the txd communication to the sts / scsservos
@@ -31,7 +31,7 @@ public:
      */
     std::vector<u8> *servoIds;
 
-    StScsSerialServoManager(std::vector<StsScsServo> *servos, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd) : _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), _servos(servos) {};
+    StScsSerialServoManager(std::vector<Servo> *servos, bool servoTypeIsScs, TCallBackErrorOccured errorOccured, int gpioRxd, int gpioTxd) : _errorOccured(errorOccured), _servoTypeIsScs(servoTypeIsScs), _gpioRxd(gpioRxd), _gpioTxd(gpioTxd), _servos(servos) {};
 
     /**
      * Set up the sts servos

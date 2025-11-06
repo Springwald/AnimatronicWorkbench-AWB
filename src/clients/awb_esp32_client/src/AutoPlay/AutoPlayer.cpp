@@ -4,8 +4,7 @@
 #include "AutoPlayer.h"
 #include "../ProjectData/Timeline.h"
 #include "../ProjectData/TimelineStateReference.h"
-#include "../ProjectData/Servos/StsServoPoint.h"
-#include "../ProjectData/Servos/Pca9685PwmServoPoint.h"
+#include "../ProjectData/Servos/ServoPoint.h"
 
 /**
  * Initializes a new instance of the <see cref="AutoPlayer"/> class.
@@ -156,7 +155,7 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     // Play STS Servos
     if (_stSerialServoManager != nullptr)
     {
-        for (int servoIndex = 0; servoIndex < _data->stsServos->size(); servoIndex++)
+        for (int servoIndex = 0; servoIndex < _data->servos->size(); servoIndex++)
         {
             u8 servoChannel = _data->stsServos->at(servoIndex).channel;
             int servoSpeed = _data->stsServos->at(servoIndex).defaultSpeed;

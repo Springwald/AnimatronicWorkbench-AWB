@@ -5,7 +5,7 @@
 #include "Adafruit_PWMServoDriver.h"
 #include <Wire.h>
 #include <vector>
-#include "../../ProjectData/Servos/Pca9685PwmServo.h"
+#include "../../ProjectData/Servos/Servo.h"
 
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
@@ -19,14 +19,14 @@ private:
     TCallBackErrorOccured _errorOccured;
     TCallBackMessageToShow _messageToShow;
 
-    std::vector<Pca9685PwmServo> *_pwmServos; /// The pwm servo
-    int _i2cAdress;                           /// the i2c adress of the pca9685 pwm board
+    std::vector<Servo> *_pwmServos; /// The pwm servo
+    int _i2cAdress;                 /// the i2c adress of the pca9685 pwm board
 
     void writeMicroseconds(uint8_t adr, uint8_t num, uint16_t microSeconds);
     void setOscillatorFrequency(uint8_t adr, uint32_t freq);
 
 public:
-    Pca9685PwmManager(std::vector<Pca9685PwmServo> *pwmServos, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow, uint i2cAdress, uint32_t osc_frequency) : _errorOccured(errorOccured), _messageToShow(messageToShow), _i2cAdress(i2cAdress), _pwmServos(pwmServos)
+    Pca9685PwmManager(std::vector<Servo> *pwmServos, TCallBackErrorOccured errorOccured, TCallBackMessageToShow messageToShow, uint i2cAdress, uint32_t osc_frequency) : _errorOccured(errorOccured), _messageToShow(messageToShow), _i2cAdress(i2cAdress), _pwmServos(pwmServos)
     {
         if (i2cAdress != 0x40)
         {

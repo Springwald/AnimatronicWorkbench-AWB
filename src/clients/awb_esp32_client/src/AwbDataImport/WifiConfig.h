@@ -1,12 +1,10 @@
 #ifndef _WIFICONFIG_H_
 #define _WIFICONFIG_H_
 
-
-
 // Created with Animatronic Workbench Studio
-// https://daniel.springwald.de/post/AnimatronicWorkbench-EN
+// https://daniel.springwald.de/post/AWB/AnimatronicWorkbench
 
-// Created on 25.06.2025 22:32:32
+// Created on 06.11.2025 22:50:54
 
 class WifiConfig
 {

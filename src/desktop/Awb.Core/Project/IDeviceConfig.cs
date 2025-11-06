@@ -7,7 +7,7 @@
 
 namespace Awb.Core.Project
 {
-    internal interface IDeviceConfig
+    public interface IDeviceConfig
     {
         /// <summary>
         /// the unqiue id of the device

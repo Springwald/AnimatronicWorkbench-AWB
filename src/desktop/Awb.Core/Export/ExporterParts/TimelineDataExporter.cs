@@ -33,21 +33,21 @@ namespace Awb.Core.Export.ExporterParts
 
                 if (state.Export == false) continue;
 
-                result.AppendLine($"\t\tauto *stsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
-                result.AppendLine($"\t\tauto *scsServoPoints{timelineNo} = new std::vector<StsServoPoint>();");
-                result.AppendLine($"\t\tauto *pca9685PwmServoPoints{timelineNo} = new std::vector<Pca9685PwmServoPoint>();");
+                result.AppendLine($"\t\tauto *servoPoints{timelineNo} = new std::vector<ServoPoint>();");
                 result.AppendLine($"\t\tauto *mp3PlayerYX5300Points{timelineNo} = new std::vector<Mp3PlayerYX5300Point>();");
                 result.AppendLine($"\t\tauto *mp3PlayerDfPlayerMiniPoints{timelineNo} = new std::vector<Mp3PlayerDfPlayerMiniPoint>();");
 
                 // Export Servo-Points
                 foreach (var servoPoint in timeline.Points.OfType<ServoPoint>().OrderBy(p => p.TimeMs))
                 {
+                    //todo: use IServo interface for all servos instead of checking each servo type here
+
                     // find STS servo
                     var stsServo = projectData.StsServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
                     if (stsServo != null)
                     {
                         var value = (int)(stsServo.MinValue + servoPoint.ValuePercent * (stsServo.MaxValue - stsServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tstsServoPoints{timelineNo}->push_back(StsServoPoint({stsServo.Channel},{servoPoint.TimeMs},{value}));");
+                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back(ServoPoint({ServoExporter.ServoExportLine(stsServo, servoPoint.TimeMs,value)});");
                         continue;
                     }
 
@@ -56,7 +56,7 @@ namespace Awb.Core.Export.ExporterParts
                     if (scsServo != null)
                     {
                         var value = (int)(scsServo.MinValue + servoPoint.ValuePercent * (scsServo.MaxValue - scsServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tscsServoPoints{timelineNo}->push_back(StsServoPoint({scsServo.Channel},{servoPoint.TimeMs},{value}));");
+                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back(ServoPoint({ServoExporter.ServoExportLine(scsServo, servoPoint.TimeMs, value)}));");
                         continue;
                     }
 
@@ -65,7 +65,7 @@ namespace Awb.Core.Export.ExporterParts
                     if (pwmServo != null)
                     {
                         var value = (int)(pwmServo.MinValue + servoPoint.ValuePercent * (pwmServo.MaxValue - pwmServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tpca9685PwmServoPoints{timelineNo}->push_back(Pca9685PwmServoPoint({pwmServo.I2cAdress},{pwmServo.Channel},{servoPoint.TimeMs},{value}));");
+                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back(ServoPoint({ServoExporter.ServoExportLine(pwmServo, servoPoint.TimeMs, value)}));");
                         continue;
                     }
 
@@ -132,7 +132,7 @@ namespace Awb.Core.Export.ExporterParts
                 }
 
                 result.AppendLine($"\t\tauto state{timelineNo} = new TimelineStateReference({state.Id}, String(\"{state.Title}\"));");
-                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId ?? -1}, String(\"{timeline.Title}\"), stsServoPoints{timelineNo}, scsServoPoints{timelineNo}, pca9685PwmServoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo}, mp3PlayerDfPlayerMiniPoints{timelineNo});");
+                result.AppendLine($"\t\tTimeline *timeline{timelineNo} = new Timeline(state{timelineNo}, {timeline.NextTimelineStateOnceId ?? -1}, String(\"{timeline.Title}\"), servoPoints{timelineNo}, mp3PlayerYX5300Points{timelineNo}, mp3PlayerDfPlayerMiniPoints{timelineNo});");
                 result.AppendLine($"\t\ttimelines->push_back(*timeline{timelineNo});");
 
                 result.AppendLine();
