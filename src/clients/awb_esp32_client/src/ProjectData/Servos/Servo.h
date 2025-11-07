@@ -11,13 +11,13 @@
 class Servo
 {
 public:
-    String id;    /// the project wide unique id of the servo
-    String title; /// the name of the servo
+    String uniqueId; /// the project wide unique id of this device
+    String title;    /// the name of the servo
 
     ServoState *state = nullptr;   /// the actual state of the servo
     ServoConfig *config = nullptr; /// the configuration of the servo
 
-    Servo(String const id, ServoConfig *config) : id(id), config(config)
+    Servo(String const uniqueId, ServoConfig *config) : uniqueId(uniqueId), config(config)
     {
         this->title = config->title;
         this->state = new ServoState();

@@ -17,7 +17,7 @@ namespace Awb.Core.Timelines
         /// <summary>
         /// The id of the servo or display or other actuators
         /// </summary>
-        public string AbwObjectId { get; set; } = targetObjectId;
+        public string AwbObjectId { get; set; } = targetObjectId;
 
         public bool IsNestedTimelinePoint { get; set; }
 

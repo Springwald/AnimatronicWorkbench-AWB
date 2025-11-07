@@ -96,7 +96,7 @@ namespace AwbStudio.TimelineEditing
             // insert he clipboard content
             foreach (var point in reAlignedPoints)
             {
-                var collidingPointAtTargetPosition = _timelineData.AllPoints.Where(p => p.TimeMs == point.TimeMs && p.AbwObjectId == point.AbwObjectId).SingleOrDefault();
+                var collidingPointAtTargetPosition = _timelineData.AllPoints.Where(p => p.TimeMs == point.TimeMs && p.AwbObjectId == point.AwbObjectId).SingleOrDefault();
                 if (collidingPointAtTargetPosition != null)
                 {
                     // there is a point for the same awb-object at the target position, so we have to remove it first

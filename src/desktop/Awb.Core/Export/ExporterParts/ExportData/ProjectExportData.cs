@@ -24,5 +24,7 @@ namespace Awb.Core.Export.ExporterParts.ExportData
         public required IEnumerable<Mp3PlayerDfPlayerMiniConfig> Mp3PlayerDfPlayerMiniConfigs { get; init; }
         public required IEnumerable<InputConfig> InputConfigs { get; init; }
         public required Esp32ClientHardwareConfig Esp32ClientHardwareConfig { get; init; }
+
+
     }
 }

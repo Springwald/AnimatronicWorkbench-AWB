@@ -207,11 +207,11 @@ namespace Awb.Core.Player
 
             // Play Servos
             var servoPoints = _allPointsMerged.OfType<ServoPoint>().ToArray();
-            var servoTargetObjectIds = servoPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
+            var servoTargetObjectIds = servoPoints.Select(p => p.AwbObjectId).Distinct().ToArray();
             foreach (var servoTargetObjectId in servoTargetObjectIds)
             {
-                var point1 = servoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs <= playPos).OrderByDescending(p => p.TimeMs).FirstOrDefault();
-                var point2 = servoPoints.Where(p => p.AbwObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
+                var point1 = servoPoints.Where(p => p.AwbObjectId == servoTargetObjectId && p.TimeMs <= playPos).OrderByDescending(p => p.TimeMs).FirstOrDefault();
+                var point2 = servoPoints.Where(p => p.AwbObjectId == servoTargetObjectId && p.TimeMs >= playPos).OrderBy(p => p.TimeMs).FirstOrDefault();
 
                 if (point1 == null && point2 == null) continue; // no points found for this object before or after the actual position
 
@@ -249,7 +249,7 @@ namespace Awb.Core.Player
 
             // Play Sounds
             var soundPoints = _allPointsMerged.OfType<SoundPoint>().ToArray();
-            var soundTargetObjectIds = soundPoints.Select(p => p.AbwObjectId).Distinct().ToArray();
+            var soundTargetObjectIds = soundPoints.Select(p => p.AwbObjectId).Distinct().ToArray();
 
             foreach (var soundTargetObjectId in soundTargetObjectIds)
             {
@@ -353,9 +353,9 @@ namespace Awb.Core.Player
             if (soundPoints == null || soundTargetObjectId == null) return null;
             foreach (var soundPoint in soundPoints.OrderBy(s => s.TimeMs))
             {
-                if (soundPoint.AbwObjectId == soundTargetObjectId)
+                if (soundPoint.AwbObjectId == soundTargetObjectId)
                 {
-                    var durationMs = GetDurationMsForSoundId(soundPoint.SoundId, soundPoint.AbwObjectId);
+                    var durationMs = GetDurationMsForSoundId(soundPoint.SoundId, soundPoint.AwbObjectId);
                     if (timeMs >= soundPoint.TimeMs && timeMs <= soundPoint.TimeMs + durationMs)
                     {
                         return new SoundPlayEventArgs(soundPoint.SoundId, startTime: TimeSpan.FromMilliseconds(timeMs - soundPoint.TimeMs));

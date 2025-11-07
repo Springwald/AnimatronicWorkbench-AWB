@@ -122,7 +122,7 @@ namespace Awb.Core.Timelines
         public TimelinePoint AddPoint(TimelinePoint point)
         {
             if (point == null) throw new ArgumentNullException(nameof(point));
-            var collidingPoint = _timelinePoints.GetPoint(point.TimeMs, point.AbwObjectId);
+            var collidingPoint = _timelinePoints.GetPoint(point.TimeMs, point.AwbObjectId);
             if (collidingPoint != null) throw new ArgumentOutOfRangeException($"Point '{point.Description}' collides with existing point '{collidingPoint.Description}'.");
             _timelinePoints.Add(point);
             SetContentChangedByPoint(point);
@@ -162,15 +162,15 @@ namespace Awb.Core.Timelines
         {
             if (point is ServoPoint servoPoint)
             {
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, point.AbwObjectId);
+                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.ServoPointChanged, point.AwbObjectId);
             }
             else if (point is SoundPoint soundPoint)
             {
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, point.AbwObjectId);
+                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.SoundPointChanged, point.AwbObjectId);
             }
             else if (point is NestedTimelinePoint nestedTimelinePoint)
             {
-                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged, point.AbwObjectId);
+                SetContentChanged(TimelineDataChangedEventArgs.ChangeTypes.NestedTimelinePointChanged, point.AwbObjectId);
             }
             else
             {
