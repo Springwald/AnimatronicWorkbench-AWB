@@ -172,15 +172,16 @@ String PacketProcessor::processPacket(String payload)
             {
                 // use the project data to set the target value
                 bool done = false;
-                for (int f = 0; f < this->_projectData->stsServos->size(); f++)
+                for (int f = 0; f < this->_projectData->servos->size(); f++)
                 {
-                    if (this->_projectData->stsServos->at(f).channel == channel)
-                    {
-                        // set servo target value
-                        this->_projectData->stsServos->at(f).targetValue = value;
-                        done = true;
-                        break;
-                    }
+                    if (this->_projectData->servos->at(f).config->type == ServoConfig::ServoTypes::STS_SERVO)
+                        if (this->_projectData->servos->at(f).config->channel == channel)
+                        {
+                            // set servo target value
+                            this->_projectData->servos->at(f).state->targetValue = value;
+                            done = true;
+                            break;
+                        }
                 }
                 if (!done)
                     _errorOccured("STS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
@@ -223,15 +224,16 @@ String PacketProcessor::processPacket(String payload)
             {
                 // use the project data to set the target value
                 bool done = false;
-                for (int f = 0; f < this->_projectData->scsServos->size(); f++)
+                for (int f = 0; f < this->_projectData->servos->size(); f++)
                 {
-                    if (this->_projectData->scsServos->at(f).channel == channel)
-                    {
-                        // set servo target value
-                        this->_projectData->scsServos->at(f).targetValue = value;
-                        done = true;
-                        break;
-                    }
+                    if (this->_projectData->servos->at(f).config->type == ServoConfig::ServoTypes::SCS_SERVO)
+                        if (this->_projectData->servos->at(f).config->channel == channel)
+                        {
+                            // set servo target value
+                            this->_projectData->servos->at(f).state->targetValue = value;
+                            done = true;
+                            break;
+                        }
                 }
                 if (!done)
                     _errorOccured("SCS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");

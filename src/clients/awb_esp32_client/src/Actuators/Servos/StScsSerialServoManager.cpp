@@ -45,7 +45,7 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
     for (int i = 0; i < this->_servos->size(); i++)
     {
         // get a pointer to the current servo
-        StsScsServo *servo = &this->_servos->at(i);
+        Servo *servo = &this->_servos->at(i);
 
         if (servo->isFaultCountDownMs > 0 || anyServoWithGlobalFaultHasCiriticalState == true)
         {

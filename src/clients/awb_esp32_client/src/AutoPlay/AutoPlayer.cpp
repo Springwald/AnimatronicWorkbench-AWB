@@ -159,11 +159,12 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         {
             if (_data->servos->at(servoIndex).config->type != ServoConfig::ServoTypes::STS_SERVO)
                 continue;
+            String servoId = _data->servos->at(servoIndex).id;
             u8 servoChannel = _data->servos->at(servoIndex).config->channel;
             int servoSpeed = _data->servos->at(servoIndex).config->defaultSpeed;
             int servoAccelleration = _data->servos->at(servoIndex).config->defaultAcceleration;
 
-            int targetValue = this->calculateServoValueFromTimeline(servoChannel, actualTimelineData.stsServoPoints);
+            int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
             if (targetValue == -1)
                 continue;
 
@@ -181,11 +182,12 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         {
             if (_data->servos->at(servoIndex).config->type != ServoConfig::ServoTypes::SCS_SERVO)
                 continue;
+            String servoId = _data->servos->at(servoIndex).id;
             u8 servoChannel = _data->servos->at(servoIndex).config->channel;
             int servoSpeed = _data->servos->at(servoIndex).config->defaultSpeed;
             int servoAccelleration = _data->servos->at(servoIndex).config->defaultAcceleration;
 
-            int targetValue = this->calculateServoValueFromTimeline(servoChannel, actualTimelineData.scsServoPoints);
+            int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
             if (targetValue == -1)
                 continue;
 
@@ -203,16 +205,17 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         {
             if (_data->servos->at(servoIndex).config->type != ServoConfig::ServoTypes::PWM_SERVO)
                 continue;
+            String servoId = _data->servos->at(servoIndex).id;
             int servoChannel = _data->servos->at(servoIndex).config->channel;
             auto servoName = _data->servos->at(servoIndex).title;
 
-            Pca9685PwmServoPoint *point1 = nullptr;
-            Pca9685PwmServoPoint *point2 = nullptr;
+            ServoPoint *point1 = nullptr;
+            ServoPoint *point2 = nullptr;
 
-            for (int iPoint = 0; iPoint < actualTimelineData.pca9685PwmPoints->size(); iPoint++)
+            for (int iPoint = 0; iPoint < actualTimelineData.servoPoints->size(); iPoint++)
             {
-                Pca9685PwmServoPoint *point = &actualTimelineData.pca9685PwmPoints->at(iPoint);
-                if (point->channel == servoChannel)
+                ServoPoint *point = &actualTimelineData.servoPoints->at(iPoint);
+                if (point->servoId == servoId)
                 {
                     if (point->ms <= _playPosInActualTimeline)
                         point1 = point;
@@ -315,15 +318,15 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     _debugging->setState(Debugging::MJ_AUTOPLAY, 99);
 }
 
-int AutoPlayer::calculateServoValueFromTimeline(u8 servoChannel, std::vector<StsServoPoint> *servoPoints)
+int AutoPlayer::calculateServoValueFromTimeline(String const servoId, std::vector<ServoPoint> *servoPoints)
 {
-    StsServoPoint *point1 = nullptr;
-    StsServoPoint *point2 = nullptr;
+    ServoPoint *point1 = nullptr;
+    ServoPoint *point2 = nullptr;
 
     for (int iPoint = 0; iPoint < servoPoints->size(); iPoint++)
     {
-        StsServoPoint *point = &servoPoints->at(iPoint);
-        if (point->channel == servoChannel)
+        ServoPoint *point = &servoPoints->at(iPoint);
+        if (point->servoId == servoId)
         {
             if (point->ms <= _playPosInActualTimeline)
                 point1 = point;

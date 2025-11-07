@@ -66,19 +66,23 @@ String StatusManagement::updateActuatorsStatuses(unsigned long diffMs)
 
     // check Sts serial bus servos
     if (this->_stSerialServoManager != nullptr)
-        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_stSerialServoManager, _projectData->stsServos, false, diffMs);
+        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_stSerialServoManager, _projectData->servos, false, diffMs);
 
     // check Scs serial bus servos
     if (this->_scSerialServoManager != nullptr)
-        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_scSerialServoManager, _projectData->scsServos, true, diffMs);
+        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_scSerialServoManager, _projectData->servos, true, diffMs);
 
     // check PWM servos
     if (this->_pca9685PwmManager != nullptr)
     {
-        for (int i = 0; i < this->_projectData->pca9685PwmServos->size(); i++)
+        for (int i = 0; i < this->_projectData->servos->size(); i++)
         {
+            Servo *servo = &this->_projectData->servos->at(i);
+            if (servo->config->type != ServoConfig::ServoTypes::PWM_SERVO)
+                continue;
+
             // PWM servo driver
-            if (this->_projectData->pca9685PwmServos->at(i).title.length() > 0)
+            if (servo->title.length() > 0)
             {
                 // PWM Servo support no status information reading
             }
@@ -93,62 +97,67 @@ String StatusManagement::updateActuatorsStatuses(unsigned long diffMs)
     return actualActuatorsStateInfo;
 }
 
-String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *serialServoManager, std::vector<StsScsServo> *servos, bool isScsServo, unsigned long diffMs)
+String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *serialServoManager, std::vector<Servo> *servos, bool isScsServo, unsigned long diffMs)
 {
     String errors = "";
     String servoInfos = "";
 
-    // Scs serial bus servos
+    // Scs and sts serial bus servos
     for (int i = 0; i < servos->size(); i++)
     {
-        StsScsServo *servo = &servos->at(i);
+        Servo *servo = &servos->at(i);
+        if (isScsServo == true && (servo->config->type != ServoConfig::ServoTypes::SCS_SERVO))
+            continue;
+        if (isScsServo == false && (servo->config->type != ServoConfig::ServoTypes::STS_SERVO))
+            continue;
+
         if (servo->title.length() > 0)
         {
-            auto wasFault = servo->isFaultCountDownMs > 0;
+            auto wasFault = servo->state->isFaultCountDownMs > 0;
             bool isFault = false;
-            servo->isFaultCountDownMs = max((unsigned long)0, servo->isFaultCountDownMs - diffMs); // decrease fault countdown
+            servo->state->isFaultCountDownMs = max((unsigned long)0, servo->state->isFaultCountDownMs - diffMs); // decrease fault countdown
 
-            servo->temperature = serialServoManager->readTemperature(servo->channel);
-            if (servo->temperature > servo->maxTemp) // servo is too hot
+            servo->state->temperature = serialServoManager->readTemperature(servo->config->channel);
+            if (servo->state->temperature > servo->config->maxTemp) // servo is too hot
             {
-                servo->isFaultCountDownMs = 5000; // pause servo for 5 seconds
-                if (servo->globalFault == true)
+                servo->state->isFaultCountDownMs = 5000; // pause servo for 5 seconds
+                if (servo->config->globalFault == true)
                     _isAnyGlobalFaultActuatorInCriticalState = true;
 
-                servo->lastFaultMessage = String(servo->temperature) + "C";
-                servo->lastFaultMs = millis();
-                serialServoManager->setTorque(servo->channel, false);
-                _errorOccured("Servo " + String(servo->title) + " critical temp! " + String(servo->temperature) + "C");
+                servo->state->lastFaultMessage = String(servo->state->temperature) + "C";
+                servo->state->lastFaultMs = millis();
+                serialServoManager->setTorque(servo->config->channel, false);
+                _errorOccured("Servo " + String(servo->title) + " critical temp! " + String(servo->state->temperature) + "C");
                 if (errors != "")
                     errors += ", ";
-                errors += String(servo->channel) + ":" + String(servo->temperature) + "C";
+                errors += String(servo->config->channel) + ":" + String(servo->state->temperature) + "C";
                 isFault = true;
             }
 
-            servo->load = serialServoManager->readLoad(servo->channel);
-            servo->maxLoad = max(servo->maxLoad, servo->load); // store max load
-            servo->minLoad = min(servo->minLoad, servo->load); // store min load
-            if (abs(servo->load) > servo->maxTorque)           // servo is overloaded
+            servo->state->load = serialServoManager->readLoad(servo->config->channel);
+            servo->state->maxLoad = max(servo->state->maxLoad, servo->state->load); // store max load
+            servo->state->minLoad = min(servo->state->minLoad, servo->state->load); // store min load
+            if (abs(servo->state->load) > servo->config->maxTorque)                 // servo is overloaded
             {
-                servo->isFaultCountDownMs = 2000; // pause servo for 2 seconds
-                if (servo->globalFault == true)
+                servo->state->isFaultCountDownMs = 2000; // pause servo for 2 seconds
+                if (servo->config->globalFault == true)
                     _isAnyGlobalFaultActuatorInCriticalState = true;
-                serialServoManager->setTorque(servo->channel, false);
-                servo->lastFaultMessage = String(servo->load) + "L";
-                servo->lastFaultMs = millis();
-                _errorOccured("Servo " + String(servo->channel) + "' critical load! " + String(servo->load));
+                serialServoManager->setTorque(servo->config->channel, false);
+                servo->state->lastFaultMessage = String(servo->state->load) + "L";
+                servo->state->lastFaultMs = millis();
+                _errorOccured("Servo " + String(servo->config->channel) + "' critical load! " + String(servo->state->load));
                 if (errors != "")
                     errors += ", ";
-                errors += String(servo->channel) + ":L" + String(servo->load);
+                errors += String(servo->config->channel) + ":L" + String(servo->state->load);
                 isFault = true;
             }
 
-            if (wasFault && servo->isFaultCountDownMs == 0) // fault cleared, re-enable servoW
-                serialServoManager->setTorque(servo->channel, true);
+            if (wasFault && servo->state->isFaultCountDownMs == 0) // fault cleared, re-enable servo
+                serialServoManager->setTorque(servo->config->channel, true);
 
             if (!isFault)
             {
-                servoInfos += (servoInfos == "" ? "" : ", ") + String(servo->channel);
+                servoInfos += (servoInfos == "" ? "" : ", ") + String(servo->config->channel);
             }
         }
     }

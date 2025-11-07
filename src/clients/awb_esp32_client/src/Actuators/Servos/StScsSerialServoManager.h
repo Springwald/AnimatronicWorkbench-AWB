@@ -5,7 +5,7 @@
 #include <vector>
 #include <SCServo.h>
 #include "../ActuatorValue.h"
-#include "../../ProjectData/Servos/StsScsServo.h"
+#include "../../ProjectData/Servos/Servo.h"
 class StScsSerialServoManager
 {
 

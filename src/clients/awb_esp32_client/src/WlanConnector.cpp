@@ -197,40 +197,41 @@ String WlanConnector::GetHtml()
         _debugging->setState(Debugging::MJ_WLAN, 34);
 
         // Servo status
+
+        // count the types of servos
+        auto allServos = this->_projectData->servos;
+        int stsCount = 0;
+        int scsCount = 0;
+        int pwmCount = 0;
+        int unknownCount = 0;
+        for (int i = 0; i < allServos->size(); i++)
+        {
+            auto servo = allServos->at(i);
+            switch (servo.config->type)
+            {
+            case ServoConfig::ServoTypes::STS_SERVO:
+                stsCount++;
+                break;
+            case ServoConfig::ServoTypes::SCS_SERVO:
+                scsCount++;
+                break;
+            case ServoConfig::ServoTypes::PWM_SERVO:
+                pwmCount++;
+                break;
+            default:
+                unknownCount++;
+                break;
+            }
+        }
+
         ptr += "<div class=\"region\">\n";
-        ptr += "<span>" + String(this->_projectData->stsServos->size()) + " STS-Servos, ";
-        ptr += String(this->_projectData->scsServos->size()) + " SCS-Servos, ";
-        ptr += String(this->_projectData->pca9685PwmServos->size()) + " PWM-Servos</span>\n";
-        ptr += "<table>\n";
-        ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th><th>Min/Max</th><th>fault</th><th>last</th></tr>\n";
+        ptr += "<span>" + String(stsCount) + " STS-Servos, ";
+        ptr += String(scsCount) + " SCS-Servos, ";
+        ptr += String(pwmCount) + " PWM-Servos, ";
+        ptr += String(unknownCount) + " unknown servos</span>\n";
 
         _debugging->setState(Debugging::MJ_WLAN, 36);
 
-        for (int i = 0; i < this->_projectData->stsServos->size(); i++)
-        {
-            auto servo = this->_projectData->stsServos->at(i);
-            AddScsStsServoInfo(ptr, "STS", servo);
-        }
-
-        _debugging->setState(Debugging::MJ_WLAN, 38);
-
-        for (int i = 0; i < this->_projectData->scsServos->size(); i++)
-        {
-            auto servo = this->_projectData->scsServos->at(i);
-            AddScsStsServoInfo(ptr, "SCS", servo);
-        }
-
-        _debugging->setState(Debugging::MJ_WLAN, 40);
-
-        for (int i = 0; i < this->_projectData->pca9685PwmServos->size(); i++)
-        {
-            auto servo = this->_projectData->pca9685PwmServos->at(i);
-            ptr += "<tr><td>PWM " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td><td>-</td><td>-</td><td>-</td></tr>\n";
-        }
-
-        _debugging->setState(Debugging::MJ_WLAN, 42);
-
-        ptr += "</table>\n";
         ptr += "</div>\n";
 
         _debugging->setState(Debugging::MJ_WLAN, 44);
@@ -286,14 +287,23 @@ String WlanConnector::GetHtml()
     return ptr;
 }
 
-void WlanConnector::AddScsStsServoInfo(String &ptr, String typeTitle, StsScsServo &servo)
+void WlanConnector::AddServoInfos(String &ptr)
 {
-    ptr += "<tr><td>" + typeTitle + " " + String(servo.channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.currentValue) + "</td>" +
-           this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
-           this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
-           this->getTd(String(servo.minLoad) + "/" + String(servo.maxLoad), abs(servo.maxLoad) > servo.maxTorque || abs(servo.minLoad) > servo.maxTorque) +
-           this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
-           this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
+    ptr += "<table>\n";
+    ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th><th>Min/Max</th><th>fault</th><th>last</th></tr>\n";
+
+    for (int i = 0; i < this->_projectData->servos->size(); i++)
+    {
+        auto &servo = this->_projectData->servos->at(i);
+        ptr += "<tr><td>" + String(servo.config->channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.state->currentValue) + "</td>" +
+               this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
+               this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
+               this->getTd(String(servo.minLoad) + "/" + String(servo.maxLoad), abs(servo.maxLoad) > servo.maxTorque || abs(servo.minLoad) > servo.maxTorque) +
+               this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
+               this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
+    }
+
+    ptr += "</table>\n";
 }
 
 String WlanConnector::getErrorTime(unsigned long errorMs)
