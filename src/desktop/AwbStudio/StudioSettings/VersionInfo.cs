@@ -56,6 +56,7 @@ namespace AwbStudio.StudioSettings
             }
             catch (Exception ex)
             {
+                if (ex.Message?.Contains(":443")==true) return null; // can't find github - seems to be offline
                 throw new InvalidOperationException("Error reading version info from GitHub:" + ex.Message, ex);
             }
         }

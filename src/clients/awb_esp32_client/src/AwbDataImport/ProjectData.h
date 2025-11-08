@@ -11,6 +11,7 @@
 
 #include "../ProjectData/Servos/ServoPoint.h"
 #include "../ProjectData/Servos/Servo.h"
+#include <ProjectData/Servos/Servos.h>
 
 #include "../ProjectData/Mp3Player/Mp3PlayerYX5300Serial.h"
 #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniSerial.h"
@@ -20,7 +21,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AWB/AnimatronicWorkbench
 
-// Created on 07.11.2025 22:14:20
+// Created on 08.11.2025 12:12:22
 
 class ProjectData
 {
@@ -37,8 +38,7 @@ public:
     const String ScsServoName_Servoleft = "Servo left";
     const String ScsServoName_Servoright = "Servo right";
 
-    std::vector<Servo> *servos;
-
+    Servos *servos;
     std::vector<TimelineState> *timelineStates;
     std::vector<Timeline> *timelines;
     std::vector<Mp3PlayerYX5300Serial> *mp3PlayersYX5300;
@@ -52,12 +52,12 @@ public:
     ProjectData(TCallBackErrorOccured errorOccured)
     {
         // the servos
-        servos = new std::vector<Servo>();
+        servos = new Servos();
         std::vector<RelaxRange> *servo_000_relaxRanges = new std::vector<RelaxRange>();
-        servos->push_back(Servo("ScsServo-1", new ServoConfig(ServoConfig::ServoTypes::SCS_SERVO, "Servo left", 1, 0, 821, 230, -1, -1, 532, 0, 200, false, servo_000_relaxRanges)));
+        servos->addServo(Servo("ScsServo-1", new ServoConfig(ServoConfig::ServoTypes::SCS_SERVO, "Servo left", 1, 0, 821, 230, -1, -1, 532, 0, 200, false, servo_000_relaxRanges)));
 
         std::vector<RelaxRange> *servo_001_relaxRanges = new std::vector<RelaxRange>();
-        servos->push_back(Servo("ScsServo-2", new ServoConfig(ServoConfig::ServoTypes::SCS_SERVO, "Servo right", 2, 0, 236, 822, -1, -1, 537, 0, 0, false, servo_001_relaxRanges)));
+        servos->addServo(Servo("ScsServo-2", new ServoConfig(ServoConfig::ServoTypes::SCS_SERVO, "Servo right", 2, 0, 236, 822, -1, -1, 537, 0, 0, false, servo_001_relaxRanges)));
 
         // sound player
         mp3PlayersYX5300 = new std::vector<Mp3PlayerYX5300Serial>();

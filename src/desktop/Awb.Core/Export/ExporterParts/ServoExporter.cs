@@ -122,9 +122,7 @@ namespace Awb.Core.Export.ExporterParts
                     throw new NotSupportedException($"Exporting servo of type {servoConfig.GetType().FullName} is not supported.");
             }
 
-           
-
-            result.Append($"\t\t\t\t{_servoListName}->push_back(Servo(\"{id}\", new ServoConfig(");
+            result.Append($"\t\t\t\t{_servoListName}->addServo(Servo(\"{id}\", new ServoConfig(");
             result.Append($"ServoConfig::ServoTypes::{servoExportType.ToString()}, "); // the servo type
             result.Append($"\"{servoConfig.Title}\", "); // the servo title
             result.Append($"{channel}, "); // chanel for e.g. PWM servo or bus ID for bus servo
@@ -143,6 +141,8 @@ namespace Awb.Core.Export.ExporterParts
             return result.ToString();
         }
 
+
+        /*
 
         public IEnumerable<string> ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos)
         {
@@ -177,6 +177,7 @@ namespace Awb.Core.Export.ExporterParts
                 yield return $"\t\t\t\t{propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()}, {relaxRangesName} ));";
             }
         }
+        */
 
         private static IEnumerable<string> ExportRelaxRanges(ISupportsRelaxRanges relaxRangeObject, string listName)
         {

@@ -160,6 +160,7 @@ namespace Awb.Core.Export.ExporterParts
 
                 #include "../ProjectData/Servos/ServoPoint.h"
                 #include "../ProjectData/Servos/Servo.h"
+                #include <ProjectData/Servos/Servos.h>
 
                 #include "../ProjectData/Mp3Player/Mp3PlayerYX5300Serial.h"
                 #include "../ProjectData/Mp3Player/Mp3PlayerDfPlayerMiniSerial.h"
@@ -176,8 +177,7 @@ namespace Awb.Core.Export.ExporterParts
 
                 {{ExportKnownNamesAsConsts()}}
 
-                std::vector<Servo> *{{servoListName}};
-
+                Servos *{{servoListName}};
                 std::vector<TimelineState>* timelineStates;
                 std::vector<Timeline>* timelines;
                 std::vector<Mp3PlayerYX5300Serial> *mp3PlayersYX5300;
@@ -188,7 +188,7 @@ namespace Awb.Core.Export.ExporterParts
                 ProjectData(TCallBackErrorOccured errorOccured)
                 {
                     // the servos
-                    {{servoListName}} = new std::vector<Servo>();
+                    {{servoListName}} = new Servos();
                     {{servoExporter.ExportServos(servoConfigs: _projectData.ScsServoConfigs)}}
                     {{servoExporter.ExportServos(servoConfigs: _projectData.StsServoConfigs)}}
                     {{servoExporter.ExportServos(servoConfigs: _projectData.Pca9685PwmServoConfigs)}}
