@@ -22,3 +22,18 @@ ECHO .
 
 cd src\desktop\AwbStudio
 dotnet run --property WarningLevel=2
+
+if errorlevel 1 goto errorHappened
+echo Success!
+exit
+
+:errorHappened
+ECHO .
+ECHO .
+ECHO . Got errors starting AWB?
+ECHO . Have a look at
+ECHO . https://daniel.springwald.de/post/AWB-Docs/AWB-FAQ
+ECHO .
+ECHO .
+
+pause
