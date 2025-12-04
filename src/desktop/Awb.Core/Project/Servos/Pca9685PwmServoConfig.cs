@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Servos
 {
-    public class Pca9685PwmServoConfig : IDeviceConfig, IProjectObjectListable
+    public class Pca9685PwmServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig
     {
         public const int MaxValConst = 4095;
 
@@ -69,6 +69,6 @@ namespace Awb.Core.Project.Servos
         [JsonIgnore]
         public string TitleDetailed => "Pca9685PwmServo " + TitleShort;
 
-
+        public bool CanReadServoPosition => false;
     }
 }
