@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
@@ -16,11 +16,9 @@ using AwbStudio.TimelineEditing;
 using AwbStudio.TimelineValuePainters;
 using System;
 using System.Collections.Generic;
-using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace AwbStudio.TimelineControls
 {
@@ -35,7 +33,7 @@ namespace AwbStudio.TimelineControls
         private GridTimePainter? _gridPainter;
         private List<ITimelineEditorControl>? _timelineEditorControls;
         private List<AbstractValuePainter>? _timelineValuePainters;
-        private List<ValueEditorHeaderControl>? _timelineEditorLabels;
+        private List<ValueEditorSelectionContainerControl>? _editorContainers;
 
         private double _zoomVerticalHeightPerValueEditorBackingField = 180; // pixel per value editor
 
@@ -65,7 +63,7 @@ namespace AwbStudio.TimelineControls
 
         private void TimelineValuesEditorControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            AlignEditorLabels();
+            AlignEditorContainers();
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -88,35 +86,19 @@ namespace AwbStudio.TimelineControls
             _timelineEditorControls = [];
             _timelineValuePainters = [];
 
-            _timelineEditorLabels = new List<ValueEditorHeaderControl>();
+            _editorContainers = new List<ValueEditorSelectionContainerControl>();
 
             // add nested timelines painter + editors
             var nestedTimelineEditorControl = new NestedTimelinesViewerControl();
             nestedTimelineEditorControl.Init(viewContext, timelineCaptions, playPosSynchronizer, actuatorsService, timelineMetaDataService);
-            // add the label
-            var label = GetValueEditorHeaderControl(NestedTimelinesFakeObject.Singleton, timelineCaptions, viewContext);
-            AllValuesEditorControlsStackPanel.Children.Add(label);
-            _timelineEditorLabels.Add(label);
-            // add the editor
-            AllValuesEditorControlsStackPanel.Children.Add(nestedTimelineEditorControl);
-            _timelineEditorControls.Add(nestedTimelineEditorControl);
+            this.WrapValueEditorInContainerControl(actuatorToEdit: NestedTimelinesFakeObject.Singleton, awbObjectControl: nestedTimelineEditorControl, timelineCaptions);
 
             // add sound painter + editors
             foreach (var soundPlayerActuator in actuatorsService.SoundPlayers)
             {
                 var editorControl = new SoundTimelineEditorControl();
-                editorControl.Init(
-                    soundPlayer: soundPlayerActuator,
-                    viewContext,
-                    timelineCaptions,
-                    projectSounds: projectSounds);
-                // add the label
-                var sndLabel = GetValueEditorHeaderControl(soundPlayerActuator, timelineCaptions, viewContext);
-                AllValuesEditorControlsStackPanel.Children.Add(sndLabel);
-                _timelineEditorLabels.Add(sndLabel);
-                // add the editor
-                AllValuesEditorControlsStackPanel.Children.Add(editorControl);
-                _timelineEditorControls.Add(editorControl);
+                editorControl.Init(soundPlayer: soundPlayerActuator, viewContext, timelineCaptions, projectSounds: projectSounds);
+                this.WrapValueEditorInContainerControl(actuatorToEdit: soundPlayerActuator, awbObjectControl: editorControl, timelineCaptions);
             }
 
             // add servo painter + editors
@@ -124,13 +106,7 @@ namespace AwbStudio.TimelineControls
             {
                 var editorControl = new ServoTimelineEditorControl();
                 editorControl.Init(servo: servoActuator, viewContext, timelineCaptions, timelineDataService, projectSounds: projectSounds, awbLogger);
-                // add the label
-                var servoLabel = GetValueEditorHeaderControl(servoActuator, timelineCaptions, viewContext);
-                AllValuesEditorControlsStackPanel.Children.Add(servoLabel);
-                _timelineEditorLabels.Add(servoLabel);
-                // add the editor
-                AllValuesEditorControlsStackPanel.Children.Add(editorControl);
-                _timelineEditorControls.Add(editorControl);
+                this.WrapValueEditorInContainerControl(actuatorToEdit: servoActuator, awbObjectControl: editorControl, timelineCaptions);
             }
 
             _playPosPainter = new PlayPosPainter(PlayPosGrid, _viewContext, _playPosSynchronizer);
@@ -153,22 +129,27 @@ namespace AwbStudio.TimelineControls
                 };
             }
 
-            AlignEditorLabels();
+            AlignEditorContainers();
 
             _isInitialized = true;
         }
 
-        /// <summary>
-        /// Creates the header label for a actuator value editor control.
-        /// </summary>
-        private ValueEditorHeaderControl GetValueEditorHeaderControl(IActuator acturator, TimelineCaptions timelineCaptions, TimelineViewContext viewContext)
+        private void WrapValueEditorInContainerControl(IActuator actuatorToEdit, IAwbObjectControl awbObjectControl, TimelineCaptions timelineCaptions)
         {
-            var caption = timelineCaptions?.GetAktuatorCaption(acturator.Id);
-            var headerControl = new ValueEditorHeaderControl();
-            headerControl.TimelineCaption = caption;
-            headerControl.MyObject = acturator;
-            headerControl.ViewContext = viewContext;
-            return headerControl;
+            if (_timelineEditorControls == null) throw new InvalidOperationException("Timeline editor controls list is null");
+            if (_editorContainers == null) throw new InvalidOperationException("Editor containers list is null");
+            if (_viewContext == null) throw new InvalidOperationException("View context is null");
+            if (awbObjectControl is not ITimelineEditorControl timelineEditorControl) throw new InvalidOperationException("awbObjectControl is not a ITimelineEditorControl");
+            if (awbObjectControl is not UserControl userControl) throw new InvalidOperationException("awbObjectControl is not a UserControl");
+
+
+            _timelineEditorControls.Add(timelineEditorControl);
+
+            // create a container for the servo timeline editor, so that we can select it and highlight the label when it is selected
+            var editorContainer = new ValueEditorSelectionContainerControl();
+            editorContainer.Init(awbObjectControl, userControl, _viewContext, timelineCaptions!.GetAktuatorCaption(actuatorToEdit.Id));
+            _editorContainers.Add(editorContainer);
+            AllValuesEditorControlsStackPanel.Children.Add(editorContainer);
         }
 
         public void TimelineDataLoaded(TimelineData timelineData)
@@ -185,7 +166,7 @@ namespace AwbStudio.TimelineControls
 
             _playPosPainter!.TimelineDataLoaded(timelineData);
 
-            AlignEditorLabels();
+            AlignEditorContainers();
         }
 
         private void UpdateZoom()
@@ -203,7 +184,7 @@ namespace AwbStudio.TimelineControls
                         editorControl.Height = _zoomVerticalHeightPerValueEditorBackingField;
                     }
                 }
-                AlignEditorLabels();
+                AlignEditorContainers();
             }
         }
 
@@ -236,11 +217,12 @@ namespace AwbStudio.TimelineControls
                 case ViewContextChangedEventArgs.ChangeTypes.PixelPerMs:
                     var newWidth = this._viewContext.PixelPerMs * this._viewContext.DurationMs;
                     this.Width = newWidth;
+                    AlignEditorContainers();
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.Scroll:
                     // set the left margin of the AllValuesEditorControlsStackPanel to the scroll position
-                    AlignEditorLabels();
+                    AlignEditorContainers();
                     break;
 
                 case ViewContextChangedEventArgs.ChangeTypes.BankIndex:
@@ -258,11 +240,11 @@ namespace AwbStudio.TimelineControls
             }
         }
 
-        private void AlignEditorLabels()
+        private void AlignEditorContainers()
         {
             if (_viewContext == null) return;
-            foreach (var label in _timelineEditorLabels!)
-                label.Margin = new Thickness(_viewContext.ScrollPositionPx, 0, 0, 0);
+            foreach (var editorContainer in _editorContainers!)
+                editorContainer.Margin = new Thickness(_viewContext.ScrollPositionPx, 0, 0, 0);
             return;
         }
     }
