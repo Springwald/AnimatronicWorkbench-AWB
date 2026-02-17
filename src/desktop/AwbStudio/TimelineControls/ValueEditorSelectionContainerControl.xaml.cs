@@ -26,13 +26,8 @@ namespace AwbStudio.TimelineControls
             InitializeComponent();
             Loaded += ValueEditorHeaderControl_Loaded;
             this.LayoutUpdated += ValueEditorSelectionContainerControl_LayoutUpdated;
-            this.SizeChanged += ValueEditorSelectionContainerControl_SizeChanged;
         }
 
-        private void ValueEditorSelectionContainerControl_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            var x = 1;
-        }
 
         private void ValueEditorSelectionContainerControl_LayoutUpdated(object? sender, System.EventArgs e)
         {
