@@ -49,22 +49,35 @@ namespace AwbStudio.TimelineControls
             this._viewContext.Changed += (sender, e) =>
             {
                 this.LabelTitle.Content = _timelineCaption?.Label;
-                if (_viewContext.ActualFocusObject == MyObjectToEdit)
+                if (_viewContext.ActualFocusObject == MyObjectToEdit?.AwbObject)
                 {
-                    this.Background = System.Windows.Media.Brushes.DarkGray;
+                    // my object is the actual selected object
+                    this.Background = new SolidColorBrush(Color.FromArgb(40, 100, 100,255));
                     this.LabelTitle.FontWeight = FontWeights.Bold;
-                    this.LabelTitle.Foreground = System.Windows.Media.Brushes.Black;
+                    this.LabelTitle.Foreground = System.Windows.Media.Brushes.White;
                 }
                 else
                 {
+                    // my object is not the actual selected object
                     this.Background = _backupBackground;
                     this.LabelTitle.FontWeight = FontWeights.Normal;
-                    this.LabelTitle.Foreground = System.Windows.Media.Brushes.White;
+                    this.LabelTitle.Foreground = System.Windows.Media.Brushes.Gray;
                 }
             };
 
             LabelTitle.Content = _timelineCaption?.Label;
             StackPanelEditorControls.Children.Add(editorControl);
+        }
+
+        /// <summary>
+        /// The values editor container is focused when the user clicks on it. 
+        /// </summary>
+        private void StackPanelEditorControls_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_viewContext == null || MyObjectToEdit == null) return;
+
+            // report the focus change to the timeline view context, so that other controls can react to it.
+            _viewContext.ActualFocusObject = MyObjectToEdit.AwbObject;
         }
     }
 }

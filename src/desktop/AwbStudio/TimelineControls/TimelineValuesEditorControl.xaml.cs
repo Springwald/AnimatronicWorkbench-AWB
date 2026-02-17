@@ -142,7 +142,6 @@ namespace AwbStudio.TimelineControls
             if (awbObjectControl is not ITimelineEditorControl timelineEditorControl) throw new InvalidOperationException("awbObjectControl is not a ITimelineEditorControl");
             if (awbObjectControl is not UserControl userControl) throw new InvalidOperationException("awbObjectControl is not a UserControl");
 
-
             _timelineEditorControls.Add(timelineEditorControl);
 
             // create a container for the servo timeline editor, so that we can select it and highlight the label when it is selected
@@ -243,9 +242,9 @@ namespace AwbStudio.TimelineControls
         private void AlignEditorContainers()
         {
             if (_viewContext == null) return;
-            foreach (var editorContainer in _editorContainers!)
-                editorContainer.Margin = new Thickness(_viewContext.ScrollPositionPx, 0, 0, 0);
-            return;
+            //foreach (var editorContainer in _editorContainers!)
+            //    editorContainer.Margin = new Thickness(_viewContext.ScrollPositionPx, 0, 0, 0);
+            //return;
         }
     }
 }
