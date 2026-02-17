@@ -5,6 +5,7 @@
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
+using Awb.Core.ActuatorsAndObjects;
 using AwbStudio.TimelineEditing;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,8 @@ namespace AwbStudio.TimelineControls
         private TimelineCaption? _timelineCaption;
         private TimelineViewContext? _viewContext;
         private Brush? _backupBackground;
+        private static Brush _selectedBackground = new SolidColorBrush(Color.FromArgb(40, 100, 100, 255));
+        private IAwbObject? _lastSelectedObject = null;
 
         public ValueEditorSelectionContainerControl()
         {
@@ -48,20 +51,25 @@ namespace AwbStudio.TimelineControls
             this._viewContext = viewContext;
             this._viewContext.Changed += (sender, e) =>
             {
+                if (_lastSelectedObject == _viewContext.ActualFocusObject) return; // nothing changed
+                _lastSelectedObject = _viewContext.ActualFocusObject;
+
                 this.LabelTitle.Content = _timelineCaption?.Label;
-                if (_viewContext.ActualFocusObject == MyObjectToEdit?.AwbObject)
+                if (_lastSelectedObject == MyObjectToEdit?.AwbObject)
                 {
                     // my object is the actual selected object
-                    this.Background = new SolidColorBrush(Color.FromArgb(40, 100, 100,255));
+                    this.Background = _selectedBackground;
+                    this.BorderEditorControls.BorderBrush = Brushes.Gray;
                     this.LabelTitle.FontWeight = FontWeights.Bold;
-                    this.LabelTitle.Foreground = System.Windows.Media.Brushes.White;
+                    this.LabelTitle.Foreground = Brushes.White;
                 }
                 else
                 {
                     // my object is not the actual selected object
                     this.Background = _backupBackground;
+                    this.BorderEditorControls.BorderBrush = Brushes.DarkGray;
                     this.LabelTitle.FontWeight = FontWeights.Normal;
-                    this.LabelTitle.Foreground = System.Windows.Media.Brushes.Gray;
+                    this.LabelTitle.Foreground = Brushes.Gray;
                 }
             };
 
