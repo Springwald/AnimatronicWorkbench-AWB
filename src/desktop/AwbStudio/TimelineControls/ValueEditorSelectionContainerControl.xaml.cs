@@ -25,6 +25,23 @@ namespace AwbStudio.TimelineControls
         {
             InitializeComponent();
             Loaded += ValueEditorHeaderControl_Loaded;
+            this.LayoutUpdated += ValueEditorSelectionContainerControl_LayoutUpdated;
+            this.SizeChanged += ValueEditorSelectionContainerControl_SizeChanged;
+        }
+
+        private void ValueEditorSelectionContainerControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var x = 1;
+        }
+
+        private void ValueEditorSelectionContainerControl_LayoutUpdated(object? sender, System.EventArgs e)
+        {
+            // stick the title to the left border of the parent scroll viewer, so that it is always visible, even when the user scrolls horizontally.
+            var parentScrollView = this.Parent;
+            while (parentScrollView != null && parentScrollView is not ScrollViewer)
+                parentScrollView = (parentScrollView as FrameworkElement)?.Parent;
+            var scrollPosInParentScrollViewer = (parentScrollView as ScrollViewer)?.HorizontalOffset ?? 0;
+            this.LabelTitle.Margin = new Thickness(scrollPosInParentScrollViewer, 0, 0, 0);
         }
 
         private void ValueEditorHeaderControl_Loaded(object sender, RoutedEventArgs e)
