@@ -11,17 +11,14 @@ namespace Awb.Core.LoadNSave.Timelines
 {
     public class MovementsActuatorsBySoundSaveFormat
     {
-        public string? ActuatorId { get; set; }
-        public bool MovementInverted { get; set; } // up/down movement inverted, e.g. for a jaw servo
+        public string? ActuatorId { get; set; } = null;
+        public bool MovementInverted { get; set; } = false;// up/down movement inverted, e.g. for a jaw servo
         public int MovementOffsetMs { get; set; } = 0; // offset in ms to the sound start, e.g. for moving a servo before the sound starts
         public int MovementFrequencyMs { get; set; } = 50; // frequency in ms tp create servo points
+        public int MovementValueScale { get; set; } = 100; // scale for the movement value, e.g. 100 for a full range of 0-100, 50 for a half range of 0-50
 
-        public MovementsActuatorsBySoundSaveFormat(string? actuatorId = null, bool movementInverted = false, int movementOffsetMs = 0, int movementFrequencyMs = 50)
+        public MovementsActuatorsBySoundSaveFormat()
         {
-            ActuatorId = actuatorId;
-            MovementInverted = movementInverted;
-            MovementOffsetMs = movementOffsetMs;
-            MovementFrequencyMs = movementFrequencyMs;
         }
 
         public static MovementsActuatorsBySoundSaveFormat FromSoundPoint(ActuatorMovementBySound actuatorMovementBySound)
@@ -30,7 +27,8 @@ namespace Awb.Core.LoadNSave.Timelines
                 ActuatorId = actuatorMovementBySound.ActuatorId,
                 MovementInverted = actuatorMovementBySound.MovementInverted,
                 MovementOffsetMs = actuatorMovementBySound.MovementOffsetMs,
-                MovementFrequencyMs = actuatorMovementBySound.MovementFrequencyMs
+                MovementFrequencyMs = actuatorMovementBySound.MovementFrequencyMs,
+                MovementValueScale = actuatorMovementBySound.MovementValueScale
             };
 
         public static ActuatorMovementBySound ToSoundPoint(MovementsActuatorsBySoundSaveFormat soundPointSaveFormat)
@@ -39,7 +37,8 @@ namespace Awb.Core.LoadNSave.Timelines
              ActuatorId = soundPointSaveFormat.ActuatorId,
              MovementOffsetMs = soundPointSaveFormat.MovementOffsetMs,
              MovementFrequencyMs = soundPointSaveFormat.MovementFrequencyMs,
-             MovementInverted = soundPointSaveFormat.MovementInverted
+             MovementInverted = soundPointSaveFormat.MovementInverted,
+             MovementValueScale = soundPointSaveFormat.MovementValueScale
          };
     }
 }
