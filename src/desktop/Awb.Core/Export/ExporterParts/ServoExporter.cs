@@ -1,15 +1,13 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project;
 using Awb.Core.Project.Actuators;
 using Awb.Core.Project.Servos;
-using Awb.Core.Timelines;
-using System.CodeDom;
 using System.Text;
 
 namespace Awb.Core.Export.ExporterParts
@@ -65,13 +63,14 @@ namespace Awb.Core.Export.ExporterParts
             {
                 // add comment with servo ID
                 id = deviceConfig.Id;
-            } else
+            }
+            else
             {
                 throw new NotSupportedException($"Exporting servo of type {servoConfig.GetType().FullName} is not supported because it does not implement IDeviceConfig.");
             }
 
-                // export relax ranges for this servo
-                var relaxRangesName = $"\t\t\t\t{servoVariableName}_relaxRanges";
+            // export relax ranges for this servo
+            var relaxRangesName = $"\t\t\t\t{servoVariableName}_relaxRanges";
             if (servoConfig is ISupportsRelaxRanges relaxRangeObject)
             {
                 result.AppendLine($"\t\t\t\tstd::vector<RelaxRange> *{relaxRangesName} = new std::vector<RelaxRange>();");
@@ -106,7 +105,7 @@ namespace Awb.Core.Export.ExporterParts
                     break;
                 case StsFeetechServoConfig stsServo:
                     servoExportType = ServoExportTypes.STS_SERVO;
-                    channel = stsServo.Channel; 
+                    channel = stsServo.Channel;
                     defaultValue = stsServo.DefaultValue ?? stsServo.MinValue + (stsServo.MaxValue - stsServo.MinValue) / 2;
                     acceleration = stsServo.Acceleration ?? 0;
                     speed = stsServo.Speed ?? 0;
@@ -137,7 +136,7 @@ namespace Awb.Core.Export.ExporterParts
             result.Append($"{globalFault.ToString().ToLower()}, ");
             result.Append($"{relaxRangesName}"); // relax ranges 
             result.AppendLine(")));");
-            
+
             return result.ToString();
         }
 
