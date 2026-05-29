@@ -17,7 +17,12 @@ void WlanConnector::setup()
     IPAddress local_ip(192, 168, 1, 1);
     IPAddress gateway(192, 168, 1, 1);
     IPAddress subnet(255, 255, 255, 0);
+    WiFi.persistent(false);
+    WiFi.disconnect();
+    WiFi.mode(WIFI_AP);
+    delay(255); // wait a bit for the wifi to start
     WiFi.softAP(_wifiConfig->WlanSSID, _wifiConfig->WlanPassword);
+    delay(255); // wait a bit for the wifi to start
     WiFi.softAPConfig(local_ip, gateway, subnet);
 
     _debugging->setState(Debugging::MJ_WLAN, 1);
