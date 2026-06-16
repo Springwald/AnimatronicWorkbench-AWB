@@ -98,7 +98,8 @@ void AwbClient::setup()
     _debugging->setState(Debugging::MJ_SETUP, 30);
 
     showSetupMsg("setup STS servos");
-    this->_stSerialServoManager = new StScsSerialServoManager(_projectData->stsServos, false, errorOccuredCallback, STS_SERVO_RXD, STS_SERVO_TXD);
+    auto stsServos = _projectData->servos->getServosByType(ServoConfig::ServoTypes::STS_SERVO);
+    this->_stSerialServoManager = new StScsSerialServoManager(stsServos, false, errorOccuredCallback, STS_SERVO_RXD, STS_SERVO_TXD);
     this->_stSerialServoManager->setup();
     showSetupMsg("setup STS servos done");
 #endif
@@ -107,7 +108,8 @@ void AwbClient::setup()
 
 #ifdef USE_SCS_SERVO
     showSetupMsg("setup SCS servos");
-    this->_scSerialServoManager = new StScsSerialServoManager(_projectData->scsServos, true, errorOccuredCallback, SCS_SERVO_RXD, SCS_SERVO_TXD);
+    auto scsServos = _projectData->servos->getServosByType(ServoConfig::ServoTypes::SCS_SERVO);
+    this->_scSerialServoManager = new StScsSerialServoManager(scsServos, true, errorOccuredCallback, SCS_SERVO_RXD, SCS_SERVO_TXD);
     this->_scSerialServoManager->setup();
     showSetupMsg("setup SCS servos done");
 #endif
@@ -119,11 +121,13 @@ void AwbClient::setup()
 
     _debugging->setState(Debugging::MJ_SETUP, 45);
 
-    if (this->_projectData->pca9685PwmServos->size() > 0)
+    auto pca9685PwmServos = _projectData->servos->getServosByType(ServoConfig::ServoTypes::PWM_SERVO);
+    if (pca9685PwmServos->size() > 0)
     {
         showSetupMsg("setup PCA9685 PWM servos");
         uint32_t osc_frequency = 25000000; // todo: get this from the project data
-        this->_pca9685pwmManager = new Pca9685PwmManager(_projectData->pca9685PwmServos, errorOccuredCallback, messageToShowCallback, this->_projectData->pca9685PwmServos->at(0).i2cAdress, osc_frequency);
+        auto firstPwmServo = pca9685PwmServos->at(0);
+        this->_pca9685pwmManager = new Pca9685PwmManager(pca9685PwmServos, errorOccuredCallback, messageToShowCallback, firstPwmServo->config->i2cAdress, osc_frequency);
     }
 
     _debugging->setState(Debugging::MJ_SETUP, 50);

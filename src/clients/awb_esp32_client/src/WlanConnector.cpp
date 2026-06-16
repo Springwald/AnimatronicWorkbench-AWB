@@ -204,14 +204,14 @@ String WlanConnector::GetHtml()
         // Servo status
 
         // count the types of servos
-        auto allServos = this->_projectData->servos;
+        auto servos = this->_projectData->servos;
         int stsCount = 0;
         int scsCount = 0;
         int pwmCount = 0;
         int unknownCount = 0;
-        for (int i = 0; i < allServos->size(); i++)
+        for (int i = 0; i < servos->allServos->size(); i++)
         {
-            auto servo = allServos->at(i);
+            auto servo = servos->allServos->at(i);
             switch (servo.config->type)
             {
             case ServoConfig::ServoTypes::STS_SERVO:
@@ -297,15 +297,15 @@ void WlanConnector::AddServoInfos(String &ptr)
     ptr += "<table>\n";
     ptr += "<tr><th>Channel</th><th>Name</th><th>Pos</th><th>Temp</th><th>Load</th><th>Min/Max</th><th>fault</th><th>last</th></tr>\n";
 
-    for (int i = 0; i < this->_projectData->servos->size(); i++)
+    for (int i = 0; i < this->_projectData->servos->allServos->size(); i++)
     {
-        auto &servo = this->_projectData->servos->at(i);
+        auto &servo = this->_projectData->servos->allServos->at(i);
         ptr += "<tr><td>" + String(servo.config->channel) + "</td><td>" + servo.title + "</td><td>" + String(servo.state->currentValue) + "</td>" +
-               this->getTdVal(String(servo.temperature), servo.maxTemp, 20, servo.temperature) +
-               this->getTd(String(servo.load), abs(servo.load) > servo.maxTorque) +
-               this->getTd(String(servo.minLoad) + "/" + String(servo.maxLoad), abs(servo.maxLoad) > servo.maxTorque || abs(servo.minLoad) > servo.maxTorque) +
-               this->getTd(String(servo.isFaultCountDownMs > 0 ? String(servo.isFaultCountDownMs / 1000) : ""), servo.isFaultCountDownMs > 0) +
-               this->getTd(servo.lastFaultMs != 0 ? getErrorTime(servo.lastFaultMs) + " " + servo.lastFaultMessage : "", false) + "</tr>\n";
+               this->getTdVal(String(servo.state->temperature), servo.config->maxTemp, 20, servo.state->temperature) +
+               this->getTd(String(servo.state->load), abs(servo.state->load) > servo.config->maxTorque) +
+               this->getTd(String(servo.state->minLoad) + "/" + String(servo.state->maxLoad), abs(servo.state->maxLoad) > servo.config->maxTorque || abs(servo.state->minLoad) > servo.config->maxTorque) +
+               this->getTd(String(servo.state->isFaultCountDownMs > 0 ? String(servo.state->isFaultCountDownMs / 1000) : ""), servo.state->isFaultCountDownMs > 0) +
+               this->getTd(servo.state->lastFaultMs != 0 ? getErrorTime(servo.state->lastFaultMs) + " " + servo.state->lastFaultMessage : "", false) + "</tr>\n";
     }
 
     ptr += "</table>\n";

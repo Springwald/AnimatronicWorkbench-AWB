@@ -66,18 +66,18 @@ String StatusManagement::updateActuatorsStatuses(unsigned long diffMs)
 
     // check Sts serial bus servos
     if (this->_stSerialServoManager != nullptr)
-        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_stSerialServoManager, _projectData->servos, false, diffMs);
+        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_stSerialServoManager, _projectData->servos->allServos, false, diffMs);
 
     // check Scs serial bus servos
     if (this->_scSerialServoManager != nullptr)
-        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_scSerialServoManager, _projectData->servos, true, diffMs);
+        actualActuatorsStateInfo += this->updateStsScsServoStatuses(this->_scSerialServoManager, _projectData->servos->allServos, true, diffMs);
 
     // check PWM servos
     if (this->_pca9685PwmManager != nullptr)
     {
-        for (int i = 0; i < this->_projectData->servos->size(); i++)
+        for (int i = 0; i < this->_projectData->servos->allServos->size(); i++)
         {
-            Servo *servo = &this->_projectData->servos->at(i);
+            Servo *servo = &this->_projectData->servos->allServos->at(i);
             if (servo->config->type != ServoConfig::ServoTypes::PWM_SERVO)
                 continue;
 

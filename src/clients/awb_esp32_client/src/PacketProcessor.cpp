@@ -172,13 +172,13 @@ String PacketProcessor::processPacket(String payload)
             {
                 // use the project data to set the target value
                 bool done = false;
-                for (int f = 0; f < this->_projectData->servos->size(); f++)
+                for (int f = 0; f < this->_projectData->servos->allServos->size(); f++)
                 {
-                    if (this->_projectData->servos->at(f).config->type == ServoConfig::ServoTypes::STS_SERVO)
-                        if (this->_projectData->servos->at(f).config->channel == channel)
+                    if (this->_projectData->servos->allServos->at(f).config->type == ServoConfig::ServoTypes::STS_SERVO)
+                        if (this->_projectData->servos->allServos->at(f).config->channel == channel)
                         {
                             // set servo target value
-                            this->_projectData->servos->at(f).state->targetValue = value;
+                            this->_projectData->servos->allServos->at(f).state->targetValue = value;
                             done = true;
                             break;
                         }
@@ -224,13 +224,13 @@ String PacketProcessor::processPacket(String payload)
             {
                 // use the project data to set the target value
                 bool done = false;
-                for (int f = 0; f < this->_projectData->servos->size(); f++)
+                for (int f = 0; f < this->_projectData->servos->allServos->size(); f++)
                 {
-                    if (this->_projectData->servos->at(f).config->type == ServoConfig::ServoTypes::SCS_SERVO)
-                        if (this->_projectData->servos->at(f).config->channel == channel)
+                    if (this->_projectData->servos->allServos->at(f).config->type == ServoConfig::ServoTypes::SCS_SERVO)
+                        if (this->_projectData->servos->allServos->at(f).config->channel == channel)
                         {
                             // set servo target value
-                            this->_projectData->servos->at(f).state->targetValue = value;
+                            this->_projectData->servos->allServos->at(f).state->targetValue = value;
                             done = true;
                             break;
                         }

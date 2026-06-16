@@ -47,36 +47,36 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
         // get a pointer to the current servo
         Servo *servo = &this->_servos->at(i);
 
-        if (servo->isFaultCountDownMs > 0 || anyServoWithGlobalFaultHasCiriticalState == true)
+        if (servo->state->isFaultCountDownMs > 0 || anyServoWithGlobalFaultHasCiriticalState == true)
         {
             // turn servo off when is fault or another servo is defined as global fault and in critical state
-            setTorque(servo->channel, false);
+            setTorque(servo->config->channel, false);
             continue;
         }
 
-        if (servo->targetValue == -1)
+        if (servo->state->targetValue == -1)
         {
             // turn servo off
-            setTorque(servo->channel, false);
+            setTorque(servo->config->channel, false);
         }
         else
         {
 
             // set new target value if changed
-            if (servo->currentValue != servo->targetValue)
+            if (servo->state->currentValue != servo->state->targetValue)
             {
 
-                int speed = servo->targetSpeed;
-                int acc = servo->targetAcc;
+                int speed = servo->state->targetSpeed;
+                int acc = servo->state->targetAcc;
                 if (speed == -1 && acc == -1)
                 {
                     if (this->_servoTypeIsScs)
                     {
-                        _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
+                        _serialServo_SCS.WritePosEx(servo->config->channel, servo->state->targetValue, servo->config->defaultSpeed, servo->config->defaultAcceleration);
                     }
                     else
                     {
-                        _serialServo_STS.WritePosEx(servo->channel, servo->targetValue, servo->defaultSpeed, servo->defaultAcceleration);
+                        _serialServo_STS.WritePosEx(servo->config->channel, servo->state->targetValue, servo->config->defaultSpeed, servo->config->defaultAcceleration);
                     }
                 }
                 else
@@ -84,21 +84,21 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
                     if (this->_servoTypeIsScs)
                     {
                         if (speed == -1)
-                            speed = servo->defaultSpeed;
+                            speed = servo->config->defaultSpeed;
                         if (acc == -1)
-                            acc = servo->defaultAcceleration;
-                        _serialServo_SCS.WritePosEx(servo->channel, servo->targetValue, speed, acc);
+                            acc = servo->config->defaultAcceleration;
+                        _serialServo_SCS.WritePosEx(servo->config->channel, servo->state->targetValue, speed, acc);
                     }
                     else
                     {
                         if (speed == -1)
-                            speed = servo->defaultSpeed;
+                            speed = servo->config->defaultSpeed;
                         if (acc == -1)
-                            acc = servo->defaultAcceleration;
-                        _serialServo_STS.WritePosEx(servo->channel, servo->targetValue, speed, acc);
+                            acc = servo->config->defaultAcceleration;
+                        _serialServo_STS.WritePosEx(servo->config->channel, servo->state->targetValue, speed, acc);
                     }
                 }
-                servo->currentValue = servo->targetValue;
+                servo->state->currentValue = servo->state->targetValue;
             }
         }
     }
@@ -113,11 +113,11 @@ void StScsSerialServoManager::writePositionDetailed(int id, int position, int sp
     {
         for (int i = 0; i < _servos->size(); i++)
         {
-            if (_servos->at(i).channel == id)
+            if (_servos->at(i).config->channel == id)
             {
-                _servos->at(i).targetValue = position;
-                _servos->at(i).targetSpeed = speed;
-                _servos->at(i).targetAcc = acc;
+                _servos->at(i).state->targetValue = position;
+                _servos->at(i).state->targetSpeed = speed;
+                _servos->at(i).state->targetAcc = acc;
             }
         }
     }
@@ -146,9 +146,9 @@ void StScsSerialServoManager::writePosition(int id, int position)
 {
     for (int i = 0; i < _servos->size(); i++)
     {
-        if (_servos->at(i).channel == id)
+        if (_servos->at(i).config->channel == id)
         {
-            _servos->at(i).targetValue = position;
+            _servos->at(i).state->targetValue = position;
         }
     }
 }

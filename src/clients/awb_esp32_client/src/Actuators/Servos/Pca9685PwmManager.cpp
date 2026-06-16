@@ -33,11 +33,14 @@ void Pca9685PwmManager::setOscillatorFrequency(uint8_t adr, uint32_t freq)
 void Pca9685PwmManager::setTargetValue(int channel, int value, String name)
 {
     for (int f = 0; f < this->_pwmServos->size(); f++)
-        if (this->_pwmServos->at(f).channel == channel)
+    {
+        auto *servo = &this->_pwmServos->at(f);
+        if (servo->config->channel == channel)
         {
-            this->_pwmServos->at(f).targetValue = value; // set servo target value
+            servo->state->targetValue = value; // set servo target value
             return;
         }
+    }
     _errorOccured("Pca9685Pwm servo for channel " + String(channel) + " not defined!");
 }
 
@@ -48,7 +51,7 @@ void Pca9685PwmManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriti
         // get a pointer to the current servo
         auto *servo = &this->_pwmServos->at(i);
 
-        if (servo->targetValue == -1 || anyServoWithGlobalFaultHasCiriticalState == true)
+        if (servo->state->targetValue == -1 || anyServoWithGlobalFaultHasCiriticalState == true)
         {
             // turn servo off
             // todo: implement
@@ -56,14 +59,14 @@ void Pca9685PwmManager::updateActuators(boolean anyServoWithGlobalFaultHasCiriti
         else
         {
             // set new target value if changed
-            if (servo->currentValue != servo->targetValue)
+            if (servo->state->currentValue != servo->state->targetValue)
             {
 
-                uint8_t servoNo = servo->channel;
-                uint16_t microseconds = servo->targetValue;
+                uint8_t servoNo = servo->config->channel;
+                uint16_t microseconds = servo->state->targetValue;
 
                 _pwm.writeMicroseconds(servoNo, microseconds);
-                servo->currentValue = servo->targetValue;
+                servo->state->currentValue = servo->state->targetValue;
             }
         }
     }
