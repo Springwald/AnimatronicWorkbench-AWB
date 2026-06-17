@@ -258,6 +258,8 @@ String WlanConnector::GetHtml()
         ptr += "</table>\n";
         ptr += "</div>\n";
 
+        this->AddServoInfos(ptr);
+
         //  System messages
         ptr += "<div class=\"region\">\n";
         ptr += "<table>\n";

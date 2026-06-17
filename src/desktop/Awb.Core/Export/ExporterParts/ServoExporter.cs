@@ -109,6 +109,8 @@ namespace Awb.Core.Export.ExporterParts
                     defaultValue = stsServo.DefaultValue ?? stsServo.MinValue + (stsServo.MaxValue - stsServo.MinValue) / 2;
                     acceleration = stsServo.Acceleration ?? 0;
                     speed = stsServo.Speed ?? 0;
+                    maxTemperature = (int)stsServo.MaxTemp;
+                    maxTorque = (int)stsServo.MaxTorque;
                     break;
                 case ScsFeetechServoConfig scsServo:
                     servoExportType = ServoExportTypes.SCS_SERVO;
@@ -116,6 +118,8 @@ namespace Awb.Core.Export.ExporterParts
                     defaultValue = scsServo.DefaultValue ?? scsServo.MinValue + (scsServo.MaxValue - scsServo.MinValue) / 2;
                     acceleration = 0; // scs servos have no acceleration
                     speed = scsServo.Speed ?? 0;
+                    maxTemperature = (int)scsServo.MaxTemp;
+                    maxTorque = (int)scsServo.MaxTorque;
                     break;
                 default:
                     throw new NotSupportedException($"Exporting servo of type {servoConfig.GetType().FullName} is not supported.");

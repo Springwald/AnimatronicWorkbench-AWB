@@ -127,7 +127,7 @@ String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *seri
                 servo->state->lastFaultMessage = String(servo->state->temperature) + "C";
                 servo->state->lastFaultMs = millis();
                 serialServoManager->setTorque(servo->config->channel, false);
-                _errorOccured("Servo " + String(servo->title) + " critical temp! " + String(servo->state->temperature) + "C");
+                _errorOccured("Servo '" + String(servo->title) + "' critical temp! " + String(servo->state->temperature) + "C");
                 if (errors != "")
                     errors += ", ";
                 errors += String(servo->config->channel) + ":" + String(servo->state->temperature) + "C";
@@ -145,7 +145,7 @@ String StatusManagement::updateStsScsServoStatuses(StScsSerialServoManager *seri
                 serialServoManager->setTorque(servo->config->channel, false);
                 servo->state->lastFaultMessage = String(servo->state->load) + "L";
                 servo->state->lastFaultMs = millis();
-                _errorOccured("Servo " + String(servo->config->channel) + "' critical load! " + String(servo->state->load));
+                _errorOccured("Servo '" + String(servo->config->channel) + "' critical load! " + String(servo->state->load));
                 if (errors != "")
                     errors += ", ";
                 errors += String(servo->config->channel) + ":L" + String(servo->state->load);
