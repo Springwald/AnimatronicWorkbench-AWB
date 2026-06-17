@@ -70,16 +70,16 @@ namespace Awb.Core.Export.ExporterParts
             }
 
             // export relax ranges for this servo
-            var relaxRangesName = $"\t\t\t\t{servoVariableName}_relaxRanges";
+            var relaxRangesName = $"{servoVariableName}_relaxRanges";
             if (servoConfig is ISupportsRelaxRanges relaxRangeObject)
             {
-                result.AppendLine($"\t\t\t\tstd::vector<RelaxRange> *{relaxRangesName} = new std::vector<RelaxRange>();");
+                result.AppendLine($"\t\tstd::vector<RelaxRange> *{relaxRangesName} = new std::vector<RelaxRange>();");
                 foreach (var relaxRangeLine in ExportRelaxRanges(relaxRangeObject: relaxRangeObject, listName: relaxRangesName))
                     result.AppendLine(relaxRangeLine);
             }
             else
             {
-                result.AppendLine($"\t\t\t\tstd::vector<RelaxRange> *{relaxRangesName} = nullptr;");
+                result.AppendLine($"\t\tstd::vector<RelaxRange> *{relaxRangesName} = nullptr;");
             }
 
             // define the variables for the servo parameters
@@ -125,7 +125,7 @@ namespace Awb.Core.Export.ExporterParts
                     throw new NotSupportedException($"Exporting servo of type {servoConfig.GetType().FullName} is not supported.");
             }
 
-            result.Append($"\t\t\t\t{_servoListName}->addServo(Servo(\"{id}\", new ServoConfig(");
+            result.Append($"\t\t{_servoListName}->addServo(Servo(\"{id}\", new ServoConfig(");
             result.Append($"ServoConfig::ServoTypes::{servoExportType.ToString()}, "); // the servo type
             result.Append($"\"{servoConfig.Title}\", "); // the servo title
             result.Append($"{channel}, "); // chanel for e.g. PWM servo or bus ID for bus servo
@@ -145,49 +145,12 @@ namespace Awb.Core.Export.ExporterParts
         }
 
 
-        /*
-
-        public IEnumerable<string> ExportScsServos(string propertyName, IEnumerable<ScsFeetechServoConfig> servos)
-        {
-            yield return $"\t\t\t\t{propertyName} = new std::vector<StsScsServo>();";
-            foreach (var servo in servos)
-            {
-                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
-                var speed = servo.Speed ?? 0;
-                var acceleration = 0; // scs servos have no acceleration
-                var relaxRangesName = $"\t\t\t\t{propertyName}_relaxRanges";
-
-                foreach (var relaxRangeLine in ExportRelaxRanges(relaxRangeObject: servo, listName: relaxRangesName))
-                    yield return relaxRangeLine;
-
-                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
-                yield return $"\t\t\t\t{propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()} ));";
-            }
-        }
-
-        public IEnumerable<string> ExportStsServos(string propertyName, IEnumerable<StsFeetechServoConfig> servos)
-        {
-            yield return $"\t\t\t\t{propertyName} = new std::vector<StsScsServo>();";
-            foreach (var servo in servos)
-            {
-                var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
-                var acceleration = servo.Acceleration ?? 0;
-                var speed = servo.Speed ?? 0;
-                var relaxRangesName = $"\t\t\t\t{propertyName}_relaxRanges";
-                foreach (var relaxRangeLine in ExportRelaxRanges(relaxRangeObject: servo, listName: relaxRangesName))
-                    yield return relaxRangeLine;
-                // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault, vector<RelaxRange> relaxRanges
-                yield return $"\t\t\t\t{propertyName}->push_back(StsScsServo({servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {servo.MaxTemp}, {servo.MaxTorque}, {defaultValue}, {acceleration}, {speed}, {servo.GlobalFault.ToString().ToLower()}, {relaxRangesName} ));";
-            }
-        }
-        */
-
         private static IEnumerable<string> ExportRelaxRanges(ISupportsRelaxRanges relaxRangeObject, string listName)
         {
             var relaxRanges = relaxRangeObject.RelaxRanges;
             //yield return $"  auto {listName}= new vector<RelaxRange>();";
             foreach (var range in relaxRanges)
-                yield return $"\t\t\t\t{listName}->push_back(RelaxRange({range.MinValue}, {range.MaxValue}));";
+                yield return $"\t\t{listName}->push_back(RelaxRange({range.MinValue}, {range.MaxValue}));";
         }
 
         public IEnumerable<string> ExportPCS9685PwmServos(IEnumerable<Pca9685PwmServoConfig> pca9685PwmServoConfigs)
@@ -195,13 +158,13 @@ namespace Awb.Core.Export.ExporterParts
             var pca9685PwmServos = pca9685PwmServoConfigs?.OrderBy(s => s.Channel).ToArray() ?? Array.Empty<Pca9685PwmServoConfig>();
 
             var propertyName = "pca9685PwmServos";
-            yield return $"\t\t\t\t{propertyName} = new std::vector<Pca9685PwmServo>();";
+            yield return $"\t\t{propertyName} = new std::vector<Pca9685PwmServo>();";
 
             foreach (var servo in pca9685PwmServos)
             // int channel, String const name, int minValue, int maxValue, int defaultValue, int acceleration, int speed, bool globalFault
             {
                 var defaultValue = servo.DefaultValue ?? servo.MinValue + (servo.MaxValue - servo.MinValue) / 2;
-                yield return $"\t\t\t\t{propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {defaultValue}));";
+                yield return $"\t\t{propertyName}->push_back(Pca9685PwmServo({servo.I2cAdress}, {servo.Channel}, \"{servo.Title}\", {servo.MinValue}, {servo.MaxValue}, {defaultValue}));";
             }
         }
     }
