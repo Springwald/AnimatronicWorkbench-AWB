@@ -1,12 +1,7 @@
 #ifndef _SERVO_STATE_H_
 #define _SERVO_STATE_H_
 
-#include <Arduino.h>
-#include <String.h>
-#include <vector>
-#include "RelaxRange.h"
 #include <string>
-#include "Servo.h"
 
 class ServoState
 {

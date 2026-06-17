@@ -127,7 +127,7 @@ void AwbClient::setup()
         showSetupMsg("setup PCA9685 PWM servos");
         uint32_t osc_frequency = 25000000; // todo: get this from the project data
         auto firstPwmServo = pca9685PwmServos->at(0);
-        this->_pca9685pwmManager = new Pca9685PwmManager(pca9685PwmServos, errorOccuredCallback, messageToShowCallback, firstPwmServo->config->i2cAdress, osc_frequency);
+        this->_pca9685pwmManager = new Pca9685PwmManager(pca9685PwmServos, errorOccuredCallback, messageToShowCallback, firstPwmServo.config->i2cAdress, osc_frequency);
     }
 
     _debugging->setState(Debugging::MJ_SETUP, 50);

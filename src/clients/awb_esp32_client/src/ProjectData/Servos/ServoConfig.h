@@ -1,12 +1,9 @@
 #ifndef _SERVO_CONFIG_H_
 #define _SERVO_CONFIG_H_
 
-#include <Arduino.h>
-#include <String.h>
 #include <vector>
-#include "RelaxRange.h"
 #include <string>
-#include "Servo.h"
+#include "RelaxRange.h"
 
 using byte = unsigned char;
 
