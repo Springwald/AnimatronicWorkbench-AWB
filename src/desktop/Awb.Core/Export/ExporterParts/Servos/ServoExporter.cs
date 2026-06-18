@@ -138,14 +138,14 @@ namespace Awb.Core.Export.ExporterParts.Servos
             result.Append($"\"{servoConfig.Title}\", "); // the servo title
             result.Append($"{exportModel.Channel}, "); // chanel for e.g. PWM servo or bus ID for bus servo
             result.Append($"{exportModel.I2cAdress}, "); // I2C adress if supported when e.g. PWM servo
-            result.Append($"{servoConfig.MinValue}, ");
-            result.Append($"{servoConfig.MaxValue}, ");
+            result.Append($"{servoConfig.MinValue}, "); // min value for this servo
+            result.Append($"{servoConfig.MaxValue}, "); // max value for this servo
             result.Append($"{exportModel.MaxTemperature}, "); // max temperature if supported
             result.Append($"{exportModel.MaxTorque}, "); // max torque if supported
-            result.Append($"{exportModel.DefaultValue}, ");
+            result.Append($"{exportModel.DefaultValue}, "); // default value for this servo
             result.Append($"{exportModel.Acceleration}, "); // default acceleration
             result.Append($"{exportModel.Speed}, "); // default speed
-            result.Append($"{exportModel.GlobalFault.ToString().ToLower()}, ");
+            result.Append($"{exportModel.GlobalFault.ToString().ToLower()}, "); // global fault if supported
             result.Append($"{relaxRangesName}"); // relax ranges 
             result.AppendLine(")));");
 
