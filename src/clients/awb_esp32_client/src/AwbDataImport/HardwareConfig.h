@@ -13,10 +13,19 @@
 #define DISPLAY_SSD1306_HEIGHT 32
 #define DISPLAY_SSD1306_COM_PINS 0x02 // 0x02, 0x12, 0x22 or 0x32
 
+/* STS serial servo settings */
+#define USE_STS_SERVO
+#define STS_SERVO_RXD 16
+#define STS_SERVO_TXD 17
+
 /* SCS serial servo settings */
 #define USE_SCS_SERVO
 #define SCS_SERVO_RXD 18
 #define SCS_SERVO_TXD 19
+
+/* PCA9685 PWM servo settings */
+#define USE_PCA9685_PWM_SERVO
+#define PCA9685_OSC_FREQUENCY 25000000
 
 
 #endif
