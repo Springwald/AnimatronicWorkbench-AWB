@@ -10,21 +10,13 @@ using Awb.Core.Project.Actuators;
 using Awb.Core.Project.Servos;
 using System.Text;
 
-namespace Awb.Core.Export.ExporterParts
+namespace Awb.Core.Export.ExporterParts.Servos
 {
     public class ServoExporter
     {
         private readonly string _servoListName;
 
-        /// <summary>
-        /// types of supported servos
-        /// </summary>
-        public enum ServoExportTypes
-        {
-            PWM_SERVO = 0,
-            STS_SERVO = 1,
-            SCS_SERVO = 2
-        }
+
 
         public ServoExporter(string servoListName)
         {
@@ -82,62 +74,78 @@ namespace Awb.Core.Export.ExporterParts
                 result.AppendLine($"\t\tstd::vector<RelaxRange> *{relaxRangesName} = nullptr;");
             }
 
-            // define the variables for the servo parameters
-            int defaultValue = -1;
-            int acceleration = -1;
-            uint i2cAdress = 0;
-            int speed = -1;
-            uint channel = 0; // channel if eg. PWM servo or bus ID if bus servo
-            string title = string.Empty;
-            int maxTemperature = -1;
-            int maxTorque = -1;
-            ServoExportTypes servoExportType;
-            bool globalFault = false;
+            ServoExportModel? exportModel = null;
 
-            // define the type of servo 
             switch (servoConfig)
             {
                 case Pca9685PwmServoConfig pwmServo:
-                    servoExportType = ServoExportTypes.PWM_SERVO;
-                    channel = pwmServo.Channel;
-                    i2cAdress = pwmServo.I2cAdress;
-                    defaultValue = pwmServo.DefaultValue ?? pwmServo.MinValue + (pwmServo.MaxValue - pwmServo.MinValue) / 2;
+                    exportModel = new ServoExportModel
+                    {
+                        Id = pwmServo.Id,
+                        ServoExportType = ServoExportModel.ServoExportTypes.PWM_SERVO,
+                        Title = pwmServo.Title,
+                        DefaultValue = pwmServo.DefaultValue ?? pwmServo.MinValue + (pwmServo.MaxValue - pwmServo.MinValue) / 2,
+                        I2cAdress = pwmServo.I2cAdress,
+                        Channel = pwmServo.Channel,
+                        Acceleration = 0, // PWM servos have no acceleration
+                        Speed = 0, // PWM servos have no speed
+                        MaxTemperature = -1, // PWM servos have no max temperature
+                        MaxTorque = -1, // PWM servos have no max torque
+                        GlobalFault = false // PWM servos have no global fault
+                    };
                     break;
                 case StsFeetechServoConfig stsServo:
-                    servoExportType = ServoExportTypes.STS_SERVO;
-                    channel = stsServo.Channel;
-                    defaultValue = stsServo.DefaultValue ?? stsServo.MinValue + (stsServo.MaxValue - stsServo.MinValue) / 2;
-                    acceleration = stsServo.Acceleration ?? 0;
-                    speed = stsServo.Speed ?? 0;
-                    maxTemperature = (int)stsServo.MaxTemp;
-                    maxTorque = (int)stsServo.MaxTorque;
+                    exportModel = new ServoExportModel
+                    {
+                        Id = stsServo.Id,
+                        ServoExportType = ServoExportModel.ServoExportTypes.STS_SERVO,
+                        Title = stsServo.Title,
+                        DefaultValue = stsServo.DefaultValue ?? stsServo.MinValue + (stsServo.MaxValue - stsServo.MinValue) / 2,
+                        I2cAdress = 0, // STS servos have no I2C address
+                        Channel = stsServo.Channel,
+                        Acceleration = stsServo.Acceleration ?? 0,
+                        Speed = stsServo.Speed ?? 0,
+                        MaxTemperature = (int)stsServo.MaxTemp,
+                        MaxTorque = (int)stsServo.MaxTorque,
+                        GlobalFault = stsServo.GlobalFault
+                    };
                     break;
                 case ScsFeetechServoConfig scsServo:
-                    servoExportType = ServoExportTypes.SCS_SERVO;
-                    channel = scsServo.Channel;
-                    defaultValue = scsServo.DefaultValue ?? scsServo.MinValue + (scsServo.MaxValue - scsServo.MinValue) / 2;
-                    acceleration = 0; // scs servos have no acceleration
-                    speed = scsServo.Speed ?? 0;
-                    maxTemperature = (int)scsServo.MaxTemp;
-                    maxTorque = (int)scsServo.MaxTorque;
+                    exportModel = new ServoExportModel
+                    {
+                        Id = scsServo.Id,
+                        ServoExportType = ServoExportModel.ServoExportTypes.SCS_SERVO,
+                        Title = scsServo.Title,
+                        DefaultValue = scsServo.DefaultValue ?? scsServo.MinValue + (scsServo.MaxValue - scsServo.MinValue) / 2,
+                        I2cAdress = 0, // SCS servos have no I2C address
+                        Channel = scsServo.Channel,
+                        Acceleration = 0, // SCS servos have no acceleration
+                        Speed = scsServo.Speed ?? 0,
+                        MaxTemperature = (int)scsServo.MaxTemp,
+                        MaxTorque = (int)scsServo.MaxTorque,
+                        GlobalFault = scsServo.GlobalFault
+                    };
                     break;
                 default:
                     throw new NotSupportedException($"Exporting servo of type {servoConfig.GetType().FullName} is not supported.");
             }
+            if (exportModel == null)
+                throw new InvalidOperationException($"Exporting servo of type {servoConfig.GetType().FullName} failed because the export model could not be created.");
+
 
             result.Append($"\t\t{_servoListName}->addServo(Servo(\"{id}\", new ServoConfig(");
-            result.Append($"ServoConfig::ServoTypes::{servoExportType.ToString()}, "); // the servo type
+            result.Append($"ServoConfig::ServoTypes::{exportModel.ServoExportType.ToString()}, "); // the servo type
             result.Append($"\"{servoConfig.Title}\", "); // the servo title
-            result.Append($"{channel}, "); // chanel for e.g. PWM servo or bus ID for bus servo
-            result.Append($"{i2cAdress}, "); // I2C adress if supported when e.g. PWM servo
+            result.Append($"{exportModel.Channel}, "); // chanel for e.g. PWM servo or bus ID for bus servo
+            result.Append($"{exportModel.I2cAdress}, "); // I2C adress if supported when e.g. PWM servo
             result.Append($"{servoConfig.MinValue}, ");
             result.Append($"{servoConfig.MaxValue}, ");
-            result.Append($"{maxTemperature}, "); // max temperature if supported
-            result.Append($"{maxTorque}, "); // max torque if supported
-            result.Append($"{defaultValue}, ");
-            result.Append($"{acceleration}, "); // default acceleration
-            result.Append($"{speed}, "); // default speed
-            result.Append($"{globalFault.ToString().ToLower()}, ");
+            result.Append($"{exportModel.MaxTemperature}, "); // max temperature if supported
+            result.Append($"{exportModel.MaxTorque}, "); // max torque if supported
+            result.Append($"{exportModel.DefaultValue}, ");
+            result.Append($"{exportModel.Acceleration}, "); // default acceleration
+            result.Append($"{exportModel.Speed}, "); // default speed
+            result.Append($"{exportModel.GlobalFault.ToString().ToLower()}, ");
             result.Append($"{relaxRangesName}"); // relax ranges 
             result.AppendLine(")));");
 

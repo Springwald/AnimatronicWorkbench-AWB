@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
@@ -33,6 +33,10 @@ namespace Awb.Core.Project.Servos
         [Display(Name = "Global fault", GroupName = "General", Order = 4)]
         [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
         public bool GlobalFault { get; set; }
+
+        [Display(Name = "Wheel mode", GroupName = "General", Order = 5)]
+        [Description("Should this servo operate in wheel mode instead of position mode?")]
+        public bool WheelMode { get; set; } = false;
 
         /// <summary>
         /// The companion property for the RelaxRangesAsString property.

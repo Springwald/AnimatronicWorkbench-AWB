@@ -7,6 +7,7 @@
 
 
 using Awb.Core.Export.ExporterParts.ExportData;
+using Awb.Core.Export.ExporterParts.Servos;
 using Awb.Core.Project.Various;
 using Awb.Core.Timelines;
 using Awb.Core.Timelines.Sounds;
