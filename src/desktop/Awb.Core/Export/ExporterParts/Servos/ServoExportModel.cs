@@ -30,5 +30,6 @@ namespace Awb.Core.Export.ExporterParts.Servos
         public required int MaxTorque { get; set; }
         public ServoExportTypes ServoExportType { get; set; }
         public required bool GlobalFault { get; set; }
+        public required bool WheelMode { get; set; }
     }
 }

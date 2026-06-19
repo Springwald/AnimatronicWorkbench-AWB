@@ -33,6 +33,7 @@ public:
     int defaultAcceleration; /// the acceleration of the servo
     int defaultSpeed;        /// the speed of the servo
     bool globalFault;        /// if this servo is to hot or overloaded, should all servos stop?
+    bool wheelMode;          /// if the servo is in wheel mode (only for SCS / STS servos)
 
     std::vector<RelaxRange> *relaxRanges; // the relax ranges of the servo
 
@@ -49,6 +50,7 @@ public:
         int defaultAcceleration,
         int defaultSpeed,
         bool globalFault,
+        bool wheelMode,
         std::vector<RelaxRange> *relaxRanges)
 
         : type(servoType),
@@ -63,6 +65,7 @@ public:
           defaultAcceleration(defaultAcceleration),
           defaultSpeed(defaultSpeed),
           globalFault(globalFault),
+          wheelMode(wheelMode),
           relaxRanges(relaxRanges)
     {
     }

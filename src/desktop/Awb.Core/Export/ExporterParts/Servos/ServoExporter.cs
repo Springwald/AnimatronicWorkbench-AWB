@@ -91,7 +91,8 @@ namespace Awb.Core.Export.ExporterParts.Servos
                         Speed = 0, // PWM servos have no speed
                         MaxTemperature = -1, // PWM servos have no max temperature
                         MaxTorque = -1, // PWM servos have no max torque
-                        GlobalFault = false // PWM servos have no global fault
+                        GlobalFault = false, // PWM servos have no global fault,
+                        WheelMode = false // PWM servos have no wheel mode
                     };
                     break;
                 case StsFeetechServoConfig stsServo:
@@ -107,7 +108,8 @@ namespace Awb.Core.Export.ExporterParts.Servos
                         Speed = stsServo.Speed ?? 0,
                         MaxTemperature = (int)stsServo.MaxTemp,
                         MaxTorque = (int)stsServo.MaxTorque,
-                        GlobalFault = stsServo.GlobalFault
+                        GlobalFault = stsServo.GlobalFault,
+                        WheelMode = stsServo.WheelMode
                     };
                     break;
                 case ScsFeetechServoConfig scsServo:
@@ -123,7 +125,8 @@ namespace Awb.Core.Export.ExporterParts.Servos
                         Speed = scsServo.Speed ?? 0,
                         MaxTemperature = (int)scsServo.MaxTemp,
                         MaxTorque = (int)scsServo.MaxTorque,
-                        GlobalFault = scsServo.GlobalFault
+                        GlobalFault = scsServo.GlobalFault,
+                        WheelMode = scsServo.WheelMode
                     };
                     break;
                 default:
@@ -146,6 +149,7 @@ namespace Awb.Core.Export.ExporterParts.Servos
             result.Append($"{exportModel.Acceleration}, "); // default acceleration
             result.Append($"{exportModel.Speed}, "); // default speed
             result.Append($"{exportModel.GlobalFault.ToString().ToLower()}, "); // global fault if supported
+            result.Append($"{exportModel.WheelMode.ToString().ToLower()}, "); // wheel mode if supported
             result.Append($"{relaxRangesName}"); // relax ranges 
             result.AppendLine(")));");
 
