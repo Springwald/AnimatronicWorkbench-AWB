@@ -1,9 +1,9 @@
-﻿// Animatronic WorkBench core routines
+﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2024 Daniel Springwald  - 44789 Bochum, Germany
-// https://daniel.springwald.de - daniel@springwald.de
-// All rights reserved   -  Licensed under MIT License
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
+// https://daniel.springwald.de - segfault@springwald.de
+// All rights reserved    -   Licensed under MIT License
 
 using Awb.Core.Project.Servos;
 using Awb.Core.Tools;
@@ -11,7 +11,7 @@ using Awb.Core.Tools;
 namespace Awb.Core.Actuators
 {
     /// <summary>
-    /// A STS serial servo motor e.g. from the manufacturer "Wavewshare" or "Feebtech" 
+    /// A STS or SCS serial servo motor e.g. from the manufacturer "Wavewshare" or "Feetech" 
     /// </summary>
     public class StsScsServo : IServo
     {
@@ -25,6 +25,7 @@ namespace Awb.Core.Actuators
         /// The requested target value of this servo
         /// </summary>
         private int _targetValue;
+        private bool _wheelMode;
 
         public StsScsTypes StsScsType { get; private set; }
 
@@ -47,6 +48,19 @@ namespace Awb.Core.Actuators
         /// The channel of the servo, mostly starting with 1 instead of 0
         /// </summary>
         public uint Channel { get; private set; }
+
+        public bool WheelMode
+        {
+            get => _wheelMode;
+            set
+            {
+                if (value != _wheelMode)
+                {
+                    _wheelMode = value;
+                    IsDirty = true;
+                }
+            }
+        }
 
         /// <summary>
         /// The maximum value this servo should handle in the constructred animatronic figure
@@ -122,6 +136,7 @@ namespace Awb.Core.Actuators
             Acceleration = acc;
             ClientId = config.ClientId;
             Channel = config.Channel;
+            WheelMode = config.WheelMode;
             Title = config.Title;
             DefaultValue = defaultValue;
             TargetValue = defaultValue;

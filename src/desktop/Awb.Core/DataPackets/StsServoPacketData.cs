@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
@@ -22,6 +22,9 @@ namespace Awb.Core.DataPackets
 
         [JsonPropertyName("Speed")]
         public required int Speed { get; set; }
+
+        [JsonPropertyName("WheelMode")]
+        public required bool WheelMode { get; set; }
 
         [JsonPropertyName("Acc")]
         public int Acc { get; set; }
