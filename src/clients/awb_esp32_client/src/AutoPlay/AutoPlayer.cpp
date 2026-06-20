@@ -180,18 +180,34 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     {
         for (int servoIndex = 0; servoIndex < _data->servos->allServos->size(); servoIndex++)
         {
-            if (_data->servos->allServos->at(servoIndex).config->type != ServoConfig::ServoTypes::SCS_SERVO)
+            auto scServo = _data->servos->allServos->at(servoIndex);
+
+            if (scServo.config->type != ServoConfig::ServoTypes::SCS_SERVO)
                 continue;
-            String servoId = _data->servos->allServos->at(servoIndex).id;
-            u8 servoChannel = _data->servos->allServos->at(servoIndex).config->channel;
-            int servoSpeed = _data->servos->allServos->at(servoIndex).config->defaultSpeed;
-            int servoAccelleration = _data->servos->allServos->at(servoIndex).config->defaultAcceleration;
+
+            String servoId = scServo.id;
+            u8 servoChannel = scServo.config->channel;
+            int servoSpeed = scServo.config->defaultSpeed;
+            int servoAccelleration = scServo.config->defaultAcceleration;
 
             int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
             if (targetValue == -1)
                 continue;
 
-            _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
+            if (scServo.config->wheelMode != scServo.state->isWheelModeActive) // wheelmode changed
+            {
+                _scSerialServoManager->setWheelMode(servoChannel, wheelMode);
+                scServo.state->isWheelModeActive = wheelMode;
+            }
+
+            if (scServo.config->wheelMode == true)
+            {
+            }
+            else
+            {
+                // no wheel mode
+                _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
+            }
         }
         _scSerialServoManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
     }
