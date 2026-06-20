@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
@@ -34,7 +34,7 @@ namespace Awb.Core.Export.ExporterParts
 
                 if (state.Export == false) continue;
 
-                result.AppendLine($"\t\tauto *servoPoints{timelineNo} = new std::vector<ServoPoint>();");
+                result.AppendLine($"auto *servoPoints{timelineNo} = new std::vector<ServoPoint>();");
                 result.AppendLine($"\t\tauto *mp3PlayerYX5300Points{timelineNo} = new std::vector<Mp3PlayerYX5300Point>();");
                 result.AppendLine($"\t\tauto *mp3PlayerDfPlayerMiniPoints{timelineNo} = new std::vector<Mp3PlayerDfPlayerMiniPoint>();");
 
@@ -48,7 +48,7 @@ namespace Awb.Core.Export.ExporterParts
                     if (stsServo != null)
                     {
                         var value = (int)(stsServo.MinValue + servoPoint.ValuePercent * (stsServo.MaxValue - stsServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back(ServoPoint({ServoExporter.ServoExportLine(stsServo, servoPoint.TimeMs,value)});");
+                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back({ServoExporter.ServoPointInstanceExport(stsServo, servoPoint.TimeMs, value)});");
                         continue;
                     }
 
@@ -57,7 +57,7 @@ namespace Awb.Core.Export.ExporterParts
                     if (scsServo != null)
                     {
                         var value = (int)(scsServo.MinValue + servoPoint.ValuePercent * (scsServo.MaxValue - scsServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back(ServoPoint({ServoExporter.ServoExportLine(scsServo, servoPoint.TimeMs, value)}));");
+                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back({ServoExporter.ServoPointInstanceExport(scsServo, servoPoint.TimeMs, value)});");
                         continue;
                     }
 
@@ -66,7 +66,7 @@ namespace Awb.Core.Export.ExporterParts
                     if (pwmServo != null)
                     {
                         var value = (int)(pwmServo.MinValue + servoPoint.ValuePercent * (pwmServo.MaxValue - pwmServo.MinValue) / 100.0);
-                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back(ServoPoint({ServoExporter.ServoExportLine(pwmServo, servoPoint.TimeMs, value)}));");
+                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back({ServoExporter.ServoPointInstanceExport(pwmServo, servoPoint.TimeMs, value)});");
                         continue;
                     }
 

@@ -16,14 +16,14 @@ namespace Awb.Core.Export.ExporterParts.Servos
     {
         private readonly string _servoListName;
 
-
+        private int _servoExportIndex = 0;
 
         public ServoExporter(string servoListName)
         {
             _servoListName = servoListName;
         }
 
-        public static string ServoExportLine(IDeviceConfig servoConfig, int milliSeconds, int value)
+        public static string ServoPointInstanceExport(IDeviceConfig servoConfig, int milliSeconds, int value)
             => $"ServoPoint(\"{servoConfig.Id}\", {milliSeconds}, {value})";
 
         /// <summary>
@@ -33,13 +33,11 @@ namespace Awb.Core.Export.ExporterParts.Servos
         {
             var result = new StringBuilder();
             //result.AppendLine($"\t\t\t\t{_servoListName} = new std::vector<Servo*>();");
-
-            int servoIndex = 0;
             foreach (var servoConfig in servoConfigs)
             {
-                var servoExport = ExportServo(servoConfig, $"servo_{servoIndex:000}");
-                result.AppendLine(servoExport);
-                servoIndex++;
+                var servoExport = ExportServo(servoConfig, $"servo_{_servoExportIndex:000}");
+                result.Append(servoExport);
+                _servoExportIndex++;
             }
             return result.ToString();
         }
@@ -65,13 +63,13 @@ namespace Awb.Core.Export.ExporterParts.Servos
             var relaxRangesName = $"{servoVariableName}_relaxRanges";
             if (servoConfig is ISupportsRelaxRanges relaxRangeObject)
             {
-                result.AppendLine($"\t\tstd::vector<RelaxRange> *{relaxRangesName} = new std::vector<RelaxRange>();");
+                result.AppendLine($"std::vector<RelaxRange> *{relaxRangesName} = new std::vector<RelaxRange>();");
                 foreach (var relaxRangeLine in ExportRelaxRanges(relaxRangeObject: relaxRangeObject, listName: relaxRangesName))
                     result.AppendLine(relaxRangeLine);
             }
             else
             {
-                result.AppendLine($"\t\tstd::vector<RelaxRange> *{relaxRangesName} = nullptr;");
+                result.AppendLine($"std::vector<RelaxRange> *{relaxRangesName} = nullptr;");
             }
 
             ServoExportModel? exportModel = null;
