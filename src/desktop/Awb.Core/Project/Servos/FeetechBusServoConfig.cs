@@ -34,9 +34,6 @@ namespace Awb.Core.Project.Servos
         [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
         public bool GlobalFault { get; set; }
 
-        [Display(Name = "Wheel mode", GroupName = "General", Order = 5)]
-        [Description("Should this servo operate in wheel mode instead of position mode?")]
-        public bool WheelMode { get; set; } = false;
 
         /// <summary>
         /// The companion property for the RelaxRangesAsString property.

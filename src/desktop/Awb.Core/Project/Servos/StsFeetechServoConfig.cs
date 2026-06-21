@@ -39,6 +39,11 @@ namespace Awb.Core.Project.Servos
         [Range(0, MaxAccConst)]
         public int? Acceleration { get; set; } = 100;
 
+        [Display(Name = "Wheel mode", GroupName = "General", Order = 5)]
+        [Description("Should this servo operate in wheel mode instead of position mode?")]
+        public bool WheelMode { get; set; } = false;
+
+
         public override IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)
         {
             foreach (var item in GetBaseProblems(project)) yield return item;

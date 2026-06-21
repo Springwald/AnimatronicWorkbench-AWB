@@ -80,7 +80,7 @@ namespace Awb.Core.DataPackets
                                 new StsServoPacketData
                                 {
                                     Channel = scsFeetechServoConfig.Channel,
-                                    WheelMode = scsFeetechServoConfig.WheelMode,
+                                    WheelMode = false,
                                     TargetValue = absolutePos,
                                     Name = string.IsNullOrWhiteSpace(scsFeetechServoConfig.Title) ? $"SCS{scsFeetechServoConfig.Channel}" : scsFeetechServoConfig.Title,
                                     Speed = scsFeetechServoConfig.Speed.HasValue ? scsFeetechServoConfig.Speed.Value : 0,

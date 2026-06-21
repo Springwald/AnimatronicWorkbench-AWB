@@ -124,7 +124,7 @@ namespace Awb.Core.Export.ExporterParts.Servos
                         MaxTemperature = (int)scsServo.MaxTemp,
                         MaxTorque = (int)scsServo.MaxTorque,
                         GlobalFault = scsServo.GlobalFault,
-                        WheelMode = scsServo.WheelMode
+                        WheelMode = false // SCS servos have no wheel mode
                     };
                     break;
                 default:

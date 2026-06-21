@@ -126,7 +126,10 @@ namespace Awb.Core.Actuators
 
             var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
 
-            var acc = config is StsFeetechServoConfig stsFeetechServoConfig ? stsFeetechServoConfig.Acceleration : null;
+            StsFeetechServoConfig? stsFeetechServoConfig = config as StsFeetechServoConfig;
+
+            var acc = stsFeetechServoConfig?.Acceleration;
+            var wheelMode = stsFeetechServoConfig?.WheelMode ?? false;
 
             Id = config.Id;
             StsScsType = type;
@@ -136,7 +139,7 @@ namespace Awb.Core.Actuators
             Acceleration = acc;
             ClientId = config.ClientId;
             Channel = config.Channel;
-            WheelMode = config.WheelMode;
+            WheelMode = wheelMode;
             Title = config.Title;
             DefaultValue = defaultValue;
             TargetValue = defaultValue;
