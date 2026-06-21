@@ -14,15 +14,15 @@ public:
 
     bool isFault = false; /// if this servo is to hot or overloaded
 
-    int temperature = -1;           /// the temperature of the actuator
-    int load = -1;                  /// the actual read load of the actuator
-    int maxLoad = -1;               /// the maximum read load of the actuator
-    int minLoad = -1;               /// the minimum read load of the actuator
-    int currentValue = -1;          /// the current value of the actuator (updated in the last update cycle)
-    long isFaultCountDownMs = 0;    /// the time in milliseconds when the fault will be cleared
-    long lastFaultMs = 0;           /// the time in milliseconds when the fault was detected
-    bool isWheelModeActive = false; /// if the servo is in wheel mode, so it can rotate infinitely in both directions
-    String lastFaultMessage = "";   /// the message of the last fault
+    int temperature = -1;         /// the temperature of the actuator
+    int load = -1;                /// the actual read load of the actuator
+    int maxLoad = -1;             /// the maximum read load of the actuator
+    int minLoad = -1;             /// the minimum read load of the actuator
+    int currentValue = -1;        /// the current value of the actuator (updated in the last update cycle)
+    long isFaultCountDownMs = 0;  /// the time in milliseconds when the fault will be cleared
+    long lastFaultMs = 0;         /// the time in milliseconds when the fault was detected
+    bool wheelModeActive = false; /// if the servo is in wheel mode, so it can rotate infinitely in both directions
+    String lastFaultMessage = ""; /// the message of the last fault
 };
 
 #endif

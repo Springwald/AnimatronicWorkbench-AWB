@@ -157,12 +157,15 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     {
         for (int servoIndex = 0; servoIndex < _data->servos->allServos->size(); servoIndex++)
         {
-            if (_data->servos->allServos->at(servoIndex).config->type != ServoConfig::ServoTypes::STS_SERVO)
+            auto stServo = _data->servos->allServos->at(servoIndex);
+
+            if (stServo.config->type != ServoConfig::ServoTypes::STS_SERVO)
                 continue;
-            String servoId = _data->servos->allServos->at(servoIndex).id;
-            u8 servoChannel = _data->servos->allServos->at(servoIndex).config->channel;
-            int servoSpeed = _data->servos->allServos->at(servoIndex).config->defaultSpeed;
-            int servoAccelleration = _data->servos->allServos->at(servoIndex).config->defaultAcceleration;
+
+            String servoId = stServo.id;
+            u8 servoChannel = stServo.config->channel;
+            int servoSpeed = stServo.config->defaultSpeed;
+            int servoAccelleration = stServo.config->defaultAcceleration;
 
             int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
             if (targetValue == -1)
@@ -194,20 +197,10 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
             if (targetValue == -1)
                 continue;
 
-            if (scServo.config->wheelMode != scServo.state->isWheelModeActive) // wheelmode changed
-            {
-                _scSerialServoManager->setWheelMode(servoChannel, wheelMode);
-                scServo.state->isWheelModeActive = wheelMode;
-            }
-
             if (scServo.config->wheelMode == true)
-            {
-            }
-            else
-            {
-                // no wheel mode
-                _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
-            }
+                continue; // scs servos don't support wheel mode
+
+            _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
         _scSerialServoManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
     }
@@ -219,12 +212,13 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     {
         for (int servoIndex = 0; servoIndex < _data->servos->allServos->size(); servoIndex++)
         {
-            if (_data->servos->allServos->at(servoIndex).config->type != ServoConfig::ServoTypes::PWM_SERVO)
+            auto pwmServo = _data->servos->allServos->at(servoIndex);
+            if (pwmServo.config->type != ServoConfig::ServoTypes::PWM_SERVO)
                 continue;
 
-            String servoId = _data->servos->allServos->at(servoIndex).id;
-            int servoChannel = _data->servos->allServos->at(servoIndex).config->channel;
-            auto servoName = _data->servos->allServos->at(servoIndex).title;
+            String servoId = pwmServo.id;
+            int servoChannel = pwmServo.config->channel;
+            auto servoName = pwmServo.title;
 
             int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
             if (targetValue == -1)

@@ -25,6 +25,7 @@ public:
         this->state->targetValue = this->config->defaultValue;
         this->state->targetSpeed = this->config->defaultSpeed;
         this->state->targetAcc = this->config->defaultAcceleration;
+        this->state->wheelModeActive = false; // wheel mode has to be send to the servo with the first update, so we set it to false here and then apply the wheel mode in the first update cycle
     }
 
     ~Servo()
