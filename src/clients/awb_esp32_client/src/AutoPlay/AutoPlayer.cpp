@@ -221,55 +221,15 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
         {
             if (_data->servos->allServos->at(servoIndex).config->type != ServoConfig::ServoTypes::PWM_SERVO)
                 continue;
+
             String servoId = _data->servos->allServos->at(servoIndex).id;
             int servoChannel = _data->servos->allServos->at(servoIndex).config->channel;
             auto servoName = _data->servos->allServos->at(servoIndex).title;
 
-            ServoPoint *point1 = nullptr;
-            ServoPoint *point2 = nullptr;
+            int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
+            if (targetValue == -1)
+                continue;
 
-            for (int iPoint = 0; iPoint < actualTimelineData.servoPoints->size(); iPoint++)
-            {
-                ServoPoint *point = &actualTimelineData.servoPoints->at(iPoint);
-                if (point->servoId == servoId)
-                {
-                    if (point->ms <= _playPosInActualTimeline)
-                        point1 = point;
-
-                    if (point->ms >= _playPosInActualTimeline)
-                    {
-                        point2 = point;
-                        break;
-                    }
-                }
-            }
-
-            if (point1 == nullptr && point2 == nullptr)
-                continue; // no points found for this object before or after the actual position
-
-            if (point1 == nullptr)
-            {
-                if (fillUpStart)
-                    point1 = point2; // no point before the actual position found, so we take the first point after the actual position
-                else
-                    continue; // no start point found
-            }
-            else if (point2 == nullptr)
-            {
-                point2 = point1; // no point after the actual position found, so we take the last point before the actual position
-            }
-
-            int pointDistanceMs = point2->ms - point1->ms;
-            int targetValue = 0;
-            if (pointDistanceMs == 0)
-            {
-                targetValue = point1->value;
-            }
-            else
-            {
-                double posBetweenPoints = (_playPosInActualTimeline - point1->ms * 1.0) / pointDistanceMs;
-                targetValue = point1->value + (point2->value - point1->value) * posBetweenPoints;
-            }
             _pca9685PwmManager->setTargetValue(servoChannel, targetValue, servoName);
         }
         _pca9685PwmManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
