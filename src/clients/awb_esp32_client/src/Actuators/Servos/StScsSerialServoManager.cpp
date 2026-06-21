@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #include "StScsSerialServoManager.h"
 #include "AwbDataImport/HardwareConfig.h"
@@ -54,6 +53,27 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
             continue;
         }
 
+        if (servo->config->wheelMode == true)
+        {
+            if (servo->config->type == ServoConfig::ServoTypes::STS_SERVO)
+            {
+                // ST servos support wheel mode, so we can set it here if not already done
+                if (servo->state->wheelModeActive == false)
+                {
+                    // set wheel mode on the servo if not already done
+                    _serialServo_STS.WheelMode(servo->config->channel);
+                    servo->state->wheelModeActive = true;
+                }
+                _serialServo_STS.WriteSpe(servo->config->channel, servo->state->targetValue, servo->state->targetAcc);
+            }
+            else
+            {
+                // no wheel mode supported for SCS servos, so we just ignore it here
+                // todo: show error if wheel mode is used with scs servos in the timeline
+                continue;
+            }
+        }
+
         if (servo->state->targetValue == -1)
         {
             // turn servo off
@@ -61,11 +81,9 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
         }
         else
         {
-
             // set new target value if changed
             if (servo->state->currentValue != servo->state->targetValue)
             {
-
                 int speed = servo->state->targetSpeed;
                 int acc = servo->state->targetAcc;
                 if (speed == -1 && acc == -1)

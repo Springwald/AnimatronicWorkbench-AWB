@@ -188,6 +188,9 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
             if (scServo.config->type != ServoConfig::ServoTypes::SCS_SERVO)
                 continue;
 
+            if (scServo.config->wheelMode == true)
+                continue; // scs servos don't support wheel mode //todo: show error if wheel mode is used with scs servos in the timeline
+
             String servoId = scServo.id;
             u8 servoChannel = scServo.config->channel;
             int servoSpeed = scServo.config->defaultSpeed;
@@ -196,9 +199,6 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
             int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
             if (targetValue == -1)
                 continue;
-
-            if (scServo.config->wheelMode == true)
-                continue; // scs servos don't support wheel mode
 
             _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
         }
