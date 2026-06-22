@@ -155,13 +155,13 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
     // Update the sero values for the actual timeline
     for (int servoIndex = 0; servoIndex < _data->servos->allServos->size(); servoIndex++)
     {
-        auto servo = _data->servos->allServos->at(servoIndex);
+        Servo *servo = &_data->servos->allServos->at(servoIndex);
 
-        int targetValue = this->calculateServoValueFromTimeline(servo.id, actualTimelineData.servoPoints);
+        int targetValue = this->calculateServoValueFromTimeline(servo->id, actualTimelineData.servoPoints);
         if (targetValue == -1)
             continue;
 
-        servo.state->targetValue = targetValue; // set servo target value
+        servo->state->targetValue = targetValue; // set servo target value
     }
 
     if (_stSerialServoManager != nullptr)
