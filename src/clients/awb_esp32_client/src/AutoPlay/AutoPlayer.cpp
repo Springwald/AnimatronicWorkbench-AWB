@@ -152,82 +152,26 @@ void AutoPlayer::update(bool anyServoWithGlobalFaultHasCiriticalState)
 
     _debugging->setState(Debugging::MJ_AUTOPLAY, 25);
 
-    // Play STS Servos
+    // Update the sero values for the actual timeline
+    for (int servoIndex = 0; servoIndex < _data->servos->allServos->size(); servoIndex++)
+    {
+        auto servo = _data->servos->allServos->at(servoIndex);
+
+        int targetValue = this->calculateServoValueFromTimeline(servo.id, actualTimelineData.servoPoints);
+        if (targetValue == -1)
+            continue;
+
+        servo.state->targetValue = targetValue; // set servo target value
+    }
+
     if (_stSerialServoManager != nullptr)
-    {
-        for (int servoIndex = 0; servoIndex < _data->servos->allServos->size(); servoIndex++)
-        {
-            auto stServo = _data->servos->allServos->at(servoIndex);
-
-            if (stServo.config->type != ServoConfig::ServoTypes::STS_SERVO)
-                continue;
-
-            String servoId = stServo.id;
-            u8 servoChannel = stServo.config->channel;
-            int servoSpeed = stServo.config->defaultSpeed;
-            int servoAccelleration = stServo.config->defaultAcceleration;
-
-            int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
-            if (targetValue == -1)
-                continue;
-
-            _stSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
-        }
         _stSerialServoManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
-    }
 
-    _debugging->setState(Debugging::MJ_AUTOPLAY, 30);
-
-    // Play SCS Servos
     if (_scSerialServoManager != nullptr)
-    {
-        for (int servoIndex = 0; servoIndex < _data->servos->allServos->size(); servoIndex++)
-        {
-            auto scServo = _data->servos->allServos->at(servoIndex);
-
-            if (scServo.config->type != ServoConfig::ServoTypes::SCS_SERVO)
-                continue;
-
-            if (scServo.config->wheelMode == true)
-                continue; // scs servos don't support wheel mode //todo: show error if wheel mode is used with scs servos in the timeline
-
-            String servoId = scServo.id;
-            u8 servoChannel = scServo.config->channel;
-            int servoSpeed = scServo.config->defaultSpeed;
-            int servoAccelleration = scServo.config->defaultAcceleration;
-
-            int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
-            if (targetValue == -1)
-                continue;
-
-            _scSerialServoManager->writePositionDetailed(servoChannel, targetValue, servoSpeed, servoAccelleration);
-        }
         _scSerialServoManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
-    }
 
-    _debugging->setState(Debugging::MJ_AUTOPLAY, 35);
-
-    // Play PWM Servos
     if (_pca9685PwmManager != nullptr)
-    {
-        for (int servoIndex = 0; servoIndex < _data->servos->allServos->size(); servoIndex++)
-        {
-            auto pwmServo = _data->servos->allServos->at(servoIndex);
-            if (pwmServo.config->type != ServoConfig::ServoTypes::PWM_SERVO)
-                continue;
-
-            String servoId = pwmServo.id;
-            int servoChannel = pwmServo.config->channel;
-            auto servoName = pwmServo.title;
-
-            int targetValue = this->calculateServoValueFromTimeline(servoId, actualTimelineData.servoPoints);
-            if (targetValue == -1)
-                continue;
-
-            _pca9685PwmManager->setTargetValue(servoChannel, targetValue, servoName);
-        }
         _pca9685PwmManager->updateActuators(anyServoWithGlobalFaultHasCiriticalState);
-    }
 
     _debugging->setState(Debugging::MJ_AUTOPLAY, 40);
 
