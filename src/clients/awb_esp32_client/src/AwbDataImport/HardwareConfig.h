@@ -18,5 +18,10 @@
 #define SCS_SERVO_RXD 18
 #define SCS_SERVO_TXD 19
 
+/* Neopixel RGB LEDs */
+#define USE_NEOPIXEL
+#define NEOPIXEL_GPIO 26
+#define NEOPIXEL_COUNT 2
+
 
 #endif

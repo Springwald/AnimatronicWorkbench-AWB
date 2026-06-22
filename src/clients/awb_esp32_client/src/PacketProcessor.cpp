@@ -155,6 +155,7 @@ String PacketProcessor::processPacket(String payload)
             int value = servos[i]["TVal"];
             int speed = servos[i]["Speed"];
             int acc = servos[i]["Acc"];
+            bool wheelMode = servos[i]["WheelMode"];
             String name = servos[i]["Name"];
 
             if (sendServoUpdateDirectly)
@@ -165,6 +166,15 @@ String PacketProcessor::processPacket(String payload)
                 else
                 {
                     this->_stSerialServoManager->setTorque(channel, true);
+                    if (wheelMode)
+                    {
+                        this->_stSerialServoManager->writeWheelModeDirectToHardware(channel, value, acc);
+                    }
+                    else
+                    {
+                        // if not in wheel mode, we use the position control with default speed and acc from the project data
+                        this->_stSerialServoManager->writePositionDirectToHardware(channel, value, -1, -1);
+                    }
                     this->_stSerialServoManager->writePositionDirectToHardware(channel, value, speed, acc);
                 }
             }
@@ -174,11 +184,13 @@ String PacketProcessor::processPacket(String payload)
                 bool done = false;
                 for (int f = 0; f < this->_projectData->servos->allServos->size(); f++)
                 {
-                    if (this->_projectData->servos->allServos->at(f).config->type == ServoConfig::ServoTypes::STS_SERVO)
-                        if (this->_projectData->servos->allServos->at(f).config->channel == channel)
+                    Servo *servo = &this->_projectData->servos->allServos->at(f);
+                    if (servo->config->type == ServoConfig::ServoTypes::STS_SERVO)
+                        if (servo->config->channel == channel)
                         {
                             // set servo target value
-                            this->_projectData->servos->allServos->at(f).state->targetValue = value;
+                            servo->state->targetValue = value;
+                            servo->config->wheelMode = wheelMode;
                             done = true;
                             break;
                         }

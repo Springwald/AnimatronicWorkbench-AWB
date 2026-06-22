@@ -73,50 +73,53 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
                 continue;
             }
         }
-
-        if (servo->state->targetValue == -1)
-        {
-            // turn servo off
-            setTorque(servo->config->channel, false);
-        }
         else
         {
-            // set new target value if changed
-            if (servo->state->currentValue != servo->state->targetValue)
+
+            if (servo->state->targetValue == -1)
             {
-                int speed = servo->state->targetSpeed;
-                int acc = servo->state->targetAcc;
-                if (speed == -1 && acc == -1)
+                // turn servo off
+                setTorque(servo->config->channel, false);
+            }
+            else
+            {
+                // set new target value if changed
+                if (servo->state->currentValue != servo->state->targetValue)
                 {
-                    if (this->_servoTypeIsScs)
+                    int speed = servo->state->targetSpeed;
+                    int acc = servo->state->targetAcc;
+                    if (speed == -1 && acc == -1)
                     {
-                        _serialServo_SCS.WritePosEx(servo->config->channel, servo->state->targetValue, servo->config->defaultSpeed, servo->config->defaultAcceleration);
+                        if (this->_servoTypeIsScs)
+                        {
+                            _serialServo_SCS.WritePosEx(servo->config->channel, servo->state->targetValue, servo->config->defaultSpeed, servo->config->defaultAcceleration);
+                        }
+                        else
+                        {
+                            _serialServo_STS.WritePosEx(servo->config->channel, servo->state->targetValue, servo->config->defaultSpeed, servo->config->defaultAcceleration);
+                        }
                     }
                     else
                     {
-                        _serialServo_STS.WritePosEx(servo->config->channel, servo->state->targetValue, servo->config->defaultSpeed, servo->config->defaultAcceleration);
+                        if (this->_servoTypeIsScs)
+                        {
+                            if (speed == -1)
+                                speed = servo->config->defaultSpeed;
+                            if (acc == -1)
+                                acc = servo->config->defaultAcceleration;
+                            _serialServo_SCS.WritePosEx(servo->config->channel, servo->state->targetValue, speed, acc);
+                        }
+                        else
+                        {
+                            if (speed == -1)
+                                speed = servo->config->defaultSpeed;
+                            if (acc == -1)
+                                acc = servo->config->defaultAcceleration;
+                            _serialServo_STS.WritePosEx(servo->config->channel, servo->state->targetValue, speed, acc);
+                        }
                     }
+                    servo->state->currentValue = servo->state->targetValue;
                 }
-                else
-                {
-                    if (this->_servoTypeIsScs)
-                    {
-                        if (speed == -1)
-                            speed = servo->config->defaultSpeed;
-                        if (acc == -1)
-                            acc = servo->config->defaultAcceleration;
-                        _serialServo_SCS.WritePosEx(servo->config->channel, servo->state->targetValue, speed, acc);
-                    }
-                    else
-                    {
-                        if (speed == -1)
-                            speed = servo->config->defaultSpeed;
-                        if (acc == -1)
-                            acc = servo->config->defaultAcceleration;
-                        _serialServo_STS.WritePosEx(servo->config->channel, servo->state->targetValue, speed, acc);
-                    }
-                }
-                servo->state->currentValue = servo->state->targetValue;
             }
         }
     }
@@ -155,6 +158,18 @@ void StScsSerialServoManager::writePositionDirectToHardware(int id, int position
     {
         _serialServo_STS.WritePosEx(id, position, speed, acc);
     }
+}
+
+void StScsSerialServoManager::writeWheelModeDirectToHardware(int id, int speed, int acc)
+{
+    if (this->_servoTypeIsScs)
+    {
+        this->_errorOccured("Wheel mode is not supported for SCS servos! ID: " + String(id));
+        return; // wheel mode is not supported for SCS servos
+    }
+
+    _serialServo_STS.WheelMode(id);
+    _serialServo_STS.WriteSpe(id, speed, acc);
 }
 
 /**
