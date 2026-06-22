@@ -68,8 +68,8 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
             }
             else
             {
-                // no wheel mode supported for SCS servos, so we just ignore it here
-                // todo: show error if wheel mode is used with scs servos in the timeline
+                // no wheel mode supported for SCS servos
+                this->_errorOccured("Wheel mode is not supported for SCS servos! CH: " + String(servo->config->channel) + " / " + servo->config->title);
                 continue;
             }
         }
@@ -125,25 +125,25 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
 /**
  * write the position to the servo, including speed and acceleration
  */
-void StScsSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
-{
-    if (this->servoAvailable(id))
-    {
-        for (int i = 0; i < _servos->size(); i++)
-        {
-            if (_servos->at(i).config->channel == id)
-            {
-                _servos->at(i).state->targetValue = position;
-                _servos->at(i).state->targetSpeed = speed;
-                _servos->at(i).state->targetAcc = acc;
-            }
-        }
-    }
-    else
-    {
-        _errorOccured("STS Servo channel " + String(id) + " not attached!");
-    }
-}
+// void StScsSerialServoManager::writePositionDetailed(int id, int position, int speed, int acc)
+// {
+//     if (this->servoAvailable(id))
+//     {
+//         for (int i = 0; i < _servos->size(); i++)
+//         {
+//             if (_servos->at(i).config->channel == id)
+//             {
+//                 _servos->at(i).state->targetValue = position;
+//                 _servos->at(i).state->targetSpeed = speed;
+//                 _servos->at(i).state->targetAcc = acc;
+//             }
+//         }
+//     }
+//     else
+//     {
+//         _errorOccured("STS Servo channel " + String(id) + " not attached!");
+//     }
+// }
 
 void StScsSerialServoManager::writePositionDirectToHardware(int id, int position, int speed, int acc)
 {
@@ -160,16 +160,16 @@ void StScsSerialServoManager::writePositionDirectToHardware(int id, int position
 /**
  * write the position to the servo, using the default speed and acceleration
  */
-void StScsSerialServoManager::writePosition(int id, int position)
-{
-    for (int i = 0; i < _servos->size(); i++)
-    {
-        if (_servos->at(i).config->channel == id)
-        {
-            _servos->at(i).state->targetValue = position;
-        }
-    }
-}
+// void StScsSerialServoManager::writePosition(int id, int position)
+// {
+//     for (int i = 0; i < _servos->size(); i++)
+//     {
+//         if (_servos->at(i).config->channel == id)
+//         {
+//             _servos->at(i).state->targetValue = position;
+//         }
+//     }
+// }
 
 /**
  * read the actual position from the servo
@@ -233,26 +233,26 @@ int StScsSerialServoManager::readTemperature(int id)
 /**
  * is the servo available?
  */
-bool StScsSerialServoManager::servoAvailable(int id)
-{
-    for (int i = 0; i < servoIds->size(); i++)
-    {
-        if (servoIds->at(i) == id)
-        {
-            return true;
-        }
-    }
+// bool StScsSerialServoManager::servoAvailable(int id)
+// {
+//     for (int i = 0; i < servoIds->size(); i++)
+//     {
+//         if (servoIds->at(i) == id)
+//         {
+//             return true;
+//         }
+//     }
 
-    // not already found with scanIds(). Try to ping it directly.
-    // int scanId = _serialServo.Ping(id);
-    // if (scanId != -1)
-    // {
-    //     servoIds->push_back(scanId);
-    //     return true;
-    // }
+//     // not already found with scanIds(). Try to ping it directly.
+//     // int scanId = _serialServo.Ping(id);
+//     // if (scanId != -1)
+//     // {
+//     //     servoIds->push_back(scanId);
+//     //     return true;
+//     // }
 
-    return false;
-}
+//     return false;
+// }
 
 /**
  * scan for all available servo ids.

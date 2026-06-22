@@ -46,12 +46,12 @@ public:
     /**
      * write the position to the servo, including speed and acceleration
      */
-    void writePositionDetailed(int id, int position, int speed, int acc);
+    // void writePositionDetailed(int id, int position, int speed, int acc);
 
     /**
      * write the position to the servo, using the default speed and acceleration
      */
-    void writePosition(int id, int position);
+    // void writePosition(int id, int position);
 
     /**
      * write the position to the servo, using the given speed and acceleration, ignoring any settings in the project data.
@@ -83,7 +83,7 @@ public:
     /**
      * is the servo available?
      */
-    bool servoAvailable(int id);
+    // bool servoAvailable(int id);
 };
 
 #endif
