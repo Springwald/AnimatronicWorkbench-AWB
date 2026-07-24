@@ -161,21 +161,19 @@ String PacketProcessor::processPacket(String payload)
             if (sendServoUpdateDirectly)
             {
                 // send the value to the STS bus servo
-                if (value < 0) // -1 means stop the servo
-                    this->_stSerialServoManager->setTorque(channel, false);
-                else
+                if (wheelMode)
                 {
                     this->_stSerialServoManager->setTorque(channel, true);
-                    if (wheelMode)
-                    {
-                        this->_stSerialServoManager->writeWheelModeDirectToHardware(channel, value, acc);
-                    }
-                    else
-                    {
-                        // if not in wheel mode, we use the position control with default speed and acc from the project data
-                        this->_stSerialServoManager->writePositionDirectToHardware(channel, value, -1, -1);
-                    }
-                    this->_stSerialServoManager->writePositionDirectToHardware(channel, value, speed, acc);
+                    int speed = _stSerialServoManager->calculateWheelModeSpeed(value);
+                    this->_stSerialServoManager->writeWheelModeDirectToHardware(channel, speed, acc);
+                }
+                else
+                {
+                    if (value < 0) // -1 means stop the servo
+                        this->_stSerialServoManager->setTorque(channel, false);
+                    this->_stSerialServoManager->setTorque(channel, true);
+                    // if not in wheel mode, we use the position control with default speed and acc from the project data
+                    this->_stSerialServoManager->writePositionDirectToHardware(channel, value, -1, -1);
                 }
             }
             else

@@ -22,7 +22,7 @@
 // Created with Animatronic Workbench Studio
 // https://daniel.springwald.de/post/AWB/AnimatronicWorkbench
 
-// Created on 22.06.2026 19:29:34
+// Created on 24.07.2026 13:19:32
 
 class ProjectData
 {
@@ -31,14 +31,12 @@ class ProjectData
     using TCallBackErrorOccured = std::function<void(String)>;
 
     public:
-        const char *ProjectName = "AWB-Demo-Board";
+        const char *ProjectName = "MotorModeTest";
         const int returnToAutoModeAfterMinutes  = -1;
 
        /* Names as const to prevent magic strings in custom code: */
 
-   const String TimelineName_ ="";
-   const String ScsServoName_Servoleft ="Servo left";
-   const String ScsServoName_Servoright ="Servo right";
+   const String StsServoName_TestServo20 ="Test Servo 20";
 
 
 
@@ -59,12 +57,10 @@ class ProjectData
     {
         // the servos
         servos = new Servos();
-        std::vector<RelaxRange> *servo_000_relaxRanges = new std::vector<RelaxRange>();
-		servos->addServo(Servo("ScsServo-1", new ServoConfig(ServoConfig::ServoTypes::SCS_SERVO, "Servo left", 1, 0, 821, 230, 55, 400, 532, 0, 300, false, false, servo_000_relaxRanges)));
-std::vector<RelaxRange> *servo_001_relaxRanges = new std::vector<RelaxRange>();
-		servos->addServo(Servo("ScsServo-2", new ServoConfig(ServoConfig::ServoTypes::SCS_SERVO, "Servo right", 2, 0, 236, 822, 55, 400, 537, 0, 0, false, false, servo_001_relaxRanges)));
-
         
+        std::vector<RelaxRange> *servo_000_relaxRanges = new std::vector<RelaxRange>();
+		servos->addServo(Servo("StsServo-1", new ServoConfig(ServoConfig::ServoTypes::STS_SERVO, "Test Servo 20", 20, 0, 0, 4095, 55, 400, 2048, 150, 4000, false, true, servo_000_relaxRanges)));
+
         
 
         // sound player
@@ -86,21 +82,7 @@ std::vector<RelaxRange> *servo_001_relaxRanges = new std::vector<RelaxRange>();
     void addTimelines() 
     {
         timelines = new std::vector<Timeline>();
-        auto *servoPoints1 = new std::vector<ServoPoint>();
-		auto *mp3PlayerYX5300Points1 = new std::vector<Mp3PlayerYX5300Point>();
-		auto *mp3PlayerDfPlayerMiniPoints1 = new std::vector<Mp3PlayerDfPlayerMiniPoint>();
-		servoPoints1->push_back(ServoPoint("ScsServo-1", 0, 532));
-		servoPoints1->push_back(ServoPoint("ScsServo-2", 0, 822));
-		servoPoints1->push_back(ServoPoint("ScsServo-2", 2000, 236));
-		servoPoints1->push_back(ServoPoint("ScsServo-1", 2000, 230));
-		servoPoints1->push_back(ServoPoint("ScsServo-2", 4000, 822));
-		servoPoints1->push_back(ServoPoint("ScsServo-1", 4000, 821));
-		servoPoints1->push_back(ServoPoint("ScsServo-1", 6000, 532));
-		auto state1 = new TimelineStateReference(1, String("Default"));
-		Timeline *timeline1 = new Timeline(state1, -1, String(""), servoPoints1, mp3PlayerYX5300Points1, mp3PlayerDfPlayerMiniPoints1);
-		timelines->push_back(*timeline1);
-
-
+        
     }
 
     

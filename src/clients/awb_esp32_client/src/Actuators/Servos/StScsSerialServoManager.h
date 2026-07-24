@@ -43,6 +43,9 @@ public:
      */
     void updateActuators(boolean anyServoWithGlobalFaultHasCiriticalState);
 
+    // convert from 0-4096 to -3500-3500 rpm (the max speed of the STS servos is 3500 rpm)
+    int calculateWheelModeSpeed(int speed0to4096);
+
     /**
      * write the position to the servo, including speed and acceleration
      */
