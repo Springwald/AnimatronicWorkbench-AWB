@@ -44,6 +44,17 @@ namespace Awb.Core.Project.Servos
             foreach (var item in GetBaseProblems(project)) yield return item;
 
             // add STS specific checks here
+            // check if the relax ranges are valid
+            foreach (var relaxRange in RelaxRanges)
+            {
+                if (relaxRange.MinValue > relaxRange.MaxValue)
+                    yield return new ProjectProblem
+                    {
+                        ProblemType = ProjectProblem.ProblemTypes.Error,
+                        Message = $"The relax range '{relaxRange}' first value is lower than second value for servo '{TitleShort}'",
+                        Source = TitleDetailed,
+                    };
+            }
         }
     }
 }

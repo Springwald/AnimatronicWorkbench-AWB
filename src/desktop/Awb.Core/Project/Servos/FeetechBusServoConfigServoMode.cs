@@ -34,30 +34,6 @@ namespace Awb.Core.Project.Servos
         [Display(Name = "Speed value", GroupName = "Values", Order = 7)]
         public abstract int? Speed { get; set; }
 
-        protected override IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project)
-        {
-            // check if the default value is between the min and max value
-            if (DefaultValue < Math.Min(MinValue, MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
-                yield return new ProjectProblem
-                {
-                    ProblemType = ProjectProblem.ProblemTypes.Error,
-                    Message = $"The default value '{DefaultValue}' is not between the lowest value '{MinValue}' and the highest value '{MaxValue}' for servo '{TitleShort}'",
-                    Source = TitleDetailed,
-                };
-
-            // check if the relax ranges are valid
-            foreach (var relaxRange in RelaxRanges)
-            {
-                if (relaxRange.MinValue > relaxRange.MaxValue)
-                    yield return new ProjectProblem
-                    {
-                        ProblemType = ProjectProblem.ProblemTypes.Error,
-                        Message = $"The relax range '{relaxRange}' first value is lower than second value for servo '{TitleShort}'",
-                        Source = TitleDetailed,
-                    };
-            }
-
-            yield break;
-        }
+       
     }
 }

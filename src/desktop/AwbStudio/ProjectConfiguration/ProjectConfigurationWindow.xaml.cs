@@ -253,6 +253,7 @@ namespace AwbStudio
             _viewModel.TimelineStates.Remove(e.ObjectToDelete);
             _viewModel.ScsServos.Remove(e.ObjectToDelete);
             _viewModel.StsServos.Remove(e.ObjectToDelete);
+            _viewModel.StsWheelServos.Remove(e.ObjectToDelete);
             _viewModel.Mp3PlayerYX5300.Remove(e.ObjectToDelete);
             _viewModel.Pca9685PwmServos.Remove(e.ObjectToDelete);
 
@@ -286,6 +287,19 @@ namespace AwbStudio
             };
             _viewModel.StsServos.Add(item);
             StsServosList.SelectedProjectObject = item;
+        }
+
+        private void StsWheelServosList_NewProjectObjectRequested(object sender, EventArgs e)
+        {
+            var item = new StsFeetechServoWheelModeConfig
+            {
+                Id = _idCreator.CreateNewObjectId("StsWheelServo"),
+                Title = "",
+                ClientId = 1,
+                Channel = 1
+            };
+            _viewModel.StsWheelServos.Add(item);
+            StsWheelServosList.SelectedProjectObject = item;
         }
 
         private void Pca9685PWMServosList_NewProjectObjectRequested(object sender, EventArgs e)

@@ -47,7 +47,10 @@
                         ProjectObjects="{Binding ScsServos}" Title="SC servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="ScsServosList_NewProjectObjectRequested"/>
 
                         <ProjectConfiguration:ProjectObjectListControl x:Name="StsServosList" 
-                        ProjectObjects="{Binding StsServos}" Title="ST servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="StsServosList_NewProjectObjectRequested"/>
+                        ProjectObjects="{Binding StsServos}" Title="ST servos (servo mode)" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="StsServosList_NewProjectObjectRequested"/>
+
+                        <ProjectConfiguration:ProjectObjectListControl x:Name="StsWheelServosList" 
+                        ProjectObjects="{Binding StsWheelServos}" Title="ST servos (wheel mode)" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="StsWheelServosList_NewProjectObjectRequested"/>
 
                         <ProjectConfiguration:ProjectObjectListControl x:Name="Pca9685PWMServosList" 
                         ProjectObjects="{Binding Pca9685PwmServos}" Title="Pca9685 PWM servos" ProjectObjectSelected="ProjectObjectSelected" NewProjectObjectRequested="Pca9685PWMServosList_NewProjectObjectRequested"/>
@@ -83,7 +86,7 @@
             </Grid>
 
         </Grid>
-        
+
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 10 10 10">
             <Button Margin="40 0 0 0" Content="Cancel without saving" Click="ButtonCloseWithoutSaving_Click"/>
             <Button Margin="40 0 0 0" Content="Save and close" Click="ButtonSaveAndClose_Click"/>

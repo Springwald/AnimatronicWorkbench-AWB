@@ -40,10 +40,5 @@ namespace Awb.Core.Project.Servos
 
             // add STS specific checks here
         }
-
-        protected override IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

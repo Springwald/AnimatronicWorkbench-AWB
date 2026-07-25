@@ -62,7 +62,19 @@ namespace Awb.Core.Project.Servos
 
         public abstract IEnumerable<ProjectProblem> GetContentProblems(AwbProject project);
 
-        protected abstract IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project);
+        protected IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project)
+        {
+            // check if the default value is between the min and max value
+            if (DefaultValue < Math.Min(MinValue, MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
+                yield return new ProjectProblem
+                {
+                    ProblemType = ProjectProblem.ProblemTypes.Error,
+                    Message = $"The default value '{DefaultValue}' is not between the lowest value '{MinValue}' and the highest value '{MaxValue}' for servo '{TitleShort}'",
+                    Source = TitleDetailed,
+                };
+
+            yield break;
+        }
 
         [JsonIgnore]
         public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"StsServo has no title set '{Id}'" : Title;

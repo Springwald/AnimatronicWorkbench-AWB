@@ -100,6 +100,18 @@ namespace AwbStudio.ProjectConfiguration
                 OnPropertyChanged();
             }
         }
+        private ObservableCollection<IProjectObjectListable> _stsWheelServos = new ObservableCollection<IProjectObjectListable>();
+        public ObservableCollection<IProjectObjectListable> StsWheelServos
+        {
+            get => _stsWheelServos;
+            set
+            {
+                _stsWheelServos = value;
+                OnPropertyChanged();
+            }
+        }
+        
+
 
         private ObservableCollection<IProjectObjectListable> _pca9685PwmServos = new ObservableCollection<IProjectObjectListable>();
         public ObservableCollection<IProjectObjectListable> Pca9685PwmServos
