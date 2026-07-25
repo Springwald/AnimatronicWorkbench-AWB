@@ -15,8 +15,6 @@ String PacketProcessor::processPacket(String payload)
 {
     _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 0);
 
-    boolean sendServoUpdateDirectly = true; // should the servo update directly send to the servo controller or via the project data? If set to false, the project data is used to set the target value of the servo. Servos not defined in the project data are ignored.
-
     _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 1);
 
     DeserializationError error = deserializeJson(jsondocPacketProcessor, payload);
@@ -153,53 +151,24 @@ String PacketProcessor::processPacket(String payload)
 
             int channel = servos[i]["Ch"];
             int value = servos[i]["TVal"];
-            int speed = servos[i]["Speed"];
             int acc = servos[i]["Acc"];
             bool wheelMode = servos[i]["WheelMode"];
             String name = servos[i]["Name"];
 
-            if (sendServoUpdateDirectly)
+            // send the value to the STS bus servo
+            if (wheelMode)
             {
-                // send the value to the STS bus servo
-                if (wheelMode)
-                {
-                    this->_stSerialServoManager->setTorque(channel, true);
-                    int speed = _stSerialServoManager->calculateWheelModeSpeed(value);
-                    this->_stSerialServoManager->writeWheelModeDirectToHardware(channel, speed, acc);
-                }
-                else
-                {
-                    if (value < 0) // -1 means stop the servo
-                        this->_stSerialServoManager->setTorque(channel, false);
-                    this->_stSerialServoManager->setTorque(channel, true);
-                    // if not in wheel mode, we use the position control with default speed and acc from the project data
-                    this->_stSerialServoManager->writePositionDirectToHardware(channel, value, -1, -1);
-                }
+                this->_stSerialServoManager->setTorque(channel, true);
+                this->_stSerialServoManager->writeWheelModeDirectToHardware(channel, value, acc); // in wheel mode the value is the speed, not the position
             }
             else
             {
-                // use the project data to set the target value
-                bool done = false;
-                for (int f = 0; f < this->_projectData->servos->allServos->size(); f++)
-                {
-                    Servo *servo = &this->_projectData->servos->allServos->at(f);
-                    if (servo->config->type == ServoConfig::ServoTypes::STS_SERVO)
-                        if (servo->config->channel == channel)
-                        {
-                            // set servo target value
-                            servo->state->targetValue = value;
-                            servo->config->wheelMode = wheelMode;
-                            done = true;
-                            break;
-                        }
-                }
-                if (!done)
-                    _errorOccured("STS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
+                // if not in wheel mode, we use the position control with default speed and acc from the project data
+                int speed = servos[i]["Speed"];
+                this->_stSerialServoManager->writePositionDirectToHardware(channel, value, speed, acc);
             }
         }
     }
-    if (!sendServoUpdateDirectly && this->_stSerialServoManager != nullptr)
-        _stSerialServoManager->updateActuators(false);
 
     _debugging->setState(Debugging::MJ_PROCESSING_PACKET, 40);
 
@@ -219,40 +188,9 @@ String PacketProcessor::processPacket(String payload)
             String name = servos[i]["Name"];
             int speed = servos[i]["Speed"];
 
-            if (sendServoUpdateDirectly)
-            {
-                if (value < 0) // -1 means stop the servo
-                    this->_scSerialServoManager->setTorque(channel, false);
-                else
-                {
-                    // send the value to the SCS bus servo
-                    this->_scSerialServoManager->setTorque(channel, true);
-                    this->_scSerialServoManager->writePositionDirectToHardware(channel, value, speed, 0);
-                }
-            }
-            else
-            {
-                // use the project data to set the target value
-                bool done = false;
-                for (int f = 0; f < this->_projectData->servos->allServos->size(); f++)
-                {
-                    if (this->_projectData->servos->allServos->at(f).config->type == ServoConfig::ServoTypes::SCS_SERVO)
-                        if (this->_projectData->servos->allServos->at(f).config->channel == channel)
-                        {
-                            // set servo target value
-                            this->_projectData->servos->allServos->at(f).state->targetValue = value;
-                            done = true;
-                            break;
-                        }
-                }
-                if (!done)
-                    _errorOccured("SCS Servo " + String(channel) + "/" + name + " not attached or not defined in awb export!");
-            }
+            this->_scSerialServoManager->writePositionDirectToHardware(channel, value, speed, 0);
         }
     }
-
-    if (!sendServoUpdateDirectly && this->_scSerialServoManager != nullptr)
-        _scSerialServoManager->updateActuators(false);
 
 #ifdef USE_NEOPIXEL_STATUS_CONTROL
     _neoPixelStatus->showActivity();

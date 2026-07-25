@@ -36,14 +36,6 @@ void StScsSerialServoManager::setup()
     scanIds();
 }
 
-int StScsSerialServoManager::calculateWheelModeSpeed(int speed0to4096)
-{
-    if (speed0to4096 == -1)
-        return 0;
-
-    return ((speed0to4096 * 3500 * 2) / 4096) - 3500; // convert from 0-4096 to -3500-3500 rpm (the max speed of the STS servos is 3500 rpm)
-}
-
 /**
  * update the sts servos
  */
@@ -63,8 +55,7 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
 
         if (servo->config->wheelMode == true)
         {
-
-                      // e.G. ST servos support wheel mode, so we can set it here if not already done
+            // e.G. ST servos support wheel mode, so we can set it here if not already done
             if (servo->state->wheelModeActive == false)
             {
                 // set wheel mode on the servo if not already done
@@ -75,7 +66,7 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
             if (acc == -1)
                 acc = servo->config->defaultAcceleration;
 
-            this->writeWheelModeDirectToHardware(servo->config->channel, calculateWheelModeSpeed(servo->state->targetValue), acc);
+            this->writeWheelModeDirectToHardware(servo->config->channel, servo->state->targetValue, acc);
         }
         else
         {
@@ -155,6 +146,15 @@ void StScsSerialServoManager::updateActuators(boolean anyServoWithGlobalFaultHas
 
 void StScsSerialServoManager::writePositionDirectToHardware(int id, int position, int speed, int acc)
 {
+    if (position < 0) // -1 means stop the servo
+    {
+        // turn servo off
+        setTorque(id, false);
+        return;
+    }
+
+    setTorque(id, true);
+
     if (this->_servoTypeIsScs)
     {
         _serialServo_SCS.WritePosEx(id, position, speed, acc);
