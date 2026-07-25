@@ -15,6 +15,7 @@ namespace Awb.Core.DataPackets
         {
             public const string ScsServo = "ScsServo";
             public const string StsServo = "StsServo";
+            public const string StsServoWheel = "StsServoWheel";
         }
 
         [JsonPropertyName("TypeName")]

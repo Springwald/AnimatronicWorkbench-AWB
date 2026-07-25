@@ -27,7 +27,7 @@ namespace Awb.Core.Project
         public IProjectObjectListable[] AdditionalClients { get; set; } = [];
 
         public Pca9685PwmServoConfig[] Pca9685PwmServos { get; set; } = [];
-        public StsFeetechServoConfig[] StsServos { get; set; } = [];
+        public StsFeetechServoConfigServoMode[] StsServos { get; set; } = [];
         public ScsFeetechServoConfig[] ScsServos { get; set; } = [];
         public Mp3PlayerYX5300Config[] Mp3PlayersYX5300 { get; set; } = [];
         public Mp3PlayerDfPlayerMiniConfig[] Mp3PlayersDFPlayerMini { get; set; } = [];

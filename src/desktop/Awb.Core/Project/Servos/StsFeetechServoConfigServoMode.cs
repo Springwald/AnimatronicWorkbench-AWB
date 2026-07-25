@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Awb.Core.Project.Servos
 {
-    public class StsFeetechServoConfig : FeetechBusServoServoModeConfig
+    public class StsFeetechServoConfigServoMode : FeetechBusServoConfigServoMode
     {
         public const int MaxValueConst = 4095;
 
@@ -19,7 +19,6 @@ namespace Awb.Core.Project.Servos
 
         public const int MaxAccConst = 150;
         public const string AccDescriptionConst = "Set the start/stop acceleration. The smaller the value, the lower the acceleration. The maximum value that can be set is 150.";
-
 
         [Range(0, MaxValueConst)]
         public override int MinValue { get; set; }
@@ -38,10 +37,6 @@ namespace Awb.Core.Project.Servos
         [Description(AccDescriptionConst + "\r\n-1 to use STS servo default acceleration.")]
         [Range(0, MaxAccConst)]
         public int? Acceleration { get; set; } = 100;
-
-        [Display(Name = "Wheel mode", GroupName = "General", Order = 5)]
-        [Description("Should this servo operate in wheel mode instead of position mode?")]
-        public bool WheelMode { get; set; } = false;
 
 
         public override IEnumerable<ProjectProblem> GetContentProblems(AwbProject project)

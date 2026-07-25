@@ -277,7 +277,7 @@ namespace AwbStudio
 
         private void StsServosList_NewProjectObjectRequested(object sender, EventArgs e)
         {
-            var item = new StsFeetechServoConfig
+            var item = new StsFeetechServoConfigServoMode
             {
                 Id = _idCreator.CreateNewObjectId("StsServo"),
                 Title = "",

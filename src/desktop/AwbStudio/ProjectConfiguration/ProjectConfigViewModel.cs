@@ -198,7 +198,7 @@ namespace AwbStudio.ProjectConfiguration
         public void WriteToProject(AwbProject awbProject)
         {
             awbProject.ScsServos = this.ScsServos.Cast<ScsFeetechServoConfig>().ToArray();
-            awbProject.StsServos = this.StsServos.Cast<StsFeetechServoConfig>().ToArray();
+            awbProject.StsServos = this.StsServos.Cast<StsFeetechServoConfigServoMode>().ToArray();
             awbProject.Pca9685PwmServos = this.Pca9685PwmServos.Cast<Pca9685PwmServoConfig>().ToArray();
             awbProject.Mp3PlayersYX5300 = this.Mp3PlayerYX5300.Cast<Mp3PlayerYX5300Config>().ToArray();
             awbProject.Mp3PlayersDFPlayerMini = this.Mp3PlayerDFPlayerMini.Cast<Mp3PlayerDfPlayerMiniConfig>().ToArray();

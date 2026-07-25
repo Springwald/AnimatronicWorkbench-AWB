@@ -63,9 +63,9 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     maxPhysValue = ScsFeetechServoConfig.MaxValConst;
                     defaultValue = scsFeetechServoConfig.DefaultValue;
                 }
-                else if (_servoConfig is StsFeetechServoConfig stsFeetechServoConfig)
+                else if (_servoConfig is StsFeetechServoConfigServoMode stsFeetechServoConfig)
                 {
-                    maxPhysValue = StsFeetechServoConfig.MaxValueConst;
+                    maxPhysValue = StsFeetechServoConfigServoMode.MaxValueConst;
                     defaultValue = stsFeetechServoConfig.DefaultValue;
                 }
                 else if (_servoConfig is Pca9685PwmServoConfig pca9685PwmServoConfig)
@@ -173,7 +173,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 _minProjectLimitValue = scsFeetechServoConfig.MinValue;
                 _maxProjectLimitValue = scsFeetechServoConfig.MaxValue;
             }
-            else if (_servoConfig is StsFeetechServoConfig stsFeetechServoConfig)
+            else if (_servoConfig is StsFeetechServoConfigServoMode stsFeetechServoConfig)
             {
                 _minProjectLimitValue = stsFeetechServoConfig.MinValue;
                 _maxProjectLimitValue = stsFeetechServoConfig.MaxValue;
@@ -287,7 +287,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                     }
                     return resultDataPacket.ScsServo.Position;
                 }
-                if (servoConfig is StsFeetechServoConfig)
+                if (servoConfig is StsFeetechServoConfigServoMode)
                 {
                     if (resultDataPacket.StsServo == null)
                     {

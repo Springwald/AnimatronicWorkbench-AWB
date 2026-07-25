@@ -16,7 +16,8 @@ namespace Awb.Core.Export.ExporterParts.Servos
         {
             PWM_SERVO = 0,
             STS_SERVO = 1,
-            SCS_SERVO = 2
+            SCS_SERVO = 2,
+            STSWHEEL_SERVO = 3
         }
 
         public required string Id { get; set; }

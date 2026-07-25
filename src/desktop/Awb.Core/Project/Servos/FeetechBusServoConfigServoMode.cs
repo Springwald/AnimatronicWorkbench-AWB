@@ -12,7 +12,7 @@ using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Servos
 {
-    public abstract class FeetechBusServoServoModeConfig : FeetechBusServoConfig, ISupportsRelaxRanges
+    public abstract class FeetechBusServoConfigServoMode : FeetechBusServoConfig, ISupportsRelaxRanges
     {
         /// <summary>
         /// The companion property for the RelaxRangesAsString property.

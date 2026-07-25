@@ -22,7 +22,7 @@ var config = new AwbProject
         ProjectTitle = "demo"
     },
     StsServos = [.. Enumerable.Range(1, 2).Select(id =>
-            new StsFeetechServoConfig
+            new StsFeetechServoConfigServoMode
             {
                 Id = $"servo {id}",
                 Title = $"Servo {id}",

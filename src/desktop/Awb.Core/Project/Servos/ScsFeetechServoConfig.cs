@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Awb.Core.Project.Servos
 {
-    public class ScsFeetechServoConfig : FeetechBusServoServoModeConfig
+    public class ScsFeetechServoConfig : FeetechBusServoConfigServoMode
     {
         public const int MaxValConst = 1023;
         public const int MaxSpeedConst = 1500;

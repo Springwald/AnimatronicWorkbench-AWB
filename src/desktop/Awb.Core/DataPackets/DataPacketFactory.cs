@@ -14,30 +14,33 @@ namespace Awb.Core.DataPackets
     {
         public ClientDataPacket? GetDataPacketGetServoPos(IServoConfig servo)
         {
-            if (servo is StsFeetechServoConfig stsFeetechServoConfig)
+            switch (servo)
             {
-                return new ClientDataPacket(stsFeetechServoConfig.ClientId,
-                new DataPacketContent
-                {
-                    ReadValue = new ReadValueData(typeName: ReadValueData.TypeNames.StsServo, id: stsFeetechServoConfig.Channel.ToString())
-                },
-                affectedAcctuatorsToRemoveDirtyFlag: []);
+                case StsFeetechServoConfigServoMode stsFeetechServoConfigServoMode:
+                    return new ClientDataPacket(stsFeetechServoConfigServoMode.ClientId,
+                           new DataPacketContent
+                           {
+                               ReadValue = new ReadValueData(typeName: ReadValueData.TypeNames.StsServo, id: stsFeetechServoConfigServoMode.Channel.ToString())
+                           },
+                           affectedAcctuatorsToRemoveDirtyFlag: []);
+
+                case ScsFeetechServoConfig scsFeetechServoConfig:
+                    return new ClientDataPacket(scsFeetechServoConfig.ClientId,
+                        new DataPacketContent
+                        {
+                            ReadValue = new ReadValueData(typeName: ReadValueData.TypeNames.ScsServo, id: scsFeetechServoConfig.Channel.ToString())
+                        },
+                        affectedAcctuatorsToRemoveDirtyFlag: []);
+
+                case StsFeetechServoWheelModeConfig stsFeetechServoConfigWheelMode:
+                    return null; // Wheel mode servos can't send their position
+
+                case Pca9685PwmServoConfig pwmServoConfig:
+                    return null; // PWM servos can't send their position
+
+                default:
+                    throw new NotImplementedException($"Unhandled servo type '{servo.GetType().Name}'");
             }
-
-            if (servo is ScsFeetechServoConfig scsFeetechServoConfig)
-            {
-                return new ClientDataPacket(scsFeetechServoConfig.ClientId,
-                    new DataPacketContent
-                    {
-                        ReadValue = new ReadValueData(typeName: ReadValueData.TypeNames.ScsServo, id: scsFeetechServoConfig.Channel.ToString())
-                    },
-                    affectedAcctuatorsToRemoveDirtyFlag: []);
-            }
-
-            if (servo is Pca9685PwmServoConfig pwmServoConfig)
-                return null; // PWM servos can't send their position
-
-            throw new NotImplementedException($"Unhandled servo type '{servo.GetType().Name}'");
         }
 
         /// <summary>
@@ -46,31 +49,52 @@ namespace Awb.Core.DataPackets
         /// </summary>
         public ClientDataPacket? GetDataPacketSetSingleServoPos(IServoConfig servo, int absolutePos)
         {
-            if (servo is StsFeetechServoConfig stsFeetechServoConfig)
+            switch (servo)
             {
-                return new ClientDataPacket(stsFeetechServoConfig.ClientId,
-                new DataPacketContent
-                {
-                    StsServos = new StsServosPacketData
-                    {
-                        Servos = new[]
-                         {
-                             new StsServoPacketData
-                             {
-                                 Channel = stsFeetechServoConfig.Channel,
-                                 WheelMode = stsFeetechServoConfig.WheelMode,
-                                 TargetValue = absolutePos,
-                                 Name = string.IsNullOrWhiteSpace(stsFeetechServoConfig.Title) ? $"STS{stsFeetechServoConfig.Channel}" : stsFeetechServoConfig.Title,
-                                 Speed = stsFeetechServoConfig.Speed.HasValue ? stsFeetechServoConfig.Speed.Value : 0,
-                                 Acc = stsFeetechServoConfig.Acceleration.HasValue ? stsFeetechServoConfig.Acceleration.Value : 0,
-                             }
-                         }
-                    },
-                }, affectedAcctuatorsToRemoveDirtyFlag: []);
-            }
-            if (servo is ScsFeetechServoConfig scsFeetechServoConfig)
-            {
-                return new ClientDataPacket(scsFeetechServoConfig.ClientId,
+                case StsFeetechServoConfigServoMode stsFeetechServoConfigServoMode:
+                    return new ClientDataPacket(stsFeetechServoConfigServoMode.ClientId,
+                           new DataPacketContent
+                           {
+                               StsServos = new StsServosPacketData
+                               {
+                                   Servos = new[]
+                                    {
+                                         new StsServoPacketData
+                                         {
+                                             Channel = stsFeetechServoConfigServoMode.Channel,
+                                             WheelMode = false,
+                                             TargetValue = absolutePos,
+                                             Name = string.IsNullOrWhiteSpace(stsFeetechServoConfigServoMode.Title) ? $"STS{stsFeetechServoConfigServoMode.Channel}" : stsFeetechServoConfigServoMode.Title,
+                                             Speed = stsFeetechServoConfigServoMode.Speed.HasValue ? stsFeetechServoConfigServoMode.Speed.Value : 0,
+                                             Acc = stsFeetechServoConfigServoMode.Acceleration.HasValue ? stsFeetechServoConfigServoMode.Acceleration.Value : 0,
+                                         }
+                                    }
+                               },
+                           }, affectedAcctuatorsToRemoveDirtyFlag: []);
+
+                case StsFeetechServoWheelModeConfig stsFeetechServoConfigWheelMode:
+                    return new ClientDataPacket(stsFeetechServoConfigWheelMode.ClientId,
+                           new DataPacketContent
+                           {
+                               StsServos = new StsServosPacketData
+                               {
+                                   Servos = new[]
+                                    {
+                                         new StsServoPacketData
+                                         {
+                                             Channel = stsFeetechServoConfigWheelMode.Channel,
+                                             WheelMode = true,
+                                             TargetValue = absolutePos,
+                                             Name = string.IsNullOrWhiteSpace(stsFeetechServoConfigWheelMode.Title) ? $"STSWHEEL{stsFeetechServoConfigWheelMode.Channel}" : stsFeetechServoConfigWheelMode.Title,
+                                             Speed = 0, // will be sent al TargetValue, because wheel mode is used
+                                             Acc = stsFeetechServoConfigWheelMode.Acceleration.HasValue ? stsFeetechServoConfigWheelMode.Acceleration.Value : 0,
+                                         }
+                                    }
+                               },
+                           }, affectedAcctuatorsToRemoveDirtyFlag: []);
+
+                case ScsFeetechServoConfig scsFeetechServoConfig:
+                    return new ClientDataPacket(scsFeetechServoConfig.ClientId,
                     new DataPacketContent
                     {
                         ScsServos = new StsServosPacketData
@@ -88,29 +112,28 @@ namespace Awb.Core.DataPackets
                             ]
                         },
                     }, affectedAcctuatorsToRemoveDirtyFlag: []);
-            }
-            if (servo is Pca9685PwmServoConfig pwmServoConfig)
-            {
-                return new ClientDataPacket(pwmServoConfig.ClientId,
-                    new DataPacketContent
-                    {
-                        Pca9685PwmServos = new Pca9685PwmServosPacketData
-                        {
-                            Servos =
-                            [
-                                new Pca9685PwmServoPacketData
+
+                case Pca9685PwmServoConfig pwmServoConfig:
+                    return new ClientDataPacket(pwmServoConfig.ClientId,
+                   new DataPacketContent
+                   {
+                       Pca9685PwmServos = new Pca9685PwmServosPacketData
+                       {
+                           Servos =
+                           [
+                               new Pca9685PwmServoPacketData
                                 {
                                     I2cAddress = pwmServoConfig.I2cAdress,
                                     Channel = pwmServoConfig.Channel,
                                     TargetValue = absolutePos,
                                     Name = string.IsNullOrWhiteSpace(pwmServoConfig.Title) ? $"PWM{pwmServoConfig.Channel}" : pwmServoConfig.Title,
                                 }
-                            ]
-                        },
-                    }, affectedAcctuatorsToRemoveDirtyFlag: []);
+                           ]
+                       },
+                   }, affectedAcctuatorsToRemoveDirtyFlag: []);
+                default:
+                    throw new NotImplementedException($"Unhandled servo type '{servo.GetType().Name}'");
             }
-
-            throw new NotImplementedException($"Unhandled servo type '{servo.GetType().Name}'");
         }
 
         public IEnumerable<ClientDataPacket> GetDataPackets(IServo[] servos)

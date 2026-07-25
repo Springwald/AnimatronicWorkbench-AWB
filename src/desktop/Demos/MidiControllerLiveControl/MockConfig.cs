@@ -26,7 +26,7 @@ namespace MidiControllerLiveControl
                     },
                     StsServos =
                      [
-                         new StsFeetechServoConfig
+                         new StsFeetechServoConfigServoMode
                          {
                              Id = "Servo 1",
                              Title = "Mouth upper",
@@ -36,7 +36,7 @@ namespace MidiControllerLiveControl
                              MaxValue = 2200,
                              DefaultValue = null
                          },
-                         new StsFeetechServoConfig
+                         new StsFeetechServoConfigServoMode
                          {
                              Id = "Servo 2",
                              Title = "Mouth lower",
@@ -46,7 +46,7 @@ namespace MidiControllerLiveControl
                              MaxValue = 2225,
                              DefaultValue = null
                          },
-                         new StsFeetechServoConfig
+                         new StsFeetechServoConfigServoMode
                          {
                              Id = "Servo 3",
                              Title = "tilt left right",
@@ -56,7 +56,7 @@ namespace MidiControllerLiveControl
                              MaxValue = 2500,
                              DefaultValue = null
                          },
-                         new StsFeetechServoConfig
+                         new StsFeetechServoConfigServoMode
                          {
                              Id = "Servo 4",
                              Title = "rotate left right",

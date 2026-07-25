@@ -18,14 +18,14 @@ namespace Awb.Core.Actuators
         public enum StsScsTypes
         {
             Scs,
-            Sts
+            Sts,
+            StsWheelMode
         }
 
         /// <summary>
         /// The requested target value of this servo
         /// </summary>
         private int _targetValue;
-        private bool _wheelMode;
 
         public StsScsTypes StsScsType { get; private set; }
 
@@ -49,18 +49,7 @@ namespace Awb.Core.Actuators
         /// </summary>
         public uint Channel { get; private set; }
 
-        public bool WheelMode
-        {
-            get => _wheelMode;
-            set
-            {
-                if (value != _wheelMode)
-                {
-                    _wheelMode = value;
-                    IsDirty = true;
-                }
-            }
-        }
+        public bool WheelMode => StsScsType == StsScsTypes.StsWheelMode;
 
         /// <summary>
         /// The maximum value this servo should handle in the constructred animatronic figure
@@ -114,36 +103,43 @@ namespace Awb.Core.Actuators
 
         public bool IsControllerTuneable => true;
 
-        public StsScsServo(FeetechBusServoServoModeConfig config)
+        public StsScsServo(FeetechBusServoConfig config)
         {
-            // find out the StsScsType by the config type using the switch expression
-            StsScsTypes type = config switch
-            {
-                StsFeetechServoConfig => StsScsTypes.Sts,
-                ScsFeetechServoConfig => StsScsTypes.Scs,
-                _ => throw new ArgumentException("Unknown servo config type")
-            };
-
-            var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
-
-            StsFeetechServoConfig? stsFeetechServoConfig = config as StsFeetechServoConfig;
-
-            var acc = stsFeetechServoConfig?.Acceleration;
-            var wheelMode = stsFeetechServoConfig?.WheelMode ?? false;
-
             Id = config.Id;
-            StsScsType = type;
             MaxValue = config.MaxValue;
             MinValue = config.MinValue;
-            Speed = config.Speed;
-            Acceleration = acc;
             ClientId = config.ClientId;
             Channel = config.Channel;
-            WheelMode = wheelMode;
             Title = config.Title;
+
+            IsDirty = true;
+
+            var defaultValue = config.DefaultValue ?? config.MinValue + (config.MaxValue - config.MinValue) / 2;
             DefaultValue = defaultValue;
             TargetValue = defaultValue;
-            IsDirty = true;
+
+            StsScsType = config switch
+            {
+                StsFeetechServoConfigServoMode => StsScsTypes.Sts,
+                StsFeetechServoWheelModeConfig => StsScsTypes.StsWheelMode,
+                ScsFeetechServoConfig => StsScsTypes.Scs,
+                _ => throw new ArgumentException("Unhandled servo config type" + config.GetType().Name)
+            };
+
+            Speed = config switch
+            {
+                StsFeetechServoConfigServoMode stsConfig => stsConfig.Speed ?? -1,
+                StsFeetechServoWheelModeConfig wheelModeConfig => -1,
+                _ => throw new ArgumentException("Unhandled servo config type" + config.GetType().Name)
+            };
+
+            Acceleration = config switch
+            {
+                StsFeetechServoConfigServoMode stsConfig => stsConfig.Acceleration ?? -1,
+                StsFeetechServoWheelModeConfig wheelModeConfig => wheelModeConfig.Acceleration ?? -1,
+                _ => throw new ArgumentException("Unhandled servo config type" + config.GetType().Name)
+            };
+
             PercentCalculator = new PercentCalculator(MinValue, MaxValue);
         }
 

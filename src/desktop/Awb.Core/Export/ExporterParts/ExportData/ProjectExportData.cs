@@ -17,7 +17,7 @@ namespace Awb.Core.Export.ExporterParts.ExportData
 
         public required IEnumerable<TimelineExportData> TimelineData { get; init; }
         public required IEnumerable<TimelineState> TimelineStates { get; init; }
-        public required IEnumerable<StsFeetechServoConfig> StsServoConfigs { get; init; }
+        public required IEnumerable<StsFeetechServoConfigServoMode> StsServoConfigs { get; init; }
         public required IEnumerable<ScsFeetechServoConfig> ScsServoConfigs { get; init; }
         public required IEnumerable<Pca9685PwmServoConfig> Pca9685PwmServoConfigs { get; init; }
         public required IEnumerable<Mp3PlayerYX5300Config> Mp3PlayerYX5300Configs { get; init; }

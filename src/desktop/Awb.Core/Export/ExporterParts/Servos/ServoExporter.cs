@@ -93,7 +93,7 @@ namespace Awb.Core.Export.ExporterParts.Servos
                         WheelMode = false // PWM servos have no wheel mode
                     };
                     break;
-                case StsFeetechServoConfig stsServo:
+                case StsFeetechServoConfigServoMode stsServo:
                     exportModel = new ServoExportModel
                     {
                         Id = stsServo.Id,
@@ -107,7 +107,25 @@ namespace Awb.Core.Export.ExporterParts.Servos
                         MaxTemperature = (int)stsServo.MaxTemp,
                         MaxTorque = (int)stsServo.MaxTorque,
                         GlobalFault = stsServo.GlobalFault,
-                        WheelMode = stsServo.WheelMode
+                        WheelMode = false
+                    };
+                    break;
+
+                case StsFeetechServoWheelModeConfig stsServoWheelMode:
+                    exportModel = new ServoExportModel
+                    {
+                        Id = stsServoWheelMode.Id,
+                        ServoExportType = ServoExportModel.ServoExportTypes.STSWHEEL_SERVO,
+                        Title = stsServoWheelMode.Title,
+                        DefaultValue = stsServoWheelMode.DefaultValue ?? stsServoWheelMode.MinValue + (stsServoWheelMode.MaxValue - stsServoWheelMode.MinValue) / 2,
+                        I2cAdress = 0, // STS servos have no I2C address
+                        Channel = stsServoWheelMode.Channel,
+                        Acceleration = stsServoWheelMode.Acceleration ?? 0,
+                        Speed = 0, // STS servos in wheel mode have their speed as the value, so the speed is not used
+                        MaxTemperature = (int)stsServoWheelMode.MaxTemp,
+                        MaxTorque = (int)stsServoWheelMode.MaxTorque,
+                        GlobalFault = stsServoWheelMode.GlobalFault,
+                        WheelMode = true
                     };
                     break;
                 case ScsFeetechServoConfig scsServo:
