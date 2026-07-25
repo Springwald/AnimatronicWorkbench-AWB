@@ -188,7 +188,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 PropertyContentBool = value != null && (bool)value;
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Visible;
                 TextPropertyContentTextEditor.Visibility = System.Windows.Visibility.Collapsed;
-                PasswordPropertyContentPasswordEditor.Visibility = System.Windows.Visibility.Collapsed;
+                PasswordEditorPanel.Visibility = System.Windows.Visibility.Collapsed;
                 return;
             }
 
@@ -198,7 +198,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 PropertyContentPassword = value?.ToString() ?? string.Empty;
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
                 TextPropertyContentTextEditor.Visibility = System.Windows.Visibility.Collapsed;
-                PasswordPropertyContentPasswordEditor.Visibility = System.Windows.Visibility.Visible;
+                PasswordEditorPanel.Visibility = System.Windows.Visibility.Visible;
                 return;
             }
 
@@ -206,7 +206,7 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             PropertyContentText = value?.ToString() ?? string.Empty;
             CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
             TextPropertyContentTextEditor.Visibility = System.Windows.Visibility.Visible;
-            PasswordPropertyContentPasswordEditor.Visibility = System.Windows.Visibility.Collapsed;
+            PasswordEditorPanel.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void PasswordPropertyContentPasswordEditor_PasswordChanged(object sender, RoutedEventArgs e) 
@@ -293,6 +293,11 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 }
             };
             GetActualServoPositionRequested?.Invoke(this, eventArgs);
+        }
+
+        private void ButtonShowPassword_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show($"Password: {PropertyContentPassword}", "Password", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
