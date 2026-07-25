@@ -52,6 +52,15 @@ namespace Awb.Core.Export.ExporterParts
                         continue;
                     }
 
+                    // find STS wheel servo
+                    var stsWheelServo = projectData.StsWheelServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
+                    if (stsWheelServo != null)
+                    {
+                        var value = (int)(stsWheelServo.MinValue + servoPoint.ValuePercent * (stsWheelServo.MaxValue - stsWheelServo.MinValue) / 100.0);
+                        result.AppendLine($"\t\tservoPoints{timelineNo}->push_back({ServoExporter.ServoPointInstanceExport(stsWheelServo, servoPoint.TimeMs, value)});");
+                        continue;
+                    }
+
                     // find SCS servo
                     var scsServo = projectData.ScsServoConfigs?.SingleOrDefault(s => s.Id == servoPoint.ServoId);
                     if (scsServo != null)

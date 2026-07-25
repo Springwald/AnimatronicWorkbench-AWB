@@ -189,6 +189,7 @@ namespace Awb.Core.Export.ExporterParts
                         {{servoListName}} = new Servos();
                         {{servoExporter.ExportServos(servoConfigs: _projectData.ScsServoConfigs)}}
                         {{servoExporter.ExportServos(servoConfigs: _projectData.StsServoConfigs)}}
+                        {{servoExporter.ExportServos(servoConfigs: _projectData.StsWheelServoConfigs)}}
                         {{servoExporter.ExportServos(servoConfigs: _projectData.Pca9685PwmServoConfigs)}}
                 
                         // sound player
@@ -240,6 +241,8 @@ namespace Awb.Core.Export.ExporterParts
                 result.AppendLine(constString("ScsServoName_", servo.Title));
             foreach (var servo in _projectData.StsServoConfigs)
                 result.AppendLine(constString("StsServoName_", servo.Title));
+            foreach (var servo in _projectData.StsWheelServoConfigs)
+                result.AppendLine(constString("StsWheelServoName_", servo.Title));
             foreach (var servo in _projectData.Pca9685PwmServoConfigs)
                 result.AppendLine(constString("Pca9685PwmServoName_", servo.Title));
             result.AppendLine();

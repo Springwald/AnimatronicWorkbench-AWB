@@ -193,6 +193,7 @@ namespace AwbStudio
                     new TimelineState  { Id=2, Title ="Dont export", Export = false, AutoPlay = false },
                 },
                 StsServos = [],
+                StsWheelServos = [],
                 ScsServos = [],
                 Pca9685PwmServos = [],
                 Mp3PlayersYX5300 = [],

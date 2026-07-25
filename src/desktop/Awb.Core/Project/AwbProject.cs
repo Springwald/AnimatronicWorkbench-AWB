@@ -28,6 +28,7 @@ namespace Awb.Core.Project
 
         public Pca9685PwmServoConfig[] Pca9685PwmServos { get; set; } = [];
         public StsFeetechServoConfigServoMode[] StsServos { get; set; } = [];
+        public StsFeetechServoWheelModeConfig[] StsWheelServos { get; set; } = [];
         public ScsFeetechServoConfig[] ScsServos { get; set; } = [];
         public Mp3PlayerYX5300Config[] Mp3PlayersYX5300 { get; set; } = [];
         public Mp3PlayerDfPlayerMiniConfig[] Mp3PlayersDFPlayerMini { get; set; } = [];
@@ -58,6 +59,7 @@ namespace Awb.Core.Project
             yield return Esp32ClientHardware;
             foreach (var item in Pca9685PwmServos) yield return item;
             foreach (var item in StsServos) yield return item;
+            foreach (var item in StsWheelServos) yield return item;
             foreach (var item in ScsServos) yield return item;
             foreach (var item in Mp3PlayersYX5300) yield return item;
             foreach (var item in Mp3PlayersDFPlayerMini) yield return item;

@@ -27,10 +27,10 @@ namespace Awb.Core.Project.Servos
         public override int MaxValue{ get; set; }
 
         [Range(MinSpeedConst, MaxSpeedConst)]
-        public override int? DefaultValue { get; set; }
+        public override int? DefaultValue { get; set; } = 0;
 
         [DisplayName("Acceleration")]
-        [Description(AccDescriptionConst + "\r\n-1 to use STS servo default acceleration.")]
+        [Description(AccDescriptionConst + "\r\n-1 to use STS wheel servo default acceleration.")]
         [Range(0, MaxAccConst)]
         public int? Acceleration { get; set; } = 100;
 

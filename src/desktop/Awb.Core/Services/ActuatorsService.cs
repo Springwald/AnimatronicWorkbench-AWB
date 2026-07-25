@@ -64,6 +64,21 @@ namespace Awb.Core.Services
                 }
             }
 
+            // add STS Wheel servos
+            if (projectConfig.StsWheelServos != null)
+            {
+                foreach (var stsWheelServoConfig in projectConfig.StsWheelServos)
+                {
+                    if (stsWheelServoConfig?.ClientId == null) throw new ArgumentNullException("ClientId must be set.");
+                    var client = awbClientsService.GetClient(stsWheelServoConfig.ClientId);
+                    if (client == null)
+                        logger.LogErrorAsync($"ActuatorsService: Client with Id '{stsWheelServoConfig.ClientId}' for stsWheelServo '{stsWheelServoConfig.Title}' not found!");
+                    var stsWheelServo = new StsScsServo(stsWheelServoConfig);
+                    servos.Add(stsWheelServo);
+                }
+            }
+
+
             // add SCS servos
             if (projectConfig.ScsServos != null)
             {

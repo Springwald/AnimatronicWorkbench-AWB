@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
@@ -18,6 +18,7 @@ namespace Awb.Core.Export.ExporterParts.ExportData
         public required IEnumerable<TimelineExportData> TimelineData { get; init; }
         public required IEnumerable<TimelineState> TimelineStates { get; init; }
         public required IEnumerable<StsFeetechServoConfigServoMode> StsServoConfigs { get; init; }
+        public required IEnumerable<StsFeetechServoWheelModeConfig> StsWheelServoConfigs { get; init; }
         public required IEnumerable<ScsFeetechServoConfig> ScsServoConfigs { get; init; }
         public required IEnumerable<Pca9685PwmServoConfig> Pca9685PwmServoConfigs { get; init; }
         public required IEnumerable<Mp3PlayerYX5300Config> Mp3PlayerYX5300Configs { get; init; }

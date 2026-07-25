@@ -52,6 +52,7 @@ namespace Awb.Core.Project
             // check list problems e.g. double IDs
             foreach (var item in GetDoubleIdProblems(_project.Pca9685PwmServos.Select(x => $"Client ID {x.ClientId}, Channel {x.Channel}"), "PCA9685 PWM servos")) yield return item;
             foreach (var item in GetDoubleIdProblems(_project.StsServos.Select(x => $"Client ID {x.ClientId}, Servo ID {x.Channel}"), "STS servos")) yield return item;
+            foreach (var item in GetDoubleIdProblems(_project.StsWheelServos.Select(x => $"Client ID {x.ClientId}, Servo ID {x.Channel}"), "STS Wheel servos")) yield return item;
             foreach (var item in GetDoubleIdProblems(_project.ScsServos.Select(x => $"Client ID {x.ClientId}, Servo ID {x.Channel}"), "SCS servos")) yield return item;
             foreach (var item in GetDoubleIdProblems(_project.TimelinesStates.Select(x => x.Id.ToString()), "Timeline state IDs")) yield return item;
             foreach (var item in GetDoubleIdProblems(_project.TimelinesStates.Select(x => x.Title), "Timeline state titles")) yield return item;

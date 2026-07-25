@@ -66,6 +66,7 @@ namespace AwbStudio.Exports
                     ProjectName = _project.ProjectMetaData.ProjectTitle,
                     TimelineStates = _project.TimelinesStates,
                     StsServoConfigs = _project.StsServos,
+                    StsWheelServoConfigs = _project.StsWheelServos,
                     ScsServoConfigs = _project.ScsServos,
                     Pca9685PwmServoConfigs = _project.Pca9685PwmServos,
                     Mp3PlayerYX5300Configs = _project.Mp3PlayersYX5300,
