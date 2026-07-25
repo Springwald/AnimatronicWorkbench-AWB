@@ -24,6 +24,7 @@ namespace Awb.Core.Project.Various
 
         public string WifiSsid => $"AWB-{ProjectTitle}";
 
+        [PasswordPropertyTextAttribute()]
         [DisplayName("Wifi password")]
         [Length(8, 32)]
         public string WifiPassword { get; set; } = $"awb{new Random().Next(10000,99999)}";

@@ -40,18 +40,23 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBox 
-                    x:Name="TextPropertyContentTextEditor"
-                    Grid.Column="0" 
-                    TextChanged="TextBoxPropertyContent_TextChanged"
-                    Text="{Binding PropertyContentText, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                        x:Name="TextPropertyContentTextEditor"
+                        Grid.Column="0" 
+                        TextChanged="TextBoxPropertyContent_TextChanged"
+                        Text="{Binding PropertyContentText, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
                     </TextBox>
                     <CheckBox
-                    x:Name="CheckBoxPropertyContentBoolEditor"
-                    Grid.Column="0"
-                    Checked="CheckBoxPropertyContentBoolEditor_Checked"
-                    Unchecked="CheckBoxPropertyContentBoolEditor_Unchecked"
-                    IsChecked="{Binding PropertyContentBool, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                        x:Name="CheckBoxPropertyContentBoolEditor"
+                        Grid.Column="0"
+                        Checked="CheckBoxPropertyContentBoolEditor_Checked"
+                        Unchecked="CheckBoxPropertyContentBoolEditor_Unchecked"
+                        IsChecked="{Binding PropertyContentBool, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}">
                     </CheckBox>
+                    <PasswordBox 
+                        x:Name="PasswordPropertyContentPasswordEditor"
+                        Grid.Column="0" 
+                        PasswordChar="*"
+                        PasswordChanged="PasswordPropertyContentPasswordEditor_PasswordChanged"/>
                     <TextBlock Grid.Column="1" Foreground="LightSalmon" Height="auto" x:Name="LabelError" 
                        Margin="10 0 0 0"
                        HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center"

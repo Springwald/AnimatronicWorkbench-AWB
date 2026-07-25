@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
@@ -11,6 +11,7 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace AwbStudio.ProjectConfiguration.PropertyEditors
@@ -72,6 +73,21 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 if (_propertyContentText != value)
                 {
                     _propertyContentText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private unsafe string? _propertyContentPassword;
+        public unsafe string? PropertyContentPassword
+        {
+            get { return _propertyContentPassword; }
+            set
+            {
+                PasswordPropertyContentPasswordEditor.Password = value ?? string.Empty;
+                if (_propertyContentPassword != value)
+                {
+                    _propertyContentPassword = value;
                     OnPropertyChanged();
                 }
             }
@@ -170,17 +186,36 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             {
                 // for bool properties use the checkbox editor
                 PropertyContentBool = value != null && (bool)value;
+                CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Visible;
                 TextPropertyContentTextEditor.Visibility = System.Windows.Visibility.Collapsed;
+                PasswordPropertyContentPasswordEditor.Visibility = System.Windows.Visibility.Collapsed;
+                return;
             }
-            else
+
+            if (propertyType == typeof(string) && prop.GetCustomAttribute<PasswordPropertyTextAttribute>() != null)
             {
-                // for all other types use the text editor
-                PropertyContentText = value?.ToString() ?? string.Empty;
+                // for password properties use the password editor
+                PropertyContentPassword = value?.ToString() ?? string.Empty;
                 CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
+                TextPropertyContentTextEditor.Visibility = System.Windows.Visibility.Collapsed;
+                PasswordPropertyContentPasswordEditor.Visibility = System.Windows.Visibility.Visible;
+                return;
             }
+
+            // for all other types use the text editor
+            PropertyContentText = value?.ToString() ?? string.Empty;
+            CheckBoxPropertyContentBoolEditor.Visibility = System.Windows.Visibility.Collapsed;
+            TextPropertyContentTextEditor.Visibility = System.Windows.Visibility.Visible;
+            PasswordPropertyContentPasswordEditor.Visibility = System.Windows.Visibility.Collapsed;
         }
 
+        private void PasswordPropertyContentPasswordEditor_PasswordChanged(object sender, RoutedEventArgs e) 
+            => TextBoxPropertyContent_TextChanged(sender, (e.Source as PasswordBox)?.Password ?? string.Empty);
+
         private void TextBoxPropertyContent_TextChanged(object sender, TextChangedEventArgs e)
+            => TextBoxPropertyContent_TextChanged(sender, (e.Source as TextBox)?.Text ?? string.Empty);
+
+        private void TextBoxPropertyContent_TextChanged(object sender, string newValue)
         {
             if (_propertyValidator == null) throw new NullReferenceException(nameof(_propertyValidator));
             ErrorMessagesJoined = string.Empty;
@@ -189,8 +224,6 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             // casting to the correct type e.g. int
             if (_targetObject != null && _propertyName != null)
             {
-                var newValue = TextPropertyContentTextEditor.Text;
-
                 // check the new value for type compatibility
                 var validationAttributeErrors = _propertyValidator.GetErrorMessagesByValidationAttributes(newValue);
                 if (validationAttributeErrors != null)
