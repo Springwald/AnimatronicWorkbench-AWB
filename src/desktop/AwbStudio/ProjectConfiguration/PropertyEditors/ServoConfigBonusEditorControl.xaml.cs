@@ -1,7 +1,7 @@
 ﻿// Animatronic WorkBench
 // https://github.com/Springwald/AnimatronicWorkBench-AWB
 //
-// (C) 2025 Daniel Springwald      -     Bochum, Germany
+// (C) 2026 Daniel Springwald      -     Bochum, Germany
 // https://daniel.springwald.de - segfault@springwald.de
 // All rights reserved    -   Licensed under MIT License
 
@@ -57,37 +57,44 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
                 var minPhysValue = 0;
                 int? defaultValue = null;
 
+
                 // get the maximum values from "range" property annotation of the attribute FeetechBusServoConfig.MaxValue
-                if (_servoConfig is ScsFeetechServoConfig scsFeetechServoConfig)
+                switch (_servoConfig)
                 {
-                    maxPhysValue = ScsFeetechServoConfig.MaxValConst;
-                    defaultValue = scsFeetechServoConfig.DefaultValue;
-                }
-                else if (_servoConfig is StsFeetechServoConfigServoMode stsFeetechServoConfig)
-                {
-                    maxPhysValue = StsFeetechServoConfigServoMode.MaxValueConst;
-                    defaultValue = stsFeetechServoConfig.DefaultValue;
-                }
-                else if (_servoConfig is Pca9685PwmServoConfig pca9685PwmServoConfig)
-                {
-                    maxPhysValue = Pca9685PwmServoConfig.MaxValConst;
-                    defaultValue = pca9685PwmServoConfig.DefaultValue;
-                }
-                else
-                {
-                    MessageBox.Show("Servo config is not a FeetechBusServoConfig or Pca9685PwmServoConfig.");
-                    // hide the sliders if the servo config is not a supported type
-                    SliderServoPhysPosition.Visibility = Visibility.Collapsed;
-                    LabelPhysMaxValue.Content = "?!?";
-                    LabelPhysMinValue.Content = "?!?";
-                    LabelPhysValue.Content = "?!?";
+                    case ScsFeetechServoConfig scsFeetechServoConfig:
+                        maxPhysValue = ScsFeetechServoConfig.MaxValConst;
+                        defaultValue = scsFeetechServoConfig.DefaultValue;
+                        break;
 
-                    SliderServoLimitPosition.Visibility = Visibility.Collapsed;
-                    LabelLimitMaxValue.Content = "?!?";
-                    LabelLimitMinValue.Content = "?!?";
-                    LabelLimitValue.Content = "?!?";
+                    case StsFeetechServoConfigServoMode stsFeetechServoConfig:
+                        maxPhysValue = StsFeetechServoConfigServoMode.MaxValueConst;
+                        defaultValue = stsFeetechServoConfig.DefaultValue;
+                        break;
 
-                    return;
+                    case StsFeetechServoWheelModeConfig stsFeetechServoWheelModeConfig:
+                        maxPhysValue = StsFeetechServoWheelModeConfig.MaxSpeedConst;
+                        minPhysValue = StsFeetechServoWheelModeConfig.MinSpeedConst;
+                        defaultValue = stsFeetechServoWheelModeConfig.DefaultValue;
+                        break;
+
+                    case Pca9685PwmServoConfig pca9685PwmServoConfig:
+                        maxPhysValue = Pca9685PwmServoConfig.MaxValConst;
+                        defaultValue = pca9685PwmServoConfig.DefaultValue;
+                        break;
+
+                    default:
+                        MessageBox.Show("Servo config is not a FeetechBusServoConfig or Pca9685PwmServoConfig.");
+                        // hide the sliders if the servo config is not a supported type
+                        SliderServoPhysPosition.Visibility = Visibility.Collapsed;
+                        LabelPhysMaxValue.Content = "?!?";
+                        LabelPhysMinValue.Content = "?!?";
+                        LabelPhysValue.Content = "?!?";
+
+                        SliderServoLimitPosition.Visibility = Visibility.Collapsed;
+                        LabelLimitMaxValue.Content = "?!?";
+                        LabelLimitMinValue.Content = "?!?";
+                        LabelLimitValue.Content = "?!?";
+                        return;
                 }
 
                 // show the sliders if the servo config is a supported type
@@ -168,20 +175,32 @@ namespace AwbStudio.ProjectConfiguration.PropertyEditors
             _maxProjectLimitValue = 0;
             _minProjectLimitValue = 0;
 
-            if (_servoConfig is ScsFeetechServoConfig scsFeetechServoConfig)
+            switch (_servoConfig)
             {
-                _minProjectLimitValue = scsFeetechServoConfig.MinValue;
-                _maxProjectLimitValue = scsFeetechServoConfig.MaxValue;
-            }
-            else if (_servoConfig is StsFeetechServoConfigServoMode stsFeetechServoConfig)
-            {
-                _minProjectLimitValue = stsFeetechServoConfig.MinValue;
-                _maxProjectLimitValue = stsFeetechServoConfig.MaxValue;
-            }
-            else if (_servoConfig is Pca9685PwmServoConfig pca9685PwmServoConfig)
-            {
-                _minProjectLimitValue = pca9685PwmServoConfig.MinValue;
-                _maxProjectLimitValue = pca9685PwmServoConfig.MaxValue;
+                case ScsFeetechServoConfig scsFeetechServoConfig:
+                    _minProjectLimitValue = scsFeetechServoConfig.MinValue;
+                    _maxProjectLimitValue = scsFeetechServoConfig.MaxValue;
+                    break;
+                case StsFeetechServoConfigServoMode stsFeetechServoConfig:
+                    _minProjectLimitValue = stsFeetechServoConfig.MinValue;
+                    _maxProjectLimitValue = stsFeetechServoConfig.MaxValue;
+                    break;
+                case StsFeetechServoWheelModeConfig stsFeetechServoWheelModeConfig:
+                    _minProjectLimitValue = stsFeetechServoWheelModeConfig.MinValue;
+                    _maxProjectLimitValue = stsFeetechServoWheelModeConfig.MaxValue;
+                    break;
+                case Pca9685PwmServoConfig pca9685PwmServoConfig:
+                    _minProjectLimitValue = pca9685PwmServoConfig.MinValue;
+                    _maxProjectLimitValue = pca9685PwmServoConfig.MaxValue;
+                    break;
+                default:
+                    MessageBox.Show("Servo config is not a FeetechBusServoConfig or Pca9685PwmServoConfig.");
+                    // hide the sliders if the servo config is not a supported type
+                    SliderServoLimitPosition.Visibility = Visibility.Collapsed;
+                    LabelLimitMaxValue.Content = "?!?";
+                    LabelLimitMinValue.Content = "?!?";
+                    LabelLimitValue.Content = "?!?";
+                    return;
             }
 
             if (_minProjectLimitValue > _maxProjectLimitValue) // swap the values if they are in the wrong order
