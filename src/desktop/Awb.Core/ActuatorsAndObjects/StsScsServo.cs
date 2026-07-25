@@ -114,7 +114,7 @@ namespace Awb.Core.Actuators
 
         public bool IsControllerTuneable => true;
 
-        public StsScsServo(FeetechBusServoConfig config)
+        public StsScsServo(FeetechBusServoServoModeConfig config)
         {
             // find out the StsScsType by the config type using the switch expression
             StsScsTypes type = config switch

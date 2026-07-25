@@ -12,7 +12,7 @@ using System.Text.Json.Serialization;
 
 namespace Awb.Core.Project.Servos
 {
-    public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig, ISupportsRelaxRanges
+    public abstract class FeetechBusServoConfig : IDeviceConfig, IProjectObjectListable, IServoConfig
     {
         public required string Id { get; set; }
 
@@ -34,22 +34,6 @@ namespace Awb.Core.Project.Servos
         [Description("If this servo is in fault state (e.g.  overheat, overtorque, etc.) should all actuators be deactivated or only this one?")]
         public bool GlobalFault { get; set; }
 
-
-        /// <summary>
-        /// The companion property for the RelaxRangesAsString property.
-        /// Needed for json serialization.
-        /// </summary>
-        public ServoRelaxRange[] RelaxRanges { get; set; } = Array.Empty<ServoRelaxRange>();
-
-       // [Display(Name = "Relax-range", GroupName = "Values", Order = 1)]
-      //  [Description("When the servo is some seconds unchanged and inside this ranges, the servo power will turned off.\r\nFormat:2000-2200\r\nUse commas to list multiple ranges.")]
-      //  [RegularExpression(@"(\d{1,4}[-]\d{1,4},?)*")]
-        [JsonIgnore]
-        public string? RelaxRangesAsString
-        {
-            get => ServoRelaxRange.ToString(RelaxRanges);
-            set => RelaxRanges = ServoRelaxRange.FromString(value);
-        }
 
         [Display(Name = "Max Temperature", GroupName = "Values", Order = 2)]
         [Description("If the servo temperature is above this value, the servo will be deactivated.")]
@@ -76,36 +60,9 @@ namespace Awb.Core.Project.Servos
         [SupportsTakeOverTheCurrentServoValue]
         public abstract int? DefaultValue { get; set; }
 
-        [Display(Name = "Speed value", GroupName = "Values", Order = 7)]
-        public abstract int? Speed { get; set; }
-
         public abstract IEnumerable<ProjectProblem> GetContentProblems(AwbProject project);
 
-        protected IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project)
-        {
-            // check if the default value is between the min and max value
-            if (DefaultValue < Math.Min(MinValue, MaxValue) || DefaultValue > Math.Max(MinValue, MaxValue))
-                yield return new ProjectProblem
-                {
-                    ProblemType = ProjectProblem.ProblemTypes.Error,
-                    Message = $"The default value '{DefaultValue}' is not between the lowest value '{MinValue}' and the highest value '{MaxValue}' for servo '{TitleShort}'",
-                    Source = TitleDetailed,
-                };
-
-            // check if the relax ranges are valid
-            foreach (var relaxRange in RelaxRanges)
-            {
-                if (relaxRange.MinValue > relaxRange.MaxValue)
-                    yield return new ProjectProblem
-                    {
-                        ProblemType = ProjectProblem.ProblemTypes.Error,
-                        Message = $"The relax range '{relaxRange}' first value is lower than second value for servo '{TitleShort}'",
-                        Source = TitleDetailed,
-                    };
-            }
-
-            yield break;
-        }
+        protected abstract IEnumerable<ProjectProblem> GetBaseProblems(AwbProject project);
 
         [JsonIgnore]
         public string TitleShort => String.IsNullOrWhiteSpace(Title) ? $"StsServo has no title set '{Id}'" : Title;
