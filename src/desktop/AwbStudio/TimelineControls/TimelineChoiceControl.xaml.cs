@@ -65,7 +65,7 @@ namespace AwbStudio.TimelineControls
                 foreach (var timelineMetaData in timelines.OrderBy(t => t.TimelineStateId).ThenBy(t => t.Title))
                 {
                     var stateName = timelineMetaData.TimelineStateId; // todo: get state name from the project  states instead
-                    var button = new Button { Content = $"[{stateName}] {timelineMetaData.Title}", Tag = timelineMetaData.Id };
+                    var button = new Button { Content = $"[{stateName}] {timelineMetaData.Title}", Tag = timelineMetaData.Id , HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left};
                     button.Click += (s, e) => { OnTimelineChosen?.Invoke(this, new TimelineNameChosenEventArgs(timelineId: timelineMetaData.Id)); };
                     this.PanelNames.Children.Add(button);
                 }
