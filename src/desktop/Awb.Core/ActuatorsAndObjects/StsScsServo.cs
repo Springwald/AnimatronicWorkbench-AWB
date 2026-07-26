@@ -130,6 +130,7 @@ namespace Awb.Core.Actuators
             {
                 StsFeetechServoConfigServoMode stsConfig => stsConfig.Speed ?? -1,
                 StsFeetechServoWheelModeConfig wheelModeConfig => -1,
+                ScsFeetechServoConfig scsConfig => scsConfig.Speed ?? -1,
                 _ => throw new ArgumentException("Unhandled servo config type" + config.GetType().Name)
             };
 
@@ -137,6 +138,7 @@ namespace Awb.Core.Actuators
             {
                 StsFeetechServoConfigServoMode stsConfig => stsConfig.Acceleration ?? -1,
                 StsFeetechServoWheelModeConfig wheelModeConfig => wheelModeConfig.Acceleration ?? -1,
+                ScsFeetechServoConfig stsConfig => -1, // Scs servos do not support acceleration
                 _ => throw new ArgumentException("Unhandled servo config type" + config.GetType().Name)
             };
 

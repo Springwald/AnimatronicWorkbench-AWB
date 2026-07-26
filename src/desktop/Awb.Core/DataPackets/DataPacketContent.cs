@@ -21,6 +21,7 @@ namespace Awb.Core.DataPackets
         public Pca9685PwmServosPacketData? Pca9685PwmServos { get; set; }
         [JsonPropertyName("STS")]
         public StsServosPacketData? StsServos { get; set; }
+
         [JsonPropertyName("SCS")]
         public StsServosPacketData? ScsServos { get; set; }
     }

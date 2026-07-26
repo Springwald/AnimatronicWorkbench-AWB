@@ -86,7 +86,7 @@ namespace Awb.Core.DataPackets
                                              WheelMode = true,
                                              TargetValue = absolutePos,
                                              Name = string.IsNullOrWhiteSpace(stsFeetechServoConfigWheelMode.Title) ? $"STSWHEEL{stsFeetechServoConfigWheelMode.Channel}" : stsFeetechServoConfigWheelMode.Title,
-                                             Speed = 0, // will be sent al TargetValue, because wheel mode is used
+                                             Speed = absolutePos, // speed is not needed here. It will be sent as TargetValue, because wheel mode is used
                                              Acc = stsFeetechServoConfigWheelMode.Acceleration.HasValue ? stsFeetechServoConfigWheelMode.Acceleration.Value : 0,
                                          }
                                     }
@@ -151,6 +151,15 @@ namespace Awb.Core.DataPackets
                 var stsServos = this.GetStsScsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Sts, collectAffectedAcctuatorsToUnsetDirty);
                 var scsServos = this.GetStsScsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.Scs, collectAffectedAcctuatorsToUnsetDirty);
                 var pwmServos = this.GetPwmServoChanges(servosByClient.Servos, collectAffectedAcctuatorsToUnsetDirty);
+
+                // mix sts and wheel mode servos together, because they are both STS servos, but with different modes. The client will handle them accordingly.
+                var stsWheelModeServos = this.GetStsScsServoChanges(servosByClient.Servos, servoType: StsScsServo.StsScsTypes.StsWheelMode, collectAffectedAcctuatorsToUnsetDirty);
+                if (stsWheelModeServos != null)
+                {
+                    if (stsServos == null)
+                        stsServos = new StsServosPacketData { Servos = [] };
+                    stsServos.Servos = stsServos.Servos!.Concat(stsWheelModeServos.Servos!).ToArray();
+                }
 
                 if (stsServos != null || pwmServos != null || scsServos != null)
                 {

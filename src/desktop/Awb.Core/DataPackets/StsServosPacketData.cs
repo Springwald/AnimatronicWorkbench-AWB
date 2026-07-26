@@ -12,6 +12,6 @@ namespace Awb.Core.DataPackets
     public class StsServosPacketData
     {
         [JsonPropertyName("Servos")]
-        public StsServoPacketData[]? Servos { get; set; }
+        public required StsServoPacketData[] Servos { get; set; }
     }
 }

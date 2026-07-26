@@ -115,7 +115,7 @@ namespace Awb.Core.Export.ExporterParts.Servos
                     exportModel = new ServoExportModel
                     {
                         Id = stsServoWheelMode.Id,
-                        ServoExportType = ServoExportModel.ServoExportTypes.STSWHEEL_SERVO,
+                        ServoExportType = ServoExportModel.ServoExportTypes.STS_SERVO,
                         Title = stsServoWheelMode.Title,
                         DefaultValue = stsServoWheelMode.DefaultValue ?? stsServoWheelMode.MinValue + (stsServoWheelMode.MaxValue - stsServoWheelMode.MinValue) / 2,
                         I2cAdress = 0, // STS servos have no I2C address
